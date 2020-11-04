@@ -1,4 +1,4 @@
-from kentik_fluent_api import kentik_api_client
+from kentik_api_client import kentik_api_client
 from python_http_client import Client
 
 
