@@ -1,0 +1,34 @@
+name: kentik-fluent-api
+
+# Run this workflow all on pushes to master
+on:
+  push:
+    paths: 'kentik_fluent_api/**'
+    branches: [ main, add_ci ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Static Analysis of the SDK and its code
+  # Stuff like linters, etc.
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v2
+      - name: Python Pylint
+        uses: fylein/python-pylint-github-action@v4
+        with:
+          args: pylint --version && pip3 install -r kentik_fluent_api/requirements.txt && pylint --rcfile=kentik_fluent_api/.pylintrc kentik_fluent_api
+  
+  dynamic-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v2
+      - name: Python Pytest
+        uses: fylein/python-pytest-github-action@v2
+        with:
+          args: pip3 install -r kentik_fluent_api/requirements.txt && pytest kentik_fluent_api/unit_tests
