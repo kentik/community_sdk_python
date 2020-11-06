@@ -4,7 +4,7 @@ name: kentik-fluent-api
 on:
   push:
     paths: 'kentik_fluent_api/**'
-    branches: [ main, add_ci ]
+    branches: [ main, ]
   pull_request:
     branches: [ main ]
 
@@ -20,7 +20,7 @@ jobs:
       - name: Python Pylint
         uses: fylein/python-pylint-github-action@v4
         with:
-          args: pylint --version && pip3 install -r kentik_fluent_api/requirements.txt && pylint --rcfile=kentik_fluent_api/.pylintrc kentik_fluent_api
+          args: pip3 install -r kentik_fluent_api/requirements.txt && pylint --rcfile=kentik_fluent_api/.pylintrc kentik_fluent_api
   
   dynamic-analysis:
     runs-on: ubuntu-latest
