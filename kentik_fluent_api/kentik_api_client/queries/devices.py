@@ -1,4 +1,4 @@
-from query_annotations import get, post, put, delete, data
+from query_decorators import get, post, put, delete, payload_type
 from query import Query
 
 
@@ -16,14 +16,14 @@ def get_device_info(device_id: int) -> Query:
 
 
 @post
-@data
+@payload_type(dict)
 def create_device() -> Query:
     """Creates and returns a device object containing information about an individual device"""
     return Query("/device")
 
 
 @put
-@data
+@payload_type(dict)
 def update_device(device_id: int) -> Query:
     """Updates and returns a device object containing information about an individual device"""
     url_path = f"/device/{device_id}"
@@ -38,7 +38,7 @@ def delete_device(device_id: int) -> Query:
 
 
 @put
-@data
+@payload_type(dict)
 def apply_device_labels(device_id: int) -> Query:
     """Removes all existing labels from the device and applies the device labels (see About Device Labels) specified
      by id. Returns a reduced version of device object containing an array of the applied labels."""
@@ -61,7 +61,7 @@ def get_device_interface_info(device_id: int, interface_id: int) -> Query:
 
 
 @post
-@data
+@payload_type(dict)
 def create_interface(device_id: int) -> Query:
     """Creates and returns an interface object containing information about an individual interface
      for a given device."""
@@ -70,7 +70,7 @@ def create_interface(device_id: int) -> Query:
 
 
 @put
-@data
+@payload_type(dict)
 def update_interface(device_id: int, interface_id: int) -> Query:
     """Updates and returns an interface object containing information about an individual interface
      from a specified device."""
