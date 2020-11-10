@@ -1,4 +1,4 @@
-from kentik_fluent_api.kentik_api_client import get_kentik_com_client
+from kentik_api_library.src import get_kentik_com_client
 import json
 
 client = get_kentik_com_client("<AUTH E-MAIL>", "<AUTH API TOKEN>")
