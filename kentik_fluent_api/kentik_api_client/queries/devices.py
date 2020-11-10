@@ -1,67 +1,84 @@
 from query_annotations import get, post, put, delete, data
+from query import Query
 
 
 @get
-def get_devices(self):
+def get_devices() -> Query:
     """Returns an array of device objects that each contain information about an individual device."""
-    pass
+    return Query("/devices")
+
 
 @get
-def get_device_info(self, device_id: int):
+def get_device_info(device_id: int) -> Query:
     """Returns a device object containing information about an individual device"""
-    pass
+    url_path = f"/device/{device_id}"
+    return Query(url_path)
+
 
 @post
 @data
-def create_device(self):
+def create_device() -> Query:
     """Creates and returns a device object containing information about an individual device"""
-    pass
+    return Query("/device")
+
 
 @put
 @data
-def update_device(self, device_id: int):
+def update_device(device_id: int) -> Query:
     """Updates and returns a device object containing information about an individual device"""
-    pass
+    url_path = f"/device/{device_id}"
+    return Query(url_path)
+
+
+@delete
+def delete_device(device_id: int) -> Query:
+    """Deletes a device."""
+    url_path = f"/device/{device_id}"
+    return Query(url_path)
+
 
 @put
 @data
-def apply_device_labels(self, device_id: int):
+def apply_device_labels(device_id: int) -> Query:
     """Removes all existing labels from the device and applies the device labels (see About Device Labels) specified
      by id. Returns a reduced version of device object containing an array of the applied labels."""
-    pass
+    url_path = f"/devices/{device_id}/labels"
+    return Query(url_path)
 
-@delete
-def delete_device(self, device_id: int):
-    """Deletes a device."""
-    pass
 
 @get
-def get_device_interfaces(self, interface_id: int):
+def get_device_interfaces(device_id: int) -> Query:
     """Returns an array of interface objects that each contain information about an interface
      from a specified device."""
-    pass
+    url_path = f"/devices/{device_id}/interfaces"
+    return Query(url_path)
+
 
 @get
-def get_device_interface_info(self, interface_id: int):
+def get_device_interface_info(device_id: int, interface_id: int) -> Query:
     """Returns a interface object containing information about an individual interface from a given device."""
-    pass
+    url_path = f"/device/{device_id}/interface/{interface_id}"
+
 
 @post
 @data
-def create_interface(self, device_id: int):
+def create_interface(device_id: int) -> Query:
     """Creates and returns an interface object containing information about an individual interface
      for a given device."""
-    pass
+    url_path = f"/device/{device_id}/interface"
+    return Query(url_path)
+
 
 @put
 @data
-def update_interface(self, device_id: int):
+def update_interface(device_id: int, interface_id: int) -> Query:
     """Updates and returns an interface object containing information about an individual interface
      from a specified device."""
-    pass
+    url_path = f"/device/{device_id}/interface/{interface_id}"
+    return Query(url_path)
 
 
 @delete
-def delete_interfaces(self, device_id: int):
+def delete_interfaces(device_id: int, interface_id: int) -> Query:
     """Deletes an interface from a given device."""
-    pass
+    url_path = f"/device/{{device_id}}/interface/{{interface_id}}"
