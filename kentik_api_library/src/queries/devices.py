@@ -1,5 +1,5 @@
-from query_decorators import get, post, put, delete, payload_type
-from query import Query
+from .query_decorators import get, post, put, delete, payload_type
+from .query import Query
 
 
 @get
@@ -58,6 +58,7 @@ def get_device_interfaces(device_id: int) -> Query:
 def get_device_interface_info(device_id: int, interface_id: int) -> Query:
     """Returns a interface object containing information about an individual interface from a given device."""
     url_path = f"/device/{device_id}/interface/{interface_id}"
+    return Query(url_path)
 
 
 @post
