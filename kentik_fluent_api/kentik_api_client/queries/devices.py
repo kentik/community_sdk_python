@@ -81,4 +81,5 @@ def update_interface(device_id: int, interface_id: int) -> Query:
 @delete
 def delete_interfaces(device_id: int, interface_id: int) -> Query:
     """Deletes an interface from a given device."""
-    url_path = f"/device/{{device_id}}/interface/{{interface_id}}"
+    url_path = f"/device/{device_id}/interface/{interface_id}"
+    return Query(url_path)

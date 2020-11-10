@@ -38,7 +38,7 @@ def delete(func):
     return add_delete
 
 
-def payload_type(_type):
+def payload_type(_type: type):
     def actual_decorator(func):
         @wraps(func)
         def add_payload_type(*args, **kwargs):
