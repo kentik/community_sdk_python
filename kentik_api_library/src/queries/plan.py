@@ -1,4 +1,5 @@
-from .query_decorators import get, post, put, delete, payload_type
+# Local application imports
+from .query_decorators import get
 from .query import Query
 
 @get
