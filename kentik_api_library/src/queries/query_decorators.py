@@ -2,7 +2,7 @@
 from functools import wraps
 
 # Local application imports
-from .query import QueryType
+from queries.query import QueryType
 
 
 def get(func):

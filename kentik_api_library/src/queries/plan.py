@@ -1,6 +1,6 @@
 # Local application imports
-from .query_decorators import get
-from .query import Query
+from queries.query_decorators import get
+from queries.query import Query
 
 @get
 def get_plans() -> Query:

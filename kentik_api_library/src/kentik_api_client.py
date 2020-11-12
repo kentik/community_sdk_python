@@ -2,7 +2,7 @@
 from typing import Optional
 
 # Local application imports
-from .queries.query import Query
+from queries.query import Query
 
 
 class KentikAPIClient:

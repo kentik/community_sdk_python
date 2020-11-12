@@ -1,5 +1,5 @@
-from .query_decorators import get, post, put, delete, payload_type
-from .query import Query
+from queries.query_decorators import get, post, put, delete, payload_type
+from queries.query import Query
 
 
 @get
