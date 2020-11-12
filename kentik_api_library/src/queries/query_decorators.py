@@ -1,5 +1,5 @@
 from functools import wraps
-from src.queries.query import QueryType
+from .query import QueryType
 
 
 def get(func):
