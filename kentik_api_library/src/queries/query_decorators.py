@@ -1,4 +1,7 @@
+# Standard library imports
 from functools import wraps
+
+# Local application imports
 from .query import QueryType
 
 
