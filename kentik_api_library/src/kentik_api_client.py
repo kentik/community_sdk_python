@@ -1,5 +1,5 @@
 from typing import Optional
-from queries.query import Query
+from .queries.query import Query
 
 
 class KentikAPIClient:
