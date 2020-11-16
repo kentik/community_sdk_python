@@ -3,8 +3,8 @@ name: kentik-fluent-api
 # Run this workflow all on pushes to master
 on:
   push:
-    paths: 'kentik_fluent_api/**'
-    branches: [ main, ]
+    paths: 'kentik_api_library/**'
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
