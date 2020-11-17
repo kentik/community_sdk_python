@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 
 # Local application imports
-from auth import auth
+from auth.auth import KentikAuth
 from api_calls.api_call import APICall
 from api_calls.api_call import APICallMethods
 
@@ -15,7 +15,7 @@ class KentikAPIClient:
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str):
         self._api_url = api_url
-        self._auth = auth.KentikAuth(auth_email, auth_token)
+        self._auth = KentikAuth(auth_email, auth_token)
 
     def send_query(self, query: APICall, payload: Optional[type] = None):
 
