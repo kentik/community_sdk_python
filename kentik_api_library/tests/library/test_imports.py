@@ -6,7 +6,8 @@ def test_kentik_api_clinet_import():
     # When
     try:
         import kentik_api_library
-        kentik_api_library_found = True
     except ImportError:
         pass
-    assert kentik_api_library_found == True
+    else:
+        kentik_api_library_found = True
+    assert kentik_api_library_found
