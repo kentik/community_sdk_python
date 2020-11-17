@@ -20,7 +20,7 @@ jobs:
       - name: Python Pylint
         uses: fylein/python-pylint-github-action@v4
         with:
-          args: pip3 install -r kentik_fluent_api/requirements.txt && pylint --rcfile=kentik_fluent_api/.pylintrc kentik_fluent_api
+          args: pip3 install -r kentik_api_library/requirements.txt && pylint --rcfile=kentik_api_library/.pylintrc kentik_fluent_api
   
   dynamic-analysis:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
       - name: Python Pytest
         uses: fylein/python-pytest-github-action@v2
         with:
-          args: pip3 install -r kentik_fluent_api/requirements.txt && pytest kentik_fluent_api/unit_tests
+          args: pip3 install -r kentik_api_library/requirements.txt && pytest kentik_api_library/unit_tests
 
   build:
     runs-on: ubuntu-latest
