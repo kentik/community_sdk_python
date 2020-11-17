@@ -54,14 +54,13 @@ jobs:
       - name: Archive code
         uses: actions/upload-artifact@v2
         with:
-          name: source.python-${{ matrix.python-version }}.tar.gz
           path: kentik_api_library/dist/*.gz
           retention-days: 5
       - name: Archive package
         uses: actions/upload-artifact@v2
         with:
-          name: package.python-${{ matrix.python-version }}.whl
-          path: kentik_api_library/dist/*.whl
+          name: artifacts.python${{ matrix.python-version }}
+          path: kentik_api_library/dist/
           retention-days: 5
 
   test-package:
@@ -79,12 +78,11 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package.python-${{ matrix.python-version }}.whl
-          path: package.zip
-          #      - name: Install lib from package
-          #        run: |
-          #          ls -l
-          #          unzip package.zip
-          #          ls -l
-          #          pip install package.whl
+          name: artifacts.python${{ matrix.python-version }}
+          path: artifacts
+      - name: Install lib from package
+        run: |
+          ls -l
+          ls -l artifacts
+          pip install artifacts/*.whl
 
