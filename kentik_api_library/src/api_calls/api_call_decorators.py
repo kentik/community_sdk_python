@@ -2,14 +2,14 @@
 from functools import wraps
 
 # Local application imports
-from queries.query import QueryType
+from api_calls.api_call import APICallMethods
 
 
 def get(func):
     @wraps(func)
     def add_get(*args, **kwargs):
         query = func(*args, **kwargs)
-        query.method = QueryType.GET
+        query.method = APICallMethods.GET
         return query
     return add_get
 
@@ -18,7 +18,7 @@ def post(func):
     @wraps(func)
     def add_post(*args, **kwargs):
         query = func(*args, **kwargs)
-        query.method = QueryType.POST
+        query.method = APICallMethods.POST
         return query
     return add_post
 
@@ -27,7 +27,7 @@ def put(func):
     @wraps(func)
     def add_put(*args, **kwargs):
         query = func(*args, **kwargs)
-        query.method = QueryType.PUT
+        query.method = APICallMethods.PUT
         return query
     return add_put
 
@@ -36,7 +36,7 @@ def delete(func):
     @wraps(func)
     def add_delete(*args, **kwargs):
         query = func(*args, **kwargs)
-        query.method = QueryType.DELETE
+        query.method = APICallMethods.DELETE
         return query
     return add_delete
 
@@ -51,6 +51,3 @@ def payload_type(_type: type):
         return add_payload_type
     return actual_decorator
 
-
-def query(tmp):
-    return tmp
