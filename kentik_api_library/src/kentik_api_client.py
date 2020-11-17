@@ -1,21 +1,36 @@
 # Standard library imports
 from typing import Optional
 
+# Third party imports
+import requests
+
 # Local application imports
+from auth import auth
 from queries.query import Query
+from queries.query import QueryType
 
 
 class KentikAPIClient:
-    def __init__(self, auth_email: str, auth_token: str):
-        pass
+    DEFAULT_HEADERS = {"Content-Type": "application/json"}
 
-    def send_call(self, query: Query, payload: Optional[type]):
-        pass
+    def __init__(self, api_url: str, auth_email: str, auth_token: str):
+        self._api_url = api_url
+        self._auth = auth.KentikAuth(auth_email, auth_token)
 
-    @staticmethod
-    def get_synchronous_client():
-        pass
+    def send_query(self, query: Query, payload: Optional[type] = None):
 
-    @staticmethod
-    def get_asynchronous_client(self):
-        pass
+        _payload: Optional[dict] = payload if isinstance(payload, dict) else None
+        url = self._get_api_query_url(query.url_path)
+        if query.method == QueryType.GET:
+            return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload)
+        if query.method == QueryType.POST:
+            return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+        if query.method == QueryType.PUT:
+            return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+        if query.method == QueryType.DELETE:
+            return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+
+    def _get_api_query_url(self, api_method: str):
+        return self._api_url + api_method
+
+
