@@ -32,4 +32,3 @@ class KentikAPIClient:
 
     def _get_api_query_url(self, api_method: str):
         return self._api_url + api_method
-

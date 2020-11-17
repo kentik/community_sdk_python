@@ -1,5 +1,5 @@
 # Local application imports
-from api_calls.api_call_decorators import get, post, put, delete, payload_type
+from api_calls.api_call_decorators import post, payload_type
 from api_calls.api_call import APICall
 
 @post
