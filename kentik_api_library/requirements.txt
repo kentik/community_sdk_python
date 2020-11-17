@@ -24,3 +24,4 @@ typing-extensions==3.7.4.3
 wheel==0.35.1
 urllib3==1.26.2
 wrapt==1.12.1
+pytest-pylint==0.18.0

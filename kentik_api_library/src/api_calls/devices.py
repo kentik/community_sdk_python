@@ -5,13 +5,15 @@ from api_calls.api_call import APICall
 
 @get
 def get_devices() -> APICall:
-    """Returns an array of device objects that each contain information about an individual device."""
+    """Returns an array of device objects that each
+    contain information about an individual device."""
     return APICall("/devices")
 
 
 @get
 def get_device_info(device_id: int) -> APICall:
-    """Returns a device object containing information about an individual device"""
+    """Returns a device object containing
+    information about an individual device"""
     url_path = f"/device/{device_id}"
     return APICall(url_path)
 
@@ -19,7 +21,8 @@ def get_device_info(device_id: int) -> APICall:
 @post
 @payload_type(dict)
 def create_device() -> APICall:
-    """Creates and returns a device object containing information about an individual device"""
+    """Creates and returns a device object
+    containing information about an individual device"""
     return APICall("/device")
 
 
@@ -41,8 +44,10 @@ def delete_device(device_id: int) -> APICall:
 @put
 @payload_type(dict)
 def apply_device_labels(device_id: int) -> APICall:
-    """Removes all existing labels from the device and applies the device labels (see About Device Labels) specified
-     by id. Returns a reduced version of device object containing an array of the applied labels."""
+    """Removes all existing labels from the device and
+    applies the device labels (see About Device Labels) specified
+    by id. Returns a reduced version of device object
+    containing an array of the applied labels."""
     url_path = f"/devices/{device_id}/labels"
     return APICall(url_path)
 
@@ -57,7 +62,8 @@ def get_device_interfaces(device_id: int) -> APICall:
 
 @get
 def get_device_interface_info(device_id: int, interface_id: int) -> APICall:
-    """Returns a interface object containing information about an individual interface from a given device."""
+    """Returns a interface object containing information
+    about an individual interface from a given device."""
     url_path = f"/device/{device_id}/interface/{interface_id}"
     return APICall(url_path)
 

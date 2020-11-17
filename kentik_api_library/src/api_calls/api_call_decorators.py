@@ -50,4 +50,3 @@ def payload_type(_type: type):
             return query
         return add_payload_type
     return actual_decorator
-
