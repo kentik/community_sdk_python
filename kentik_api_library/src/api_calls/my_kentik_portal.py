@@ -1,5 +1,5 @@
 # Local application imports
-from api_calls.api_call_decorators import get, post, put, delete, payload_type
+from api_calls.api_call_decorators import get, post, delete, payload_type
 from api_calls.api_call import APICall
 
 
@@ -18,7 +18,7 @@ def get_tenant_info(tenant_id: int) -> APICall:
 @payload_type(dict)
 def create_tenant_user(tenant_id: int) -> APICall:
     """Creates and returns a tenant user object containing information about an individual tenant user"""
-    return APICall("/mykentik/tenant/{tenant_id}/user")
+    return APICall(f"/mykentik/tenant/{tenant_id}/user")
 
 @delete
 def delete_tenant_user(tenant_id: int, user_id: int) -> APICall:
