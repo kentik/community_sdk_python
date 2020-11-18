@@ -25,3 +25,4 @@ wheel==0.35.1
 urllib3==1.26.2
 wrapt==1.12.1
 pytest-pylint==0.18.0
+mypy==0.790

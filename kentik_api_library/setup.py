@@ -45,6 +45,37 @@ class PylintCommand(distutils.cmd.Command):
         except subprocess.CalledProcessError:
             pass
 
+class MypyCmd(distutils.cmd.Command):
+    """Custom command to run Mypy"""
+
+    description = 'run Mypy on src directory'    
+    user_options = [
+        ('package=', None, 'Path to run mypy (default src)')
+    ]
+
+    def initialize_options(self):
+        """Set default values for option package (default src)"""
+        self.package = 'src'
+    
+    def finalize_options(self):
+        """Post-process options."""
+        if self.package:
+            assert os.path.exists(self.package), (
+                'Path {} does not exist.'.format(self.package))
+
+    def run(self):
+        """Run command"""
+        cmd = ['mypy']
+        if self.package:
+            cmd.append('-p{}'.format(self.package))
+        self.announce(
+            'Run command: {}'.format(str(cmd)),
+            level=distutils.log.INFO)
+        try:
+            subprocess.check_call(cmd)
+        except subprocess.CalledProcessError:
+            pass
+
 
 setup(
     name="kentik-api",
@@ -59,5 +90,6 @@ setup(
     tests_require=['pytest', 'pylint'],
     cmdclass={
         'pylint': PylintCommand,
+        'mypy' : MypyCmd
     },
 )
