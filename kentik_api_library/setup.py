@@ -55,7 +55,7 @@ setup(
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     include_package_data=True,
     install_requires=['python-http-client==3.3.1'],
-    setup_requires=['pytest-runner', 'pylint-runner'],
+    setup_requires=['pytest-runner', 'pylint-runner', 'wheel'],
     tests_require=['pytest', 'pylint'],
     cmdclass={
         'pylint': PylintCommand,
