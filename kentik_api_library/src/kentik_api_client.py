@@ -24,9 +24,9 @@ class KentikAPIClient:
         if api_call.method == APICallMethods.GET:
             return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload)
         if api_call.method == APICallMethods.POST:
-            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
         if api_call.method == APICallMethods.PUT:
-            return requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+            return requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
         if api_call.method == APICallMethods.DELETE:
             return requests.delete(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
         raise ValueError("Improper API call method")
