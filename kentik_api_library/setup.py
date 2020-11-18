@@ -13,10 +13,10 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 
-class PylintCommand(distutils.cmd.Command):
-    """A custom command to run Pylint on all Python source files."""
+class PylintCmd(distutils.cmd.Command):
+    """Custom command to run Pylint"""
 
-    description = 'run Pylint on Python source files'
+    description = 'run Pylint on src, tests and examples dir'
     user_options = [
         ('pylint-rcfile=', None, 'path to Pylint config file'),
     ]
@@ -29,19 +29,21 @@ class PylintCommand(distutils.cmd.Command):
         """Post-process options."""
         if self.pylint_rcfile:
             assert os.path.exists(self.pylint_rcfile), (
-                'Pylint config file %s does not exist.' % self.pylint_rcfile)
+                'Pylint config file {} does not exist.'.format(self.pylint_rcfile))
 
     def run(self):
         """Run command."""
-        command = ['pylint']
+        cmd = ['pylint']
+        paths = ['./src', './tests', './examples']
         if self.pylint_rcfile:
-            command.append('--rcfile=%s' % self.pylint_rcfile)
-        command.append(os.getcwd())
+            cmd.append('--rcfile={}'.format(self.pylint_rcfile))
+        for path in paths:
+            cmd.append(path)
         self.announce(
-            'Running command: %s' % str(command),
+            'Running command: %s' % str(cmd),
             level=distutils.log.INFO)
         try:
-            subprocess.check_call(command)
+            subprocess.check_call(cmd)
         except subprocess.CalledProcessError:
             pass
 
@@ -89,7 +91,7 @@ setup(
     setup_requires=['pytest-runner', 'pylint-runner'],
     tests_require=['pytest', 'pylint'],
     cmdclass={
-        'pylint': PylintCommand,
+        'pylint': PylintCmd,
         'mypy' : MypyCmd
     },
 )
