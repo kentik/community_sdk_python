@@ -14,14 +14,22 @@ jobs:
   # Stuff like linters, etc.
   static-analysis:
     runs-on: ubuntu-latest
-    
+    strategy: 
+      matrix:
+        python-version: [ '3.7', '3.8' ]
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v2
-      - name: Python Pylint
-        uses: fylein/python-pylint-github-action@v4
+      - name: Prepare python env
+        uses: actions/setup-python@v2
         with:
-          args: pip3 install -r kentik_api_library/requirements.txt && pylint --rcfile=kentik_api_library/.pylintrc kentik_fluent_api
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: PyLint
+        working-directory: ./kentik_api_library
+        run: |
+          pip3 install -r requirements.txt
+          python3 setup.py pylint
   
   dynamic-analysis:
     runs-on: ubuntu-latest
@@ -38,7 +46,9 @@ jobs:
           architecture: x64
       - name: PyTest
         working-directory: ./kentik_api_library
-        run: python3 setup.py pylint
+        run: |
+          pip3 install wheel
+          python3 setup.py pytest
 
   build:
     runs-on: ubuntu-latest
