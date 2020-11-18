@@ -12,7 +12,7 @@ on:
 jobs:
   # Static Analysis of the SDK and its code
   # Stuff like linters, etc.
-  static-analysis:
+  code-tests:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
@@ -25,30 +25,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - name: PyLint
+      - name: Install requirements
         working-directory: ./kentik_api_library
-        run: |
-          pip3 install -r requirements.txt
-          python3 setup.py pylint
-  
-  dynamic-analysis:
-    runs-on: ubuntu-latest
-    strategy: 
-      matrix:
-        python-version: [ '3.7', '3.8' ]
-    steps:
-      - name: (HELPER) Checkout Code
-        uses: actions/checkout@v2
-      - name: Prepare python env
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
+        run: pip3 install -r requirements.txt
       - name: PyTest
         working-directory: ./kentik_api_library
-        run: |
-          pip3 install wheel
-          python3 setup.py pytest
+        run: python3 setup.py pytest
+      - name: PyLint
+        working-directory: ./kentik_api_library
+        run: python3 setup.py pylint
 
   build:
     runs-on: ubuntu-latest
@@ -80,7 +65,7 @@ jobs:
           path: kentik_api_library/dist/
           retention-days: 5
 
-  test-package:
+  package-tests:
     runs-on: ubuntu-latest
     needs: [ build ]
     strategy: 
