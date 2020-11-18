@@ -1,5 +1,5 @@
 ---
-name: kentik-fluent-api
+name: kentik-api
 
 # Run this workflow all on pushes to master
 on:
