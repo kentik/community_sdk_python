@@ -1,4 +1,5 @@
-from python_http_client import Client
+# Third party imports
+from python_http_client import Client  # type: ignore
 
 BASE_API_COM_URL = "https://api.kentik.com/api"
 BASE_API_EU_URL = "https://api.kentik.eu/api"
