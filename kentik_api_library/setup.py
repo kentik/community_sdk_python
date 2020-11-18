@@ -53,9 +53,8 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
-    licence="GPL-3.0",
-    package_dir= {'':'src'},
     include_package_data=True,
+    install_requires=['python-http-client==3.3.1'],
     setup_requires=['pytest-runner', 'pylint-runner'],
     tests_require=['pytest', 'pylint'],
     cmdclass={

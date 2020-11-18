@@ -1,3 +1,4 @@
+---
 name: kentik-fluent-api
 
 # Run this workflow all on pushes to master
@@ -24,18 +25,24 @@ jobs:
   
   dynamic-analysis:
     runs-on: ubuntu-latest
-    
+    strategy: 
+      matrix:
+        python-version: [ '3.7', '3.8' ]
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v2
-      - name: Python Pytest
-        uses: fylein/python-pytest-github-action@v2
+      - name: Prepare python env
+        uses: actions/setup-python@v2
         with:
-          args: pip3 install -r kentik_api_library/requirements.txt && pytest kentik_api_library/unit_tests
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: PyTest
+        working-directory: ./kentik_api_library
+        run: python3 setup.py pylint
 
   build:
     runs-on: ubuntu-latest
-    strategy:
+    strategy: 
       matrix:
         python-version: [ '3.7', '3.8' ]
     steps:
@@ -66,7 +73,7 @@ jobs:
   test-package:
     runs-on: ubuntu-latest
     needs: [ build ]
-    strategy:
+    strategy: 
       matrix:
         python-version: [ '3.7', '3.8' ]
     steps:
