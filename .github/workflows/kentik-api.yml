@@ -34,6 +34,9 @@ jobs:
       - name: PyLint
         working-directory: ./kentik_api_library
         run: python3 setup.py pylint
+      - name: Mypy
+        working-directory: ./kentik_api_library
+        run: python3 setup.py mypy
 
   build:
     runs-on: ubuntu-latest
@@ -87,4 +90,3 @@ jobs:
           ls -l
           ls -l artifacts
           pip install artifacts/*.whl
-
