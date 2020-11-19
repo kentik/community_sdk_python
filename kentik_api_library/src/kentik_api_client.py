@@ -19,12 +19,17 @@ class KentikAPIClient:
 
     def send_query(self, api_call: APICall, payload: Optional[type] = None):
 
+        # print("#"*80)
+        # print(api_call.method)
+        # print("#"*80)
+
         _payload: Optional[dict] = payload if isinstance(payload, dict) else None
         url = self._get_api_query_url(api_call.url_path)
         if api_call.method == APICallMethods.GET:
             return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload)
         if api_call.method == APICallMethods.POST:
-            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
+            # print("HERE "*5)
+            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=_payload)
         if api_call.method == APICallMethods.PUT:
             return requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
         if api_call.method == APICallMethods.DELETE:
@@ -33,3 +38,4 @@ class KentikAPIClient:
 
     def _get_api_query_url(self, api_method: str):
         return self._api_url + api_method
+

@@ -1,6 +1,7 @@
 from python_http_client import Client
 import kentik_fluent_api_client
 
+
 DUMMY_API_URL = " www.dummyurl.test"
 DUMMY_EMAIL = "dummy@email"
 DUMMY_API_TOKEN = "dummy_api_tocen"

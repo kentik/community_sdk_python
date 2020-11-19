@@ -5,18 +5,24 @@ name: kentik-api
 on:
   push:
     paths: 'kentik_api_library/**'
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
+  python-versions-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - id: set-matrix
+      run: echo "::set-output name=matrix::{\"python-version\":['3.7', '3.8']}"
+
   # Static Analysis of the SDK and its code
   # Stuff like linters, etc.
   code-tests:
+    needs: python-versions-setup
     runs-on: ubuntu-latest
     strategy: 
-      matrix:
-        python-version: [ '3.7', '3.8' ]
+      matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
+
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v2
@@ -39,10 +45,10 @@ jobs:
         run: python3 setup.py mypy
 
   build:
+    needs: python-versions-setup
     runs-on: ubuntu-latest
     strategy: 
-      matrix:
-        python-version: [ '3.7', '3.8' ]
+      matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v2
@@ -64,16 +70,15 @@ jobs:
       - name: Archive package
         uses: actions/upload-artifact@v2
         with:
-          name: artifacts.python${{ matrix.python-version }}
+          name: artifacts.python${{ matrix.python-version}}
           path: kentik_api_library/dist/
           retention-days: 5
 
   package-tests:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ python-versions-setup, build ]
     strategy: 
-      matrix:
-        python-version: [ '3.7', '3.8' ]
+      matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v2

@@ -90,6 +90,8 @@ setup(
     install_requires=['python-http-client==3.3.1'],
     setup_requires=['pytest-runner', 'pylint-runner'],
     tests_require=['pytest', 'pylint'],
+    packages=['kentik_api'],
+    package_dir={'kentik_api': 'src'},
     cmdclass={
         'pylint': PylintCmd,
         'mypy' : MypyCmd
