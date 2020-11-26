@@ -1,5 +1,5 @@
 from python_http_client import Client
-import kentik_fluent_api_client
+import client as kentik_fluent_api_client
 
 
 DUMMY_API_URL = " www.dummyurl.test"

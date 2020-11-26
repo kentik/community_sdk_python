@@ -1,6 +1,6 @@
-from src.api_calls.api_call import APICall
-from src.api_calls.api_call import APICallMethods
-from src.api_calls.custom_applications import *
+from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_calls.custom_applications import *
 
 DUMMY_API_URL = "/customApplications"
 DUMMY_APP_ID = "dummy_app_id"

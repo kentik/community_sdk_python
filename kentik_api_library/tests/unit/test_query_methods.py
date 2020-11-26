@@ -1,6 +1,6 @@
-from src.api_calls.api_call import APICall
-from src.api_calls.api_call import APICallMethods
-from src.api_calls.query_methods import *
+from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_calls.query_methods import *
 
 DUMMY_API_URL = "/query"
 

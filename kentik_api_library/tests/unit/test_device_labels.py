@@ -1,6 +1,6 @@
-from src.api_calls.api_call import APICall
-from src.api_calls.api_call import APICallMethods
-from src.api_calls.device_labels import *
+from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_calls.device_labels import *
 
 DUMMY_API_URL = "/deviceLabels"
 DUMMY_DEV_ID = "dummy_dim_id"
