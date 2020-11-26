@@ -1,4 +1,4 @@
-from src.auth.auth import KentikAuth
+from kentik_api.auth.auth import KentikAuth
 
 DUMMY_EMAIL = "dummy@email"
 DUMMY_API_TOKEN = "dummy_api_tocen"

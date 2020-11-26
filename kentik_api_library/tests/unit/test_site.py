@@ -1,6 +1,6 @@
-from src.api_calls.api_call import APICall
-from src.api_calls.api_call import APICallMethods
-from src.api_calls.site import *
+from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_calls.site import *
 
 DUMMY_API_URL = "/site"
 DUMMY_SITE_ID = "dummy_dim_id"
