@@ -19,10 +19,6 @@ class API:
 
     def send_query(self, api_call: APICall, payload: Optional[type] = None):
 
-        # print("#"*80)
-        # print(api_call.method)
-        # print("#"*80)
-
         _payload: Optional[dict] = payload if isinstance(payload, dict) else None
         url = self._get_api_query_url(api_call.url_path)
         if api_call.method == APICallMethods.GET:
