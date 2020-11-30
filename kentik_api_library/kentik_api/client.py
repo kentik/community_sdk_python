@@ -5,12 +5,12 @@ from typing import Optional
 import requests
 
 # Local application imports
-from auth.auth import KentikAuth
-from api_calls.api_call import APICall
-from api_calls.api_call import APICallMethods
+from kentik_api.auth.auth import KentikAuth
+from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICallMethods
 
 
-class KentikAPIClient:
+class API:
     DEFAULT_HEADERS = {"Content-Type": "application/json"}
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str):
@@ -24,7 +24,8 @@ class KentikAPIClient:
         if api_call.method == APICallMethods.GET:
             return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload)
         if api_call.method == APICallMethods.POST:
-            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
+            # print("HERE "*5)
+            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=_payload)
         if api_call.method == APICallMethods.PUT:
             return requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
         if api_call.method == APICallMethods.DELETE:
@@ -33,3 +34,31 @@ class KentikAPIClient:
 
     def _get_api_query_url(self, api_method: str):
         return self._api_url + api_method
+
+# Third party imports
+from python_http_client import Client  # type: ignore
+
+BASE_API_COM_URL = "https://api.kentik.com/api"
+BASE_API_EU_URL = "https://api.kentik.eu/api"
+
+GLOBAL_HEADERS_TEMPLATE = {
+    "X-CH-Auth-Email": None,
+    "X-CH-Auth-API-Token": None,
+    "Content-Type": "application/json"
+}
+
+
+def get_kentik_client(base_url, auth_email, auth_api_token):
+    global_headers = GLOBAL_HEADERS_TEMPLATE
+    global_headers["X-CH-Auth-Email"] = auth_email
+    global_headers["X-CH-Auth-API-Token"] = auth_api_token
+    return Client(host=base_url, request_headers=global_headers)
+
+
+def get_kentik_com_client(auth_email, auth_api_token):
+    return get_kentik_client(BASE_API_COM_URL, auth_email, auth_api_token)
+
+
+def get_kentik_eu_client(auth_email, auth_api_token):
+    return get_kentik_client(BASE_API_EU_URL, auth_email, auth_api_token)
+

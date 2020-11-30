@@ -39,10 +39,10 @@ def delete_custom_dimension(custom_dimension_id: int) -> APICall:
 
 @post
 @payload_type(dict)
-def create_populator() -> APICall:
+def create_populator(custom_dimension_id: int) -> APICall:
     """Creates and returns a populator object containing
     information about an individual populator"""
-    return APICall("/customdimension/{custom_dimension_id}/populator")
+    return APICall(f"/customdimension/{custom_dimension_id}/populator")
 
 @put
 @payload_type(dict)

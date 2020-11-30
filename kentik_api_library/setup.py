@@ -50,14 +50,14 @@ class PylintCmd(distutils.cmd.Command):
 class MypyCmd(distutils.cmd.Command):
     """Custom command to run Mypy"""
 
-    description = 'run Mypy on src directory'    
+    description = 'run Mypy on kentik_api directory'    
     user_options = [
-        ('package=', None, 'Path to run mypy (default src)')
+        ('package=', None, 'Path to run mypy (default kentik_api)')
     ]
 
     def initialize_options(self):
-        """Set default values for option package (default src)"""
-        self.package = 'src'
+        """Set default values for option package (default kentik_api)"""
+        self.package = 'kentik_api'
     
     def finalize_options(self):
         """Post-process options."""
@@ -87,9 +87,22 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     include_package_data=True,
-    install_requires=['python-http-client==3.3.1'],
+    install_requires=[
+        'python-http-client>=3.3.1',
+        'requests>=2.25.0'
+        ],
     setup_requires=['pytest-runner', 'pylint-runner'],
     tests_require=['pytest', 'pylint'],
+    packages=[
+        'kentik_api',
+        'kentik_api.auth',
+        'kentik_api.api_calls'
+        ],
+    package_dir={
+        'kentik_api': 'kentik_api',
+        'kentik_api.auth' : 'kentik_api/auth',
+        'kentik_api.api_calls' : 'kentik_api/api_calls'
+        },
     cmdclass={
         'pylint': PylintCmd,
         'mypy' : MypyCmd

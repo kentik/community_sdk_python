@@ -19,6 +19,7 @@ def post(func):
     def add_post(*args, **kwargs):
         query = func(*args, **kwargs)
         query.method = APICallMethods.POST
+        # print(query.method)
         return query
     return add_post
 
