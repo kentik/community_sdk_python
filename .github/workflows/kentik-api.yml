@@ -4,7 +4,9 @@ name: kentik-api
 # Run this workflow all on pushes to master
 on:
   push:
-    paths: 'kentik_api_library/**'
+    paths: 
+    - 'kentik_api_library/**'
+    - '.github/workflows/kentik-api.yml'
 
 jobs:
   python-versions-setup:
@@ -94,17 +96,11 @@ jobs:
           path: artifacts
       - name: Install lib from package
         run: |
-          pwd
-          ls -l
-          ls -lR
           pip install artifacts/dist/*.whl
       - name: Show installed packages
         run: pip freeze
       - name: Check if import is possible
         run: |
-          pwd
-          ls -l
-          ls -lR
           for package in 'kentik_api' 'kentik_api.auth' 'kentik_api.api_calls'
           do
             python artifacts/tests/library/test_imports.py ${package}
