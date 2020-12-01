@@ -5,7 +5,7 @@ def test_kentik_api_clinet_import():
 
     # When
     try:
-        import kentik_api_library
+        import kentik_api
     except ImportError:
         pass
     else:
