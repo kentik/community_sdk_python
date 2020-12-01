@@ -47,10 +47,11 @@ class PylintCmd(distutils.cmd.Command):
         except subprocess.CalledProcessError:
             pass
 
+
 class MypyCmd(distutils.cmd.Command):
     """Custom command to run Mypy"""
 
-    description = 'run Mypy on kentik_api directory'    
+    description = 'run Mypy on kentik_api directory'
     user_options = [
         ('package=', None, 'Path to run mypy (default kentik_api)')
     ]
@@ -58,7 +59,7 @@ class MypyCmd(distutils.cmd.Command):
     def initialize_options(self):
         """Set default values for option package (default kentik_api)"""
         self.package = 'kentik_api'
-    
+
     def finalize_options(self):
         """Post-process options."""
         if self.package:
@@ -81,7 +82,10 @@ class MypyCmd(distutils.cmd.Command):
 
 setup(
     name="kentik-api",
-    version="0.0.1",
+    use_scm_version={
+        "root": "..",
+        "relative_to": __file__,
+    },
     description="API Library to help using Kenti API",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -90,21 +94,21 @@ setup(
     install_requires=[
         'python-http-client>=3.3.1',
         'requests>=2.25.0'
-        ],
-    setup_requires=['pytest-runner', 'pylint-runner'],
+    ],
+    setup_requires=['pytest-runner', 'pylint-runner', 'setuptools_scm'],
     tests_require=['pytest', 'pylint'],
     packages=[
         'kentik_api',
         'kentik_api.auth',
         'kentik_api.api_calls'
-        ],
+    ],
     package_dir={
         'kentik_api': 'kentik_api',
-        'kentik_api.auth' : 'kentik_api/auth',
-        'kentik_api.api_calls' : 'kentik_api/api_calls'
-        },
+        'kentik_api.auth': 'kentik_api/auth',
+        'kentik_api.api_calls': 'kentik_api/api_calls'
+    },
     cmdclass={
         'pylint': PylintCmd,
-        'mypy' : MypyCmd
+        'mypy': MypyCmd
     },
 )
