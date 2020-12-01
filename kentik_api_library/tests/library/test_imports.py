@@ -1,15 +1,18 @@
+import sys
+import importlib
 
-def test_kentik_api_clinet_import():
-    # Given
-    kentik_api_library_found = False
+def test_import(library=""):
+    
+    library_found = False
 
-    # When
     try:
-        import kentik_api_library
+        imported_library = importlib.import_module(library)
     except ImportError:
         pass
     else:
-        kentik_api_library_found = True
+        library_found = True
 
-    # Then
-    assert kentik_api_library_found
+    assert library_found, "Can't import '" + library +"'"
+
+if __name__ == '__main__':
+    test_import(sys.argv[1])

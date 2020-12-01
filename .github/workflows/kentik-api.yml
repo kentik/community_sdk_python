@@ -92,6 +92,12 @@ jobs:
           path: artifacts
       - name: Install lib from package
         run: |
-          ls -l
-          ls -l artifacts
           pip install artifacts/*.whl
+      - name: Show installed packages
+        run: pip freeze
+      - name: Check if import is possible
+        run: |
+          for package in 'kentik_api' 'kentik_api.auth' 'kentik_api.api_calls'
+          do
+            python kentik_api_library/tests/library/test_imports.py ${package}
+          done
