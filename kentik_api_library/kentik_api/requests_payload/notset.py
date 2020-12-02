@@ -6,7 +6,7 @@ from typing import Any
 class NOTSET:
     """Default type for unset fields."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "NOTSET_"
 
 
