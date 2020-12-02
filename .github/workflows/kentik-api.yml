@@ -3,6 +3,10 @@ name: kentik-api
 
 # Run this workflow all on pushes to master
 on:
+  pull_request:
+    paths: 
+    - 'kentik_api_library/**'
+    - '.github/workflows/kentik-api.yml'
   push:
     paths: 
     - 'kentik_api_library/**'
