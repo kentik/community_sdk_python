@@ -1,10 +1,9 @@
 from kentik_api.client import get_kentik_com_client
 import json
+import os
 
-client = get_kentik_com_client("<AUTH E-MAIL>", "<AUTH API TOKEN>")
 
-
-def example1():
+def example1(client):
     try:
         response = client.v5.devices.get()
     except Exception as e:
@@ -14,7 +13,7 @@ def example1():
     print_response(response)
 
 
-def example2():
+def example2(client):
     try:
         response = client.v5._("deviceLabels").get()
     except Exception as e:
@@ -22,6 +21,18 @@ def example2():
         exit(1)
 
     print_response(response)
+
+
+def get_client():
+    email = token = ''
+    try:
+        email = os.environ['AUTH_EMAIL']
+        token = os.environ['AUTH_TOKEN']
+    except KeyError:
+        print('You have to specify AUTH_EMAIL and AUTH_TOKEN first')
+        exit(1)
+
+    return get_kentik_com_client(email, token)
 
 
 def print_response(response):
@@ -35,6 +46,7 @@ def print_spacing():
 
 
 if __name__ == "__main__":
-    example1()
+    com_client = get_client()
+    example1(com_client)
     print_spacing()
-    example2()
+    example2(com_client)
