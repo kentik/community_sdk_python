@@ -11,6 +11,8 @@ on:
     paths: 
     - 'kentik_api_library/**'
     - '.github/workflows/kentik-api.yml'
+    tags:
+      - "v[0-9].[0-9]+.[0-9]+"
 
 jobs:
   python-versions-setup:
@@ -110,3 +112,26 @@ jobs:
             python artifacts/tests/library/test_imports.py ${package}
             echo "Imported package: ${package}"
           done
+  #Publish package to PyPi job, run only on tag creation and for python 3.8
+  package-publish:
+    runs-on: ubuntu-latest
+    if: contains(github.ref, '/tags/')
+    needs: [ python-versions-setup, code-tests, build, package-tests ]
+    strategy: 
+      matrix: 
+        python-version: [ '3.8' ]
+    steps:
+      - name: Prepare python env
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts.python${{ matrix.python-version }}
+          path: artifacts
+      - name: Push package to PyPi
+        run: |
+          python3 -m pip install --user --upgrade twine
+          python3 -m twine upload --repository testpypi artifacts/dist/* -u __token__ -p ${{ secrets.TEST_PYPI_TOKEN }}
