@@ -1,5 +1,6 @@
 # community_sdk_python
 
+
 ## Release process for kentik-api
 
 Release process for kentik-api library is based on github repo tags. Every tag with format v[0-9].[0-9].[0-9] will trigger automatic build of package and publish it in PyPi repository (at the moment in testing instance).
