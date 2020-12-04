@@ -3,8 +3,16 @@ name: kentik-api
 
 # Run this workflow all on pushes to master
 on:
+  pull_request:
+    paths: 
+    - 'kentik_api_library/**'
+    - '.github/workflows/kentik-api.yml'
   push:
-    paths: 'kentik_api_library/**'
+    paths: 
+    - 'kentik_api_library/**'
+    - '.github/workflows/kentik-api.yml'
+    tags:
+      - "v[0-9].[0-9]+.[0-9]+"
 
 jobs:
   python-versions-setup:
@@ -71,7 +79,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: artifacts.python${{ matrix.python-version}}
-          path: kentik_api_library/dist/
+          path: |
+            kentik_api_library/dist/
+            kentik_api_library/tests/library/test_imports.py
           retention-days: 5
 
   package-tests:
@@ -92,6 +102,36 @@ jobs:
           path: artifacts
       - name: Install lib from package
         run: |
-          ls -l
-          ls -l artifacts
-          pip install artifacts/*.whl
+          pip install artifacts/dist/*.whl
+      - name: Show installed packages
+        run: pip freeze
+      - name: Check if import is possible
+        run: |
+          for package in kentik_api kentik_api.auth kentik_api.api_calls
+          do
+            python artifacts/tests/library/test_imports.py ${package}
+            echo "Imported package: ${package}"
+          done
+  #Publish package to PyPi job, run only on tag creation and for python 3.8
+  package-publish:
+    runs-on: ubuntu-latest
+    if: contains(github.ref, '/tags/')
+    needs: [ python-versions-setup, code-tests, build, package-tests ]
+    strategy: 
+      matrix: 
+        python-version: [ '3.8' ]
+    steps:
+      - name: Prepare python env
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts.python${{ matrix.python-version }}
+          path: artifacts
+      - name: Push package to PyPi
+        run: |
+          python3 -m pip install --user --upgrade twine
+          python3 -m twine upload --repository testpypi artifacts/dist/* -u __token__ -p ${{ secrets.TEST_PYPI_TOKEN }}
