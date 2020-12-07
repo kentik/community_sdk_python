@@ -1,8 +1,9 @@
 import sys
 import importlib
 
+
 def test_import(library=""):
-    
+
     library_found = False
 
     try:
@@ -12,7 +13,8 @@ def test_import(library=""):
     else:
         library_found = True
 
-    assert library_found, "Can't import '" + library +"'"
+    assert library_found, "Can't import '" + library + "'"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_import(sys.argv[1])

@@ -2,6 +2,7 @@
 from api_calls.api_call_decorators import post, payload_type
 from api_calls.api_call import APICall
 
+
 @post
 @payload_type(dict)
 def create_manual_mitigation() -> APICall:

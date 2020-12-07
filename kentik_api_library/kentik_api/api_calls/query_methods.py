@@ -3,7 +3,6 @@ from api_calls.api_call_decorators import post, payload_type
 from api_calls.api_call import APICall
 
 
-
 @post
 @payload_type(dict)
 def query_sql() -> APICall:
@@ -24,7 +23,7 @@ def query_url() -> APICall:
 @payload_type(dict)
 def query_data() -> APICall:
     """A Top X Query in Kentik Detect’s KDE (see KDE Tables).
-     Returns results in a JSON results array."""
+    Returns results in a JSON results array."""
     return APICall("/query/topXdata")
 
 

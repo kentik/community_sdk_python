@@ -22,18 +22,27 @@ class API:
         _payload: Optional[dict] = payload if isinstance(payload, dict) else None
         url = self._get_api_query_url(api_call.url_path)
         if api_call.method == APICallMethods.GET:
-            return requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload)
+            return requests.get(
+                url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=_payload
+            )
         if api_call.method == APICallMethods.POST:
             # print("HERE "*5)
-            return requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=_payload)
+            return requests.post(
+                url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=_payload
+            )
         if api_call.method == APICallMethods.PUT:
-            return requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload)
+            return requests.put(
+                url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=_payload
+            )
         if api_call.method == APICallMethods.DELETE:
-            return requests.delete(url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload)
+            return requests.delete(
+                url, auth=self._auth, headers=self.DEFAULT_HEADERS, data=payload
+            )
         raise ValueError("Improper API call method")
 
     def _get_api_query_url(self, api_method: str):
         return self._api_url + api_method
+
 
 # Third party imports
 from python_http_client import Client  # type: ignore
@@ -44,7 +53,7 @@ BASE_API_EU_URL = "https://api.kentik.eu/api"
 GLOBAL_HEADERS_TEMPLATE = {
     "X-CH-Auth-Email": None,
     "X-CH-Auth-API-Token": None,
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
 }
 
 
@@ -61,4 +70,3 @@ def get_kentik_com_client(auth_email, auth_api_token):
 
 def get_kentik_eu_client(auth_email, auth_api_token):
     return get_kentik_client(BASE_API_EU_URL, auth_email, auth_api_token)
-

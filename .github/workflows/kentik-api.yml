@@ -45,6 +45,11 @@ jobs:
       - name: PyTest
         working-directory: ./kentik_api_library
         run: python3 setup.py pytest
+      - name: Black
+        continue-on-error: true
+        uses: piotrpawlaczek/python-blacken@release/stable
+        with:
+          path: './kentik_api_library'
       - name: PyLint
         working-directory: ./kentik_api_library
         run: python3 setup.py pylint

@@ -8,12 +8,14 @@ def get_saved_filters() -> APICall:
     that each contain information about an individual saved-filter."""
     return APICall("/saved-filters/custom")
 
+
 @get
 def get_saved_filter_info(saved_filter_id: int) -> APICall:
     """Returns a saved-filter object containing
     information about an individual saved-filter"""
     url_path = f"/saved-filter/custom/{saved_filter_id}"
     return APICall(url_path)
+
 
 @post
 @payload_type(dict)
@@ -22,6 +24,7 @@ def create_saved_filter() -> APICall:
     information about an individual saved-filter"""
     return APICall("/saved-filter/custom")
 
+
 @put
 @payload_type(dict)
 def update_saved_filter(saved_filter_id: int) -> APICall:
@@ -29,6 +32,7 @@ def update_saved_filter(saved_filter_id: int) -> APICall:
     information about an individual saved-filter"""
     url_path = f"/saved-filter/custom/{saved_filter_id}"
     return APICall(url_path)
+
 
 @delete
 def delete_saved_filter(saved_filter_id: int) -> APICall:

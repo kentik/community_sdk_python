@@ -55,7 +55,7 @@ def apply_device_labels(device_id: int) -> APICall:
 @get
 def get_device_interfaces(device_id: int) -> APICall:
     """Returns an array of interface objects that each contain information about an interface
-     from a specified device."""
+    from a specified device."""
     url_path = f"/devices/{device_id}/interfaces"
     return APICall(url_path)
 
@@ -72,7 +72,7 @@ def get_device_interface_info(device_id: int, interface_id: int) -> APICall:
 @payload_type(dict)
 def create_interface(device_id: int) -> APICall:
     """Creates and returns an interface object containing information about an individual interface
-     for a given device."""
+    for a given device."""
     url_path = f"/device/{device_id}/interface"
     return APICall(url_path)
 
@@ -81,7 +81,7 @@ def create_interface(device_id: int) -> APICall:
 @payload_type(dict)
 def update_interface(device_id: int, interface_id: int) -> APICall:
     """Updates and returns an interface object containing information about an individual interface
-     from a specified device."""
+    from a specified device."""
     url_path = f"/device/{device_id}/interface/{interface_id}"
     return APICall(url_path)
 
