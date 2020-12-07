@@ -100,12 +100,20 @@ setup(
     packages=[
         'kentik_api',
         'kentik_api.auth',
-        'kentik_api.api_calls'
+        'kentik_api.api_calls',
+        'kentik_api.api_connection',
+        'kentik_api.api_resources',
+        'kentik_api.requests_payload',
+        'kentik_api.public',
     ],
     package_dir={
         'kentik_api': 'kentik_api',
         'kentik_api.auth': 'kentik_api/auth',
-        'kentik_api.api_calls': 'kentik_api/api_calls'
+        'kentik_api.api_calls': 'kentik_api/api_calls',
+        'kentik_api.api_connection' : 'kentik_api/api_connection',
+        'kentik_api.api_resources' : 'kentik_api/api_resources',
+        'kentik_api.requests_payload' : 'kentik_api/requests_payload',
+        'kentik_api.public' : 'kentik_api/public',
     },
     cmdclass={
         'pylint': PylintCmd,
