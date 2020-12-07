@@ -9,12 +9,14 @@ def get_custom_applications() -> APICall:
     information about an individual customApplication."""
     return APICall("/customApplications")
 
+
 @post
 @payload_type(dict)
 def create_custom_application() -> APICall:
     """Creates and returns a custocustomApplicationm_application object
     containing information about an individual custom_appcustomApplicationlication"""
     return APICall("/customApplications")
+
 
 @put
 @payload_type(dict)
@@ -23,6 +25,7 @@ def update_custom_application(custom_application_id: int) -> APICall:
     information about an individual customApplication"""
     url_path = f"/customApplications/{custom_application_id}"
     return APICall(url_path)
+
 
 @delete
 def delete_custom_application(custom_application_id: int) -> APICall:

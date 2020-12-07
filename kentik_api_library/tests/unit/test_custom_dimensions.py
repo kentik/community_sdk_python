@@ -51,6 +51,7 @@ def test_update_custom_dimension__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}"
     assert call.method.name == "PUT"
 
+
 def test_delete_custom_dimension__return_apiCall():
 
     # WHEN
@@ -60,6 +61,7 @@ def test_delete_custom_dimension__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}"
     assert call.method.name == "DELETE"
+
 
 def test_create_populator__return_apiCall():
 
@@ -71,6 +73,7 @@ def test_create_populator__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}/{DUMMY_POP_URL}"
     assert call.method.name == "POST"
 
+
 def test_update_populator__return_apiCall():
 
     # WHEN
@@ -78,8 +81,12 @@ def test_update_populator__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}/{DUMMY_POP_URL}/{DUMMY_POP_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}/{DUMMY_POP_URL}/{DUMMY_POP_ID}"
+    )
     assert call.method.name == "PUT"
+
 
 def test_delete_populator__return_apiCall():
 
@@ -88,5 +95,8 @@ def test_delete_populator__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}/{DUMMY_POP_URL}/{DUMMY_POP_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_DIM_ID}/{DUMMY_POP_URL}/{DUMMY_POP_ID}"
+    )
     assert call.method.name == "DELETE"

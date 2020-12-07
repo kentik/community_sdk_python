@@ -16,6 +16,7 @@ def test_get_saved_filters__return_apiCall():
     assert call.url_path == "/saved-filters/custom"
     assert call.method.name == "GET"
 
+
 def test_get_saved_filter_info__return_apiCall():
 
     # WHEN
@@ -47,6 +48,7 @@ def test_update_saved_filter__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_FIL_ID}"
     assert call.method.name == "PUT"
+
 
 def test_delete_saved_filter__return_apiCall():
 

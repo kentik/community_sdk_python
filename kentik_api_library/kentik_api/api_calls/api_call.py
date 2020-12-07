@@ -10,11 +10,13 @@ class APICallMethods(Enum):
 
 
 class APICall:
-    def __init__(self,
-    url_path: str,
-    additional_headers: dict = None,
-    method: APICallMethods = None,
-    payload_type=None):
+    def __init__(
+        self,
+        url_path: str,
+        additional_headers: dict = None,
+        method: APICallMethods = None,
+        payload_type=None,
+    ):
         self.url_path = url_path
         self.additional_headers = additional_headers
         self.method = method
