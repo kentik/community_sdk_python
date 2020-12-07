@@ -24,13 +24,12 @@ def example2(client):
 
 
 def get_client():
-    email = token = ''
+    email = token = ""
     try:
-        email = os.environ['KTAPI_AUTH_EMAIL']
-        token = os.environ['KTAPI_AUTH_TOKEN']
+        email = os.environ["KTAPI_AUTH_EMAIL"]
+        token = os.environ["KTAPI_AUTH_TOKEN"]
     except KeyError:
-        print('You have to specify KTAPI_AUTH_EMAIL and '
-              'KTAPI_AUTH_TOKEN first')
+        print("You have to specify KTAPI_AUTH_EMAIL and " "KTAPI_AUTH_TOKEN first")
         exit(1)
 
     return get_kentik_com_client(email, token)

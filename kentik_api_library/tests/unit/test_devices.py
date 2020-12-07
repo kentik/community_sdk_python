@@ -18,6 +18,7 @@ def test_get_devices__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}s"
     assert call.method.name == "GET"
 
+
 def test_get_devices_info__return_apiCall():
 
     # WHEN
@@ -50,6 +51,7 @@ def test_update_device__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}"
     assert call.method.name == "PUT"
 
+
 def test_delete_device__return_apiCall():
 
     # WHEN
@@ -59,7 +61,8 @@ def test_delete_device__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}"
     assert call.method.name == "DELETE"
-    
+
+
 def test_apply_device_labels():
 
     # WHEN
@@ -69,6 +72,7 @@ def test_apply_device_labels():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}s/{DUMMY_DEV_ID}/labels"
     assert call.method.name == "PUT"
+
 
 def test_get_device_interfaces__return_apiCall():
 
@@ -80,6 +84,7 @@ def test_get_device_interfaces__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}s/{DUMMY_DEV_ID}/{DUMMY_INT_URL}s"
     assert call.method.name == "GET"
 
+
 def test_get_device_interface_info__return_apiCall():
 
     # WHEN
@@ -87,7 +92,10 @@ def test_get_device_interface_info__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    )
     assert call.method.name == "GET"
 
 
@@ -109,8 +117,12 @@ def test_update_interface__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    )
     assert call.method.name == "PUT"
+
 
 def test_delete_interface__return_apiCall():
 
@@ -119,5 +131,8 @@ def test_delete_interface__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}/{DUMMY_INT_ID}"
+    )
     assert call.method.name == "DELETE"

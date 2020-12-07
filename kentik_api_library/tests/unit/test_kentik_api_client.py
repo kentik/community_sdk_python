@@ -12,7 +12,9 @@ def test_get_kentik_client__return_api_client():
     # DUMMY_API_URL, DUMMY_EMAIL, DUMMY_API_TOKEN
 
     # WHEN
-    client = kentik_fluent_api_client.get_kentik_client(DUMMY_API_URL, DUMMY_EMAIL, DUMMY_API_TOKEN)
+    client = kentik_fluent_api_client.get_kentik_client(
+        DUMMY_API_URL, DUMMY_EMAIL, DUMMY_API_TOKEN
+    )
 
     # THEN
     assert isinstance(client, Client)
@@ -23,7 +25,9 @@ def test_get_kentik_com_client__return_com_api_client():
     # DUMMY_EMAIL, DUMMY_API_TOKEN
 
     # WHEN
-    client = kentik_fluent_api_client.get_kentik_com_client(DUMMY_EMAIL, DUMMY_API_TOKEN)
+    client = kentik_fluent_api_client.get_kentik_com_client(
+        DUMMY_EMAIL, DUMMY_API_TOKEN
+    )
 
     # THEN
     assert isinstance(client, Client)

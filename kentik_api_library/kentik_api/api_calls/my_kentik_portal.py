@@ -9,11 +9,13 @@ def get_tenants() -> APICall:
     information about an individual tenant."""
     return APICall("/mykentik/tenants")
 
+
 @get
 def get_tenant_info(tenant_id: int) -> APICall:
     """Returns a tenant object containing information about an individual tenant"""
     url_path = f"/mykentik/tenant/{tenant_id}"
     return APICall(url_path)
+
 
 @post
 @payload_type(dict)
@@ -22,6 +24,7 @@ def create_tenant_user(tenant_id: int) -> APICall:
     information about an individual tenant user"""
     url_path = f"/mykentik/tenant/{tenant_id}/user"
     return APICall(url_path)
+
 
 @delete
 def delete_tenant_user(tenant_id: int, user_id: int) -> APICall:

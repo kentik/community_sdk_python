@@ -48,5 +48,8 @@ def test_delete_tenant_user__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_TEN_ID}/{DUMMY_USR_URL}/{DUMMY_USR_ID}"
+    assert (
+        call.url_path
+        == f"{DUMMY_API_URL}/{DUMMY_TEN_ID}/{DUMMY_USR_URL}/{DUMMY_USR_ID}"
+    )
     assert call.method.name == "DELETE"

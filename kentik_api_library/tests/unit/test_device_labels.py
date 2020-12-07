@@ -16,6 +16,7 @@ def test_get_device_labels__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}"
     assert call.method.name == "GET"
 
+
 def test_get_device_labels_info__return_apiCall():
 
     # WHEN
@@ -47,6 +48,7 @@ def test_update_device_label__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}"
     assert call.method.name == "PUT"
+
 
 def test_delete_device_label__return_apiCall():
 

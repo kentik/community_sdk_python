@@ -16,6 +16,7 @@ def test_get_users__return_apiCall():
     assert call.url_path == f"{DUMMY_API_URL}s"
     assert call.method.name == "GET"
 
+
 def test_get_user_info__return_apiCall():
 
     # WHEN
@@ -47,6 +48,7 @@ def test_update_user__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_USR_ID}"
     assert call.method.name == "PUT"
+
 
 def test_delete_user__return_apiCall():
 

@@ -27,6 +27,7 @@ def test_create_custom_applications__return_apiCall():
     assert call.url_path == DUMMY_API_URL
     assert call.method.name == "POST"
 
+
 def test_update_custom_applications__return_apiCall():
 
     # WHEN
@@ -36,6 +37,7 @@ def test_update_custom_applications__return_apiCall():
     assert isinstance(call, APICall)
     assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_APP_ID}"
     assert call.method.name == "PUT"
+
 
 def test_delete_custom_applications__return_apiCall():
 

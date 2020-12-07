@@ -7,6 +7,7 @@ AUT_API_TOKEN_KEY: str = "X-CH-Auth-API-Token"
 
 class KentikAuth(AuthBase):
     """Attaches HTTP Kentik Authentication to the given Request object."""
+
     def __init__(self, auth_email: str, auth_token: str):
         self.auth_email = auth_email
         self.auth_token = auth_token
