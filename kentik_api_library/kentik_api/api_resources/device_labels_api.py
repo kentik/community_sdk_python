@@ -21,15 +21,15 @@ class DeviceLabelsAPI:
         response = self._api_connector.send(apicall)
         return labels_payload.GetResponse.from_json(response.text).to_device_label()
 
-    def create(self, device: DeviceLabel) -> DeviceLabel:
+    def create(self, device_label: DeviceLabel) -> DeviceLabel:
         apicall = labels.create_label()
-        payload = labels_payload.CreateRequest(device.name, device.color).__dict__
+        payload = labels_payload.CreateRequest(device_label.name, device_label.color).__dict__
         response = self._api_connector.send(apicall, payload)
         return labels_payload.CreateResponse.from_json(response.text).to_device_label()
 
-    def update(self, label_id: int, device: DeviceLabel) -> DeviceLabel:
-        apicall = labels.update_label(label_id)
-        payload = labels_payload.UpdateRequest(device.name, device.color).__dict__
+    def update(self, device_label: DeviceLabel) -> DeviceLabel:
+        apicall = labels.update_label(device_label.id)
+        payload = labels_payload.UpdateRequest(device_label.name, device_label.color).__dict__
         response = self._api_connector.send(apicall, payload)
         return labels_payload.UpdateResponse.from_json(response.text).to_device_label()
 

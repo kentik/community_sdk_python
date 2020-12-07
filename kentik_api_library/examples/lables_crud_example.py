@@ -50,18 +50,18 @@ def run_crud():
     print()
 
     print("### UPDATE")
-    label.name = "apitest-label-one"
-    updated = client.device_labels.update(created.id, label)
+    created.name = "apitest-label-one"
+    updated = client.device_labels.update(created)
     print(updated.__dict__)
     print()
 
     print("### GET")
-    got = client.device_labels.get(created.id)
+    got = client.device_labels.get(updated.id)
     print(got.__dict__)
     print()
     
     print("### DELETE")
-    deleted = client.device_labels.delete(created.id)
+    deleted = client.device_labels.delete(updated.id)
     print(deleted)
 
 
