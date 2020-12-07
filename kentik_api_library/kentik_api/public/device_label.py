@@ -1,10 +1,20 @@
 from typing import List, Any, Optional
+from dataclasses import dataclass
+
+@dataclass
+class DeviceItem:
+
+    id: str
+    device_name: str
+    device_type: str
+    device_subtype: str
+
 
 class DeviceLabel:
 
-    def __init__(self, name: str, color: Optional[str] = None, id: Optional[int] = None, 
-                    user_id: Optional[str] = None, company_id: Optional[str] = None, 
-                    devices: Optional[List[Any]] = None, 
+    def __init__(self, name: str, color: Optional[str] = None, id: Optional[int] = None,
+                    user_id: Optional[str] = None, company_id: Optional[str] = None,
+                    devices: Optional[List[DeviceItem]] = None,
                     created_date: Optional[str] = None, updated_date: Optional[str] = None) -> None:
         # read-write
         self.name = name
@@ -32,7 +42,7 @@ class DeviceLabel:
         return self._company_id
 
     @property
-    def devices(self) -> List[Any]:
+    def devices(self) -> List[DeviceItem]:
         return self._devices
 
     @property

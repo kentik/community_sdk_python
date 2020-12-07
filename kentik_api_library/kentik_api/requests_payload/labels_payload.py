@@ -1,8 +1,37 @@
 # Standard library imports
 import json
-from typing import Optional, List, Any
+from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
-from kentik_api.public.device_label import DeviceLabel
+
+# Local imports
+from kentik_api.public.device_label import DeviceLabel, DeviceItem
+
+
+@dataclass()
+class Device:
+
+    id: str
+    device_name: str
+    device_type: str
+    device_subtype: str
+
+    def to_device_item(self) -> DeviceItem:
+        return DeviceItem(self.id, self.device_name, self.device_type, self.device_subtype)
+
+
+class DeviceArray(List[Device]):
+
+    @classmethod
+    def from_dict(cls, dic : Dict[str, Any]):
+        devices = cls()
+        for item in dic:
+            d = Device(**item)
+            devices.append(d)
+        return devices
+
+    def to_device_items(self) -> List[DeviceItem]:
+        return [d.to_device_item() for d in self]
+
 
 @dataclass()
 class GetResponse:
@@ -12,19 +41,19 @@ class GetResponse:
     color: str
     user_id: str
     company_id: str
-    devices : List[Any]
+    devices : DeviceArray
     created_date : str
     updated_date : str
 
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
+        dic["devices"] = DeviceArray.from_dict(dic["devices"]) # replace dictionary with actual data class
         return cls(**dic)
 
     def to_device_label(self) -> DeviceLabel:
-        return DeviceLabel(self.name, self.color, self.id, self.user_id, self.company_id, self.devices, self.created_date, self.updated_date)
-
-
+        return DeviceLabel(self.name, self.color, self.id, self.user_id, self.company_id, 
+                            self.devices.to_device_items(), self.created_date, self.updated_date)
 
 
 class GetAllResponse(List[GetResponse]):
@@ -57,7 +86,7 @@ class CreateResponse:
     color: str
     user_id: str
     company_id: str
-    devices : List[Any]
+    devices : List[Device]
     created_date : str
     updated_date : str
 
@@ -85,7 +114,7 @@ class UpdateResponse:
     color: str
     user_id: str
     company_id: str
-    devices : List[Any]
+    devices : List[Device]
     created_date : str
     updated_date : str
 

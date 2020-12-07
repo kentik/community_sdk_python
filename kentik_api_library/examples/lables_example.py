@@ -64,6 +64,19 @@ def run_crud():
     deleted = client.device_labels.delete(updated.id)
     print(deleted)
 
+def run_get_with_devices():
+    email, token = get_auth_email_token()
+    client = kentik_api.for_com_domain(email, token)
+
+    print("### GET")
+    label_with_devices_id = 2752
+    got = client.device_labels.get(label_with_devices_id)
+    print(got.__dict__)
+    print("devices:")
+    for device in got.devices:
+        print(device.__dict__)
+    print()
+
 
 def run_list():
     email, token = get_auth_email_token()
@@ -73,5 +86,6 @@ def run_list():
         print(l.__dict__)
 
 if __name__ == "__main__":
+    # run_get_with_devices()
     run_crud()
     # run_list()
