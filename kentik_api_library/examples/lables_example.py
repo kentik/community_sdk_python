@@ -15,12 +15,13 @@ logging.basicConfig(level=logging.INFO)
 
 def get_auth_email_token() -> Tuple[str, str]:
     try:
-        email = os.environ['KTAPI_AUTH_EMAIL']
-        token = os.environ['KTAPI_AUTH_TOKEN']
+        email = os.environ["KTAPI_AUTH_EMAIL"]
+        token = os.environ["KTAPI_AUTH_TOKEN"]
         return email, token
     except KeyError:
-        print('You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first')
+        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
         sys.exit(1)
+
 
 def run_crud():
     """
@@ -38,7 +39,6 @@ def run_crud():
     ### DELETE
     DeleteResponse(success=True)
     """
-
 
     email, token = get_auth_email_token()
     client = kentik_api.for_com_domain(email, token)
@@ -59,10 +59,11 @@ def run_crud():
     got = client.device_labels.get(updated.id)
     print(got.__dict__)
     print()
-    
+
     print("### DELETE")
     deleted = client.device_labels.delete(updated.id)
     print(deleted)
+
 
 def run_get_with_devices():
     email, token = get_auth_email_token()
@@ -84,6 +85,7 @@ def run_list():
     labels = client.device_labels.get_all()
     for l in labels:
         print(l.__dict__)
+
 
 if __name__ == "__main__":
     # run_get_with_devices()

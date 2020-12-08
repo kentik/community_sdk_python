@@ -1,6 +1,7 @@
 from typing import List, Any, Optional
 from dataclasses import dataclass
 
+
 @dataclass
 class DeviceItem:
 
@@ -11,11 +12,17 @@ class DeviceItem:
 
 
 class DeviceLabel:
-
-    def __init__(self, name: str, color: Optional[str] = None, id: Optional[int] = None,
-                    user_id: Optional[str] = None, company_id: Optional[str] = None,
-                    devices: Optional[List[DeviceItem]] = None,
-                    created_date: Optional[str] = None, updated_date: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        color: Optional[str] = None,
+        id: Optional[int] = None,
+        user_id: Optional[str] = None,
+        company_id: Optional[str] = None,
+        devices: Optional[List[DeviceItem]] = None,
+        created_date: Optional[str] = None,
+        updated_date: Optional[str] = None,
+    ) -> None:
         # read-write
         self.name = name
         self.color = color
@@ -27,7 +34,6 @@ class DeviceLabel:
         self._devices = devices
         self._created_date = created_date
         self._updated_date = updated_date
-
 
     @property
     def id(self) -> int:
