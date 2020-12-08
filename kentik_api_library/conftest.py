@@ -1,4 +1,3 @@
-
 import sys
 
-sys.path.append('./kentik_api')
+sys.path.append("./kentik_api")

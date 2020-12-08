@@ -11,6 +11,7 @@ def get(func):
         query = func(*args, **kwargs)
         query.method = APICallMethods.GET
         return query
+
     return add_get
 
 
@@ -21,6 +22,7 @@ def post(func):
         query.method = APICallMethods.POST
         # print(query.method)
         return query
+
     return add_post
 
 
@@ -30,6 +32,7 @@ def put(func):
         query = func(*args, **kwargs)
         query.method = APICallMethods.PUT
         return query
+
     return add_put
 
 
@@ -39,6 +42,7 @@ def delete(func):
         query = func(*args, **kwargs)
         query.method = APICallMethods.DELETE
         return query
+
     return add_delete
 
 
@@ -49,5 +53,7 @@ def payload_type(_type: type):
             query = func(*args, **kwargs)
             query.payload_type = _type
             return query
+
         return add_payload_type
+
     return actual_decorator

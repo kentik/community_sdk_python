@@ -11,7 +11,7 @@ BASE_API_EU_URL = "https://api.kentik.eu/api"
 GLOBAL_HEADERS_TEMPLATE = {
     "X-CH-Auth-Email": None,
     "X-CH-Auth-API-Token": None,
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
 }
 
 
