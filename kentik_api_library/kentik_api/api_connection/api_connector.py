@@ -24,9 +24,6 @@ class APIConnector:
 
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
-        if payload is not None:
-            payload = remove_keys_with_empty_values(payload)
-
         url = self._get_api_query_url(api_call.url_path)
         response : requests.Response
  
@@ -53,11 +50,3 @@ class APIConnector:
         # http error handling can be implemented here eg with exceptions, Expected[return, error] or error codes
         if response.status_code >= 400:
             self._logger.error("code: %d, body: %s", response.status_code, response.text)
-
-
-def remove_keys_with_empty_values(d : Dict[str, Any]) -> Dict[str, Any]:
-    result = dict()
-    for k, v in d.items():
-        if v is not None:
-            result[k] = v
-    return result
