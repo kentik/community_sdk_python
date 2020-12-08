@@ -85,7 +85,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     include_package_data=True,
-    install_requires=["python-http-client>=3.3.1", "requests>=2.25.0"],
+    install_requires=["python-http-client>=3.3.1", "requests>=2.25.0", "typing-extensions>=3.7.4.3"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
     tests_require=["pytest", "pylint"],
     packages=[

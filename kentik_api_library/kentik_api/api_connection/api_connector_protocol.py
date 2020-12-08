@@ -1,4 +1,5 @@
-from typing import Protocol, Optional, Dict, Any
+from typing import Optional, Dict, Any
+from typing_extensions import Protocol
 
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_connection.api_call_response import APICallResponse
