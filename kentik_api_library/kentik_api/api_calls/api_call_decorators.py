@@ -2,7 +2,7 @@
 from functools import wraps
 
 # Local application imports
-from api_calls.api_call import APICallMethods
+from kentik_api.api_calls.api_call import APICallMethods
 
 
 def get(func):
