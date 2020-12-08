@@ -12,7 +12,7 @@ class DeviceLabelsAPI:
     def __init__(self, api_connector: APIConnectorProtocol) -> None:
         self._api_connector = api_connector
 
-    def _send(self, api_call, payload = None):
+    def _send(self, api_call, payload=None):
         if payload is not None:
             payload = as_dict.as_dict(payload)
         return self._api_connector.send(api_call, payload)

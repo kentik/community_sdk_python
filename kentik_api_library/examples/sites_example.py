@@ -15,11 +15,11 @@ logging.basicConfig(level=logging.INFO)
 
 def get_auth_email_token() -> Tuple[str, str]:
     try:
-        email = os.environ['KTAPI_AUTH_EMAIL']
-        token = os.environ['KTAPI_AUTH_TOKEN']
+        email = os.environ["KTAPI_AUTH_EMAIL"]
+        token = os.environ["KTAPI_AUTH_TOKEN"]
         return email, token
     except KeyError:
-        print('You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first')
+        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
         sys.exit(1)
 
 
@@ -39,7 +39,6 @@ def run_crud():
     ### DELETE
     True
     """
-
 
     email, token = get_auth_email_token()
     client = kentik_api.for_com_domain(email, token)
@@ -61,7 +60,7 @@ def run_crud():
     got = client.sites.get(updated.id)
     print(got.__dict__)
     print()
-    
+
     print("### DELETE")
     deleted = client.sites.delete(updated.id)
     print(deleted)

@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+
 def as_dict(obj: Any) -> Dict[str, Any]:
     """ Convert obj to dict, removing all keys with None values """
 

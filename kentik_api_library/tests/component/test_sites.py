@@ -8,10 +8,9 @@ from tests.component.stub_api_connector import StubAPIConnector
 
 
 class SitesAPITest(unittest.TestCase):
-
     def test_create_site(self):
         # given
-        create_response_payload = '''
+        create_response_payload = """
         {
             "site": {
                 "id": 42,
@@ -20,10 +19,10 @@ class SitesAPITest(unittest.TestCase):
                 "lon": 18.659577,
                 "company_id": "3250"
             }
-        }'''
+        }"""
         connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED.value)
         client = kentik_api.KentikAPI(connector)
- 
+
         # when
         site = Site("apitest-site-1", 54.349276, 18.659577)
         created = client.sites.create(site)
@@ -44,10 +43,9 @@ class SitesAPITest(unittest.TestCase):
         self.assertEqual(created.longitude, 18.659577)
         self.assertEqual(created.company_id, "3250")
 
-
     def test_get_site(self):
         # given
-        get_response_payload = '''
+        get_response_payload = """
         {
             "site": {
                 "id": 42,
@@ -56,10 +54,10 @@ class SitesAPITest(unittest.TestCase):
                 "lon": 18.659577,
                 "company_id": "3250"
             }
-        }'''
+        }"""
         connector = StubAPIConnector(get_response_payload, HTTPStatus.OK.value)
         client = kentik_api.KentikAPI(connector)
- 
+
         # when
         site_id = 42
         site = client.sites.get(site_id)
@@ -68,7 +66,7 @@ class SitesAPITest(unittest.TestCase):
         self.assertEqual(connector.last_url, f"/site/{site_id}")
         self.assertEqual(connector.last_method, APICallMethods.GET)
         self.assertIsNone(connector.last_payload)
-        
+
         # then response properly unmarshalled
         self.assertEqual(site.id, 42)
         self.assertEqual(site.site_name, "apitest-site-1")
@@ -76,10 +74,9 @@ class SitesAPITest(unittest.TestCase):
         self.assertEqual(site.longitude, 18.659577)
         self.assertEqual(site.company_id, "3250")
 
-
     def test_update_site(self):
         # given
-        update_response_payload = '''
+        update_response_payload = """
         {
             "site": {
                 "id": 42,
@@ -88,7 +85,7 @@ class SitesAPITest(unittest.TestCase):
                 "lon": -45.0,
                 "company_id": "3250"
             }
-        }'''
+        }"""
         connector = StubAPIConnector(update_response_payload, HTTPStatus.OK.value)
         client = kentik_api.KentikAPI(connector)
 
@@ -113,10 +110,9 @@ class SitesAPITest(unittest.TestCase):
         self.assertEqual(updated.longitude, -45.0)
         self.assertEqual(updated.company_id, "3250")
 
-
     def test_delete_site(self):
         # given
-        delete_response_payload = '' # deleting site responds with empty body
+        delete_response_payload = ""  # deleting site responds with empty body
         connector = StubAPIConnector(delete_response_payload, HTTPStatus.NO_CONTENT.value)
         client = kentik_api.KentikAPI(connector)
 

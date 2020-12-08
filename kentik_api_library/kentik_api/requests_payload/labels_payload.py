@@ -20,9 +20,8 @@ class Device:
 
 
 class DeviceArray(List[Device]):
-
     @classmethod
-    def from_dict(cls, dic : Dict[str, Any]):
+    def from_dict(cls, dic: Dict[str, Any]):
         devices = cls()
         for item in dic:
             d = Device(**item)
@@ -36,28 +35,35 @@ class DeviceArray(List[Device]):
 @dataclass()
 class GetResponse:
 
-    id : int
+    id: int
     name: str
     color: str
     user_id: str
     company_id: str
-    devices : DeviceArray
-    created_date : str
-    updated_date : str
+    devices: DeviceArray
+    created_date: str
+    updated_date: str
 
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
-        dic["devices"] = DeviceArray.from_dict(dic["devices"]) # replace dictionary with actual data class
+        dic["devices"] = DeviceArray.from_dict(dic["devices"])  # replace dictionary with actual data class
         return cls(**dic)
 
     def to_device_label(self) -> DeviceLabel:
-        return DeviceLabel(self.name, self.color, self.id, self.user_id, self.company_id, 
-                            self.devices.to_device_items(), self.created_date, self.updated_date)
+        return DeviceLabel(
+            self.name,
+            self.color,
+            self.id,
+            self.user_id,
+            self.company_id,
+            self.devices.to_device_items(),
+            self.created_date,
+            self.updated_date,
+        )
 
 
 class GetAllResponse(List[GetResponse]):
-
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
@@ -74,21 +80,21 @@ class GetAllResponse(List[GetResponse]):
 @dataclass()
 class CreateRequest:
 
-    name: str # eg. "apitest-label-1"
-    color: str # eg. "#00FF00"
+    name: str  # eg. "apitest-label-1"
+    color: str  # eg. "#00FF00"
 
 
 @dataclass()
 class CreateResponse:
 
-    id : int
+    id: int
     name: str
     color: str
     user_id: str
     company_id: str
-    devices : List[Device]
-    created_date : str
-    updated_date : str
+    devices: List[Device]
+    created_date: str
+    updated_date: str
 
     @classmethod
     def from_json(cls, json_string):
@@ -96,7 +102,16 @@ class CreateResponse:
         return cls(**dic)
 
     def to_device_label(self) -> DeviceLabel:
-        return DeviceLabel(self.name, self.color, self.id, self.user_id, self.company_id, self.devices, self.created_date, self.updated_date)
+        return DeviceLabel(
+            self.name,
+            self.color,
+            self.id,
+            self.user_id,
+            self.company_id,
+            self.devices,
+            self.created_date,
+            self.updated_date,
+        )
 
 
 @dataclass()
@@ -109,14 +124,14 @@ class UpdateRequest:
 @dataclass()
 class UpdateResponse:
 
-    id : int
+    id: int
     name: str
     color: str
     user_id: str
     company_id: str
-    devices : List[Device]
-    created_date : str
-    updated_date : str
+    devices: List[Device]
+    created_date: str
+    updated_date: str
 
     @classmethod
     def from_json(cls, json_string):
@@ -124,7 +139,16 @@ class UpdateResponse:
         return cls(**dic)
 
     def to_device_label(self) -> DeviceLabel:
-        return DeviceLabel(self.name, self.color, self.id, self.user_id, self.company_id, self.devices, self.created_date, self.updated_date)
+        return DeviceLabel(
+            self.name,
+            self.color,
+            self.id,
+            self.user_id,
+            self.company_id,
+            self.devices,
+            self.created_date,
+            self.updated_date,
+        )
 
 
 @dataclass()

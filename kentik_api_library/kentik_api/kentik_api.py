@@ -4,6 +4,7 @@ from kentik_api.api_connection.api_connector_protocol import APIConnectorProtoco
 from kentik_api.api_resources.device_labels_api import DeviceLabelsAPI
 from kentik_api.api_resources.sites_api import SitesAPI
 
+
 class KentikAPI:
     """ Root object for operating KentikAPI """
 
@@ -16,7 +17,6 @@ class KentikAPI:
         # self.users =
         # self.tags =
         # ...
-
 
 
 def for_com_domain(auth_email: str, auth_token: str) -> KentikAPI:

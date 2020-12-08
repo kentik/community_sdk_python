@@ -3,6 +3,7 @@ from typing import Any
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_connection.api_call_response import APICallResponse
 
+
 class StubAPIConnector:
     """StubAPIConnector allows for stubbed responses for api requests"""
 

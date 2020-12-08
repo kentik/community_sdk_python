@@ -28,9 +28,9 @@ class PylintCmd(distutils.cmd.Command):
     def finalize_options(self):
         """Post-process options."""
         if self.pylint_rcfile:
-            assert os.path.exists(
+            assert os.path.exists(self.pylint_rcfile), "Pylint config file {} does not exist.".format(
                 self.pylint_rcfile
-            ), "Pylint config file {} does not exist.".format(self.pylint_rcfile)
+            )
 
     def run(self):
         """Run command."""
@@ -60,9 +60,7 @@ class MypyCmd(distutils.cmd.Command):
     def finalize_options(self):
         """Post-process options."""
         if self.package:
-            assert os.path.exists(self.package), "Path {} does not exist.".format(
-                self.package
-            )
+            assert os.path.exists(self.package), "Path {} does not exist.".format(self.package)
 
     def run(self):
         """Run command"""
@@ -91,22 +89,22 @@ setup(
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
     tests_require=["pytest", "pylint"],
     packages=[
-        'kentik_api',
-        'kentik_api.auth',
-        'kentik_api.api_calls',
-        'kentik_api.api_connection',
-        'kentik_api.api_resources',
-        'kentik_api.requests_payload',
-        'kentik_api.public',
+        "kentik_api",
+        "kentik_api.auth",
+        "kentik_api.api_calls",
+        "kentik_api.api_connection",
+        "kentik_api.api_resources",
+        "kentik_api.requests_payload",
+        "kentik_api.public",
     ],
     package_dir={
-        'kentik_api': 'kentik_api',
-        'kentik_api.auth': 'kentik_api/auth',
-        'kentik_api.api_calls': 'kentik_api/api_calls',
-        'kentik_api.api_connection' : 'kentik_api/api_connection',
-        'kentik_api.api_resources' : 'kentik_api/api_resources',
-        'kentik_api.requests_payload' : 'kentik_api/requests_payload',
-        'kentik_api.public' : 'kentik_api/public',
+        "kentik_api": "kentik_api",
+        "kentik_api.auth": "kentik_api/auth",
+        "kentik_api.api_calls": "kentik_api/api_calls",
+        "kentik_api.api_connection": "kentik_api/api_connection",
+        "kentik_api.api_resources": "kentik_api/api_resources",
+        "kentik_api.requests_payload": "kentik_api/requests_payload",
+        "kentik_api.public": "kentik_api/public",
     },
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
 )

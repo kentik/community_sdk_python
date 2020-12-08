@@ -25,9 +25,7 @@ class Device:
     minimize_snmp: Union[bool, None, NOTSET] = _NOTSET
     device_snmp_ip: Union[str, None, NOTSET] = _NOTSET
     device_snmp_community: Union[str, None, NOTSET] = _NOTSET
-    device_snmp_v3_conf: Union[
-        _DeviceSnmpV3Conf, _NOTSET_, _None_
-    ] = _DeviceSnmpV3Conf()
+    device_snmp_v3_conf: Union[_DeviceSnmpV3Conf, _NOTSET_, _None_] = _DeviceSnmpV3Conf()
     device_bgp_type: Union[str, None, NOTSET] = _NOTSET
     device_bgp_neighbor_ip: Union[str, None, NOTSET] = _NOTSET
     device_bgp_neighbor_ip6: Union[str, None, NOTSET] = _NOTSET
