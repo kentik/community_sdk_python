@@ -4,7 +4,7 @@ from typing import Optional
 class Site:
     def __init__(
         self,
-        site_name: Optional[int] = None,
+        site_name: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
         id: Optional[int] = None,
@@ -20,9 +20,9 @@ class Site:
         self._company_id = company_id
 
     @property
-    def id(self) -> int:
+    def id(self) -> Optional[int]:
         return self._id
 
     @property
-    def company_id(self) -> str:
+    def company_id(self) -> Optional[str]:
         return self._company_id

@@ -36,25 +36,25 @@ class DeviceLabel:
         self._updated_date = updated_date
 
     @property
-    def id(self) -> int:
+    def id(self) -> Optional[int]:
         return self._id
 
     @property
-    def user_id(self) -> str:
+    def user_id(self) -> Optional[str]:
         return self._user_id
 
     @property
-    def company_id(self) -> str:
+    def company_id(self) -> Optional[str]:
         return self._company_id
 
     @property
-    def devices(self) -> List[DeviceItem]:
+    def devices(self) -> Optional[List[DeviceItem]]:
         return self._devices
 
     @property
-    def created_date(self) -> str:
+    def created_date(self) -> Optional[str]:
         return self._created_date
 
     @property
-    def updated_date(self) -> str:
+    def updated_date(self) -> Optional[str]:
         return self._updated_date
