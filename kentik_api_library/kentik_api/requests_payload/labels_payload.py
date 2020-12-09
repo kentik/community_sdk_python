@@ -21,9 +21,9 @@ class Device:
 
 class DeviceArray(List[Device]):
     @classmethod
-    def from_dict(cls, dic: Dict[str, Any]):
+    def from_list(cls, items: List[Dict[str, Any]]):
         devices = cls()
-        for item in dic:
+        for item in items:
             d = Device(**item)
             devices.append(d)
         return devices
@@ -47,7 +47,7 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
-        dic["devices"] = DeviceArray.from_dict(dic["devices"])  # replace dictionary with actual data class
+        dic["devices"] = DeviceArray.from_list(dic["devices"])
         return cls(**dic)
 
     def to_device_label(self) -> DeviceLabel:
@@ -108,7 +108,7 @@ class CreateResponse:
             self.id,
             self.user_id,
             self.company_id,
-            self.devices,
+            [d.to_device_item() for d in self.devices],
             self.created_date,
             self.updated_date,
         )
@@ -145,7 +145,7 @@ class UpdateResponse:
             self.id,
             self.user_id,
             self.company_id,
-            self.devices,
+            [d.to_device_item() for d in self.devices],
             self.created_date,
             self.updated_date,
         )

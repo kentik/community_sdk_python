@@ -28,6 +28,7 @@ class SitesAPI:
         return sites_payload.GetResponse.from_json(response.text).to_site()
 
     def create(self, site: Site) -> Site:
+        assert site.site_name is not None
         apicall = sites.create_site()
         payload = sites_payload.CreateRequest(site.site_name, site.latitude, site.longitude)
         response = self._send(apicall, payload)
