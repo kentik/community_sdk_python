@@ -1,6 +1,6 @@
 # pylint: disable=redefined-outer-name
 """
-Examples of using the typed labels API
+Examples of using the typed sites API
 """
 
 import os
