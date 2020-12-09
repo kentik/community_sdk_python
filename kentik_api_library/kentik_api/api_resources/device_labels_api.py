@@ -30,13 +30,13 @@ class DeviceLabelsAPI:
     def create(self, device_label: DeviceLabel) -> DeviceLabel:
         assert device_label.color is not None
         apicall = labels.create_label()
-        payload = labels_payload.CreateRequest(device_label.name, device_label.color).__dict__
+        payload = labels_payload.CreateRequest(device_label.name, device_label.color)
         response = self._send(apicall, payload)
         return labels_payload.CreateResponse.from_json(response.text).to_device_label()
 
     def update(self, device_label: DeviceLabel) -> DeviceLabel:
         apicall = labels.update_label(device_label.id)
-        payload = labels_payload.UpdateRequest(device_label.name, device_label.color).__dict__
+        payload = labels_payload.UpdateRequest(device_label.name, device_label.color)
         response = self._send(apicall, payload)
         return labels_payload.UpdateResponse.from_json(response.text).to_device_label()
 

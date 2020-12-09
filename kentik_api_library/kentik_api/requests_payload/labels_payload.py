@@ -12,11 +12,13 @@ class Device:
 
     id: str
     device_name: str
-    device_type: str
     device_subtype: str
+    device_type: Optional[str] = None
 
     def to_device_item(self) -> DeviceItem:
-        return DeviceItem(self.id, self.device_name, self.device_type, self.device_subtype)
+        return DeviceItem(
+            id=self.id, device_name=self.device_name, device_subtype=self.device_subtype, device_type=self.device_type
+        )
 
 
 class DeviceArray(List[Device]):
@@ -43,6 +45,7 @@ class GetResponse:
     devices: DeviceArray
     created_date: str
     updated_date: str
+    order: Optional[int] = None
 
     @classmethod
     def from_json(cls, json_string):
@@ -95,6 +98,7 @@ class CreateResponse:
     devices: List[Device]
     created_date: str
     updated_date: str
+    order: Optional[int] = None
 
     @classmethod
     def from_json(cls, json_string):
@@ -132,6 +136,7 @@ class UpdateResponse:
     devices: List[Device]
     created_date: str
     updated_date: str
+    order: Optional[int] = None
 
     @classmethod
     def from_json(cls, json_string):

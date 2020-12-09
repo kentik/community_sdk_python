@@ -7,8 +7,8 @@ class DeviceItem:
 
     id: str
     device_name: str
-    device_type: str
     device_subtype: str
+    device_type: Optional[str]
 
 
 class DeviceLabel:
