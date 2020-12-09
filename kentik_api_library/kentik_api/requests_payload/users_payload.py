@@ -23,20 +23,20 @@ class _User:
     saved_filters: List
 
     def to_user(self) -> User:
-        return User(id=self.id,
+        return User(id=int(self.id),
                     username=self.username,
                     full_name=self.user_full_name,
                     email=self.user_email,
                     role=self.role,
-                    email_service=self.email_service,
-                    email_product=self.email_product,
+                    email_service=bool(self.email_service),
+                    email_product=bool(self.email_product),
                     last_login=self.last_login,
                     created_date=self.created_date,
                     updated_date=self.updated_date,
-                    company_id=self.company_id,
+                    company_id=int(self.company_id),
                     api_token=self.user_api_token,
-                    filters=self.filters,
-                    saved_filters=self.saved_filters,
+                    filters=dict(self.filters),
+                    saved_filters=list(self.saved_filters),
                     )
 
 
