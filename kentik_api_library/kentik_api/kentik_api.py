@@ -3,6 +3,7 @@ from kentik_api.api_connection.api_connector import APIConnector
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
 from kentik_api.api_resources.device_labels_api import DeviceLabelsAPI
 from kentik_api.api_resources.sites_api import SitesAPI
+from kentik_api.api_resources.users_api import UsersAPI
 
 
 class KentikAPI:
@@ -14,7 +15,7 @@ class KentikAPI:
         self.device_labels = DeviceLabelsAPI(connector)
         self.sites = SitesAPI(connector)
         # self.devices =
-        # self.users =
+        self.users = UsersAPI(connector)
         # self.tags =
         # ...
 
