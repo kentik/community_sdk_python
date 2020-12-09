@@ -32,7 +32,7 @@ def run_crud():
     client = kentik_api.for_com_domain(email, token)
 
     print("### CREATE")
-    user = User(username='test_user', full_name='Test User', email='test@user.example', role='Member',
+    user = User(full_name='Test User', email='test@user.example', role='Member',
                 password='test_password', email_service=True, email_product=True)
     created = client.users.create(user)
     print(created.__dict__)
@@ -56,7 +56,7 @@ def run_crud():
     got = client.users.get(created.id)
     print(got.__dict__)
     print()
-    
+
     print("### DELETE")
     deleted = client.users.delete(created.id)
     print(deleted)

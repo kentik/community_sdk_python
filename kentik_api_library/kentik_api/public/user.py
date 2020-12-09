@@ -38,17 +38,17 @@ class User:
         self._updated_date = updated_date
 
     @property
-    def id(self) -> int:
+    def id(self) -> Optional[int]:
         return self._id
 
     @property
-    def last_login(self) -> str:
+    def last_login(self) -> Optional[str]:
         return self._last_login
 
     @property
-    def created_date(self) -> str:
+    def created_date(self) -> Optional[str]:
         return self._created_date
 
     @property
-    def updated_date(self) -> str:
+    def updated_date(self) -> Optional[str]:
         return self._updated_date

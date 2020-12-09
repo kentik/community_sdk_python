@@ -25,9 +25,14 @@ class UsersAPI:
         return users_payload.GetResponse.from_json(response.text).to_user()
 
     def create(self, user: User) -> User:
+        # Checking if required data is provided
+        assert user.email is not None,  "User email has to be provided"
+        assert user.role is not None,  "User role has to be provided"
+        assert user.email_service is not None,  "Email service has to be provided"
+        assert user.email_product is not None,  "Email product has to be provided"
+
         api_call = users.create_user()
-        payload = {
-            'user': as_dict(users_payload.CreateRequest(
+        payload = as_dict(users_payload.CreateRequest(
                 user_name=user.username,
                 user_full_name=user.full_name,
                 user_email=user.email,
@@ -35,31 +40,22 @@ class UsersAPI:
                 role=user.role,
                 email_service=user.email_service,
                 email_product=user.email_product,
-                )),
-        }
+                ))
         response = self._api_connector.send(api_call, payload)
         return users_payload.CreateResponse.from_json(response.text).to_user()
 
     def update(self, user: User) -> User:
+        assert user.id is not None,  "User ID has to be provided"
+
         api_call = users.update_user(user.id)
-        payload = {
-            'user': as_dict(users_payload.UpdateRequest(
+        payload = as_dict(users_payload.UpdateRequest(
                 user_name=user.username,
                 user_full_name=user.full_name,
                 user_email=user.email,
                 role=user.role,
                 email_service=user.email_service,
                 email_product=user.email_product,
-                id=user.id,
-                last_login=user.last_login,
-                created_date=user.created_date,
-                updated_date=user.updated_date,
-                company_id=user.company_id,
-                user_api_token=user.api_token,
-                filters=user.filters,
-                saved_filters=user.saved_filters,
-            )),
-        }
+            ))
         response = self._api_connector.send(api_call, payload)
         return users_payload.UpdateResponse.from_json(response.text).to_user()
 
