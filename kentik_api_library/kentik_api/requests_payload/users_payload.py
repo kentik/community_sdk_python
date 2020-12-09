@@ -1,6 +1,6 @@
-import json
-from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
+import json
+from typing import Optional, Dict, List
 
 from kentik_api.public.user import User
 
@@ -25,8 +25,8 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)['user']
-        return cls(**dic)
+        dic = json.loads(json_string)
+        return cls(**dic['user'])
 
     def to_user(self) -> User:
         return User(id=self.id,
@@ -57,7 +57,7 @@ class GetAllResponse(List[GetResponse]):
             users.append(user)
         return users
 
-    def to_users(self) -> List[GetResponse]:
+    def to_users(self) -> List[User]:
         return [user.to_user() for user in self]
 
 
@@ -81,33 +81,17 @@ UpdateResponse = GetResponse
 @dataclass()
 class UpdateRequest:
 
-    def __init__(self,
-                 username: Optional[str] = None,
-                 full_name: Optional[str] = None,
-                 email: Optional[str] = None,
-                 role: Optional[str] = None,
-                 email_service: Optional[bool] = None,
-                 email_product: Optional[bool] = None,
-                 _id: Optional[int] = None,
-                 last_login: Optional[str] = None,
-                 created_date: Optional[str] = None,
-                 updated_date: Optional[str] = None,
-                 company_id: Optional[int] = None,
-                 api_token: Optional[str] = None,
-                 filters: Optional[Dict] = None,
-                 saved_filters: Optional[List] = None,
-                 ) -> None:
-        self.id = _id
-        self.user_name = username
-        self.user_full_name = full_name
-        self.user_email = email
-        self.role = role
-        self.email_service = email_service
-        self.email_product = email_product
-        self.last_login = last_login
-        self.created_date = created_date
-        self.updated_date = updated_date
-        self.company_id = company_id
-        self.user_api_token = api_token
-        self.filters = filters
-        self.saved_filters = saved_filters
+    user_name: Optional[str]
+    user_full_name: Optional[str]
+    user_email: Optional[str]
+    role: Optional[str]
+    email_service: Optional[bool]
+    email_product: Optional[bool]
+    id: Optional[int]
+    last_login: Optional[str]
+    created_date: Optional[str]
+    updated_date: Optional[str]
+    company_id: Optional[int]
+    user_api_token: Optional[str]
+    filters: Optional[Dict]
+    saved_filters: Optional[List]
