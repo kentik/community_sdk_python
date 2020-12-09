@@ -1,12 +1,10 @@
 from http import HTTPStatus
 
-from kentik_api import kentik_api
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.site import Site
-from tests.component.stub_api_connector import StubAPIConnector
 
 
-def test_create_site_success():
+def test_create_site_success(client, connector):
     # given
     create_response_payload = """
     {
@@ -18,8 +16,8 @@ def test_create_site_success():
             "company_id": "3250"
         }
     }"""
-    connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = create_response_payload
+    connector.response_code = HTTPStatus.CREATED
 
     # when
     site = Site("apitest-site-1", 54.349276, 18.659577)
@@ -42,7 +40,7 @@ def test_create_site_success():
     assert created.company_id == "3250"
 
 
-def test_get_site_success():
+def test_get_site_success(client, connector):
     # given
     get_response_payload = """
     {
@@ -54,8 +52,8 @@ def test_get_site_success():
             "company_id": "3250"
         }
     }"""
-    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = get_response_payload
+    connector.response_code = HTTPStatus.OK
 
     # when
     site_id = 42
@@ -74,7 +72,7 @@ def test_get_site_success():
     assert site.company_id == "3250"
 
 
-def test_update_site_success():
+def test_update_site_success(client, connector):
     # given
     update_response_payload = """
     {
@@ -86,8 +84,8 @@ def test_update_site_success():
             "company_id": "3250"
         }
     }"""
-    connector = StubAPIConnector(update_response_payload, HTTPStatus.OK.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = update_response_payload
+    connector.response_code = HTTPStatus.OK
 
     # when
     site_id = 42
@@ -111,11 +109,11 @@ def test_update_site_success():
     assert updated.company_id == "3250"
 
 
-def test_delete_site_success():
+def test_delete_site_success(client, connector):
     # given
     delete_response_payload = ""  # deleting site responds with empty body
-    connector = StubAPIConnector(delete_response_payload, HTTPStatus.NO_CONTENT.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = delete_response_payload
+    connector.response_code = HTTPStatus.NO_CONTENT
 
     # when
     site_id = 42

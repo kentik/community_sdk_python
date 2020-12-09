@@ -7,12 +7,12 @@ from kentik_api.api_connection.api_call_response import APICallResponse
 class StubAPIConnector:
     """StubAPIConnector allows for stubbed responses for api requests"""
 
-    def __init__(self, response_text: str, response_code: int):
+    def __init__(self):
         self.last_url = None
         self.last_method = None
         self.last_payload = None
-        self.response_text = response_text
-        self.response_code = response_code
+        self.response_text = None
+        self.response_code = None
 
     def send(self, api_call: APICall, payload: Any = None) -> APICallResponse:
         self.last_url = api_call.url_path

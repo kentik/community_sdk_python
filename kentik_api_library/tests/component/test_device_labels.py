@@ -1,12 +1,10 @@
 from http import HTTPStatus
 
-from kentik_api import kentik_api
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.device_label import DeviceLabel
-from tests.component.stub_api_connector import StubAPIConnector
 
 
-def test_create_device_label_success():
+def test_create_device_label_success(client, connector):
     # given
     create_response_payload = """
     {
@@ -20,8 +18,8 @@ def test_create_device_label_success():
         "created_date": "2018-05-16T20:21:10.406Z",
         "updated_date": "2018-05-16T20:21:10.406Z"
     }"""
-    connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = create_response_payload
+    connector.response_code = HTTPStatus.CREATED
 
     # when
     device_label = DeviceLabel("apitest-device_label-1", "#00FF00")
@@ -45,7 +43,7 @@ def test_create_device_label_success():
     assert len(created.devices) == 0
 
 
-def test_get_device_label_success():
+def test_get_device_label_success(client, connector):
     # given
     get_response_payload = """
     {
@@ -65,8 +63,8 @@ def test_get_device_label_success():
         "created_date": "2018-05-16T20:21:10.406Z",
         "updated_date": "2018-05-16T20:21:10.406Z"
     }"""
-    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = get_response_payload
+    connector.response_code = HTTPStatus.OK
 
     # when
     device_label_id = 32
@@ -91,7 +89,7 @@ def test_get_device_label_success():
     assert device_label.devices[0].device_subtype == "router"
 
 
-def test_update_device_label_success():
+def test_update_device_label_success(client, connector):
     # given
     update_response_payload = """
     {
@@ -104,8 +102,8 @@ def test_update_device_label_success():
         "created_date": "2018-05-16T20:21:10.406Z",
         "updated_date": "2018-05-16T20:21:10.406Z"
     }"""
-    connector = StubAPIConnector(update_response_payload, HTTPStatus.OK.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = update_response_payload
+    connector.response_code = HTTPStatus.OK
 
     # when
     device_label_id = 42
@@ -130,14 +128,14 @@ def test_update_device_label_success():
     assert len(updated.devices) == 0
 
 
-def test_delete_device_label_success():
+def test_delete_device_label_success(client, connector):
     # given
     delete_response_payload = """
     {
         "success": true
     }"""
-    connector = StubAPIConnector(delete_response_payload, HTTPStatus.OK.value)
-    client = kentik_api.KentikAPI(connector)
+    connector.response_text = delete_response_payload
+    connector.response_code = HTTPStatus.OK
 
     # when
     device_label_id = 42

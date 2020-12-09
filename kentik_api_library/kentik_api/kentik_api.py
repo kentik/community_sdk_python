@@ -1,37 +1,33 @@
-# Local application imports
-from kentik_api.api_connection.api_connector import APIConnector
-from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
-from kentik_api.api_resources.device_labels_api import DeviceLabelsAPI
-from kentik_api.api_resources.sites_api import SitesAPI
-from kentik_api.api_resources.users_api import UsersAPI
+from typing import Optional
+
+from .api_connection.api_connector import APIConnector
+from .api_resources.device_labels_api import DeviceLabelsAPI
+from .api_resources.sites_api import SitesAPI
+from .api_resources.users_api import UsersAPI
 
 
-class KentikAPI:
+API_REGION_US = "us"
+API_REGION_EU = "eu"
+
+
+class KentikAPI(object):
     """ Root object for operating KentikAPI """
 
     API_VERSION = "v5"
 
-    def __init__(self, connector: APIConnectorProtocol) -> None:
+    def __init__(self, auth_email: str, auth_token: str, region: Optional[str] = API_REGION_US) -> None:
+        if region.lower() == API_REGION_EU:
+            url = APIConnector.BASE_API_EU_URL
+        else:
+            url = APIConnector.BASE_API_US_URL
+        connector = new_connector(url, auth_email, auth_token)
+
         self.device_labels = DeviceLabelsAPI(connector)
         self.sites = SitesAPI(connector)
         # self.devices =
         self.users = UsersAPI(connector)
         # self.tags =
         # ...
-
-
-def for_com_domain(auth_email: str, auth_token: str) -> KentikAPI:
-    """ Handy kentik api client constructor for COM domain """
-
-    connector = new_connector(APIConnector.BASE_API_COM_URL, auth_email, auth_token)
-    return KentikAPI(connector)
-
-
-def for_eu_domain(auth_email: str, auth_token: str) -> KentikAPI:
-    """ Handy kentik api client constructor for EU domain """
-
-    connector = new_connector(APIConnector.BASE_API_EU_URL, auth_email, auth_token)
-    return KentikAPI(connector)
 
 
 def new_connector(api_url: str, auth_email: str, auth_token: str) -> APIConnector:
