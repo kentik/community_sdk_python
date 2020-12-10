@@ -1,6 +1,6 @@
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.api_calls.tag import *
+from kentik_api.api_calls.tags import *
 
 DUMMY_API_URL = "/tag"
 DUMMY_TAG_ID = "dummy_dim_id"

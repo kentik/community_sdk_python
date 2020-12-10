@@ -12,7 +12,7 @@ from kentik_api.api_connection.api_call_response import APICallResponse
 
 
 class APIConnector:
-    """ Allows sending authorized http requests to Kentik API """
+    """ APIConnector implements APIConnectorProtocol. Allows sending authorized http requests to Kentik API """
 
     DEFAULT_HEADERS = {"Content-Type": "application/json"}
     BASE_API_US_URL = "https://api.kentik.com/api"
