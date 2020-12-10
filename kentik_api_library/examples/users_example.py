@@ -7,19 +7,18 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import kentik_api
-from kentik_api.public.user import User
+from kentik_api import KentikAPI, User
 
 logging.basicConfig(level=logging.INFO)
 
 
 def get_auth_email_token() -> Tuple[str, str]:
     try:
-        email = os.environ['KTAPI_AUTH_EMAIL']
-        token = os.environ['KTAPI_AUTH_TOKEN']
+        email = os.environ["KTAPI_AUTH_EMAIL"]
+        token = os.environ["KTAPI_AUTH_TOKEN"]
         return email, token
     except KeyError:
-        print('You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first')
+        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
         sys.exit(1)
 
 
@@ -29,11 +28,17 @@ def run_crud():
     """
 
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
 
     print("### CREATE")
-    user = User(full_name='Test User', email='test@user.example', role='Member',
-                password='test_password', email_service=True, email_product=True)
+    user = User(
+        full_name="Test User",
+        email="test@user.example",
+        role="Member",
+        password="test_password",
+        email_service=True,
+        email_product=True,
+    )
     created = client.users.create(user)
     print(created.__dict__)
     print()
@@ -45,9 +50,10 @@ def run_crud():
     print()
 
     print("### UPDATE")
-    user = User(id=created.id,
-                full_name='User Testing',
-                )
+    user = User(
+        id=created.id,
+        full_name="User Testing",
+    )
     got = client.users.update(user)
     print(got.__dict__)
     print()

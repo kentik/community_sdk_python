@@ -7,8 +7,8 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import kentik_api
-from kentik_api.public.device_label import DeviceLabel
+from kentik_api import KentikAPI, DeviceLabel
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -41,7 +41,7 @@ def run_crud():
     """
 
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
 
     print("### CREATE")
     label = DeviceLabel("apitest-label-1", "#0000FF")
@@ -67,7 +67,7 @@ def run_crud():
 
 def run_get_with_devices():
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
 
     print("### GET")
     label_with_devices_id = 2752
@@ -81,7 +81,7 @@ def run_get_with_devices():
 
 def run_list():
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
     labels = client.device_labels.get_all()
     for l in labels:
         print(l.__dict__)

@@ -7,8 +7,8 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import kentik_api
-from kentik_api.public.site import Site
+from kentik_api import KentikAPI, Site
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -41,7 +41,7 @@ def run_crud():
     """
 
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
 
     print("### CREATE")
     site = Site(site_name="apitest-site-1", latitude=None, longitude=12)
@@ -68,7 +68,7 @@ def run_crud():
 
 def run_list():
     email, token = get_auth_email_token()
-    client = kentik_api.for_com_domain(email, token)
+    client = KentikAPI(email, token)
     sites = client.sites.get_all()
     for s in sites:
         print(s.__dict__)

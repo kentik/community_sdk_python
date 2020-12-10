@@ -2,24 +2,24 @@ from typing import List, Dict, Optional
 
 
 class User:
-
-    def __init__(self,
-                 username: Optional[str] = None,
-                 full_name: Optional[str] = None,
-                 email: Optional[str] = None,
-                 role: Optional[str] = None,
-                 email_service: Optional[bool] = None,
-                 email_product: Optional[bool] = None,
-                 id: Optional[int] = None,
-                 password: Optional[str] = None,
-                 last_login: Optional[str] = None,
-                 created_date: Optional[str] = None,
-                 updated_date: Optional[str] = None,
-                 company_id: Optional[int] = None,
-                 api_token: Optional[str] = None,
-                 filters: Optional[Dict] = None,
-                 saved_filters: Optional[List] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        username: Optional[str] = None,
+        full_name: Optional[str] = None,
+        email: Optional[str] = None,
+        role: Optional[str] = None,
+        email_service: Optional[bool] = None,
+        email_product: Optional[bool] = None,
+        id: Optional[int] = None,
+        password: Optional[str] = None,
+        last_login: Optional[str] = None,
+        created_date: Optional[str] = None,
+        updated_date: Optional[str] = None,
+        company_id: Optional[int] = None,
+        api_token: Optional[str] = None,
+        filters: Optional[Dict] = None,
+        saved_filters: Optional[List] = None,
+    ) -> None:
         self.username = username
         self.full_name = full_name
         self.email = email

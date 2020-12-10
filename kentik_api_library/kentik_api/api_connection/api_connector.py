@@ -15,7 +15,7 @@ class APIConnector:
     """ Allows sending authorized http requests to Kentik API """
 
     DEFAULT_HEADERS = {"Content-Type": "application/json"}
-    BASE_API_COM_URL = "https://api.kentik.com/api"
+    BASE_API_US_URL = "https://api.kentik.com/api"
     BASE_API_EU_URL = "https://api.kentik.eu/api"
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str) -> None:
