@@ -4,7 +4,7 @@ from .api_connection.api_connector import APIConnector
 from .api_resources.device_labels_api import DeviceLabelsAPI
 from .api_resources.sites_api import SitesAPI
 from .api_resources.users_api import UsersAPI
-
+from .api_resources.tags_api import TagsAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
@@ -15,7 +15,7 @@ class KentikAPI(object):
 
     API_VERSION = "v5"
 
-    def __init__(self, auth_email: str, auth_token: str, region: Optional[str] = API_REGION_US) -> None:
+    def __init__(self, auth_email: str, auth_token: str, region: str = API_REGION_US) -> None:
         if region.lower() == API_REGION_EU:
             url = APIConnector.BASE_API_EU_URL
         else:
@@ -26,7 +26,7 @@ class KentikAPI(object):
         self.sites = SitesAPI(connector)
         # self.devices =
         self.users = UsersAPI(connector)
-        # self.tags =
+        self.tags = TagsAPI(connector)
         # ...
 
 
