@@ -4,7 +4,7 @@ from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.user import User
 
 
-def test_create_user_success(client, connector):
+def test_create_user_success(client, connector) -> None:
     # given
     create_response_payload = """
     {
@@ -56,7 +56,7 @@ def test_create_user_success(client, connector):
     assert created.api_token is None
 
 
-def test_get_user_success(client, connector):
+def test_get_user_success(client, connector) -> None:
     # given
     get_response_payload = """
         {
@@ -103,7 +103,7 @@ def test_get_user_success(client, connector):
     assert user.api_token == "****************************a997"
 
 
-def test_update_user_success(client, connector):
+def test_update_user_success(client, connector) -> None:
     # given
     update_response_payload = """
     {
@@ -148,7 +148,7 @@ def test_update_user_success(client, connector):
     assert updated.email == "test@user.example"
 
 
-def test_delete_user_success(client, connector):
+def test_delete_user_success(client, connector) -> None:
     # given
     delete_response_payload = ""  # deleting user responds with empty body
     connector.response_text = delete_response_payload

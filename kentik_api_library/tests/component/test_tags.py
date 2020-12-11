@@ -6,7 +6,7 @@ from kentik_api.public.tag import Tag
 from tests.component.stub_api_connector import StubAPIConnector
 
 
-def test_create_tag_success():
+def test_create_tag_success() -> None:
     # given
     create_response_payload = """
     {
@@ -122,7 +122,7 @@ def test_create_tag_success():
     assert created.updated_date == "2020-12-10T11:53:48.752418Z"
 
 
-def test_get_tag_success():
+def test_get_tag_success() -> None:
     # given
     get_response_payload = """
     {
@@ -198,7 +198,7 @@ def test_get_tag_success():
     assert tag.updated_date == "2020-12-10T11:53:48.752418Z"
 
 
-def test_update_tag_success():
+def test_update_tag_success() -> None:
     # given
     update_response_payload = """
     {
@@ -306,7 +306,7 @@ def test_update_tag_success():
     assert updated.updated_date == "2020-12-10T11:53:48.752418Z"
 
 
-def test_delete_tag_success():
+def test_delete_tag_success() -> None:
     # given
     delete_response_payload = ""  # deleting tag responds with empty body
     connector = StubAPIConnector(delete_response_payload, HTTPStatus.NO_CONTENT)
@@ -325,7 +325,7 @@ def test_delete_tag_success():
     assert delete_successful
 
 
-def test_get_all_tags_success():
+def test_get_all_tags_success() -> None:
     # given
     get_response_payload = """
     {

@@ -4,7 +4,7 @@ from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.device_label import DeviceLabel
 
 
-def test_create_device_label_success(client, connector):
+def test_create_device_label_success(client, connector) -> None:
     # given
     create_response_payload = """
     {
@@ -43,7 +43,7 @@ def test_create_device_label_success(client, connector):
     assert len(created.devices) == 0
 
 
-def test_get_device_label_success(client, connector):
+def test_get_device_label_success(client, connector) -> None:
     # given
     get_response_payload = """
     {
@@ -89,7 +89,7 @@ def test_get_device_label_success(client, connector):
     assert device_label.devices[0].device_subtype == "router"
 
 
-def test_update_device_label_success(client, connector):
+def test_update_device_label_success(client, connector) -> None:
     # given
     update_response_payload = """
     {
@@ -128,7 +128,7 @@ def test_update_device_label_success(client, connector):
     assert len(updated.devices) == 0
 
 
-def test_delete_device_label_success(client, connector):
+def test_delete_device_label_success(client, connector) -> None:
     # given
     delete_response_payload = """
     {
