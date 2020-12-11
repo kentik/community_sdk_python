@@ -36,7 +36,8 @@ class DeviceLabel:
         self._updated_date = updated_date
 
     @property
-    def id(self) -> Optional[int]:
+    def id(self) -> int:
+        assert self._id is not None
         return self._id
 
     @property
@@ -48,8 +49,8 @@ class DeviceLabel:
         return self._company_id
 
     @property
-    def devices(self) -> Optional[List[DeviceItem]]:
-        return self._devices
+    def devices(self) -> List[DeviceItem]:
+        return [] if self._devices is None else self._devices
 
     @property
     def created_date(self) -> Optional[str]:

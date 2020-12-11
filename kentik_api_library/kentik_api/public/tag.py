@@ -64,7 +64,8 @@ class Tag:
         self._updated_date = updated_date
 
     @property
-    def id(self) -> Optional[int]:
+    def id(self) -> int:
+        assert self._id is not None
         return self._id
 
     @property

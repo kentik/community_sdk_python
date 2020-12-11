@@ -22,7 +22,7 @@ def get_auth_email_token() -> Tuple[str, str]:
         sys.exit(1)
 
 
-def run_crud():
+def run_crud() -> None:
     """
     Runs example CRUD API calls and prints responses
     """
@@ -44,8 +44,8 @@ def run_crud():
     print()
 
     print("### GET_ALL")
-    got = client.users.get_all()
-    for i in got:
+    all_users = client.users.get_all()
+    for i in all_users:
         print(i.__dict__)
     print()
 
