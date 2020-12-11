@@ -23,7 +23,7 @@ def get_auth_email_token() -> Tuple[str, str]:
         sys.exit(1)
 
 
-def run_crud():
+def run_crud() -> None:
     """
     Expected response is like:
 
@@ -65,7 +65,7 @@ def run_crud():
     print(deleted)
 
 
-def run_get_with_devices():
+def run_get_with_devices() -> None:
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
 
@@ -79,7 +79,7 @@ def run_get_with_devices():
     print()
 
 
-def run_list():
+def run_list() -> None:
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
     labels = client.device_labels.get_all()

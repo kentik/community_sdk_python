@@ -51,22 +51,22 @@ class MypyCmd(distutils.cmd.Command):
     """Custom command to run Mypy"""
 
     description = "run Mypy on kentik_api directory"
-    user_options = [("package=", None, "Path to run mypy (default kentik_api)")]
+    user_options = [("packages=", None, "Packages to check with mypy")]
 
     def initialize_options(self):
-        """Set default values for option package (default kentik_api)"""
-        self.package = "kentik_api"
+        """Set default values for option packages"""
+        self.packages = ["kentik_api", "tests/component", "examples"]
 
     def finalize_options(self):
         """Post-process options."""
-        if self.package:
-            assert os.path.exists(self.package), "Path {} does not exist.".format(self.package)
+        for package in self.packages:
+            assert os.path.exists(package), "Path {} does not exist.".format(package)
 
     def run(self):
         """Run command"""
         cmd = ["mypy"]
-        if self.package:
-            cmd.append("-p{}".format(self.package))
+        for package in self.packages:
+            cmd.append(package)
         self.announce("Run command: {}".format(str(cmd)), level=distutils.log.INFO)
         try:
             subprocess.check_call(cmd)

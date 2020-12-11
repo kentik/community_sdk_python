@@ -4,7 +4,7 @@ from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.site import Site
 
 
-def test_create_site_success(client, connector):
+def test_create_site_success(client, connector) -> None:
     # given
     create_response_payload = """
     {
@@ -40,7 +40,7 @@ def test_create_site_success(client, connector):
     assert created.company_id == "3250"
 
 
-def test_get_site_success(client, connector):
+def test_get_site_success(client, connector) -> None:
     # given
     get_response_payload = """
     {
@@ -72,7 +72,7 @@ def test_get_site_success(client, connector):
     assert site.company_id == "3250"
 
 
-def test_update_site_success(client, connector):
+def test_update_site_success(client, connector) -> None:
     # given
     update_response_payload = """
     {
@@ -109,7 +109,7 @@ def test_update_site_success(client, connector):
     assert updated.company_id == "3250"
 
 
-def test_delete_site_success(client, connector):
+def test_delete_site_success(client, connector) -> None:
     # given
     delete_response_payload = ""  # deleting site responds with empty body
     connector.response_text = delete_response_payload

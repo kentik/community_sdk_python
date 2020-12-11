@@ -22,7 +22,7 @@ def get_auth_email_token() -> Tuple[str, str]:
         sys.exit(1)
 
 
-def run_crud():
+def run_crud() -> None:
     """
     Expected response is like:
 
@@ -86,7 +86,7 @@ def run_crud():
     print(deleted)
 
 
-def run_list():
+def run_list() -> None:
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
     tags = client.tags.get_all()
