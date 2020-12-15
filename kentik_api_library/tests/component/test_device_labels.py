@@ -148,3 +148,68 @@ def test_delete_device_label_success(client, connector) -> None:
 
     # then response properly parsed
     assert delete_successful
+
+
+def test_get_all_device_labels_success(client, connector) -> None:
+    # given
+    get_response_payload = """
+    [
+        {
+            "id": 41,
+            "name": "device_labels_1",
+            "color": "#5289D9",
+            "user_id": "136885",
+            "company_id": "74333",
+            "devices": [],
+            "created_date": "2020-11-20T12:54:49.575Z",
+            "updated_date": "2020-11-20T12:54:49.575Z"
+        },
+        {
+            "id": 42,
+            "name": "device_labels_2",
+            "color": "#3F4EA0",
+            "user_id": "136885",
+            "company_id": "74333",
+            "devices": [
+                {
+                    "id": "1",
+                    "device_name": "device1",
+                    "device_type": "type1",
+                    "device_subtype": "subtype1"
+                },
+                {
+                    "id": "2",
+                    "device_name": "device2",
+                    "device_type": "type2",
+                    "device_subtype": "subtype2"
+                }
+            ],
+            "created_date": "2020-11-20T13:45:27.430Z",
+            "updated_date": "2020-11-20T13:45:27.430Z"
+        }
+    ]"""
+    connector.response_text = get_response_payload
+    connector.response_code = HTTPStatus.OK
+
+    # when
+    labels = client.device_labels.get_all()
+
+    # then request properly formed
+    assert connector.last_url == f"/deviceLabels"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # then response properly parsed
+    assert len(labels) == 2
+    assert labels[1].id == 42
+    assert labels[1].name == "device_labels_2"
+    assert labels[1].color == "#3F4EA0"
+    assert labels[1].user_id == "136885"
+    assert labels[1].company_id == "74333"
+    assert labels[1].created_date == "2020-11-20T13:45:27.430Z"
+    assert labels[1].updated_date == "2020-11-20T13:45:27.430Z"
+    assert len(labels[1].devices) == 2
+    assert labels[1].devices[1].id == "2"
+    assert labels[1].devices[1].device_name == "device2"
+    assert labels[1].devices[1].device_subtype == "subtype2"
+    assert labels[1].devices[1].device_type == "type2"
