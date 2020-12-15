@@ -1,6 +1,6 @@
 # pylint: disable=redefined-outer-name
 """
-Examples of using the typed tags API
+Examples of using the typed custom dimensions API
 """
 
 import os
