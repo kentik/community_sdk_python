@@ -3,6 +3,7 @@ from typing import List, Any
 from dataclasses import dataclass
 
 from kentik_api.public.custom_dimension import CustomDimension
+from kentik_api.requests_payload.populators_payload import PopulatorArray
 
 
 @dataclass
@@ -10,21 +11,22 @@ class GetResponse:
     name: str
     display_name: str
     type: str
-    populators: List[Any]
+    populators: PopulatorArray
     id: int
     company_id: str
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = json.loads(json_string)
-        return cls(**dic["customDimension"])  # payload is embeded under "customDimension" key
+        dic = json.loads(json_string)["customDimension"]  # payload is embeded under "customDimension" key
+        dic["populators"] = PopulatorArray.from_list(dic["populators"])
+        return cls(**dic)
 
     def to_custom_dimension(self) -> CustomDimension:
         return CustomDimension(
             name=self.name,
             display_name=self.display_name,
             type=self.type,
-            populators=self.populators,
+            populators=self.populators.to_populators(),
             id=self.id,
             company_id=self.company_id,
         )
@@ -36,7 +38,14 @@ class GetAllResponse(List[GetResponse]):
         dic = json.loads(json_string)
         dimensions = cls()
         for item in dic["customDimensions"]:  # payload is embeded under "customDimensions" key
-            d = GetResponse(**item)
+            d = GetResponse(
+                name=item["name"],
+                display_name=item["display_name"],
+                type=item["type"],
+                populators=PopulatorArray.from_list(item["populators"]),
+                id=item["id"],
+                company_id=item["company_id"],
+            )
             dimensions.append(d)
         return dimensions
 
