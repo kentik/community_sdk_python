@@ -90,7 +90,6 @@ def test_get_user_success(client, connector) -> None:
     assert connector.last_payload is None
 
     # then response properly parsed
-    print(user.id)
     assert int(user.id) == 145999
     assert user.username == "test@user.example"
     assert user.full_name == "Test User"

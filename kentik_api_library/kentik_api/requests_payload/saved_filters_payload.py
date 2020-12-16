@@ -7,8 +7,8 @@ from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, F
 
 @dataclass()
 class GetResponse:
-    id: Optional[int] = None
-    company_id: Optional[int] = None
+    id: int
+    company_id: int
     filters: Optional[Dict] = None
     filter_name: Optional[str] = None
     filter_description: Optional[str] = None
@@ -25,13 +25,13 @@ class GetResponse:
         filters_obj = self._to_filters(self.filters)
         return SavedFilter(
             cdate=self.cdate,
-            company_id=self.company_id,
+            company_id=int(self.company_id),
             edate=self.edate,
             filter_description=self.filter_description,
             filter_level=self.filter_level,
             filter_name=self.filter_name,
             filters=filters_obj,
-            id=self.id,
+            id=int(self.id),
         )
 
     def _to_filters(self, dic) -> Filters:
@@ -51,7 +51,7 @@ class GetResponse:
             filters=filters,
             id=dic.get("id"),
             metric=dic.get("metric"),
-            not_=dic["not"],
+            not_=bool(dic["not"]),
         )
 
     def _to_filter(self, dic) -> Filter:
