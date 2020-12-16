@@ -7,14 +7,14 @@ from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, F
 
 @dataclass()
 class GetResponse:
-    id: Optional[int] = None,
-    company_id: Optional[int] = None,
-    filters: Optional[Dict] = None,
-    filter_name: Optional[str] = None,
-    filter_description: Optional[str] = None,
-    cdate: Optional[str] = None,
-    edate: Optional[str] = None,
-    filter_level: Optional[str] = None,
+    id: Optional[int] = None
+    company_id: Optional[int] = None
+    filters: Optional[Dict] = None
+    filter_name: Optional[str] = None
+    filter_description: Optional[str] = None
+    cdate: Optional[str] = None
+    edate: Optional[str] = None
+    filter_level: Optional[str] = None
 
     @classmethod
     def from_json(cls, json_string):
@@ -86,11 +86,11 @@ class CreateRequest:
         self.filter_description = saved_filter.filter_description
         self.filters = {
                 "connector": saved_filter.filters.connector,
-                "filterGroups": CreateRequest.get_filterGroups(saved_filter.filters.filterGroups)
-            }
+                "filterGroups": CreateRequest.get_filter_groups(saved_filter.filters.filterGroups)
+            } if saved_filter.filters is not None else None
 
     @staticmethod
-    def get_filterGroups(filter_groups: List[FilterGroups]) -> List[Dict[str, Any]]:
+    def get_filter_groups(filter_groups: List[FilterGroups]) -> List[Dict[str, Any]]:
         return [{
             "connector": i.connector,
             "filters": [{
@@ -101,9 +101,8 @@ class CreateRequest:
             "not": i.not_
         } for i in filter_groups]
 
-    # def get_dict(self):
-    #     return self.data
-
 
 CreateResponse = GetResponse
+
+UpdateRequest = CreateRequest
 UpdateResponse = GetResponse
