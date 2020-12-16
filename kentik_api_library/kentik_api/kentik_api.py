@@ -5,6 +5,7 @@ from .api_resources.device_labels_api import DeviceLabelsAPI
 from .api_resources.sites_api import SitesAPI
 from .api_resources.users_api import UsersAPI
 from .api_resources.tags_api import TagsAPI
+from .api_resources.saved_filters_api import SavedFiltersAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
@@ -27,6 +28,7 @@ class KentikAPI(object):
         # self.devices =
         self.users = UsersAPI(connector)
         self.tags = TagsAPI(connector)
+        self.saved_filters = SavedFiltersAPI(connector)
         # ...
 
 

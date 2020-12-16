@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import KentikAPI, SavedFilter
+from kentik_api import KentikAPI, SavedFilter, Filters, FilterGroups, Filter
 
 logging.basicConfig(level=logging.INFO)
 
@@ -30,25 +30,38 @@ def run_crud() -> None:
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
 
+    print("### GET_ALL")
+    all_saved_filters = client.saved_filters.get_all()
+    for i in all_saved_filters:
+        print(i.__dict__)
+    print()
+
     print("### CREATE")
-    filter = SavedFilter()
-    #     full_name="Test User",
-    #     email="test@user.example",
-    #     role="Member",
-    #     password="test_password",
-    #     email_service=True,
-    #     email_product=True,
-    # )
-    # created = client.users.create(user)
-    # print(created.__dict__)
-    # print()
-    #
-    # print("### GET_ALL")
-    # all_users = client.users.get_all()
-    # for i in all_users:
-    #     print(i.__dict__)
-    # print()
-    #
+    filter = Filter(filterField="dst_as", filterValue="81", operator="=")
+    filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter])]
+    filters = Filters(connector="All", filterGroups=filter_groups)
+    sfilter = SavedFilter(filter_name="test_filter1", filters=filters,
+                          filter_description="This is test filter description")
+    created = client.saved_filters.create(sfilter)
+    print(created.__dict__)
+    created_id = created.id
+    print()
+
+    print("### GET_ALL")
+    all_saved_filters = client.saved_filters.get_all()
+    for i in all_saved_filters:
+        print(i.__dict__)
+    print()
+
+    print("### GET")
+    got = client.saved_filters.get(created_id)
+    print(got.__dict__)
+    print()
+
+    print("### DELETE")
+    deleted = client.saved_filters.delete(created_id)
+    print(deleted)
+
     # print("### UPDATE")
     # user = User(
     #     id=created.id,
@@ -57,15 +70,6 @@ def run_crud() -> None:
     # got = client.users.update(user)
     # print(got.__dict__)
     # print()
-    #
-    # print("### GET")
-    # got = client.users.get(created.id)
-    # print(got.__dict__)
-    # print()
-    #
-    # print("### DELETE")
-    # deleted = client.users.delete(created.id)
-    # print(deleted)
 
 
 if __name__ == "__main__":

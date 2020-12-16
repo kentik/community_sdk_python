@@ -5,27 +5,27 @@ from typing import Optional, List
 @dataclass()
 class Filter:
     filterField: str
-    id: Optional[str]
     filterValue: str
     operator: str
+    id: Optional[str] = None
 
 
 @dataclass()
 class FilterGroups:
     connector: str
-    filterString: Optional[str]
     filters: List[Filter]
-    id: Optional[str]
-    metric: str
-    _not: bool
+    not_: bool
+    filterString: Optional[str] = None
+    id: Optional[str] = None
+    metric: Optional[str] = None
 
 
 @dataclass()
 class Filters:
     connector: str
-    custom: bool
     filterGroups: List[FilterGroups]
-    filterString: Optional[str]
+    custom: Optional[bool] = None
+    filterString: Optional[str] = None
 
 
 class SavedFilter:
