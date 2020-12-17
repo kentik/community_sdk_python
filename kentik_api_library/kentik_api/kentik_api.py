@@ -1,5 +1,6 @@
 from .api_connection.api_connector import APIConnector
 from .api_resources.device_labels_api import DeviceLabelsAPI
+from .api_resources.query_api import QueryAPI
 from .api_resources.sites_api import SitesAPI
 from .api_resources.users_api import UsersAPI
 from .api_resources.tags_api import TagsAPI
@@ -28,6 +29,7 @@ class KentikAPI(object):
         self.tags = TagsAPI(connector)
         self.custom_dimensions = CustomDimensionsAPI(connector)
         self.custom_applications = CustomApplicationsAPI(connector)
+        self.query = QueryAPI(connector)
         # self.devices =
         # ...
 
