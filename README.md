@@ -22,10 +22,12 @@ Implemented API resources:
 - custom applications
 - saved filters
 
+Working on:
+- query methods
+
 To be implemented:
 - devices
 - plans
 - alerts
 - alerts active
 - my kentik portal
-- query methods
