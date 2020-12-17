@@ -1,21 +1,13 @@
 from typing import List
 
 from kentik_api.api_calls import sites
+from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.site import Site
-from kentik_api.requests_payload import sites_payload, as_dict
-from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+from kentik_api.requests_payload import sites_payload
 
 
-class SitesAPI:
+class SitesAPI(BaseAPI):
     """ Exposes Kentik API operations related to sites """
-
-    def __init__(self, api_connector: APIConnectorProtocol) -> None:
-        self._api_connector = api_connector
-
-    def _send(self, api_call, payload=None):
-        if payload is not None:
-            payload = as_dict.as_dict(payload)
-        return self._api_connector.send(api_call, payload)
 
     def get_all(self) -> List[Site]:
         apicall = sites.get_sites()

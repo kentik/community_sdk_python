@@ -1,21 +1,14 @@
 from typing import List
 
 from kentik_api.api_calls import custom_dimensions
+from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.custom_dimension import CustomDimension, Populator
-from kentik_api.requests_payload import custom_dimensions_payload, populators_payload, as_dict
+from kentik_api.requests_payload import custom_dimensions_payload, populators_payload
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
 
 
-class PopulatorsAPI:
+class PopulatorsAPI(BaseAPI):
     """ Exposes Kentik API operations related to populators (belong to custom dimensions) """
-
-    def __init__(self, api_connector: APIConnectorProtocol) -> None:
-        self._api_connector = api_connector
-
-    def _send(self, api_call, payload=None):
-        if payload is not None:
-            payload = as_dict.as_dict(payload)
-        return self._api_connector.send(api_call, payload)
 
     def create(self, populator: Populator) -> Populator:
         assert populator.value is not None
@@ -83,17 +76,12 @@ class PopulatorsAPI:
         return response.http_status_code == 204
 
 
-class CustomDimensionsAPI:
+class CustomDimensionsAPI(BaseAPI):
     """ Exposes Kentik API operations related to custom dimensions """
 
     def __init__(self, api_connector: APIConnectorProtocol) -> None:
-        self._api_connector = api_connector
+        super(CustomDimensionsAPI, self).__init__(api_connector)
         self._populators = PopulatorsAPI(api_connector)
-
-    def _send(self, api_call, payload=None):
-        if payload is not None:
-            payload = as_dict.as_dict(payload)
-        return self._api_connector.send(api_call, payload)
 
     def get(self, custom_dimension_id: int) -> CustomDimension:
         apicall = custom_dimensions.get_custom_dimension_info(custom_dimension_id)

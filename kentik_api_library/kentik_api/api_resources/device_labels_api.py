@@ -1,21 +1,13 @@
 from typing import List
 
 from kentik_api.api_calls import device_labels
-from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.device_label import DeviceLabel
-from kentik_api.requests_payload import labels_payload, as_dict
+from kentik_api.requests_payload import labels_payload
 
 
-class DeviceLabelsAPI:
+class DeviceLabelsAPI(BaseAPI):
     """ Exposes Kentik API operations related to device labels """
-
-    def __init__(self, api_connector: APIConnectorProtocol) -> None:
-        self._api_connector = api_connector
-
-    def _send(self, api_call, payload=None):
-        if payload is not None:
-            payload = as_dict.as_dict(payload)
-        return self._api_connector.send(api_call, payload)
 
     def get_all(self) -> List[DeviceLabel]:
         apicall = device_labels.get_device_labels()
