@@ -1,21 +1,13 @@
 from typing import List
 
 from kentik_api.api_calls import custom_applications
+from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.custom_application import CustomApplication
-from kentik_api.requests_payload import custom_applications_payload, as_dict
-from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+from kentik_api.requests_payload import custom_applications_payload
 
 
-class CustomApplicationsAPI:
+class CustomApplicationsAPI(BaseAPI):
     """ Exposes Kentik API operations related to custom applications """
-
-    def __init__(self, api_connector: APIConnectorProtocol) -> None:
-        self._api_connector = api_connector
-
-    def _send(self, api_call, payload=None):
-        if payload is not None:
-            payload = as_dict.as_dict(payload)
-        return self._api_connector.send(api_call, payload)
 
     def get_all(self) -> List[CustomApplication]:
         apicall = custom_applications.get_custom_applications()

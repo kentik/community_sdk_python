@@ -5,3 +5,4 @@ from .tag import Tag
 from .saved_filter import SavedFilter, Filters, FilterGroups, Filter
 from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
+from .query import SQLQuery
