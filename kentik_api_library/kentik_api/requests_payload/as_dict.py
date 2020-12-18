@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from enum import Enum
 
 
 def as_dict(obj: Any) -> Dict[str, Any]:
@@ -13,7 +14,9 @@ def as_dict(obj: Any) -> Dict[str, Any]:
     for k, v in obj.items():
         if v is None:
             continue
-        if hasattr(v, "__dict__") or isinstance(v, dict):
+        if isinstance(v, Enum):
+            result[k] = v.value
+        elif hasattr(v, "__dict__") or isinstance(v, dict):
             result[k] = as_dict(v)
         else:
             result[k] = v
