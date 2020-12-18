@@ -1,0 +1,136 @@
+from typing import Optional, List
+from enum import Enum
+
+
+class Populator:
+    class Direction(Enum):
+        SRC = "SRC"
+        DST = "DST"
+        EITHER = "EITHER"
+
+    def __init__(
+        self,
+        value: str,
+        direction: Direction,
+        device_name: Optional[str] = None,
+        interface_name: Optional[str] = None,
+        addr: Optional[str] = None,
+        port: Optional[str] = None,
+        tcp_flags: Optional[str] = None,
+        protocol: Optional[str] = None,
+        asn: Optional[str] = None,
+        nexthop_asn: Optional[str] = None,
+        nexthop: Optional[str] = None,
+        bgp_aspath: Optional[str] = None,
+        bgp_community: Optional[str] = None,
+        device_type: Optional[str] = None,
+        site: Optional[str] = None,
+        lasthop_as_name: Optional[str] = None,
+        nexthop_as_name: Optional[str] = None,
+        mac: Optional[str] = None,
+        country: Optional[str] = None,
+        vlans: Optional[str] = None,
+        id: Optional[int] = None,
+        company_id: Optional[str] = None,
+        user: Optional[str] = None,
+        dimension_id: Optional[int] = None,
+        mac_count: Optional[int] = None,
+        addr_count: Optional[int] = None,
+        created_date: Optional[str] = None,
+        updated_date: Optional[str] = None,
+    ) -> None:
+        # read-write
+        self.value = value
+        self.direction = direction
+        self.device_name = device_name
+        self.interface_name = interface_name
+        self.addr = addr
+        self.port = port
+        self.tcp_flags = tcp_flags
+        self.protocol = protocol
+        self.asn = asn
+        self.nexthop_asn = nexthop_asn
+        self.nexthop = nexthop
+        self.bgp_aspath = bgp_aspath
+        self.bgp_community = bgp_community
+        self.device_type = device_type
+        self.site = site
+        self.lasthop_as_name = lasthop_as_name
+        self.nexthop_as_name = nexthop_as_name
+        self.mac = mac
+        self.country = country
+        self.vlans = vlans
+
+        # read-only
+        self._id = id
+        self._company_id = company_id
+        self._dimension_id = dimension_id
+        self._user = user
+        self._mac_count = mac_count
+        self._addr_count = addr_count
+        self._created_date = created_date
+        self._updated_date = updated_date
+
+    @property
+    def id(self) -> int:
+        assert self._id is not None
+        return self._id
+
+    @property
+    def company_id(self) -> Optional[str]:
+        return self._company_id
+
+    @property
+    def dimension_id(self) -> int:
+        assert self._dimension_id is not None
+        return self._dimension_id
+
+    @property
+    def user(self) -> Optional[str]:
+        return self._user
+
+    @property
+    def mac_count(self) -> Optional[int]:
+        return self._mac_count
+
+    @property
+    def addr_count(self) -> Optional[int]:
+        return self._addr_count
+
+    @property
+    def created_date(self) -> Optional[str]:
+        return self._created_date
+
+    @property
+    def updated_date(self) -> Optional[str]:
+        return self._updated_date
+
+
+class CustomDimension:
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        display_name: Optional[str] = None,
+        type: Optional[str] = None,
+        populators: Optional[List[Populator]] = None,
+        id: Optional[int] = None,
+        company_id: Optional[str] = None,
+    ) -> None:
+        # read-write
+        self.name = name  # must start with c_ and be unique even against deleted dimensions (deleted names are retained for 1 year)
+        self.display_name = display_name
+        self.type = type
+        self.populators = populators
+
+        # read-only
+        self._id = id
+        self._company_id = company_id
+
+    @property
+    def id(self) -> int:
+        assert self._id is not None
+        return self._id
+
+    @property
+    def company_id(self) -> Optional[str]:
+        return self._company_id

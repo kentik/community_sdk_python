@@ -9,3 +9,25 @@ To build and release package:
 1. Make sure that all code that you want to release is in main branch
 1. Create tag with format v[0-9].[0-9].[0-9] in github. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
 1. Go to [Github Actions](https://github.com/kentik/community_sdk_python/actions)
+
+
+## Development state
+
+Implemented API resources:
+- users
+- sites
+- tags
+- device labels
+- custom dimensions
+- custom applications
+- saved filters
+
+Working on:
+- query methods
+
+To be implemented:
+- devices
+- plans
+- alerts
+- alerts active
+- my kentik portal

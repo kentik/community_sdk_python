@@ -28,9 +28,9 @@ class PylintCmd(distutils.cmd.Command):
     def finalize_options(self):
         """Post-process options."""
         if self.pylint_rcfile:
-            assert os.path.exists(
+            assert os.path.exists(self.pylint_rcfile), "Pylint config file {} does not exist.".format(
                 self.pylint_rcfile
-            ), "Pylint config file {} does not exist.".format(self.pylint_rcfile)
+            )
 
     def run(self):
         """Run command."""
@@ -51,24 +51,22 @@ class MypyCmd(distutils.cmd.Command):
     """Custom command to run Mypy"""
 
     description = "run Mypy on kentik_api directory"
-    user_options = [("package=", None, "Path to run mypy (default kentik_api)")]
+    user_options = [("packages=", None, "Packages to check with mypy")]
 
     def initialize_options(self):
-        """Set default values for option package (default kentik_api)"""
-        self.package = "kentik_api"
+        """Set default values for option packages"""
+        self.packages = ["kentik_api", "tests/component", "examples"]
 
     def finalize_options(self):
         """Post-process options."""
-        if self.package:
-            assert os.path.exists(self.package), "Path {} does not exist.".format(
-                self.package
-            )
+        for package in self.packages:
+            assert os.path.exists(package), "Path {} does not exist.".format(package)
 
     def run(self):
         """Run command"""
         cmd = ["mypy"]
-        if self.package:
-            cmd.append("-p{}".format(self.package))
+        for package in self.packages:
+            cmd.append(package)
         self.announce("Run command: {}".format(str(cmd)), level=distutils.log.INFO)
         try:
             subprocess.check_call(cmd)
@@ -87,14 +85,26 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     include_package_data=True,
-    install_requires=["python-http-client>=3.3.1", "requests>=2.25.0"],
+    install_requires=["python-http-client>=3.3.1", "requests>=2.25.0", "typing-extensions>=3.7.4.3"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
     tests_require=["pytest", "pylint"],
-    packages=["kentik_api", "kentik_api.auth", "kentik_api.api_calls"],
+    packages=[
+        "kentik_api",
+        "kentik_api.auth",
+        "kentik_api.api_calls",
+        "kentik_api.api_connection",
+        "kentik_api.api_resources",
+        "kentik_api.requests_payload",
+        "kentik_api.public",
+    ],
     package_dir={
         "kentik_api": "kentik_api",
         "kentik_api.auth": "kentik_api/auth",
         "kentik_api.api_calls": "kentik_api/api_calls",
+        "kentik_api.api_connection": "kentik_api/api_connection",
+        "kentik_api.api_resources": "kentik_api/api_resources",
+        "kentik_api.requests_payload": "kentik_api/requests_payload",
+        "kentik_api.public": "kentik_api/public",
     },
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
 )
