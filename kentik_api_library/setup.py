@@ -12,6 +12,25 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
+PACKAGES=[
+        "kentik_api",
+        "kentik_api.auth",
+        "kentik_api.api_calls",
+        "kentik_api.api_connection",
+        "kentik_api.api_resources",
+        "kentik_api.requests_payload",
+        "kentik_api.public",
+    ]
+PACKAGE_DIR={
+        "kentik_api": "kentik_api",
+        "kentik_api.auth": "kentik_api/auth",
+        "kentik_api.api_calls": "kentik_api/api_calls",
+        "kentik_api.api_connection": "kentik_api/api_connection",
+        "kentik_api.api_resources": "kentik_api/api_resources",
+        "kentik_api.requests_payload": "kentik_api/requests_payload",
+        "kentik_api.public": "kentik_api/public",
+    }
+
 
 class PylintCmd(distutils.cmd.Command):
     """Custom command to run Pylint"""
@@ -35,7 +54,7 @@ class PylintCmd(distutils.cmd.Command):
     def run(self):
         """Run command."""
         cmd = ["pylint"]
-        paths = ["./src", "./tests", "./examples"]
+        paths = ["./kentik_api", "./tests", "./examples"]
         if self.pylint_rcfile:
             cmd.append("--rcfile={}".format(self.pylint_rcfile))
         for path in paths:
@@ -90,23 +109,7 @@ setup(
     install_requires=["python-http-client>=3.3.1", "requests>=2.25.0", "typing-extensions>=3.7.4.3"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
     tests_require=["pytest", "pylint"],
-    packages=[
-        "kentik_api",
-        "kentik_api.auth",
-        "kentik_api.api_calls",
-        "kentik_api.api_connection",
-        "kentik_api.api_resources",
-        "kentik_api.requests_payload",
-        "kentik_api.public",
-    ],
-    package_dir={
-        "kentik_api": "kentik_api",
-        "kentik_api.auth": "kentik_api/auth",
-        "kentik_api.api_calls": "kentik_api/api_calls",
-        "kentik_api.api_connection": "kentik_api/api_connection",
-        "kentik_api.api_resources": "kentik_api/api_resources",
-        "kentik_api.requests_payload": "kentik_api/requests_payload",
-        "kentik_api.public": "kentik_api/public",
-    },
+    packages=PACKAGES,
+    package_dir=PACKAGE_DIR,
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
 )
