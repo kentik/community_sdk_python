@@ -30,15 +30,15 @@ class Filters:
 
 class SavedFilter:
     def __init__(
-            self,
-            cdate: Optional[str] = None,
-            company_id: Optional[int] = None,
-            edate: Optional[str] = None,
-            filter_description: Optional[str] = None,
-            filter_level: Optional[str] = None,
-            filter_name: Optional[str] = None,
-            filters: Optional[Filters] = None,
-            id: Optional[int] = None,
+        self,
+        cdate: Optional[str] = None,
+        company_id: Optional[int] = None,
+        edate: Optional[str] = None,
+        filter_description: Optional[str] = None,
+        filter_level: Optional[str] = None,
+        filter_name: Optional[str] = None,
+        filters: Optional[Filters] = None,
+        id: Optional[int] = None,
     ) -> None:
         self.filter_description = filter_description
         self.filter_level = filter_level

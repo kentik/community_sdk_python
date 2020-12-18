@@ -79,27 +79,33 @@ class GetAllResponse(List[GetResponse]):
 
 class CreateRequest:
     def __init__(
-            self,
-            saved_filter: SavedFilter,
+        self,
+        saved_filter: SavedFilter,
     ) -> None:
         self.filter_name = saved_filter.filter_name
         self.filter_description = saved_filter.filter_description
-        self.filters = {
+        self.filters = (
+            {
                 "connector": saved_filter.filters.connector,
-                "filterGroups": CreateRequest.get_filter_groups(saved_filter.filters.filterGroups)
-            } if saved_filter.filters is not None else None
+                "filterGroups": CreateRequest.get_filter_groups(saved_filter.filters.filterGroups),
+            }
+            if saved_filter.filters is not None
+            else None
+        )
 
     @staticmethod
     def get_filter_groups(filter_groups: List[FilterGroups]) -> List[Dict[str, Any]]:
-        return [{
-            "connector": i.connector,
-            "filters": [{
-                "filterField": j.filterField,
-                "filterValue": j.filterValue,
-                "operator": j.operator
-            } for j in i.filters],
-            "not": i.not_
-        } for i in filter_groups]
+        return [
+            {
+                "connector": i.connector,
+                "filters": [
+                    {"filterField": j.filterField, "filterValue": j.filterValue, "operator": j.operator}
+                    for j in i.filters
+                ],
+                "not": i.not_,
+            }
+            for i in filter_groups
+        ]
 
 
 CreateResponse = GetResponse
