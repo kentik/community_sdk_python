@@ -12,24 +12,24 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-PACKAGES=[
-        "kentik_api",
-        "kentik_api.auth",
-        "kentik_api.api_calls",
-        "kentik_api.api_connection",
-        "kentik_api.api_resources",
-        "kentik_api.requests_payload",
-        "kentik_api.public",
-    ]
-PACKAGE_DIR={
-        "kentik_api": "kentik_api",
-        "kentik_api.auth": "kentik_api/auth",
-        "kentik_api.api_calls": "kentik_api/api_calls",
-        "kentik_api.api_connection": "kentik_api/api_connection",
-        "kentik_api.api_resources": "kentik_api/api_resources",
-        "kentik_api.requests_payload": "kentik_api/requests_payload",
-        "kentik_api.public": "kentik_api/public",
-    }
+PACKAGES = [
+    "kentik_api",
+    "kentik_api.auth",
+    "kentik_api.api_calls",
+    "kentik_api.api_connection",
+    "kentik_api.api_resources",
+    "kentik_api.requests_payload",
+    "kentik_api.public",
+]
+PACKAGE_DIR = {
+    "kentik_api": "kentik_api",
+    "kentik_api.auth": "kentik_api/auth",
+    "kentik_api.api_calls": "kentik_api/api_calls",
+    "kentik_api.api_connection": "kentik_api/api_connection",
+    "kentik_api.api_resources": "kentik_api/api_resources",
+    "kentik_api.requests_payload": "kentik_api/requests_payload",
+    "kentik_api.public": "kentik_api/public",
+}
 
 
 class PylintCmd(distutils.cmd.Command):
