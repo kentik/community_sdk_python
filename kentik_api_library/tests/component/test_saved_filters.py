@@ -37,8 +37,9 @@ def test_create_saved_filter_success(client, connector) -> None:
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
-    to_create = SavedFilter(filter_name="test_filter1", filters=filters,
-                            filter_description="This is test filter description")
+    to_create = SavedFilter(
+        filter_name="test_filter1", filters=filters, filter_description="This is test filter description"
+    )
     created = client.saved_filters.create(to_create)
 
     # then
@@ -150,8 +151,9 @@ def test_update_saved_filter_success(client, connector) -> None:
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
-    to_update = SavedFilter(filter_name="test_filter1", filters=filters, id=filter_id,
-                            filter_description="Updated Saved Filter description")
+    to_update = SavedFilter(
+        filter_name="test_filter1", filters=filters, id=filter_id, filter_description="Updated Saved Filter description"
+    )
     updated = client.saved_filters.update(to_update)
 
     # then

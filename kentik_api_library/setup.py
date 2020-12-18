@@ -71,7 +71,9 @@ class MypyCmd(distutils.cmd.Command):
         try:
             subprocess.check_call(cmd)
         except subprocess.CalledProcessError:
-            pass
+            self.announce(
+                "Command: {} returned error. Check if tests are not failing.".format(str(cmd)), level=distutils.log.INFO
+            )
 
 
 setup(

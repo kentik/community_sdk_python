@@ -40,8 +40,9 @@ def run_crud() -> None:
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
-    to_create = SavedFilter(filter_name="test_filter1", filters=filters,
-                          filter_description="This is test filter description")
+    to_create = SavedFilter(
+        filter_name="test_filter1", filters=filters, filter_description="This is test filter description"
+    )
     created = client.saved_filters.create(to_create)
     print(created.__dict__)
     created_id = created.id
@@ -62,7 +63,6 @@ def run_crud() -> None:
     print("### DELETE")
     deleted = client.saved_filters.delete(created_id)
     print(deleted)
-
 
 
 if __name__ == "__main__":
