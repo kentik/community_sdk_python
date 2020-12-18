@@ -24,9 +24,9 @@ Implemented API resources:
 
 Working on:
 - query methods
+- devices (need request-response data structures implemented)
 
 To be implemented:
-- devices
 - plans
 - alerts
 - alerts active
