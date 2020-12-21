@@ -10,6 +10,7 @@ class DeviceItem:
     device_subtype: str
     device_type: Optional[str]
 
+# pylint: disable=too-many-instance-attributes
 
 class DeviceLabel:
     def __init__(
@@ -59,3 +60,5 @@ class DeviceLabel:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
+# pylint: enable=too-many-instance-attributes

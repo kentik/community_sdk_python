@@ -1,6 +1,7 @@
 from typing import Optional, List
 from enum import Enum
 
+# pylint: disable=too-many-instance-attributes
 
 class Populator:
     class Direction(Enum):
@@ -105,6 +106,7 @@ class Populator:
     def updated_date(self) -> Optional[str]:
         return self._updated_date
 
+# pylint: enable=too-many-instance-attributes
 
 class CustomDimension:
     def __init__(

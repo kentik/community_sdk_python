@@ -11,6 +11,7 @@ from .api_resources.custom_dimensions_api import CustomDimensionsAPI
 API_REGION_US = "us"
 API_REGION_EU = "eu"
 
+# pylint: disable=too-many-instance-attributes
 
 class KentikAPI(object):
     """ Root object for operating KentikAPI """
@@ -35,6 +36,7 @@ class KentikAPI(object):
         # self.devices =
         # ...
 
+# pylint: enable=too-many-instance-attributes
 
 def new_connector(api_url: str, auth_email: str, auth_token: str) -> APIConnector:
     versioned_api_url = api_url + "/" + KentikAPI.API_VERSION

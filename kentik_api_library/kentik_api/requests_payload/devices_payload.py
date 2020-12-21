@@ -13,6 +13,7 @@ class _DeviceSnmpV3Conf:
     AuthenticationPassphrase: Union[str, None, NOTSET] = _NOTSET
     PrivacyPassphrase: Union[str, None, NOTSET] = _NOTSET
 
+# pylint: disable=too-many-instance-attributes
 
 @dataclass()
 class Device:
@@ -32,3 +33,5 @@ class Device:
     device_bgp_neighbor_asn: Union[str, None, NOTSET] = _NOTSET
     device_bgp_password: Union[str, None, NOTSET] = _NOTSET
     device_bgp_flowspec: Union[bool, None, NOTSET] = _NOTSET
+
+# pylint: enable=too-many-instance-attributes

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from kentik_api.public.custom_application import CustomApplication
 
+# pylint: disable=too-many-instance-attributes
 
 @dataclass
 class GetResponse:
@@ -39,6 +40,7 @@ class GetResponse:
             edate=self.edate,
         )
 
+# pylint: enable=too-many-instance-attributes
 
 class GetAllResponse(List[GetResponse]):
     @classmethod

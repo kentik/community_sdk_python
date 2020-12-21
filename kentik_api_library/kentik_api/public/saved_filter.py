@@ -27,6 +27,7 @@ class Filters:
     custom: Optional[bool] = None
     filterString: Optional[str] = None
 
+# pylint: disable=too-many-instance-attributes
 
 class SavedFilter:
     def __init__(
@@ -67,3 +68,5 @@ class SavedFilter:
     def company_id(self) -> int:
         assert self._company_id is not None
         return self._company_id
+
+# pylint: enable=too-many-instance-attributes

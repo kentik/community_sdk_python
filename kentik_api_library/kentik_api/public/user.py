@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional
 
+# pylint: disable=too-many-instance-attributes
 
 class User:
     def __init__(
@@ -53,3 +54,5 @@ class User:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
+# pylint: enable=too-many-instance-attributes

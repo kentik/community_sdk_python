@@ -4,6 +4,7 @@ from typing import Optional, Dict, List
 
 from kentik_api.public.user import User
 
+# pylint: disable=too-many-instance-attributes
 
 @dataclass()
 class _User:
@@ -40,6 +41,7 @@ class _User:
             saved_filters=list(self.saved_filters),
         )
 
+# pylint: enable=too-many-instance-attributes
 
 @dataclass()
 class GetResponse:

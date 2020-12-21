@@ -1,5 +1,6 @@
 from typing import Optional
 
+# pylint: disable=too-many-instance-attributes
 
 class CustomApplication:
     def __init__(
@@ -51,3 +52,5 @@ class CustomApplication:
     @property
     def edate(self) -> Optional[str]:
         return self._edate
+
+# pylint: enable=too-many-instance-attributes
