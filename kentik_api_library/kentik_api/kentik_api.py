@@ -3,6 +3,7 @@ from .api_resources.device_labels_api import DeviceLabelsAPI
 from .api_resources.query_api import QueryAPI
 from .api_resources.sites_api import SitesAPI
 from .api_resources.users_api import UsersAPI
+from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.saved_filters_api import SavedFiltersAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
@@ -32,6 +33,7 @@ class KentikAPI(object):
         self.custom_dimensions = CustomDimensionsAPI(connector)
         self.custom_applications = CustomApplicationsAPI(connector)
         self.query = QueryAPI(connector)
+        self.my_kentik_portal = MyKentikPortalAPI(connector)
         # self.devices =
         # ...
 
