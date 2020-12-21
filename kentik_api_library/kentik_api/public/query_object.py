@@ -1,14 +1,13 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Mapping, Sequence
+from typing import List, Optional, Dict
 from enum import Enum
 
 from kentik_api.public.saved_filter import Filters
 
 
 class ImageType(Enum):
-    none = "None"
     png = "png"
-    jpg = "jpg"
+    jpg = "jpeg"
     svg = "svg"
     pdf = "pdf"
 
@@ -137,55 +136,55 @@ class Aggregate:
     name: str
     column: str
     fn: AggregateFunctionType
-    rank: Optional[int]  # value [5-99]; only used when fn == percentile
     sample_rate: int = 1
-    raw: Optional[bool] = False
+    rank: Optional[int] = None  # valid: number 5..99; only used when fn == percentile
+    raw: Optional[bool] = None  # requred for topxchart queries
 
 
 @dataclass
 class Query:
-    device_name: str  # eg. "device1,device2", alternative with "all_selected"
-    filters_obj: Filters
-    saved_filters: List[SavedFilter]
     metric: MetricType
     dimension: List[DimensionType]
-    viz_type: Optional[ChartViewType] = None
-    show_overlay: Optional[bool] = None
-    overlay_day: Optional[int] = None
-    sync_axes: Optional[bool] = None
+    filters_obj: Optional[Filters] = None
+    saved_filters: List[SavedFilter] = field(default_factory=list)
     matrixBy: List[str] = field(default_factory=list)  # DimensionType or custom dimension
-    cidr: Optional[int] = None
-    cidr6: Optional[int] = None
-    pps_threshold: Optional[int] = None
-    topx: int = 8
-    depth: int = 100
-    fastData: FastDataType = FastDataType.full
-    outsort: str = "max"  # also: "avg", "sum", "p95th" and others
+    cidr: Optional[int] = None  # valid: number 0..32
+    cidr6: Optional[int] = None  # valid: number 0..128
+    pps_threshold: Optional[int] = None  # valid number > 0
+    topx: int = 8  # valid: number 1..40
+    depth: int = 100  # valid: number 25..250
+    fastData: FastDataType = FastDataType.auto
     time_format: TimeFormat = TimeFormat.utc
     hostname_lookup: bool = True
-    lookback_seconds: int = 0  # value != 0 overrides "starting_time" and "ending_time"
-    starting_time: Optional[str] = None  # alternative with "lookback_seconds"
-    ending_time: Optional[str] = None  # alternative with "lookback_seconds"
-    all_selected: bool = False  # overrides "device_name"
-    descriptor: str = ""  # only used when dimension is "traffic"
+    lookback_seconds: int = 3600  # value != 0 overrides "starting_time" and "ending_time"
+    starting_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
+    ending_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
+    all_selected: Optional[bool] = None  # overrides "device_name" if true (makes it ignored)
+    device_name: List[str] = field(default_factory=list)  #  alternative with "all_selected"
+    descriptor: str = ""  # only used when dimension is "Traffic"
     aggregates: List[Aggregate] = field(default_factory=list)
-    query_title: str = ""
+    outsort: Optional[str] = None  # name of aggregate object, required when more than 1 objects on "aggregates" list
+    query_title: str = ""  # only used in QueryChart
+    viz_type: Optional[ChartViewType] = None  # only used in QueryChart, QueryURL
+    show_overlay: Optional[bool] = None  # only used in QueryChart, QueryURL
+    overlay_day: Optional[int] = None  # only used in QueryChart, QueryURL
+    sync_axes: Optional[bool] = None  # only used in QueryChart, QueryURL
 
 
 @dataclass
 class QueryArrayItem:
     query: Query
     bucket: str
-    bucketIndex: int
-    isOverlay: Optional[bool]
+    bucketIndex: Optional[int] = None
+    isOverlay: Optional[bool] = None  # used in QueryChart, QueryURL
 
 
 @dataclass
 class QueryObject:
     queries: List[QueryArrayItem]
-    imageType: Optional[ImageType]
+    imageType: Optional[ImageType] = None  # used in QueryChart
 
 
 @dataclass
 class QueryResult:
-    results: Sequence[Mapping]
+    results: List[Dict]  # The elements included in the array depend on the query passed into the call
