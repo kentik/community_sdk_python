@@ -4,6 +4,7 @@ from typing import Optional
 
 
 class CustomApplication:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name: Optional[str] = None,
@@ -32,6 +33,8 @@ class CustomApplication:
         self._user_id = user_id
         self._cdate = cdate
         self._edate = edate
+
+    # pylint: disable=too-many-arguments
 
     @property
     def id(self) -> int:

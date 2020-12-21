@@ -10,6 +10,8 @@ class Populator:
         DST = "DST"
         EITHER = "EITHER"
 
+    # pylint: disable=too-many-arguments
+
     def __init__(
         self,
         value: str,
@@ -73,6 +75,8 @@ class Populator:
         self._created_date = created_date
         self._updated_date = updated_date
 
+    # pylint: enable=too-many-arguments
+
     @property
     def id(self) -> int:
         assert self._id is not None
@@ -112,6 +116,7 @@ class Populator:
 
 
 class CustomDimension:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name: Optional[str] = None,
@@ -130,6 +135,8 @@ class CustomDimension:
         # read-only
         self._id = id
         self._company_id = company_id
+
+    # pylint: enable=too-many-arguments
 
     @property
     def id(self) -> int:

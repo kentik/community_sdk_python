@@ -2,6 +2,7 @@ from typing import Optional
 
 
 class Site:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         site_name: Optional[str] = None,
@@ -18,6 +19,8 @@ class Site:
         # read-only
         self._id = id
         self._company_id = company_id
+
+    # pylint: enable=too-many-arguments
 
     @property
     def id(self) -> int:

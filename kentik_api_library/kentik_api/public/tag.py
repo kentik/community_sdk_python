@@ -4,6 +4,7 @@ from typing import Optional
 
 
 class Tag:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         flow_tag: Optional[str] = None,
@@ -64,6 +65,8 @@ class Tag:
         self._edited_by = edited_by
         self._created_date = created_date
         self._updated_date = updated_date
+
+    # pylint: enable=too-many-arguments
 
     @property
     def id(self) -> int:

@@ -15,6 +15,7 @@ class DeviceItem:
 
 
 class DeviceLabel:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name: str,
@@ -37,6 +38,8 @@ class DeviceLabel:
         self._devices = devices
         self._created_date = created_date
         self._updated_date = updated_date
+
+    # pylint: enable=too-many-arguments
 
     @property
     def id(self) -> int:
