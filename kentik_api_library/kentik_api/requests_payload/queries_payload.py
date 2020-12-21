@@ -1,5 +1,5 @@
 import json
-from typing import Mapping, Sequence
+from typing import List, Dict
 from dataclasses import dataclass
 
 from kentik_api.public.query_object import QueryResult
@@ -7,7 +7,7 @@ from kentik_api.public.query_object import QueryResult
 
 @dataclass()
 class GetDataResponse:
-    results: Sequence[Mapping]
+    results: List[Dict]
 
     @classmethod
     def from_json(cls, json_string):
