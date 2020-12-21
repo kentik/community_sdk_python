@@ -1,5 +1,5 @@
-import pytest
 from unittest import mock
+import pytest
 
 from tests.component.stub_api_connector import StubAPIConnector
 from kentik_api import KentikAPI

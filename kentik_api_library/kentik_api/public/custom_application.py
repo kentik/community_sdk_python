@@ -1,7 +1,10 @@
 from typing import Optional
 
+# pylint: disable=too-many-instance-attributes
+
 
 class CustomApplication:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name: Optional[str] = None,
@@ -31,6 +34,8 @@ class CustomApplication:
         self._cdate = cdate
         self._edate = edate
 
+    # pylint: disable=too-many-arguments
+
     @property
     def id(self) -> int:
         assert self._id is not None
@@ -51,3 +56,6 @@ class CustomApplication:
     @property
     def edate(self) -> Optional[str]:
         return self._edate
+
+
+# pylint: enable=too-many-instance-attributes

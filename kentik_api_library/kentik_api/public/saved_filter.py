@@ -28,7 +28,11 @@ class Filters:
     filterString: Optional[str] = None
 
 
+# pylint: disable=too-many-instance-attributes
+
+
 class SavedFilter:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         cdate: Optional[str] = None,
@@ -50,6 +54,7 @@ class SavedFilter:
         self._id = id
         self._company_id = company_id
 
+    # pylint: enable=too-many-arguments
     @property
     def cdate(self) -> Optional[str]:
         return self._cdate
@@ -67,3 +72,6 @@ class SavedFilter:
     def company_id(self) -> int:
         assert self._company_id is not None
         return self._company_id
+
+
+# pylint: enable=too-many-instance-attributes

@@ -1,3 +1,4 @@
+# pylint: disable=too-few-public-methods
 from typing import Any, Dict, Optional
 
 from kentik_api.api_calls.api_call import APICall, APICallMethods

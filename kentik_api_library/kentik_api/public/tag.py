@@ -1,7 +1,10 @@
 from typing import Optional
 
+# pylint: disable=too-many-instance-attributes
+
 
 class Tag:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         flow_tag: Optional[str] = None,
@@ -63,6 +66,8 @@ class Tag:
         self._created_date = created_date
         self._updated_date = updated_date
 
+    # pylint: enable=too-many-arguments
+
     @property
     def id(self) -> int:
         assert self._id is not None
@@ -95,3 +100,6 @@ class Tag:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
+
+# pylint: enable=too-many-instance-attributes

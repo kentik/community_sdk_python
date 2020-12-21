@@ -1,7 +1,10 @@
 from typing import List, Dict, Optional
 
+# pylint: disable=too-many-instance-attributes
+
 
 class User:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         username: Optional[str] = None,
@@ -37,6 +40,7 @@ class User:
         self._created_date = created_date
         self._updated_date = updated_date
 
+    # pylint: enable=too-many-arguments
     @property
     def id(self) -> int:
         assert self._id is not None
@@ -53,3 +57,6 @@ class User:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
+
+# pylint: enable=too-many-instance-attributes

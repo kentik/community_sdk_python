@@ -195,7 +195,7 @@ def test_get_all_device_labels_success(client, connector) -> None:
     labels = client.device_labels.get_all()
 
     # then request properly formed
-    assert connector.last_url == f"/deviceLabels"
+    assert connector.last_url == "/deviceLabels"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 

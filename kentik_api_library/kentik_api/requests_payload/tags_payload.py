@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 from kentik_api.public.tag import Tag
 
+# pylint: disable=too-many-instance-attributes
+
 
 @dataclass
 class _RequestTag:
@@ -26,6 +28,11 @@ class _RequestTag:
     mac: Optional[str] = None
     country: Optional[str] = None
     vlans: Optional[str] = None
+
+
+# pylint: enable=too-many-instance-attributes
+
+# pylint: disable=too-many-instance-attributes
 
 
 @dataclass
@@ -59,6 +66,9 @@ class _ResponseTag:
     updated_date: str
 
 
+# pylint: enable=too-many-instance-attributes
+
+
 @dataclass()
 class GetResponse:
     tag: _ResponseTag  # tags api payload is embedded under "tag" key
@@ -68,6 +78,7 @@ class GetResponse:
         dic = json.loads(json_string)
         return cls(_ResponseTag(**dic["tag"]))
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def from_fields(
         cls,
@@ -130,6 +141,8 @@ class GetResponse:
         )
         return cls(tag)
 
+    # pylint: enable=too-many-arguments
+
     def to_tag(self) -> Tag:
         return Tag(
             flow_tag=self.tag.flow_tag,
@@ -177,6 +190,7 @@ class GetAllResponse(List[GetResponse]):
 
 
 class CreateRequest:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         flow_tag: str,
@@ -221,11 +235,14 @@ class CreateRequest:
             vlans=vlans,
         )
 
+    # pylint: enable=too-many-arguments
+
 
 CreateResponse = GetResponse
 
 
 class UpdateRequest:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         flow_tag: Optional[str] = None,
@@ -269,6 +286,8 @@ class UpdateRequest:
             country=country,
             vlans=vlans,
         )
+
+    # pylint: enable=too-many-arguments
 
 
 UpdateResponse = GetResponse
