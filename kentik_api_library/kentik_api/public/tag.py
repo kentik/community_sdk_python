@@ -2,6 +2,7 @@ from typing import Optional
 
 # pylint: disable=too-many-instance-attributes
 
+
 class Tag:
     def __init__(
         self,
@@ -96,5 +97,6 @@ class Tag:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
 
 # pylint: enable=too-many-instance-attributes

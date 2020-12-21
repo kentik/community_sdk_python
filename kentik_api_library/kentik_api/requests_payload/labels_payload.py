@@ -32,7 +32,9 @@ class _DeviceArray(List[_Device]):
     def to_device_items(self) -> List[DeviceItem]:
         return [d.to_device_item() for d in self]
 
+
 # pylint: disable=too-many-instance-attributes
+
 
 @dataclass()
 class GetResponse:
@@ -64,7 +66,9 @@ class GetResponse:
             self.updated_date,
         )
 
+
 # pylint: enable=too-many-instance-attributes
+
 
 class GetAllResponse(List[GetResponse]):
     @classmethod

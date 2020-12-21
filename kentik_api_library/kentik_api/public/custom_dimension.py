@@ -3,6 +3,7 @@ from enum import Enum
 
 # pylint: disable=too-many-instance-attributes
 
+
 class Populator:
     class Direction(Enum):
         SRC = "SRC"
@@ -106,7 +107,9 @@ class Populator:
     def updated_date(self) -> Optional[str]:
         return self._updated_date
 
+
 # pylint: enable=too-many-instance-attributes
+
 
 class CustomDimension:
     def __init__(

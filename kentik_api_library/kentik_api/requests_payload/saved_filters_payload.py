@@ -6,6 +6,7 @@ from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, F
 
 # pylint: disable=too-many-instance-attributes
 
+
 @dataclass()
 class GetResponse:
     id: int
@@ -62,6 +63,7 @@ class GetResponse:
             operator=dic["operator"],
             id=dic.get("id"),
         )
+
 
 # pylint: enable=too-many-instance-attributes
 

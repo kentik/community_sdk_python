@@ -6,6 +6,7 @@ from kentik_api.public.custom_dimension import Populator
 
 # pylint: disable=too-many-instance-attributes
 
+
 @dataclass
 class _Populator:
     id: int
@@ -70,7 +71,9 @@ class _Populator:
             updated_date=self.updated_date,
         )
 
+
 # pylint: enable=too-many-instance-attributes
+
 
 class PopulatorArray(List[_Populator]):
     @classmethod
@@ -117,6 +120,7 @@ class CreateRequest:
         mac: Optional[str]
         country: Optional[str]
         vlans: Optional[str]
+
     # pylint: enable=too-many-instance-attributes
 
     def __init__(self, **kwargs):
@@ -153,6 +157,7 @@ class UpdateRequest:
         mac: Optional[str]
         country: Optional[str]
         vlans: Optional[str]
+
     # pylint: enable=too-many-instance-attributes
 
     def __init__(self, **kwargs):

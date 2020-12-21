@@ -6,6 +6,7 @@ from kentik_api.public.tag import Tag
 
 # pylint: disable=too-many-instance-attributes
 
+
 @dataclass
 class _RequestTag:
     flow_tag: Optional[str] = None
@@ -28,9 +29,11 @@ class _RequestTag:
     country: Optional[str] = None
     vlans: Optional[str] = None
 
+
 # pylint: enable=too-many-instance-attributes
 
 # pylint: disable=too-many-instance-attributes
+
 
 @dataclass
 class _ResponseTag:
@@ -62,7 +65,9 @@ class _ResponseTag:
     created_date: str
     updated_date: str
 
+
 # pylint: enable=too-many-instance-attributes
+
 
 @dataclass()
 class GetResponse:
