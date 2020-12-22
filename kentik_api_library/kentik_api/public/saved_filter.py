@@ -28,10 +28,12 @@ class FilterGroups:
         self.metric = metric
 
     @property
-    def not_(self, not_: Optional[bool] = None) -> bool:
-        if not_ is not None:
-            setattr(self, "not", not_)
+    def not_(self) -> bool:
         return getattr(self, "not")
+
+    @not_.setter
+    def not_(self, not_: bool) -> None:
+        setattr(self, "not", not_)
 
 
 @dataclass()
