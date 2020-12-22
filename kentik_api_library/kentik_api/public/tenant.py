@@ -3,14 +3,14 @@ from typing import List, Optional
 
 class TenantUser:
     def __init__(
-            self,
-            id: str,
-            user_email: str,
-            tenant_id: str,
-            company_id: str,
-            last_login: Optional[str] = None,
-            user_name: Optional[str] = None,
-            user_full_name: Optional[str] = None,
+        self,
+        id: str,
+        user_email: str,
+        tenant_id: str,
+        company_id: str,
+        last_login: Optional[str] = None,
+        user_name: Optional[str] = None,
+        user_full_name: Optional[str] = None,
     ) -> None:
         self.id = id
         self.email = user_email
@@ -23,13 +23,13 @@ class TenantUser:
 
 class Tenant:
     def __init__(
-            self,
-            id: int,
-            users: List[TenantUser],
-            created_date: str,
-            updated_date: str,
-            name: Optional[str] = None,
-            description: Optional[str] = None,
+        self,
+        id: int,
+        users: List[TenantUser],
+        created_date: str,
+        updated_date: str,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
     ) -> None:
         self.id = int(id)
         self.company_id = users[0].company_id if len(users) > 0 else None
@@ -38,4 +38,3 @@ class Tenant:
         self.cdate = created_date
         self.edate = updated_date
         self.users = users
-

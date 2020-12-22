@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import json
 from typing import Optional, Dict, List
-
 from kentik_api.public.tenant import Tenant, TenantUser
 
 
@@ -46,11 +45,8 @@ class GetAllResponse(List[GetResponse]):
 
 
 class CreateUserRequest:
-
     def __init__(self, email: str) -> None:
-        self.user = {
-            "user_email": email
-        }
+        self.user = {"user_email": email}
 
 
 @dataclass()
