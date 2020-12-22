@@ -6,4 +6,4 @@ from .saved_filter import SavedFilter, Filters, FilterGroups, Filter
 from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .query_sql import SQLQuery
-from .query_object import QueryObject, QueryResult
+from .query_object import QueryObject, QueryDataResult, QueryChartResult
