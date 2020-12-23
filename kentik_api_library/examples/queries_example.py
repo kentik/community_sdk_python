@@ -17,6 +17,8 @@ from kentik_api.public.query_object import (
     FastDataType,
     MetricType,
     DimensionType,
+    ImageType,
+    ChartViewType,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -34,12 +36,7 @@ def get_auth_email_token() -> Tuple[str, str]:
 
 def run_query_data() -> None:
     """
-    Expected response is like:
-
-    Sending data query...
-
-    Results:
-    [subsequent result items]
+    Expected response is subsequent result items
     """
 
     email, token = get_auth_email_token()
@@ -68,7 +65,7 @@ def run_query_data() -> None:
     query_item = QueryArrayItem(query=query, bucket="Left +Y Axis")
     query_object = QueryObject(queries=[query_item])
 
-    print("Sending data query...")
+    print("Sending query for data...")
     result = client.query.data(query_object)
 
     print("Results:")
@@ -76,5 +73,48 @@ def run_query_data() -> None:
         print(item.__dict__)
 
 
+def run_query_chart() -> None:
+    """
+    Expected response is image type and base64 encoded image data
+    """
+
+    email, token = get_auth_email_token()
+    client = KentikAPI(email, token)
+
+    agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
+    agg2 = Aggregate(name="p95th_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.percentile, rank=95)
+    agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
+    query = Query(
+        dimension=[DimensionType.Traffic],
+        cidr=32,
+        cidr6=128,
+        metric=MetricType.bytes,
+        topx=8,
+        depth=75,
+        fastData=FastDataType.auto,
+        outsort="avg_bits_per_sec",
+        overlay_day=-7,
+        show_overlay=False,
+        sync_axes=False,
+        viz_type=ChartViewType.stackedArea,
+        lookback_seconds=3600,
+        hostname_lookup=True,
+        device_name=[],
+        matrixBy=[],
+        all_selected=True,
+        filters_obj=None,
+        descriptor="",
+        aggregates=[agg1, agg2, agg3],
+    )
+    query_item = QueryArrayItem(query=query, bucket="Left +Y Axis", isOverlay=False)
+    query_object = QueryObject(queries=[query_item], imageType=ImageType.png)
+
+    print("Sending query for chart...")
+    result = client.query.chart(query_object)
+
+    print("Result:")
+    print(result.__dict__)
+
+
 if __name__ == "__main__":
-    run_query_data()
+    run_query_chart()

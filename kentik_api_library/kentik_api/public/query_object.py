@@ -186,5 +186,11 @@ class QueryObject:
 
 
 @dataclass
-class QueryResult:
+class QueryDataResult:
     results: List[Dict]  # The elements included in the array depend on the query passed into the call
+
+
+@dataclass
+class QueryChartResult:
+    image_type: ImageType
+    image_data_base64: str

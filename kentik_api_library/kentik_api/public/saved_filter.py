@@ -10,14 +10,30 @@ class Filter:
     id: Optional[str] = None
 
 
-@dataclass()
 class FilterGroups:
-    connector: str
-    filters: List[Filter]
-    not_: bool
-    filterString: Optional[str] = None
-    id: Optional[str] = None
-    metric: Optional[str] = None
+    def __init__(
+        self,
+        connector: str,
+        filters: List[Filter],
+        not_: bool,
+        filterString: Optional[str] = None,
+        id: Optional[str] = None,
+        metric: Optional[str] = None,
+    ) -> None:
+        self.connector = connector
+        self.filters = filters
+        setattr(self, "not", not_)
+        self.filterString = filterString
+        self.id = id
+        self.metric = metric
+
+    @property
+    def not_(self) -> bool:
+        return getattr(self, "not")
+
+    @not_.setter
+    def not_(self, not_: bool) -> None:
+        setattr(self, "not", not_)
 
 
 @dataclass()

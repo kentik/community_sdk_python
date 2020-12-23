@@ -1,8 +1,8 @@
 from kentik_api.api_calls import query_methods
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.requests_payload.queries_payload import GetDataResponse
+from kentik_api.requests_payload.queries_payload import QueryDataResponse, QueryChartResponse
 from kentik_api.public.query_sql import SQLQuery, SQLQueryResult
-from kentik_api.public.query_object import QueryObject, QueryResult
+from kentik_api.public.query_object import QueryObject, QueryDataResult, QueryChartResult, ImageType
 
 
 class QueryAPI(BaseAPI):
@@ -14,8 +14,14 @@ class QueryAPI(BaseAPI):
         response = self._send(apicall, payload)
         return SQLQueryResult.from_json(response.text)
 
-    def data(self, query: QueryObject) -> QueryResult:
+    def data(self, query: QueryObject) -> QueryDataResult:
         apicall = query_methods.query_data()
         payload = query
         response = self._send(apicall, payload)
-        return GetDataResponse.from_json(response.text).to_query_result()
+        return QueryDataResponse.from_json(response.text).to_query_data_result()
+
+    def chart(self, query: QueryObject) -> QueryChartResult:
+        apicall = query_methods.query_chart()
+        payload = query
+        response = self._send(apicall, payload)
+        return QueryChartResponse.from_json(response.text).to_query_chart_result()
