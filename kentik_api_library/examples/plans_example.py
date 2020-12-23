@@ -1,6 +1,6 @@
 # pylint: disable=redefined-outer-name
 """
-Example of using the users API
+Example of using the plans API
 """
 
 import os
