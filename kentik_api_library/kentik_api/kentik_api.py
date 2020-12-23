@@ -15,7 +15,7 @@ API_REGION_EU = "eu"
 # pylint: disable=too-many-instance-attributes
 
 
-class KentikAPI(object):
+class KentikAPI:
     """ Root object for operating KentikAPI """
 
     API_VERSION = "v5"
