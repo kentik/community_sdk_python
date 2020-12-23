@@ -7,4 +7,16 @@ from .tenant import Tenant, TenantUser
 from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .query_sql import SQLQuery
-from .query_object import QueryObject, QueryDataResult, QueryChartResult
+from .query_object import (
+    QueryObject,
+    QueryArrayItem,
+    Query,
+    ImageType,
+    Aggregate,
+    AggregateFunctionType,
+    FastDataType,
+    MetricType,
+    DimensionType,
+    ChartViewType,
+    TimeFormat,
+)
