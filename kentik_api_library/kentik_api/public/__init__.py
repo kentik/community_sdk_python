@@ -7,3 +7,4 @@ from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .query_sql import SQLQuery
 from .query_object import QueryObject, QueryResult
+from .plan import Plan, PlanDevice, PlanDeviceType
