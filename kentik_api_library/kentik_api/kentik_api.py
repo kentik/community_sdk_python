@@ -8,6 +8,7 @@ from .api_resources.tags_api import TagsAPI
 from .api_resources.saved_filters_api import SavedFiltersAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
 from .api_resources.custom_dimensions_api import CustomDimensionsAPI
+from .api_resources.batch_api import BatchAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
@@ -36,6 +37,7 @@ class KentikAPI(object):
         self.custom_applications = CustomApplicationsAPI(connector)
         self.query = QueryAPI(connector)
         self.my_kentik_portal = MyKentikPortalAPI(connector)
+        self.batch = BatchAPI(connector)
         # self.devices =
         # ...
 
