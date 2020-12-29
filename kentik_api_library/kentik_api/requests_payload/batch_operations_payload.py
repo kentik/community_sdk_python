@@ -21,11 +21,11 @@ class BatchRequest:
 
         value: str
 
-    guid: Optional[str]
     replace_all: bool
     complete: bool
     upserts: List[Upsert]
     deletes: List[Delete]
+    guid: Optional[str] = None
 
 
 @dataclass()
@@ -93,7 +93,7 @@ class BatchStatusResponse:
     def from_json(cls, json_string):
         dic = json.loads(json_string)
         return cls(
-            custom_dimension=dic.get("custom_dimension"),
+            custom_dimension=cls.CustomDimension(**dic.get("custom_dimension")) if "custom_dimension" in dic else None,
             guid=dic["guid"],
             is_multipart=dic["is_multipart"],
             is_complete=dic["is_complete"],

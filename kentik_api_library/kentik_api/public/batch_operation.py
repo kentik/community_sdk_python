@@ -32,8 +32,8 @@ class Deletion:
 @dataclass()
 class BatchOperationPart:
 
-    guid: Optional[str]
     replace_all: bool
     complete: bool
     upserts: List[Upsert]
     deletes: List[Deletion]
+    guid: Optional[str] = None
