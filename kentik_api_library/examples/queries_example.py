@@ -7,8 +7,9 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import KentikAPI
-from kentik_api.public.query_object import (
+from kentik_api import (
+    KentikAPI,
+    SQLQuery,
     QueryObject,
     QueryArrayItem,
     Query,
@@ -20,6 +21,7 @@ from kentik_api.public.query_object import (
     ImageType,
     ChartViewType,
 )
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -150,7 +152,40 @@ def run_query_url() -> None:
     print(result)
 
 
+def run_query_sql() -> None:
+    """
+    Expected response is rows containing SQL query result
+    """
+
+    email, token = get_auth_email_token()
+    client = KentikAPI(email, token)
+
+    # Return kpps and kBps over the last hour,
+    # grouped by minute (the first minute is skipped
+    # as it is likely incomplete most of the time):
+    query_string = (
+        "SELECT i_start_time, "
+        "round(sum(in_pkts)/(3600)/1000) AS f_sum_in_pkts, "
+        "round(sum(in_bytes)/(3600)/1000)*8 AS f_sum_in_bytes "
+        "FROM all_devices "
+        "WHERE ctimestamp > 3660 "
+        "AND ctimestamp < 60 "
+        "GROUP by i_start_time "
+        "ORDER by i_start_time DESC "
+        "LIMIT 1000;"
+    )
+
+    sql_query = SQLQuery(query_string)
+
+    print("Sending SQL query...")
+    result = client.query.sql(sql_query)
+
+    print("Result:")
+    print(result.rows)
+
+
 if __name__ == "__main__":
     # run_query_data()
     # run_query_chart()
-    run_query_url()
+    # run_query_url()
+    run_query_sql()
