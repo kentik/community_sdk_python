@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import KentikAPI
+from kentik_api import KentikAPI, SQLQuery
 from kentik_api.public.query_object import (
     QueryObject,
     QueryArrayItem,
@@ -114,6 +114,38 @@ def run_query_chart() -> None:
 
     print("Result:")
     print(result.__dict__)
+
+
+def run_query_sql() -> None:
+    """
+    Expected response is rows containing SQL query result
+    """
+
+    email, token = get_auth_email_token()
+    client = KentikAPI(email, token)
+
+    # Return kpps and kBps over the last hour,
+    # grouped by minute (the first minute is skipped
+    # as it is likely incomplete most of the time):
+    query_string = (
+        "SELECT i_start_time, "
+        "round(sum(in_pkts)/(3600)/1000) AS f_sum_in_pkts, "
+        "round(sum(in_bytes)/(3600)/1000)*8 AS f_sum_in_bytes "
+        "FROM all_devices "
+        "WHERE ctimestamp > 3660 "
+        "AND ctimestamp < 60 "
+        "GROUP by i_start_time "
+        "ORDER by i_start_time DESC "
+        "LIMIT 1000;"
+    )
+
+    sql_query = SQLQuery(query_string)
+
+    print("Sending SQL query...")
+    result = client.query.sql(sql_query)
+
+    print("Result:")
+    print(result.rows)
 
 
 if __name__ == "__main__":

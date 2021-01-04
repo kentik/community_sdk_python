@@ -7,5 +7,6 @@ from .tenant import Tenant, TenantUser
 from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .query_sql import SQLQuery
+from .plan import Plan, PlanDevice, PlanDeviceType
 from .query_object import QueryObject, QueryDataResult, QueryChartResult
 from .batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
