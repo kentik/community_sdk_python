@@ -7,7 +7,7 @@ from typing import Optional
 @dataclass()
 class CreateRequest:
     ipCidr: str
-    Comment: Optional[str]
+    comment: Optional[str]
     platformID: str
     methodID: str
     minutesBeforeAutoStop: str
@@ -15,7 +15,7 @@ class CreateRequest:
 
 class CreateResponse:
     def __init__(self, result: str) -> None:
-        self.response = {"result": result}
+        self.result = result
 
     @classmethod
     def from_json(cls, json_string):
@@ -23,4 +23,4 @@ class CreateResponse:
         return cls(dic["response"]["result"])
 
     def status(self) -> str:
-        return self.response["status"]
+        return self.result

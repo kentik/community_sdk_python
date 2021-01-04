@@ -12,14 +12,12 @@ class AlertingAPI(BaseAPI):
 
     def create_manual_mitigation(self, manual_mitigation: ManualMitigation) -> bool:
         api_call = alerts.create_manual_mitigation()
-        payload = as_dict(
-            manual_mitigations_payload.CreateRequest(
-                ipCidr=manual_mitigation.ipCidr,
-                Comment=manual_mitigation.comment,
-                platformID=manual_mitigation.platformID,
-                methodID=manual_mitigation.methodId,
-                minutesBeforeAutoStop=manual_mitigation.minutesBeforeAutoStop,
-            )
+        payload = manual_mitigations_payload.CreateRequest(
+            ipCidr=manual_mitigation.ipCidr,
+            comment=manual_mitigation.comment,
+            platformID=manual_mitigation.platformID,
+            methodID=manual_mitigation.methodId,
+            minutesBeforeAutoStop=manual_mitigation.minutesBeforeAutoStop,
         )
         response = self._send(api_call, payload)
-        return manual_mitigations_payload.CreateResponse.from_json(response.text).response["result"] == "OK"
+        return manual_mitigations_payload.CreateResponse.from_json(response.text).status() == "OK"

@@ -26,7 +26,7 @@ def test_create_manual_mitigation_success() -> None:
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["ipCidr"] == "192.168.1.0/24"
-    assert connector.last_payload["Comment"] == "comment"
+    assert connector.last_payload["comment"] == "comment"
     assert connector.last_payload["platformID"] == "1234"
     assert connector.last_payload["methodID"] == "12345"
     assert connector.last_payload["minutesBeforeAutoStop"] == "20"
