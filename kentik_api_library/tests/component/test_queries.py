@@ -19,6 +19,15 @@ from kentik_api.public.query_object import (
 from tests.component.stub_api_connector import StubAPIConnector
 
 
+def test_query_sql_success() -> None:
+    # given
+
+    # when
+
+    # then
+    pass
+
+
 def test_query_data_success() -> None:
     # given
     query_response_payload = """
@@ -198,7 +207,7 @@ def test_query_chart_success() -> None:
     assert query0["all_selected"] == False
     assert len(query0["filters_obj"]["filterGroups"]) == 1
     assert query0["filters_obj"]["filterGroups"][0]["connector"] == "All"
-    # assert query0["filters_obj"]["filterGroups"][0]["not"] == False # TODO: uncomment once FilterGroups marshaling "not" as "not_" is fixed
+    assert query0["filters_obj"]["filterGroups"][0]["not"] == False
     assert len(query0["filters_obj"]["filterGroups"][0]["filters"]) == 1
     assert query0["filters_obj"]["filterGroups"][0]["filters"][0]["filterField"] == "dst_as"
     assert query0["filters_obj"]["filterGroups"][0]["filters"][0]["operator"] == "="
@@ -224,3 +233,59 @@ def test_query_chart_success() -> None:
     # and response properly parsed
     assert result.image_type == ImageType.png
     assert result.image_data_base64 == "ImageDataEncodedBase64"
+
+
+def test_query_url_success() -> None:
+    # given
+    unquoted_response = "https://portal.kentik.com/portal/#Charts/shortUrl/e0d24b3cc8dfe41f9093668e531cbe96"
+    query_response_payload = f'"{unquoted_response}"'  # actual response is url in quotation marks
+    connector = StubAPIConnector(query_response_payload, HTTPStatus.OK)
+    query_api = QueryAPI(connector)
+
+    # when
+    query = Query(
+        viz_type=ChartViewType.stackedArea,
+        dimension=[DimensionType.Traffic],
+        cidr=32,
+        cidr6=128,
+        metric=MetricType.bytes,
+        topx=8,
+        depth=75,
+        fastData=FastDataType.auto,
+        outsort="avg_bits_per_sec",
+        lookback_seconds=3600,
+        hostname_lookup=True,
+        device_name=[],
+        all_selected=True,
+        descriptor="",
+    )
+    query_item = QueryArrayItem(query=query, bucket="Left +Y Axis")
+    query_object = QueryObject(queries=[query_item])
+    result = query_api.url(query_object)
+
+    # then request properly formed
+    assert connector.last_url == "/query/url"
+    assert connector.last_method == APICallMethods.POST
+    assert connector.last_payload is not None
+    assert len(connector.last_payload["queries"]) == 1
+    assert connector.last_payload["queries"][0]["bucket"] == "Left +Y Axis"
+    query0 = connector.last_payload["queries"][0]["query"]
+    assert query0["viz_type"] == "stackedArea"
+    assert len(query0["dimension"]) == 1
+    assert query0["dimension"][0] == "Traffic"
+    assert query0["cidr"] == 32
+    assert query0["cidr6"] == 128
+    assert query0["metric"] == "bytes"
+    assert query0["topx"] == 8
+    assert query0["depth"] == 75
+    assert query0["fastData"] == "Auto"
+    assert query0["outsort"] == "avg_bits_per_sec"
+    assert query0["lookback_seconds"] == 3600
+    assert query0["hostname_lookup"] == True
+    assert query0["device_name"] == []
+    assert query0["all_selected"] == True
+    assert "filters_obj" not in query0
+    assert query0["descriptor"] == ""
+
+    # and response properly parsed
+    assert result.url == unquoted_response
