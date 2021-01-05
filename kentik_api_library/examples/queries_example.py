@@ -7,8 +7,9 @@ import os
 import sys
 import logging
 from typing import Tuple
-from kentik_api import KentikAPI, SQLQuery
-from kentik_api.public.query_object import (
+from kentik_api import (
+    KentikAPI,
+    SQLQuery,
     QueryObject,
     QueryArrayItem,
     Query,
@@ -20,6 +21,7 @@ from kentik_api.public.query_object import (
     ImageType,
     ChartViewType,
 )
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -70,7 +72,7 @@ def run_query_data() -> None:
 
     print("Results:")
     for item in result.results:
-        print(item.__dict__)
+        print(item)
 
 
 def run_query_chart() -> None:
@@ -116,6 +118,40 @@ def run_query_chart() -> None:
     print(result.__dict__)
 
 
+def run_query_url() -> None:
+    """
+    Expected response is url to Data Explorer page with query params filled as specified in query
+    """
+
+    email, token = get_auth_email_token()
+    client = KentikAPI(email, token)
+
+    query = Query(
+        viz_type=ChartViewType.stackedArea,
+        dimension=[DimensionType.Traffic],
+        cidr=32,
+        cidr6=128,
+        metric=MetricType.bytes,
+        topx=8,
+        depth=75,
+        fastData=FastDataType.auto,
+        outsort="avg_bits_per_sec",
+        lookback_seconds=3600,
+        hostname_lookup=True,
+        device_name=[],
+        all_selected=True,
+        descriptor="",
+    )
+    query_item = QueryArrayItem(query=query, bucket="Left +Y Axis")
+    query_object = QueryObject(queries=[query_item])
+
+    print("Sending query for url...")
+    result = client.query.url(query_object)
+
+    print("Result:")
+    print(result)
+
+
 def run_query_sql() -> None:
     """
     Expected response is rows containing SQL query result
@@ -149,4 +185,7 @@ def run_query_sql() -> None:
 
 
 if __name__ == "__main__":
-    run_query_chart()
+    # run_query_data()
+    # run_query_chart()
+    # run_query_url()
+    run_query_sql()

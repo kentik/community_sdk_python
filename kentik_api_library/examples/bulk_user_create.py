@@ -55,7 +55,8 @@ if __name__ == "__main__":
 
     email = args.email or os.getenv("KTAPI_AUTH_EMAIL")
     token = args.token or os.getenv("KTAPI_AUTH_TOKEN")
-
+    assert isinstance(email, str)
+    assert isinstance(token, str)
     api = kentik_api.KentikAPI(email, token)
 
     print_all_users(api)

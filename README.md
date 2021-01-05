@@ -1,5 +1,8 @@
 # community_sdk_python
 
+## Usage examples
+
+For usage examples please see: kentik_api_library/examples/
 
 ## Release process for kentik-api
 
@@ -21,13 +24,13 @@ Implemented API resources:
 - custom dimensions
 - custom applications
 - saved filters
+- my kentik portal
+- query methods
 
 Working on:
-- query methods
+- plans
 - devices (need request-response data structures implemented)
 
 To be implemented:
-- plans
 - alerts
 - alerts active
-- my kentik portal
