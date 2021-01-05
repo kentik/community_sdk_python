@@ -264,7 +264,7 @@ def test_query_url_success() -> None:
     result = query_api.url(query_object)
 
     # then request properly formed
-    assert connector.last_url == "/query/url"
+    assert connector.last_url_path == "/query/url"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert len(connector.last_payload["queries"]) == 1
