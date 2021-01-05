@@ -55,8 +55,9 @@ def test_batch_operation_on_populators_success(client, connector) -> None:
     criterion = Criterion(["192.168.0.2", "192.168.0.3"])
     upsert = Upsert("value", [criterion])
     deletion = Deletion("del_value")
-    batch_operation = BatchOperationPart(replace_all=False, complete=True, upserts=[upsert],
-                                         deletes=[deletion], guid="guid2137")
+    batch_operation = BatchOperationPart(
+        replace_all=False, complete=True, upserts=[upsert], deletes=[deletion], guid="guid2137"
+    )
 
     # when
     response = client.batch.batch_operation_on_populators("dimension_name", batch_operation)
