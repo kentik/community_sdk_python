@@ -1,3 +1,4 @@
+from base64 import b64decode
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict
 from enum import Enum
@@ -194,3 +195,12 @@ class QueryDataResult:
 class QueryChartResult:
     image_type: ImageType
     image_data_base64: str
+
+    def save_image_as(self, file_path: str) -> None:
+        data = self.get_data()
+        with open(file_path, "wb") as file:
+            file.write(data)
+
+    def get_data(self) -> bytes:
+        data = str.encode(self.image_data_base64)
+        return b64decode(data)
