@@ -18,7 +18,7 @@ def test_create_manual_mitigation_success() -> None:
     alerting_api = AlertingAPI(connector)
 
     # when
-    manual_mitigation = ManualMitigation("192.168.1.0/24", "1234", "12345", "20", "comment")
+    manual_mitigation = ManualMitigation("192.168.1.0/24", "comment", "1234", "12345", "20")
     created = alerting_api.create_manual_mitigation(manual_mitigation)
 
     # then

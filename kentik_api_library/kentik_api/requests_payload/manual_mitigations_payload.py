@@ -1,16 +1,8 @@
 from kentik_api.public.manual_mitigation import ManualMitigation
 import json
-from dataclasses import dataclass
-from typing import Optional
 
 
-@dataclass()
-class CreateRequest:
-    ipCidr: str
-    comment: Optional[str]
-    platformID: str
-    methodID: str
-    minutesBeforeAutoStop: str
+CreateRequest = ManualMitigation
 
 
 class CreateResponse:
