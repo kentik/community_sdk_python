@@ -88,6 +88,7 @@ class BatchStatusResponse:
     deletes: Deletes
     replace_all: ReplaceAll
     batch_date: str
+    is_pending: Optional[bool] = None
 
     @classmethod
     def from_json(cls, json_string):
@@ -96,6 +97,7 @@ class BatchStatusResponse:
             custom_dimension=cls.CustomDimension(**dic.get("custom_dimension")) if "custom_dimension" in dic else None,
             guid=dic["guid"],
             is_multipart=dic["is_multipart"],
+            is_pending=dic.get("is_pending"),
             is_complete=dic["is_complete"],
             number_of_parts=dic["number_of_parts"],
             user=cls.User(

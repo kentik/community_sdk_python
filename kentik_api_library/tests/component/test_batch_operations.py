@@ -13,7 +13,7 @@ def test_batch_operation_on_flow_tags_success(client, connector) -> None:
     connector.response_text = response_payload
     connector.response_code = HTTPStatus.OK
     criterion1 = Criterion(["192.168.0.2", "192.168.0.3"])
-    criterion2 = Criterion(["192.168.0.4", "192.168.0.5"], "src")
+    criterion2 = Criterion(["192.168.0.4", "192.168.0.5"], Criterion.Direction.SRC)
     upsert1 = Upsert("value1", [criterion1, criterion2])
     upsert2 = Upsert("value2", [criterion1])
     deletion1 = Deletion("del_value1")
@@ -55,7 +55,8 @@ def test_batch_operation_on_populators_success(client, connector) -> None:
     criterion = Criterion(["192.168.0.2", "192.168.0.3"])
     upsert = Upsert("value", [criterion])
     deletion = Deletion("del_value")
-    batch_operation = BatchOperationPart(replace_all=False, complete=True, upserts=[upsert], deletes=[deletion])
+    batch_operation = BatchOperationPart(replace_all=False, complete=True, upserts=[upsert],
+                                         deletes=[deletion], guid="guid2137")
 
     # when
     response = client.batch.batch_operation_on_populators("dimension_name", batch_operation)
@@ -66,6 +67,7 @@ def test_batch_operation_on_populators_success(client, connector) -> None:
     assert connector.last_payload is not None
     assert connector.last_payload["replace_all"] is False
     assert connector.last_payload["complete"] is True
+    assert connector.last_payload["guid"] == "guid2137"
     assert connector.last_payload["upserts"][0]["value"] == "value"
     assert connector.last_payload["deletes"][0]["value"] == "del_value"
 

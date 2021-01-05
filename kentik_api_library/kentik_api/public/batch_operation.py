@@ -1,15 +1,19 @@
 from dataclasses import dataclass
 from typing import List, Optional
+from enum import Enum
 
 
 @dataclass()
 class Criterion:
+    class Direction(Enum):
+        SRC = "src"
+        DST = "dst"
+        EITHER = "either"
 
-    direction: str
+    direction: Direction
     addr: List[str]
 
-    def __init__(self, addr: List[str], direction: Optional[str] = "either") -> None:
-        assert direction in ["src", "dst", "either"]
+    def __init__(self, addr: List[str], direction: Direction = Direction.EITHER) -> None:
         assert len(addr) > 0
 
         self.direction = direction

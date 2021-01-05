@@ -39,7 +39,10 @@ class BatchAPI(BaseAPI):
             upserts=[
                 batch_operations_payload.BatchRequest.Upsert(
                     i.value,
-                    [batch_operations_payload.BatchRequest.Upsert.Criterion(j.direction, j.addr) for j in i.criteria],
+                    [
+                        batch_operations_payload.BatchRequest.Upsert.Criterion(j.direction.value, j.addr)
+                        for j in i.criteria
+                    ],
                 )
                 for i in operation_part.upserts
             ],
