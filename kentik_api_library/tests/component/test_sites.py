@@ -24,7 +24,7 @@ def test_create_site_success(client, connector) -> None:
     created = client.sites.create(site)
 
     # then request properly formed
-    assert connector.last_url == "/site"
+    assert connector.last_url_path == "/site"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert "site" in connector.last_payload
@@ -60,7 +60,7 @@ def test_get_site_success(client, connector) -> None:
     site = client.sites.get(site_id)
 
     # then request properly formed
-    assert connector.last_url == f"/site/{site_id}"
+    assert connector.last_url_path == f"/site/{site_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -93,7 +93,7 @@ def test_update_site_success(client, connector) -> None:
     updated = client.sites.update(site)
 
     # then request properly formed
-    assert connector.last_url == f"/site/{site_id}"
+    assert connector.last_url_path == f"/site/{site_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert "site" in connector.last_payload
@@ -120,7 +120,7 @@ def test_delete_site_success(client, connector) -> None:
     delete_successful = client.sites.delete(site_id)
 
     # then request properly formed
-    assert connector.last_url == f"/site/{site_id}"
+    assert connector.last_url_path == f"/site/{site_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
