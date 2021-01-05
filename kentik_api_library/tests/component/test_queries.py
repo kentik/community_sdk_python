@@ -85,7 +85,7 @@ def test_query_data_success() -> None:
     result = query_api.data(query_object)
 
     # then request properly formed
-    assert connector.last_url == "/query/topXdata"
+    assert connector.last_url_path == "/query/topXdata"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert len(connector.last_payload["queries"]) == 1
@@ -170,7 +170,7 @@ def test_query_chart_success() -> None:
     result = query_api.chart(query_object)
 
     # then request properly formed
-    assert connector.last_url == "/query/topXchart"
+    assert connector.last_url_path == "/query/topXchart"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert len(connector.last_payload["queries"]) == 1

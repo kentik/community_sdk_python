@@ -22,7 +22,7 @@ def test_create_manual_mitigation_success() -> None:
     created = alerting_api.create_manual_mitigation(manual_mitigation)
 
     # then
-    assert connector.last_url == "/alerts/manual-mitigate"
+    assert connector.last_url_path == "/alerts/manual-mitigate"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["ipCidr"] == "192.168.1.0/24"

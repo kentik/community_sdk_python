@@ -31,7 +31,7 @@ def test_create_custom_dimension_success() -> None:
     created = custom_dimensions_api.create(dimension)
 
     # then request properly formed
-    assert connector.last_url == "/customdimension"
+    assert connector.last_url_path == "/customdimension"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "c_testapi_dimension_1"
@@ -113,7 +113,7 @@ def test_get_custom_dimension_success() -> None:
     dimension = custom_dimensions_api.get(dimension_id)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -160,7 +160,7 @@ def test_update_custom_dimension_success() -> None:
     updated = custom_dimensions_api.update(dimension)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert connector.last_payload["display_name"] == "dimension_display_name2"
@@ -186,7 +186,7 @@ def test_delete_custom_dimension_success() -> None:
     delete_successful = custom_dimensions_api.delete(dimension_id)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
@@ -240,7 +240,7 @@ def test_get_all_custom_dimensions_success() -> None:
     dimensions = custom_dimensions_api.get_all()
 
     # then request properly formed
-    assert connector.last_url == "/customdimensions"
+    assert connector.last_url_path == "/customdimensions"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -334,7 +334,7 @@ def test_create_populator_success() -> None:
     created = custom_dimensions_api.populators.create(populator)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}/populator"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}/populator"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert "populator" in connector.last_payload
@@ -432,7 +432,7 @@ def test_update_populator_success() -> None:
     updated = custom_dimensions_api.populators.update(populator)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}/populator/{populator_id}"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}/populator/{populator_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert "populator" in connector.last_payload
@@ -487,7 +487,7 @@ def test_delete_populator_success() -> None:
     delete_successful = custom_dimensions_api.populators.delete(dimension_id, populator_id)
 
     # then request properly formed
-    assert connector.last_url == f"/customdimension/{dimension_id}/populator/{populator_id}"
+    assert connector.last_url_path == f"/customdimension/{dimension_id}/populator/{populator_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
