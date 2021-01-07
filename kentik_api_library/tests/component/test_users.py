@@ -33,7 +33,7 @@ def test_create_user_success(client, connector) -> None:
     created = client.users.create(user)
 
     # then request properly formed
-    assert connector.last_url == "/user"
+    assert connector.last_url_path == "/user"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert "user" in connector.last_payload
@@ -85,7 +85,7 @@ def test_get_user_success(client, connector) -> None:
     user = client.users.get(user_id)
 
     # then request properly formed
-    assert connector.last_url == f"/user/{user_id}"
+    assert connector.last_url_path == f"/user/{user_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -135,7 +135,7 @@ def test_update_user_success(client, connector) -> None:
     updated = client.users.update(user)
 
     # then request properly formed
-    assert connector.last_url == f"/user/{user_id}"
+    assert connector.last_url_path == f"/user/{user_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert "user" in connector.last_payload
@@ -158,7 +158,7 @@ def test_delete_user_success(client, connector) -> None:
     delete_successful = client.users.delete(user_id)
 
     # then request properly formed
-    assert connector.last_url == f"/user/{user_id}"
+    assert connector.last_url_path == f"/user/{user_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 

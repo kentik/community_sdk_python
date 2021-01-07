@@ -136,7 +136,7 @@ def test_get_device_router_success() -> None:
     device = devices_api.get(device_id)
 
     # then request properly formed
-    assert connector.last_url == f"/device/{device_id}"
+    assert connector.last_url_path == f"/device/{device_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -285,7 +285,7 @@ def test_get_device_dns_success() -> None:
     device = devices_api.get(device_id)
 
     # then request properly formed
-    assert connector.last_url == f"/device/{device_id}"
+    assert connector.last_url_path == f"/device/{device_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 

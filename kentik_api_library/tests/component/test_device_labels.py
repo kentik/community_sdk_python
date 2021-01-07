@@ -26,7 +26,7 @@ def test_create_device_label_success(client, connector) -> None:
     created = client.device_labels.create(device_label)
 
     # then request properly formed
-    assert connector.last_url == "/deviceLabels"
+    assert connector.last_url_path == "/deviceLabels"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "apitest-device_label-1"
@@ -71,7 +71,7 @@ def test_get_device_label_success(client, connector) -> None:
     device_label = client.device_labels.get(device_label_id)
 
     # then request properly formed
-    assert connector.last_url == f"/deviceLabels/{device_label_id}"
+    assert connector.last_url_path == f"/deviceLabels/{device_label_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -111,7 +111,7 @@ def test_update_device_label_success(client, connector) -> None:
     updated = client.device_labels.update(device_label)
 
     # then request properly formed
-    assert connector.last_url == f"/deviceLabels/{device_label_id}"
+    assert connector.last_url_path == f"/deviceLabels/{device_label_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "apitest-device_label-one"
@@ -142,7 +142,7 @@ def test_delete_device_label_success(client, connector) -> None:
     delete_successful = client.device_labels.delete(device_label_id)
 
     # then request properly formed
-    assert connector.last_url == f"/deviceLabels/{device_label_id}"
+    assert connector.last_url_path == f"/deviceLabels/{device_label_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
@@ -195,7 +195,7 @@ def test_get_all_device_labels_success(client, connector) -> None:
     labels = client.device_labels.get_all()
 
     # then request properly formed
-    assert connector.last_url == "/deviceLabels"
+    assert connector.last_url_path == "/deviceLabels"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
