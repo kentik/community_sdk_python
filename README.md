@@ -26,12 +26,12 @@ Implemented API resources:
 - saved filters
 - my kentik portal
 - query methods
+- plans
+- alerts
 
 Working on:
-- plans
 - devices (need request-response data structures implemented)
 
 To be implemented:
-- alerts
 - alerts active
 - interfaces

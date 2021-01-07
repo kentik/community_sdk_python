@@ -9,6 +9,7 @@ from .api_resources.saved_filters_api import SavedFiltersAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
 from .api_resources.custom_dimensions_api import CustomDimensionsAPI
 from .api_resources.plans_api import PlansAPI
+from .api_resources.devices_api import DevicesAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
@@ -38,7 +39,7 @@ class KentikAPI:
         self.query = QueryAPI(connector)
         self.plans = PlansAPI(connector)
         self.my_kentik_portal = MyKentikPortalAPI(connector)
-        # self.devices =
+        self.devices = DevicesAPI(connector)
         # ...
 
 
