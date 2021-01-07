@@ -1,2 +1,2 @@
-from .kentik_api import KentikAPI, API_REGION_US, API_REGION_EU
+from .kentik_api import KentikAPI
 from .public import *

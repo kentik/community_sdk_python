@@ -49,26 +49,27 @@ Data = Dict[str, Any]
 
 
 def from_dict(data_class: Type[T], data: Data) -> T:
-    """ Converts given dictionary to the data class of given type. It converts Dacite errors into DeserializationError """
+    """Converts given dictionary to the data class of given type. It converts Dacite errors into
+    DeserializationError"""
 
     try:
         return dacite.from_dict(data_class=data_class, data=data)
     except dacite.DaciteError as err:
-        raise DeserializationError(data_class.__name__, str(err))
+        raise DeserializationError(data_class.__name__, str(err)) from err
 
 
 def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, Any]:
     """
     Decodes given JSON to a dictionary. It converts json errors into DeserializationError.
-    root - use it to extract data that is nested under a root object eg. "interface": {...}
+    root - use it to extract data that is nested under a root object e.g. "interface": {...}
     """
 
     try:
         return json.loads(json_string) if root == "" else json.loads(json_string)[root]
     except json.JSONDecodeError as err:
-        raise DeserializationError(class_name, str(err))
+        raise DeserializationError(class_name, str(err)) from err
     except KeyError as err:
-        raise DeserializationError(class_name, str(err))
+        raise DeserializationError(class_name, str(err)) from err
 
 
 def convert(attr: Any, convert_func) -> Any:
@@ -77,7 +78,7 @@ def convert(attr: Any, convert_func) -> Any:
     try:
         return convert_func(attr)
     except Exception as err:
-        raise DataFormatError(str(err))
+        raise DataFormatError(str(err)) from err
 
 
 def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
