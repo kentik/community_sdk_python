@@ -21,39 +21,45 @@ from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResp
 
 
 @dataclass
-class SNMPv3ConfGetResponse:
-    conf: Dict[str, Any]
+class _SNMPv3Conf:
+    UserName: str
+    AuthenticationProtocol: Optional[str] = None
+    AuthenticationPassphrase: Optional[str] = None
+    PrivacyProtocol: Optional[str] = None
+    PrivacyPassphrase: Optional[str] = None
 
     @classmethod
     def from_dict(cls, dic: Dict[str, Any]):
-        return cls(conf=dic)
+        return cls(**dic)
+
+    @classmethod
+    def from_conf(cls, conf: SNMPv3Conf):
+        auth_proto = conf.authentication_protocol.value if conf.authentication_protocol is not None else None
+        priv_proto = conf.privacy_protocol.value if conf.privacy_protocol is not None else None
+        return cls(
+            UserName=conf.user_name,
+            AuthenticationProtocol=auth_proto,
+            AuthenticationPassphrase=conf.authentication_passphrase,
+            PrivacyProtocol=priv_proto,
+            PrivacyPassphrase=conf.privacy_passphrase,
+        )
 
     def to_conf(self) -> SNMPv3Conf:
-        conf_dict = self.conf
-
         auth_proto = (
-            AuthenticationProtocol(conf_dict["AuthenticationProtocol"])
-            if attr_provided("AuthenticationProtocol", conf_dict)
-            else None
+            AuthenticationProtocol(self.AuthenticationProtocol) if self.AuthenticationProtocol is not None else None
         )
-        auth_pass = conf_dict.get("AuthenticationPassphrase")
-
-        priv_proto = (
-            PrivacyProtocol(conf_dict["PrivacyProtocol"]) if attr_provided("PrivacyProtocol", conf_dict) else None
-        )
-        priv_pass = conf_dict.get("PrivacyPassphrase")
-
+        priv_proto = PrivacyProtocol(self.PrivacyProtocol) if self.PrivacyProtocol is not None else None
         return SNMPv3Conf(
-            user_name=conf_dict["UserName"],
+            user_name=self.UserName,
             authentication_protocol=auth_proto,
-            authentication_passphrase=auth_pass,
+            authentication_passphrase=self.AuthenticationPassphrase,
             privacy_protocol=priv_proto,
-            privacy_passphrase=priv_pass,
+            privacy_passphrase=self.PrivacyPassphrase,
         )
 
 
 @dataclass
-class LabelGetResponse:
+class _Label:
     label: Dict[str, Any]
 
     @classmethod
@@ -87,19 +93,19 @@ class GetResponse:
     device_subtype: str
     device_sample_rate: int
     sending_ips: List[str]
-    labels: List[LabelGetResponse] = field(default_factory=list)
+    labels: List[_Label] = field(default_factory=list)
     all_interfaces: List[Any] = field(default_factory=list)
     # optional fields
     cdn_attr: Optional[str] = None
     device_description: Optional[str] = None
     device_snmp_ip: Optional[str] = None
     device_snmp_community: Optional[str] = None
-    device_snmp_v3_conf: Optional[SNMPv3ConfGetResponse] = None
+    device_snmp_v3_conf: Optional[_SNMPv3Conf] = None
     minimize_snmp: Optional[bool] = None
     device_bgp_type: Optional[str] = None
     device_bgp_neighbor_ip: Optional[str] = None
     device_bgp_neighbor_ip6: Optional[str] = None
-    device_bgp_neighbor_asn: Optional[int] = None
+    device_bgp_neighbor_asn: Optional[str] = None
     device_bgp_flowspec: Optional[bool] = None
     device_bgp_password: Optional[str] = None
     use_bgp_device_id: Optional[int] = None
@@ -115,13 +121,15 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)["device"]
+        return cls.from_dict(dic)
+
+    @classmethod
+    def from_dict(cls, dic: Dict[str, Any]):
         snmp_v3_conf = (
-            SNMPv3ConfGetResponse.from_dict(dic["device_snmp_v3_conf"])
-            if attr_provided("device_snmp_v3_conf", dic)
-            else None
+            _SNMPv3Conf.from_dict(dic["device_snmp_v3_conf"]) if attr_provided("device_snmp_v3_conf", dic) else None
         )
         site = SiteGetResponse.from_fields(**dic["site"]) if attr_provided("site", dic) else None
-        labels = [LabelGetResponse.from_dict(d) for d in dic["labels"]]
+        labels = [_Label.from_dict(d) for d in dic["labels"]]
         return cls(
             id=int(dic["id"]),
             plan=PlanGetResponse.from_dict(dic["plan"]),
@@ -194,6 +202,89 @@ class GetResponse:
             cdn_attr=CDNAttribute(self.cdn_attr) if self.cdn_attr is not None else None,
         )
 
+
+@dataclass
+class GetAllResponse:
+    devices: List[GetResponse]
+
+    @classmethod
+    def from_json(cls, json_string):
+        dic = json.loads(json_string)
+        devices = list()
+        for item in dic["devices"]:
+            d = GetResponse.from_dict(item)
+            devices.append(d)
+        return cls(devices=devices)
+
+    def to_devices(self) -> List[Device]:
+        return [d.to_device() for d in self.devices]
+
+
+@dataclass
+class _RequestDevice:
+    plan_id: Optional[int] = None
+    site_id: Optional[int] = None
+    device_name: Optional[str] = None
+    device_type: Optional[DeviceType] = None
+    device_subtype: Optional[DeviceSubtype] = None
+    device_description: Optional[str] = None
+    device_sample_rate: Optional[int] = None
+    sending_ips: List[str] = field(default_factory=list)
+    device_snmp_ip: Optional[str] = None
+    device_snmp_community: Optional[str] = None
+    minimize_snmp: Optional[bool] = None
+    device_bgp_type: Optional[DeviceBGPType] = None
+    device_bgp_neighbor_ip: Optional[str] = None
+    device_bgp_neighbor_ip6: Optional[str] = None
+    device_bgp_neighbor_asn: Optional[str] = None
+    device_bgp_flowspec: Optional[bool] = None
+    device_bgp_password: Optional[str] = None
+    use_bgp_device_id: Optional[int] = None
+    device_snmp_v3_conf: Optional[_SNMPv3Conf] = None
+    cdn_attr: Optional[CDNAttribute] = None
+
+    @classmethod
+    def from_device(cls, device: Device):
+        snmp_v3_conf = (
+            _SNMPv3Conf.from_conf(device.device_snmp_v3_conf) if device.device_snmp_v3_conf is not None else None
+        )
+        return cls(
+            plan_id=device.plan_id,
+            site_id=device.site_id,
+            device_name=device.device_name,
+            device_type=device.device_type,
+            device_subtype=device.device_subtype,
+            device_description=device.device_description,
+            device_sample_rate=device.device_sample_rate,
+            sending_ips=device.sending_ips,
+            device_snmp_ip=device.device_snmp_ip,
+            device_snmp_community=device.device_snmp_community,
+            minimize_snmp=device.minimize_snmp,
+            device_bgp_type=device.device_bgp_type,
+            device_bgp_neighbor_ip=device.device_bgp_neighbor_ip,
+            device_bgp_neighbor_ip6=device.device_bgp_neighbor_ip6,
+            device_bgp_neighbor_asn=device.device_bgp_neighbor_asn,
+            device_bgp_flowspec=device.device_bgp_flowspec,
+            device_bgp_password=device.device_bgp_password,
+            use_bgp_device_id=device.use_bgp_device_id,
+            device_snmp_v3_conf=snmp_v3_conf,
+            cdn_attr=device.cdn_attr,
+        )
+
+
+@dataclass
+class CreateRequest:
+    device: _RequestDevice  # request device object is provided under key "device"
+
+    @classmethod
+    def from_device(cls, device: Device):
+        return cls(device=_RequestDevice.from_device(device))
+
+
+CreateResponse = GetResponse
+
+UpdateRequest = CreateRequest
+UpdateResponse = GetResponse
 
 # pylint: enable=too-many-instance-attributes
 

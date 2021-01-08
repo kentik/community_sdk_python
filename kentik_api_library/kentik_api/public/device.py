@@ -52,10 +52,24 @@ class PrivacyProtocol(Enum):
 @dataclass
 class SNMPv3Conf:
     user_name: str
-    authentication_protocol: Optional[AuthenticationProtocol]
-    authentication_passphrase: Optional[str]
-    privacy_protocol: Optional[PrivacyProtocol]
-    privacy_passphrase: Optional[str]
+    authentication_protocol: Optional[AuthenticationProtocol] = None
+    authentication_passphrase: Optional[str] = None
+    privacy_protocol: Optional[PrivacyProtocol] = None
+    privacy_passphrase: Optional[str] = None
+
+    @classmethod
+    def new(cls, user_name: str):
+        return cls(user_name=user_name)
+
+    def with_authentication(self, protocol: AuthenticationProtocol, passphrase: str):
+        self.authentication_protocol = protocol
+        self.authentication_passphrase = passphrase
+        return self
+
+    def with_privacy(self, protocol: PrivacyProtocol, passphrase: str):
+        self.privacy_protocol = protocol
+        self.privacy_passphrase = passphrase
+        return self
 
 
 class Device:
@@ -78,11 +92,12 @@ class Device:
         device_bgp_type: Optional[DeviceBGPType] = None,
         device_bgp_neighbor_ip: Optional[str] = None,
         device_bgp_neighbor_ip6: Optional[str] = None,
-        device_bgp_neighbor_asn: Optional[int] = None,
+        device_bgp_neighbor_asn: Optional[str] = None,
         device_bgp_flowspec: Optional[bool] = None,
         device_bgp_password: Optional[str] = None,
         use_bgp_device_id: Optional[int] = None,
         device_snmp_v3_conf: Optional[SNMPv3Conf] = None,
+        cdn_attr: Optional[CDNAttribute] = None,
         # server-provided
         device_status: Optional[str] = None,
         device_flow_type: Optional[str] = None,
@@ -96,14 +111,12 @@ class Device:
         site: Optional[Site] = None,
         labels: List[DeviceLabel] = [],
         all_interfaces: List[Any] = [],
-        cdn_attr: Optional[CDNAttribute] = None,
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 
         # read-write properties (can be updated in update call)
         self.plan_id = plan_id
         self.site_id = site_id
-        self.device_name = device_name
         self.device_description = device_description
         self.device_sample_rate = device_sample_rate
         self.sending_ips = sending_ips
@@ -121,6 +134,7 @@ class Device:
         self.cdn_attr = cdn_attr
         # read-only properties (can't be updated in update call)
         self._id = id
+        self._device_name = device_name
         self._device_type = device_type
         self._device_subtype = device_subtype
         self._device_status = device_status
@@ -140,6 +154,10 @@ class Device:
     def id(self) -> int:
         assert self._id is not None
         return self._id
+
+    @property
+    def device_name(self) -> Optional[str]:
+        return self._device_name
 
     @property
     def device_type(self) -> Optional[DeviceType]:
@@ -199,9 +217,90 @@ class Device:
         return self._all_interfaces
 
     @classmethod
-    def new_router(cls):
-        pass
+    def new_router(
+        cls,
+        # common required
+        device_name: str,
+        device_subtype: DeviceSubtype,
+        device_sample_rate: int,
+        plan_id: int,
+        # router required
+        sending_ips: List[str],
+        minimize_snmp: bool,
+        # router optional
+        device_snmp_ip: Optional[str] = None,
+        device_snmp_community: Optional[str] = None,
+        device_snmp_v3_conf: Optional[SNMPv3Conf] = None,  # when set, overwrites "device_snmp_community"
+        # common optional
+        device_description: Optional[str] = None,
+        site_id: Optional[int] = None,
+        device_bgp_flowspec: Optional[bool] = None,
+    ):
+        return cls(
+            device_type=DeviceType.router,
+            device_name=device_name,
+            device_subtype=device_subtype,
+            device_sample_rate=device_sample_rate,
+            plan_id=plan_id,
+            sending_ips=sending_ips,
+            minimize_snmp=minimize_snmp,
+            device_snmp_ip=device_snmp_ip,
+            device_snmp_community=device_snmp_community,
+            device_snmp_v3_conf=device_snmp_v3_conf,
+            device_description=device_description,
+            site_id=site_id,
+            device_bgp_flowspec=device_bgp_flowspec,
+            device_bgp_type=DeviceBGPType.none,
+        )
 
     @classmethod
-    def new_dns(cls):
-        pass
+    def new_dns(
+        cls,
+        # common required
+        device_name: str,
+        device_subtype: DeviceSubtype,
+        device_sample_rate: int,
+        plan_id: int,
+        # dns required
+        cdn_attr: CDNAttribute,
+        # common optional
+        device_description: Optional[str] = None,
+        site_id: Optional[int] = None,
+        device_bgp_flowspec: Optional[bool] = None,
+    ):
+        return cls(
+            device_type=DeviceType.host_nprobe_dns_www,
+            device_name=device_name,
+            device_subtype=device_subtype,
+            device_sample_rate=device_sample_rate,
+            plan_id=plan_id,
+            cdn_attr=cdn_attr,
+            device_description=device_description,
+            site_id=site_id,
+            device_bgp_flowspec=device_bgp_flowspec,
+            device_bgp_type=DeviceBGPType.none,
+        )
+
+    def with_bgp_type_device(
+        self,
+        device_bgp_neighbor_asn: str,
+        device_bgp_neighbor_ip: Optional[str] = None,
+        device_bgp_neighbor_ip6: Optional[str] = None,
+        device_bgp_password: Optional[str] = None,
+    ):
+        """
+        This is alternative to with_bgp_type_other_device.
+        Note: either device_bgp_neighbor_ip or device_bgp_neighbor_ip6 is required.
+        """
+        self.device_bgp_type = DeviceBGPType.device
+        self.device_bgp_neighbor_ip = device_bgp_neighbor_ip
+        self.device_bgp_neighbor_ip6 = device_bgp_neighbor_ip6
+        self.device_bgp_password = device_bgp_password
+        self.device_bgp_neighbor_asn = device_bgp_neighbor_asn
+        return self
+
+    def with_bgp_type_other_device(self, use_bgp_device_id: int):
+        """ This is alternative to with_bgp_type_device. """
+        self.device_bgp_type = DeviceBGPType.other_device
+        self.use_bgp_device_id = use_bgp_device_id
+        return self

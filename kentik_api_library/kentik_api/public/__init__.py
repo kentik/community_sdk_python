@@ -30,4 +30,5 @@ from .device import (
     DeviceBGPType,
     DeviceType,
     DeviceSubtype,
+    SNMPv3Conf,
 )
