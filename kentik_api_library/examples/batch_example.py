@@ -30,9 +30,10 @@ def run_crud() -> None:
     client = KentikAPI(email, token)
 
     print("### BATCH ON FLOW TAGS")
-    criterion = Criterion(["192.168.0.77"], "src")
+    criterion = Criterion(["192.168.0.77"], Criterion.Direction.SRC)
     upsert = Upsert("test_value", [criterion])
-    batch = BatchOperationPart(False, True, [upsert], [])
+    deletion = Deletion("value_to_delete")
+    batch = BatchOperationPart(False, True, [upsert], [deletion])
     status = client.batch.batch_operation_on_flow_tags(batch)
     print(status.__dict__)
     print()

@@ -1,4 +1,4 @@
-from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
+from kentik_api.api_calls.api_call_decorators import get, post, payload_type
 from kentik_api.api_calls.api_call import APICall
 
 

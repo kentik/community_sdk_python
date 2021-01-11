@@ -1,6 +1,7 @@
 import json
 from typing import Optional, List
 from dataclasses import dataclass
+from dacite import from_dict
 
 
 @dataclass()
@@ -93,34 +94,4 @@ class BatchStatusResponse:
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
-        return cls(
-            custom_dimension=cls.CustomDimension(**dic.get("custom_dimension")) if "custom_dimension" in dic else None,
-            guid=dic["guid"],
-            is_multipart=dic["is_multipart"],
-            is_pending=dic.get("is_pending"),
-            is_complete=dic["is_complete"],
-            number_of_parts=dic["number_of_parts"],
-            user=cls.User(
-                id=dic["user"]["id"],
-                email=dic["user"]["email"],
-            ),
-            upserts=cls.Upserts(
-                total=dic["upserts"]["total"],
-                applied=dic["upserts"]["applied"],
-                unchanged=dic["upserts"]["unchanged"],
-                over_limit=dic["upserts"]["over_limit"],
-                invalid=dic["upserts"]["invalid"],
-            ),
-            deletes=cls.Deletes(
-                total=dic["deletes"]["total"],
-                applied=dic["deletes"]["applied"],
-                unchanged=dic["deletes"]["unchanged"],
-                invalid=dic["deletes"]["invalid"],
-            ),
-            replace_all=cls.ReplaceAll(
-                requested=dic["replace_all"]["requested"],
-                deletes_performed=dic["replace_all"]["deletes_performed"],
-                successful=dic["replace_all"]["successful"],
-            ),
-            batch_date=dic["batch_date"],
-        )
+        return from_dict(data_class=cls, data=dic)
