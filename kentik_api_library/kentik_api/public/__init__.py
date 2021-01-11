@@ -31,4 +31,5 @@ from .device import (
     DeviceType,
     DeviceSubtype,
     SNMPv3Conf,
+    AppliedLabels,
 )

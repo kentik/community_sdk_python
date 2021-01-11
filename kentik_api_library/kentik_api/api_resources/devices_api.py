@@ -2,7 +2,7 @@ from typing import List
 from http import HTTPStatus
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.api_calls import devices
-from kentik_api.public.device import Device
+from kentik_api.public.device import Device, AppliedLabels
 from kentik_api.requests_payload import devices_payload
 
 
@@ -39,3 +39,9 @@ class DevicesAPI(BaseAPI):
         api_call = devices.delete_device(device_id)
         response = self._send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT
+
+    def apply_labels(self, device_id: int, label_ids: List[int]) -> AppliedLabels:
+        api_call = devices.apply_device_labels(device_id)
+        payload = devices_payload.ApplyLabelsRequest.from_id_list(label_ids)
+        response = self._send(api_call, payload)
+        return devices_payload.ApplyLabelsResponse.from_json(response.text).to_applied_labels()

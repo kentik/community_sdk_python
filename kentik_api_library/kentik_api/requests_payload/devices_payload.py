@@ -12,6 +12,7 @@ from kentik_api.public.device import (
     PrivacyProtocol,
     AuthenticationProtocol,
     CDNAttribute,
+    AppliedLabels,
 )
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.requests_payload.sites_payload import GetResponse as SiteGetResponse
@@ -285,6 +286,39 @@ CreateResponse = GetResponse
 
 UpdateRequest = CreateRequest
 UpdateResponse = GetResponse
+
+
+@dataclass
+class LabelID:
+    id: int
+
+
+@dataclass
+class ApplyLabelsRequest:
+    labels: List[LabelID]
+
+    @classmethod
+    def from_id_list(cls, ids: List[int]):
+        labels = [LabelID(id=label_id) for label_id in ids]
+        return cls(labels=labels)
+
+
+@dataclass
+class ApplyLabelsResponse:
+    id: str
+    device_name: str
+    labels: List[_Label]
+
+    @classmethod
+    def from_json(cls, json_string: str):
+        dic = json.loads(json_string)
+        labels = [_Label.from_dict(d) for d in dic["labels"]]
+        return cls(id=dic["id"], device_name=dic["device_name"], labels=labels)
+
+    def to_applied_labels(self) -> AppliedLabels:
+        labels = [l.to_label() for l in self.labels]
+        return AppliedLabels(id=self.id, device_name=self.device_name, labels=labels)
+
 
 # pylint: enable=too-many-instance-attributes
 

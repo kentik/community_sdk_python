@@ -87,6 +87,13 @@ def run_crud_router() -> None:
     print(updated.__dict__)
     print()
 
+    # first make sure the label ids exist!
+    # print("### APPLY LABELS")
+    # label_ids = [3011, 3012]
+    # labels = client.devices.apply_labels(updated.id, label_ids)
+    # print(labels.__dict__)
+    # print()
+
     print("### GET")
     got = client.devices.get(updated.id)
     print(got.__dict__)
@@ -142,6 +149,13 @@ def run_crud_dns() -> None:
     print(updated.__dict__)
     print()
 
+    # first make sure the label ids exist!
+    # print("### APPLY LABELS")
+    # label_ids = [3011, 3012]
+    # labels = client.devices.apply_labels(updated.id, label_ids)
+    # print(labels.__dict__)
+    # print()
+
     print("### GET")
     got = client.devices.get(updated.id)
     print(got.__dict__)
@@ -162,6 +176,6 @@ def run_list() -> None:
 
 
 if __name__ == "__main__":
-    # run_crud_router()
-    run_crud_dns()
+    run_crud_router()
+    # run_crud_dns()
     # run_list()

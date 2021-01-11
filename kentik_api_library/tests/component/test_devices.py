@@ -880,7 +880,7 @@ def test_delete_device_success() -> None:
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
-    # then response properly parsed
+    # and response properly parsed
     assert delete_successful
 
 
@@ -1135,3 +1135,75 @@ def test_get_all_devices_success() -> None:
     assert device.bgp_peer_ip6 == "2620:129:1:2::1"
     assert device.snmp_last_updated is None
     assert device.device_subtype == DeviceSubtype.router
+
+
+def test_apply_labels_success() -> None:
+    # given
+    apply_labels_response_payload = """
+    {
+        "id": "42",
+        "device_name": "test_router",
+        "labels": [
+            {
+                "id": 3011,
+                "name": "apitest-label-red",
+                "description": null,
+                "edate": "2021-01-11T08:38:08.678Z",
+                "cdate": "2021-01-11T08:38:08.678Z",
+                "user_id": "144319",
+                "company_id": "74333",
+                "color": "#FF0000",
+                "order": null,
+                "_pivot_device_id": "79175",
+                "_pivot_label_id": "3011"
+            },
+            {
+                "id": 3012,
+                "name": "apitest-label-blue",
+                "description": null,
+                "edate": "2021-01-11T08:38:42.627Z",
+                "cdate": "2021-01-11T08:38:42.627Z",
+                "user_id": "144319",
+                "company_id": "74333",
+                "color": "#0000FF",
+                "order": null,
+                "_pivot_device_id": "79175",
+                "_pivot_label_id": "3012"
+            }
+        ]
+    }"""
+    connector = StubAPIConnector(apply_labels_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    labels = [3011, 3012]
+    apply_result = devices_api.apply_labels(device_id, labels)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/devices/{device_id}/labels"
+    assert connector.last_method == APICallMethods.PUT
+    assert connector.last_payload is not None
+    assert "labels" in connector.last_payload
+    assert len(connector.last_payload["labels"]) == 2
+    assert connector.last_payload["labels"][0]["id"] == 3011
+    assert connector.last_payload["labels"][1]["id"] == 3012
+
+    # and response properly parsed
+    assert apply_result.id == "42"
+    assert apply_result.device_name == "test_router"
+    assert len(apply_result.labels) == 2
+    assert apply_result.labels[0].id == 3011
+    assert apply_result.labels[0].name == "apitest-label-red"
+    assert apply_result.labels[0].created_date == "2021-01-11T08:38:08.678Z"
+    assert apply_result.labels[0].updated_date == "2021-01-11T08:38:08.678Z"
+    assert apply_result.labels[0].user_id == "144319"
+    assert apply_result.labels[0].company_id == "74333"
+    assert apply_result.labels[0].color == "#FF0000"
+    assert apply_result.labels[1].id == 3012
+    assert apply_result.labels[1].name == "apitest-label-blue"
+    assert apply_result.labels[1].created_date == "2021-01-11T08:38:42.627Z"
+    assert apply_result.labels[1].updated_date == "2021-01-11T08:38:42.627Z"
+    assert apply_result.labels[1].user_id == "144319"
+    assert apply_result.labels[1].company_id == "74333"
+    assert apply_result.labels[1].color == "#0000FF"

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from kentik_api.public.site import Site
 from kentik_api.public.plan import Plan
+
 from kentik_api.public.device_label import DeviceLabel
 
 
@@ -304,3 +305,23 @@ class Device:
         self.device_bgp_type = DeviceBGPType.other_device
         self.use_bgp_device_id = use_bgp_device_id
         return self
+
+
+class AppliedLabels:
+    def __init__(self, id: str, device_name: str, labels: List[DeviceLabel]):
+        # read-only
+        self._id = id
+        self._device_name = device_name
+        self._labels = labels
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @property
+    def device_name(self) -> str:
+        return self._device_name
+
+    @property
+    def labels(self) -> List[DeviceLabel]:
+        return self._labels
