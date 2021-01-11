@@ -26,7 +26,7 @@ def test_batch_operation_on_flow_tags_success(client, connector) -> None:
     response = client.batch.batch_operation_on_flow_tags(batch_operation)
 
     # then
-    assert connector.last_url == "/batch/tags"
+    assert connector.last_url_path == "/batch/tags"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["replace_all"] is False
@@ -63,7 +63,7 @@ def test_batch_operation_on_populators_success(client, connector) -> None:
     response = client.batch.batch_operation_on_populators("dimension_name", batch_operation)
 
     # then
-    assert connector.last_url == "/batch/customdimensions/dimension_name/populators"
+    assert connector.last_url_path == "/batch/customdimensions/dimension_name/populators"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["replace_all"] is False
@@ -121,7 +121,7 @@ def test_get_status_success(client, connector) -> None:
     status = client.batch.get_status(batch_guid)
 
     # then
-    assert connector.last_url == "/batch/guid12345/status"
+    assert connector.last_url_path == "/batch/guid12345/status"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
