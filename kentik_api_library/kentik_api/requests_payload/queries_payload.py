@@ -1,6 +1,7 @@
 import json
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
+from base64 import b64decode
 
 from kentik_api.public.query_object import QueryDataResult, QueryChartResult, ImageType
 
@@ -28,7 +29,8 @@ class QueryChartResponse:
         return cls(**params)
 
     def to_query_chart_result(self) -> QueryChartResult:
-        return QueryChartResult(image_type=self._get_image_type(), image_data_base64=self._get_image_data_base64())
+        data = str.encode(self._get_image_data_base64())
+        return QueryChartResult(image_type=self._get_image_type(), image_data=b64decode(data))
 
     def _get_image_type(self) -> ImageType:
         mime_type, _, _ = _parse_uri(self.dataUri)
