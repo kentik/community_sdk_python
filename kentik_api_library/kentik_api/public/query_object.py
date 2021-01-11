@@ -193,7 +193,15 @@ class QueryDataResult:
 @dataclass
 class QueryChartResult:
     image_type: ImageType
-    image_data_base64: str
+    image_data: bytes
+
+    def save_image_as(self, file_path: str) -> None:
+        data = self.get_data()
+        with open(file_path, "wb") as file:
+            file.write(data)
+
+    def get_data(self) -> bytes:
+        return self.image_data
 
 
 @dataclass

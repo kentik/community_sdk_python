@@ -135,7 +135,7 @@ def test_query_data_success() -> None:
 
 def test_query_chart_success() -> None:
     # given
-    query_response_payload = """{"dataUri": "data:image/png;base64,ImageDataEncodedBase64"}"""
+    query_response_payload = """{"dataUri": "data:image/png;base64,ImageDataEncodedBase64=="}"""
     connector = StubAPIConnector(query_response_payload, HTTPStatus.OK)
     query_api = QueryAPI(connector)
 
@@ -232,7 +232,7 @@ def test_query_chart_success() -> None:
 
     # and response properly parsed
     assert result.image_type == ImageType.png
-    assert result.image_data_base64 == "ImageDataEncodedBase64"
+    assert result.image_data == b'"f\xa0x6\xadhI\xdc\xa1\xd7\x9d\x05\xab\x1e\xeb'
 
 
 def test_query_url_success() -> None:
