@@ -26,7 +26,7 @@ class MyKentikPortalAPI(BaseAPI):
         response = self._send(api_call, payload)
         return tenants_payload.CreateUserResponse.from_json(response.text).to_tenant_user()
 
-    def delete_tenant_user(self, tenant_id: int, user_id: int) -> bool:
+    def delete_tenant_user(self, tenant_id: int, user_id: str) -> bool:
         api_call = my_kentik_portal.delete_tenant_user(tenant_id, user_id)
         response = self._send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT

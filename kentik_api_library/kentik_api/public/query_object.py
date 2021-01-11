@@ -162,7 +162,7 @@ class Query:
     all_selected: Optional[bool] = None  # overrides "device_name" if true (makes it ignored)
     device_name: List[str] = field(default_factory=list)  #  alternative with "all_selected"
     descriptor: str = ""  # only used when dimension is "Traffic"
-    aggregates: List[Aggregate] = field(default_factory=list)
+    aggregates: List[Aggregate] = field(default_factory=list)  # if empty, will be auto-filled based on "metric" field
     outsort: Optional[str] = None  # name of aggregate object, required when more than 1 objects on "aggregates" list
     query_title: str = ""  # only used in QueryChart
     viz_type: Optional[ChartViewType] = None  # only used in QueryChart, QueryURL
@@ -202,3 +202,8 @@ class QueryChartResult:
 
     def get_data(self) -> bytes:
         return self.image_data
+
+
+@dataclass
+class QueryURLResult:
+    url: str

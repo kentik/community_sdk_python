@@ -3,7 +3,16 @@ from typing import List, Dict, Tuple
 from dataclasses import dataclass
 from base64 import b64decode
 
-from kentik_api.public.query_object import QueryDataResult, QueryChartResult, ImageType
+from kentik_api.public.query_object import QueryDataResult, QueryChartResult, ImageType, QueryURLResult
+
+
+@dataclass
+class QueryURLResponse:
+    received_url: str
+
+    def to_query_url_result(self) -> QueryURLResult:
+        unquoted_url = self.received_url[1:-1]  # received url is in quotation marks
+        return QueryURLResult(url=unquoted_url)
 
 
 @dataclass()
