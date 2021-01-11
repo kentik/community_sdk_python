@@ -35,7 +35,7 @@ def test_create_custom_application_success() -> None:
     created = custom_applications_api.create(app)
 
     # then request properly formed
-    assert connector.last_url == "/customApplications"
+    assert connector.last_url_path == "/customApplications"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "apitest-customapp-1"
@@ -88,7 +88,7 @@ def test_update_custom_application_success() -> None:
     updated = custom_applications_api.update(app)
 
     # then request properly formed
-    assert connector.last_url == f"/customApplications/{app_id}"
+    assert connector.last_url_path == f"/customApplications/{app_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "apitest-customapp-one"
@@ -123,7 +123,7 @@ def test_delete_custom_application_success() -> None:
     delete_successful = custom_applications_api.delete(app_id)
 
     # then request properly formed
-    assert connector.last_url == f"/customApplications/{app_id}"
+    assert connector.last_url_path == f"/customApplications/{app_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
@@ -169,7 +169,7 @@ def test_get_all_custom_applications_success() -> None:
     apps = custom_applications_api.get_all()
 
     # then request properly formed
-    assert connector.last_url == "/customApplications"
+    assert connector.last_url_path == "/customApplications"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
