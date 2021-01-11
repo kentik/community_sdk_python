@@ -68,7 +68,7 @@ def test_create_tag_success() -> None:
     created = tags_api.create(tag)
 
     # then request properly formed
-    assert connector.last_url == "/tag"
+    assert connector.last_url_path == "/tag"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert "tag" in connector.last_payload
@@ -164,7 +164,7 @@ def test_get_tag_success() -> None:
     tag = tags_api.get(tag_id)
 
     # then request properly formed
-    assert connector.last_url == f"/tag/{tag_id}"
+    assert connector.last_url_path == f"/tag/{tag_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -252,7 +252,7 @@ def test_update_tag_success() -> None:
     updated = tags_api.update(tag)
 
     # then request properly formed
-    assert connector.last_url == f"/tag/{tag_id}"
+    assert connector.last_url_path == f"/tag/{tag_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert "tag" in connector.last_payload
@@ -317,7 +317,7 @@ def test_delete_tag_success() -> None:
     delete_successful = tags_api.delete(tag_id)
 
     # then request properly formed
-    assert connector.last_url == f"/tag/{tag_id}"
+    assert connector.last_url_path == f"/tag/{tag_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
 
@@ -397,7 +397,7 @@ def test_get_all_tags_success() -> None:
     tags = tags_api.get_all()
 
     # then request properly formed
-    assert connector.last_url == "/tags"
+    assert connector.last_url_path == "/tags"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
