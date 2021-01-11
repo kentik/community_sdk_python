@@ -117,11 +117,8 @@ def run_query_chart() -> None:
     result = client.query.chart(query_object)
 
     print("Result:")
-    # result.save_image_as("/home/lukasz/test.png")
     img = Image.open(BytesIO(result.get_data()))
     img.show()
-    print("File saved")
-    # print(result.__dict__)
 
 
 def run_query_url() -> None:
