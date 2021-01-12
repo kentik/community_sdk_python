@@ -7,6 +7,7 @@ from .tenant import Tenant, TenantUser
 from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .plan import Plan, PlanDevice, PlanDeviceType
+from .batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
 from .manual_mitigation import ManualMitigation
 from .query_sql import SQLQuery
 from .query_object import (

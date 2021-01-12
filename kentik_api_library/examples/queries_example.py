@@ -6,6 +6,8 @@ Examples of using the typed Query API
 import os
 import sys
 import logging
+from io import BytesIO
+from PIL import Image
 from typing import Tuple
 from kentik_api import (
     KentikAPI,
@@ -115,7 +117,8 @@ def run_query_chart() -> None:
     result = client.query.chart(query_object)
 
     print("Result:")
-    print(result.__dict__)
+    img = Image.open(BytesIO(result.get_data()))
+    img.show()
 
 
 def run_query_url() -> None:
