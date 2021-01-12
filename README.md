@@ -6,7 +6,7 @@
 ```pip3 install --index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/ kentik-api```
 1. Check installation successful - no errors should be reported:  
 ```python3 -c "import kentik_api"```
-1. Run an example (Optional):
+1. Run an example (optional):
   ```bash
   export KTAPI_AUTH_EMAIL=<your kentik api credentials email>
   export KTAPI_AUTH_TOKEN=<your kentik api credentials token>
@@ -16,11 +16,12 @@
 ## Usage examples
 
 For library usage examples please see: kentik_api_library/examples/  
-List of examples:
+List of available examples:
 - alerting_example.py - create Manual Mitigation
 - applications_example.py - create/update/delete Custom Application
 - bulk_user_create.py - create users from YAML file
-- dimmensions_example.py - create/update/get/delete/list Custom Dimmensions, create/update/delete Populator
+- devices_example.py - create/update/get/delete/list Devices
+- dimensions_example.py - create/update/get/delete/list Custom Dimensions, create/update/delete Populator
 - labels_examply.py - create/update/get/delete/list Device Labels
 - my_kentik_portal_example.py - get/list Tenants, create/delete Tenant User
 - plans_example.py - list plans
