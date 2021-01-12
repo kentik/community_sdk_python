@@ -17,19 +17,19 @@
 
 For library usage examples please see: kentik_api_library/examples/  
 List of available examples:
-- alerting_example.py - create Manual Mitigation
-- applications_example.py - create/update/delete Custom Application
-- bulk_user_create.py - create users from YAML file
-- devices_example.py - create/update/get/delete/list Devices
-- dimensions_example.py - create/update/get/delete/list Custom Dimensions, create/update/delete Populator
-- labels_examply.py - create/update/get/delete/list Device Labels
-- my_kentik_portal_example.py - get/list Tenants, create/delete Tenant User
-- plans_example.py - list plans
-- queries_example.py - query for SQL/URL/data/chart
-- saved_filters_example.py - create/update/get/delete/list Saved Filters
-- sites_example.py - create/update/get/delete/list Sites
-- tags_example.py - create/update/get/delete/list Tags
-- users_example.py - create/update/get/delete/list Users
+- [alerting_example.py](./kentik_api_library/examples/alerting_example.py) - create Manual Mitigation
+- [applications_example.py](./kentik_api_library/examples/applications_example.py) - create/update/delete Custom Application
+- [bulk_user_create.py](./kentik_api_library/examples/bulk_user_create.py) - create users from YAML file
+- [devices_example.py](./kentik_api_library/examples/devices_example.py) - create/update/get/delete/list Devices
+- [dimensions_example.py](./kentik_api_library/examples/dimensions_example.py) - create/update/get/delete/list Custom Dimensions, create/update/delete Populator
+- [labels_example.py](./kentik_api_library/examples/labels_example.py) - create/update/get/delete/list Device Labels
+- [my_kentik_portal_example.py](./kentik_api_library/examples/my_kentik_portal_example.py) - get/list Tenants, create/delete Tenant User
+- [plans_example.py](./kentik_api_library/examples/plans_example.py) - list plans
+- [queries_example.py](./kentik_api_library/examples/queries_example.py) - query for SQL/URL/data/chart
+- [saved_filters_example.py](./kentik_api_library/examples/saved_filters_example.py) - create/update/get/delete/list Saved Filters
+- [sites_example.py](./kentik_api_library/examples/sites_example.py) - create/update/get/delete/list Sites
+- [tags_example.py](./kentik_api_library/examples/tags_example.py) - create/update/get/delete/list Tags
+- [users_example.py](./kentik_api_library/examples/users_example.py) - create/update/get/delete/list Users
 
 ## Release process for kentik-api
 
