@@ -23,3 +23,14 @@ from .query_object import (
     ChartViewType,
     TimeFormat,
 )
+from .device import (
+    Device,
+    AuthenticationProtocol,
+    PrivacyProtocol,
+    CDNAttribute,
+    DeviceBGPType,
+    DeviceType,
+    DeviceSubtype,
+    SNMPv3Conf,
+    AppliedLabels,
+)

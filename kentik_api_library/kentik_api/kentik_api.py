@@ -11,6 +11,7 @@ from .api_resources.custom_dimensions_api import CustomDimensionsAPI
 from .api_resources.batch_api import BatchAPI
 from .api_resources.alerting_api import AlertingAPI
 from .api_resources.plans_api import PlansAPI
+from .api_resources.devices_api import DevicesAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
@@ -40,10 +41,9 @@ class KentikAPI:
         self.query = QueryAPI(connector)
         self.plans = PlansAPI(connector)
         self.my_kentik_portal = MyKentikPortalAPI(connector)
+        self.devices = DevicesAPI(connector)
         self.batch = BatchAPI(connector)
         self.alerting = AlertingAPI(connector)
-        # self.devices =
-        # ...
 
 
 # pylint: enable=too-many-instance-attributes

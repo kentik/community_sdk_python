@@ -15,7 +15,7 @@
 
 ## Usage examples
 
-For usage examples please see: kentik_api_library/examples/
+For library usage examples please see: kentik_api_library/examples/
 
 ## Release process for kentik-api
 
@@ -33,17 +33,18 @@ Implemented API resources:
 - users
 - sites
 - tags
+- devices
 - device labels
 - custom dimensions
 - custom applications
 - saved filters
 - my kentik portal
 - query methods
+- plans
+- alerts
 
 Working on:
-- plans
-- devices (need request-response data structures implemented)
+- interfaces
 
 To be implemented:
-- alerts
 - alerts active
