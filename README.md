@@ -47,17 +47,18 @@ Implemented API resources:
 - users
 - sites
 - tags
+- devices
 - device labels
 - custom dimensions
 - custom applications
 - saved filters
 - my kentik portal
 - query methods
+- plans
+- alerts
 
 Working on:
-- plans
-- devices (need request-response data structures implemented)
+- interfaces
 
 To be implemented:
-- alerts
 - alerts active

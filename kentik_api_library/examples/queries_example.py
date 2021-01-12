@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from io import BytesIO
-from PIL import Image
+from PIL import Image  # type: ignore
 from typing import Tuple
 from kentik_api import (
     KentikAPI,
