@@ -12,6 +12,7 @@ from kentik_api.public.device import (
     PrivacyProtocol,
     AuthenticationProtocol,
     CDNAttribute,
+    AllInterfaces,
     AppliedLabels,
 )
 from kentik_api.public.device_label import DeviceLabel
@@ -83,6 +84,28 @@ class _Label:
         return label
 
 
+@dataclass
+class _AllInterfaces:
+    interface: Dict[str, Any]
+
+    @classmethod
+    def from_dict(cls, dic: Dict[str, Any]):
+        return cls(interface=dic)
+
+    def to_all_interfaces(self) -> AllInterfaces:
+        intf_dict = self.interface
+        initial_snmp_speed = (
+            float(intf_dict["initial_snmp_speed"]) if attr_provided("initial_snmp_speed", intf_dict) else None
+        )
+        interface = AllInterfaces(
+            interface_description=intf_dict["interface_description"],
+            device_id=int(intf_dict["device_id"]),
+            snmp_speed=float(intf_dict["snmp_speed"]),
+            initial_snmp_speed=initial_snmp_speed,
+        )
+        return interface
+
+
 @dataclass()
 class GetResponse:
     # reguired fields
@@ -95,7 +118,7 @@ class GetResponse:
     device_sample_rate: int
     sending_ips: List[str]
     labels: List[_Label] = field(default_factory=list)
-    all_interfaces: List[Any] = field(default_factory=list)
+    all_interfaces: List[_AllInterfaces] = field(default_factory=list)
     # optional fields
     cdn_attr: Optional[str] = None
     device_description: Optional[str] = None
@@ -130,7 +153,10 @@ class GetResponse:
             _SNMPv3Conf.from_dict(dic["device_snmp_v3_conf"]) if attr_provided("device_snmp_v3_conf", dic) else None
         )
         site = SiteGetResponse.from_fields(**dic["site"]) if attr_provided("site", dic) else None
-        labels = [_Label.from_dict(d) for d in dic["labels"]]
+        labels = [_Label.from_dict(d) for d in dic["labels"]] if attr_provided("labels", dic) else []
+        all_interfaces = (
+            [_AllInterfaces.from_dict(d) for d in dic["all_interfaces"]] if attr_provided("all_interfaces", dic) else []
+        )
         return cls(
             id=int(dic["id"]),
             plan=PlanGetResponse.from_dict(dic["plan"]),
@@ -141,7 +167,7 @@ class GetResponse:
             device_sample_rate=dic["device_sample_rate"],
             sending_ips=dic["sending_ips"],
             labels=labels,
-            all_interfaces=dic["all_interfaces"],
+            all_interfaces=all_interfaces,
             cdn_attr=dic.get("cdn_attr"),
             device_description=dic.get("device_description"),
             device_snmp_ip=dic.get("device_snmp_ip"),
@@ -169,6 +195,7 @@ class GetResponse:
         snmp_v3_conf = self.device_snmp_v3_conf.to_conf() if self.device_snmp_v3_conf is not None else None
         site = self.site.to_site() if self.site is not None else None
         labels = [l.to_label() for l in self.labels]
+        all_intefaces = [i.to_all_interfaces() for i in self.all_interfaces]
         return Device(
             id=self.id,
             plan=self.plan.to_plan(),
@@ -198,7 +225,7 @@ class GetResponse:
             bgp_peer_ip4=self.bgpPeerIP4,
             bgp_peer_ip6=self.bgpPeerIP6,
             labels=labels,
-            all_interfaces=self.all_interfaces,
+            all_interfaces=all_intefaces,
             device_snmp_v3_conf=snmp_v3_conf,
             cdn_attr=CDNAttribute(self.cdn_attr) if self.cdn_attr is not None else None,
         )

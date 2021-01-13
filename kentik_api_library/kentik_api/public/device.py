@@ -73,6 +73,33 @@ class SNMPv3Conf:
         return self
 
 
+class AllInterfaces:
+    def __init__(
+        self, interface_description: str, device_id: int, snmp_speed: float, initial_snmp_speed: Optional[float] = None
+    ) -> None:
+        # read-only
+        self._interface_description = interface_description
+        self._device_id = device_id
+        self._snmp_speed = snmp_speed
+        self._initial_snmp_speed = initial_snmp_speed
+
+    @property
+    def interface_description(self) -> str:
+        return self._interface_description
+
+    @property
+    def device_id(self) -> int:
+        return self._device_id
+
+    @property
+    def snmp_speed(self) -> float:
+        return self._snmp_speed
+
+    @property
+    def initial_snmp_speed(self) -> Optional[float]:
+        return self._initial_snmp_speed
+
+
 class Device:
     def __init__(
         self,
@@ -111,7 +138,7 @@ class Device:
         plan: Optional[Plan] = None,
         site: Optional[Site] = None,
         labels: List[DeviceLabel] = [],
-        all_interfaces: List[Any] = [],
+        all_interfaces: List[AllInterfaces] = [],
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 

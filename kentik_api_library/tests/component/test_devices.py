@@ -421,7 +421,20 @@ def test_get_device_router_success() -> None:
                             "_pivot_label_id": "2751"
                         }
                     ],
-            "all_interfaces": [],
+            "all_interfaces": [
+                {
+                    "interface_description": "testapi-interface-1",
+                    "initial_snmp_speed": null,
+                    "device_id": "42",
+                    "snmp_speed": "75"
+                },
+                {
+                    "interface_description": "testapi-interface-2",
+                    "initial_snmp_speed": 7.5,
+                    "device_id": "42",
+                    "snmp_speed": "7.5"
+                }
+            ],
             "device_flow_type": "auto",
             "device_sample_rate": "1001",
             "sending_ips": [
@@ -519,7 +532,15 @@ def test_get_device_router_success() -> None:
     assert device.labels[1].user_id == "136885"
     assert device.labels[1].company_id == "74333"
     assert device.labels[1].color == "#5289D9"
-    assert len(device.all_interfaces) == 0
+    assert len(device.all_interfaces) == 2
+    assert device.all_interfaces[0].interface_description == "testapi-interface-1"
+    assert device.all_interfaces[0].initial_snmp_speed == None
+    assert device.all_interfaces[0].device_id == 42
+    assert device.all_interfaces[0].snmp_speed == 75
+    assert device.all_interfaces[1].interface_description == "testapi-interface-2"
+    assert device.all_interfaces[1].initial_snmp_speed == 7.5
+    assert device.all_interfaces[1].device_id == 42
+    assert device.all_interfaces[1].snmp_speed == 7.5
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
     assert len(device.sending_ips) == 2
