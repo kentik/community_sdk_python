@@ -112,4 +112,7 @@ setup(
     packages=PACKAGES,
     package_dir=PACKAGE_DIR,
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
+    classifiers=[
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+    ],
 )
