@@ -43,7 +43,7 @@ def test_create_saved_filter_success(client, connector) -> None:
     created = client.saved_filters.create(to_create)
 
     # then
-    assert connector.last_url == "/saved-filter/custom"
+    assert connector.last_url_path == "/saved-filter/custom"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
     assert connector.last_payload["filter_name"] == "test_filter1"
@@ -100,7 +100,7 @@ def test_get_saved_filter_success(client, connector) -> None:
     saved_filter = client.saved_filters.get(filter_id)
 
     # then
-    assert connector.last_url == f"/saved-filter/custom/{filter_id}"
+    assert connector.last_url_path == f"/saved-filter/custom/{filter_id}"
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
@@ -157,7 +157,7 @@ def test_update_saved_filter_success(client, connector) -> None:
     updated = client.saved_filters.update(to_update)
 
     # then
-    assert connector.last_url == f"/saved-filter/custom/{filter_id}"
+    assert connector.last_url_path == f"/saved-filter/custom/{filter_id}"
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
 
@@ -175,7 +175,7 @@ def test_delete_saved_filter_success(client, connector) -> None:
     delete_successful = client.saved_filters.delete(filter_id)
 
     # then
-    assert connector.last_url == f"/saved-filter/custom/{filter_id}"
+    assert connector.last_url_path == f"/saved-filter/custom/{filter_id}"
     assert connector.last_method == APICallMethods.DELETE
     assert connector.last_payload is None
     assert delete_successful is True

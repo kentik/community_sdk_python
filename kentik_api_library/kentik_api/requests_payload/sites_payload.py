@@ -22,10 +22,12 @@ class GetResponse:
         dic = json.loads(json_string)
         return cls(GetResponse._Site(**dic["site"]))
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def from_fields(cls, id: int, site_name: str, lat: Optional[float], lon: Optional[float], company_id: str):
         return cls(GetResponse._Site(id, site_name, lat, lon, company_id))
 
+    # pylint: enable=too-many-arguments
     def to_site(self) -> Site:
         return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, self.site.company_id)
 

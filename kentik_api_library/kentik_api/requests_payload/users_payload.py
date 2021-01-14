@@ -4,6 +4,8 @@ from typing import Optional, Dict, List
 
 from kentik_api.public.user import User
 
+# pylint: disable=too-many-instance-attributes
+
 
 @dataclass()
 class _User:
@@ -39,6 +41,9 @@ class _User:
             filters=dict(self.filters),
             saved_filters=list(self.saved_filters),
         )
+
+
+# pylint: enable=too-many-instance-attributes
 
 
 @dataclass()
@@ -86,7 +91,7 @@ class CreateRequest:
         email_product: bool
 
     user: _CreateData
-
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         user_email: str,
@@ -100,6 +105,8 @@ class CreateRequest:
         self.user = CreateRequest._CreateData(
             user_name, user_full_name, user_email, user_password, role, email_service, email_product
         )
+
+    # pylint: enable=too-many-arguments
 
 
 # Create response and Update response are exactly the same as Get response
@@ -120,6 +127,7 @@ class UpdateRequest:
 
     user: _UpdateData
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         user_email: Optional[str] = None,
@@ -130,3 +138,5 @@ class UpdateRequest:
         user_full_name: Optional[str] = None,
     ) -> None:
         self.user = UpdateRequest._UpdateData(user_name, user_full_name, user_email, role, email_service, email_product)
+
+    # pylint: enable=too-many-arguments

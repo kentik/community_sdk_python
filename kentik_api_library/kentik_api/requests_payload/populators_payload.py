@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 from kentik_api.public.custom_dimension import Populator
 
+# pylint: disable=too-many-instance-attributes
+
 
 @dataclass
 class _Populator:
@@ -70,6 +72,9 @@ class _Populator:
         )
 
 
+# pylint: enable=too-many-instance-attributes
+
+
 class PopulatorArray(List[_Populator]):
     @classmethod
     def from_list(cls, items: List[Dict[str, Any]]):
@@ -91,6 +96,7 @@ class GetResponse(_Populator):
 
 
 class CreateRequest:
+    # pylint: disable=too-many-instance-attributes
     @dataclass
     class _Populator:
         # dimension_id: int # this id goes as url param
@@ -115,6 +121,8 @@ class CreateRequest:
         country: Optional[str]
         vlans: Optional[str]
 
+    # pylint: enable=too-many-instance-attributes
+
     def __init__(self, **kwargs):
         self.populator = CreateRequest._Populator(**kwargs)
 
@@ -124,6 +132,7 @@ CreateResponse = GetResponse
 
 @dataclass
 class UpdateRequest:
+    # pylint: disable=too-many-instance-attributes
     @dataclass
     class _Populator:
         # id: int # this id goes as url param
@@ -148,6 +157,8 @@ class UpdateRequest:
         mac: Optional[str]
         country: Optional[str]
         vlans: Optional[str]
+
+    # pylint: enable=too-many-instance-attributes
 
     def __init__(self, **kwargs):
         self.populator = UpdateRequest._Populator(**kwargs)

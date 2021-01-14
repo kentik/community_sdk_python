@@ -11,7 +11,11 @@ class DeviceItem:
     device_type: Optional[str]
 
 
+# pylint: disable=too-many-instance-attributes
+
+
 class DeviceLabel:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name: str,
@@ -34,6 +38,8 @@ class DeviceLabel:
         self._devices = devices
         self._created_date = created_date
         self._updated_date = updated_date
+
+    # pylint: enable=too-many-arguments
 
     @property
     def id(self) -> int:
@@ -59,3 +65,6 @@ class DeviceLabel:
     @property
     def updated_date(self) -> Optional[str]:
         return self._updated_date
+
+
+# pylint: enable=too-many-instance-attributes

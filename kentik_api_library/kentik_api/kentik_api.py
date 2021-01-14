@@ -3,16 +3,23 @@ from .api_resources.device_labels_api import DeviceLabelsAPI
 from .api_resources.query_api import QueryAPI
 from .api_resources.sites_api import SitesAPI
 from .api_resources.users_api import UsersAPI
+from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.saved_filters_api import SavedFiltersAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
 from .api_resources.custom_dimensions_api import CustomDimensionsAPI
+from .api_resources.batch_api import BatchAPI
+from .api_resources.alerting_api import AlertingAPI
+from .api_resources.plans_api import PlansAPI
+from .api_resources.devices_api import DevicesAPI
 
 API_REGION_US = "us"
 API_REGION_EU = "eu"
 
+# pylint: disable=too-many-instance-attributes
 
-class KentikAPI(object):
+
+class KentikAPI:
     """ Root object for operating KentikAPI """
 
     API_VERSION = "v5"
@@ -32,8 +39,14 @@ class KentikAPI(object):
         self.custom_dimensions = CustomDimensionsAPI(connector)
         self.custom_applications = CustomApplicationsAPI(connector)
         self.query = QueryAPI(connector)
-        # self.devices =
-        # ...
+        self.plans = PlansAPI(connector)
+        self.my_kentik_portal = MyKentikPortalAPI(connector)
+        self.devices = DevicesAPI(connector)
+        self.batch = BatchAPI(connector)
+        self.alerting = AlertingAPI(connector)
+
+
+# pylint: enable=too-many-instance-attributes
 
 
 def new_connector(api_url: str, auth_email: str, auth_token: str) -> APIConnector:

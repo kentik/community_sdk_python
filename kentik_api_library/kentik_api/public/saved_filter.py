@@ -10,14 +10,30 @@ class Filter:
     id: Optional[str] = None
 
 
-@dataclass()
 class FilterGroups:
-    connector: str
-    filters: List[Filter]
-    not_: bool
-    filterString: Optional[str] = None
-    id: Optional[str] = None
-    metric: Optional[str] = None
+    def __init__(
+        self,
+        connector: str,
+        filters: List[Filter],
+        not_: bool,
+        filterString: Optional[str] = None,
+        id: Optional[str] = None,
+        metric: Optional[str] = None,
+    ) -> None:
+        self.connector = connector
+        self.filters = filters
+        setattr(self, "not", not_)
+        self.filterString = filterString
+        self.id = id
+        self.metric = metric
+
+    @property
+    def not_(self) -> bool:
+        return getattr(self, "not")
+
+    @not_.setter
+    def not_(self, not_: bool) -> None:
+        setattr(self, "not", not_)
 
 
 @dataclass()
@@ -28,7 +44,11 @@ class Filters:
     filterString: Optional[str] = None
 
 
+# pylint: disable=too-many-instance-attributes
+
+
 class SavedFilter:
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         cdate: Optional[str] = None,
@@ -50,6 +70,7 @@ class SavedFilter:
         self._id = id
         self._company_id = company_id
 
+    # pylint: enable=too-many-arguments
     @property
     def cdate(self) -> Optional[str]:
         return self._cdate
@@ -67,3 +88,6 @@ class SavedFilter:
     def company_id(self) -> int:
         assert self._company_id is not None
         return self._company_id
+
+
+# pylint: enable=too-many-instance-attributes

@@ -27,7 +27,7 @@ def create_tenant_user(tenant_id: int) -> APICall:
 
 
 @delete
-def delete_tenant_user(tenant_id: int, user_id: int) -> APICall:
+def delete_tenant_user(tenant_id: int, user_id: str) -> APICall:
     """Deletes a tenant user from the system"""
     url_path = f"/mykentik/tenant/{tenant_id}/user/{user_id}"
     return APICall(url_path)
