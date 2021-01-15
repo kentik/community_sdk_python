@@ -12,7 +12,7 @@ from kentik_api.public.errors import DeserializationError, DataFormatError
 
 
 @dataclass
-class TestDataClass:
+class _TestDataClass:
     name: str
     age: int
     hobby: Optional[str] = None
@@ -23,7 +23,7 @@ def test_from_dict_required_and_optional_fields_success() -> None:
     dic = {"name": "Liz", "age": 42, "hobby": "papercut"}
 
     # when
-    obj = from_dict(data_class=TestDataClass, data=dic)
+    obj = from_dict(data_class=_TestDataClass, data=dic)
 
     # then
     assert obj is not None
@@ -39,7 +39,7 @@ def test_from_dict_required_optional_extra_fields_success() -> None:
     dic = {"name": "Liz", "age": 42, "hobby": "papercut", "origin": "Sierra Leone"}
 
     # when
-    obj = from_dict(data_class=TestDataClass, data=dic)
+    obj = from_dict(data_class=_TestDataClass, data=dic)
 
     # then
     assert obj is not None
@@ -53,7 +53,7 @@ def test_from_dict_only_required_fields_success() -> None:
     dic = {"name": "Liz", "age": 42}
 
     # when
-    obj = from_dict(data_class=TestDataClass, data=dic)
+    obj = from_dict(data_class=_TestDataClass, data=dic)
 
     # then
     assert obj is not None
@@ -68,7 +68,7 @@ def test_from_dict_missing_required_field_raises_error() -> None:
 
     # when - then
     with pytest.raises(DeserializationError):
-        _ = from_dict(data_class=TestDataClass, data=dic)
+        _ = from_dict(data_class=_TestDataClass, data=dic)
 
 
 def test_from_dict_different_casing_raises_error() -> None:
@@ -77,7 +77,7 @@ def test_from_dict_different_casing_raises_error() -> None:
 
     # when - then
     with pytest.raises(DeserializationError):
-        _ = from_dict(data_class=TestDataClass, data=dic)
+        _ = from_dict(data_class=_TestDataClass, data=dic)
 
 
 def test_from_json_valid_document_success() -> None:
