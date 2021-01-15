@@ -5,7 +5,7 @@ from kentik_api.api_calls import saved_filters
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
 from kentik_api.public.saved_filter import SavedFilter
 from kentik_api.requests_payload import saved_filters_payload
-from kentik_api.requests_payload.as_dict import as_dict
+from kentik_api.requests_payload.conversions import as_dict
 
 
 class SavedFiltersAPI:
