@@ -108,7 +108,7 @@ class _AllInterfaces:
 
 @dataclass()
 class GetResponse:
-    # reguired fields
+    # required fields
     id: int
     plan: PlanGetResponse
     site: SiteGetResponse

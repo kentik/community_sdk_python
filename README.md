@@ -47,9 +47,9 @@ Implemented API resources:
 - users
 - sites
 - tags
-- devices
+- devices (with interfaces)
 - device labels
-- custom dimensions
+- custom dimensions (with populators)
 - custom applications
 - saved filters
 - my kentik portal
@@ -58,7 +58,7 @@ Implemented API resources:
 - alerts
 
 Working on:
-- interfaces
+- alerts active
 
 To be implemented:
-- alerts active
+- [none]
