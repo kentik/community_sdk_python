@@ -11,12 +11,12 @@ class SavedFiltersAPI(BaseAPI):
 
     def get_all(self) -> List[SavedFilter]:
         api_call = saved_filters.get_saved_filters()
-        response = self._send(api_call)
+        response = self.send(api_call)
         return saved_filters_payload.GetAllResponse.from_json(response.text).to_saved_filters()
 
     def get(self, saved_filter_id: int) -> SavedFilter:
         api_call = saved_filters.get_saved_filter_info(saved_filter_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return saved_filters_payload.GetResponse.from_json(response.text).to_saved_filter()
 
     def create(self, saved_filter: SavedFilter) -> SavedFilter:
@@ -24,7 +24,7 @@ class SavedFiltersAPI(BaseAPI):
 
         api_call = saved_filters.create_saved_filter()
         payload = saved_filters_payload.CreateRequest(saved_filter)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return saved_filters_payload.CreateResponse.from_json(response.text).to_saved_filter()
 
     def update(self, saved_filter: SavedFilter) -> SavedFilter:
@@ -33,12 +33,12 @@ class SavedFiltersAPI(BaseAPI):
 
         api_call = saved_filters.update_saved_filter(saved_filter.id)
         payload = saved_filters_payload.UpdateRequest(saved_filter)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return saved_filters_payload.UpdateResponse.from_json(response.text).to_saved_filter()
 
     def delete(self, saved_filter_id: int) -> bool:
         api_call = saved_filters.delete_saved_filter(saved_filter_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
     @staticmethod

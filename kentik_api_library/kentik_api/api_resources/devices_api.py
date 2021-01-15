@@ -12,29 +12,29 @@ class InterfacesAPI(BaseAPI):
 
     def get_all(self, device_id: int) -> List[Interface]:
         api_call = devices.get_device_interfaces(device_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return interfaces_payload.GetAllResponse.from_json(response.text).to_interfaces()
 
     def get(self, device_id: int, interface_id: int) -> Interface:
         api_call = devices.get_device_interface_info(device_id, interface_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return interfaces_payload.GetResponse.from_json(response.text).to_interface()
 
     def create(self, interface: Interface) -> Interface:
         api_call = devices.create_interface(interface.device_id)
         payload = interfaces_payload.CreateRequest.from_interface(interface)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return interfaces_payload.CreateResponse.from_json(response.text).to_interface()
 
     def update(self, interface: Interface) -> Interface:
         api_call = devices.update_interface(interface.device_id, interface.id)
         payload = interfaces_payload.UpdateRequest.from_interface(interface)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return interfaces_payload.UpdateResponse.from_json(response.text).to_interface()
 
     def delete(self, device_id: int, interface_id: int) -> bool:
         api_call = devices.delete_interface(device_id, interface_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return response.http_status_code == HTTPStatus.OK
 
 
@@ -47,24 +47,24 @@ class DevicesAPI(BaseAPI):
 
     def get_all(self) -> List[Device]:
         api_call = devices.get_devices()
-        response = self._send(api_call)
+        response = self.send(api_call)
         return devices_payload.GetAllResponse.from_json(response.text).to_devices()
 
     def get(self, device_id: int) -> Device:
         api_call = devices.get_device_info(device_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return devices_payload.GetResponse.from_json(response.text).to_device()
 
     def create(self, device: Device) -> Device:
         api_call = devices.create_device()
         payload = devices_payload.CreateRequest.from_device(device)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return devices_payload.CreateResponse.from_json(response.text).to_device()
 
     def update(self, device: Device) -> Device:
         api_call = devices.update_device(device.id)
         payload = devices_payload.UpdateRequest.from_device(device)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return devices_payload.UpdateResponse.from_json(response.text).to_device()
 
     def delete(self, device_id: int) -> bool:
@@ -73,13 +73,13 @@ class DevicesAPI(BaseAPI):
         This is a safety measure preventing deletion by mistake.
         """
         api_call = devices.delete_device(device_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
     def apply_labels(self, device_id: int, label_ids: List[int]) -> AppliedLabels:
         api_call = devices.apply_device_labels(device_id)
         payload = devices_payload.ApplyLabelsRequest.from_id_list(label_ids)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return devices_payload.ApplyLabelsResponse.from_json(response.text).to_applied_labels()
 
     @property

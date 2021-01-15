@@ -11,7 +11,7 @@ class CustomApplicationsAPI(BaseAPI):
 
     def get_all(self) -> List[CustomApplication]:
         apicall = custom_applications.get_custom_applications()
-        response = self._send(apicall)
+        response = self.send(apicall)
         return custom_applications_payload.GetAllResponse.from_json(response.text).to_custom_applications()
 
     def create(self, custom_application: CustomApplication) -> CustomApplication:
@@ -25,7 +25,7 @@ class CustomApplicationsAPI(BaseAPI):
             port=custom_application.port,
             asn=custom_application.asn,
         )
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return custom_applications_payload.CreateResponse.from_json(response.text).to_custom_application()
 
     def update(self, custom_application: CustomApplication) -> CustomApplication:
@@ -38,10 +38,10 @@ class CustomApplicationsAPI(BaseAPI):
             port=custom_application.port,
             asn=custom_application.asn,
         )
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return custom_applications_payload.UpdateResponse.from_json(response.text).to_custom_application()
 
     def delete(self, custom_application_id: int) -> bool:
         apicall = custom_applications.delete_custom_application(custom_application_id)
-        response = self._send(apicall)
+        response = self.send(apicall)
         return response.http_status_code == 204

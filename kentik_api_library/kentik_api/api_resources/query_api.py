@@ -11,23 +11,23 @@ class QueryAPI(BaseAPI):
     def sql(self, query: SQLQuery) -> SQLQueryResult:
         apicall = query_methods.query_sql()
         payload = query
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return SQLQueryResult.from_json(response.text)
 
     def data(self, query: QueryObject) -> QueryDataResult:
         apicall = query_methods.query_data()
         payload = query
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return QueryDataResponse.from_json(response.text).to_query_data_result()
 
     def chart(self, query: QueryObject) -> QueryChartResult:
         apicall = query_methods.query_chart()
         payload = query
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return QueryChartResponse.from_json(response.text).to_query_chart_result()
 
     def url(self, query: QueryObject) -> QueryURLResult:
         apicall = query_methods.query_url()
         payload = query
-        response = self._send(apicall, payload)
+        response = self.send(apicall, payload)
         return QueryURLResponse(response.text).to_query_url_result()

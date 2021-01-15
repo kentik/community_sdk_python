@@ -12,7 +12,7 @@ class BaseAPI:
     def __init__(self, api_connector: APIConnectorProtocol) -> None:
         self._api_connector = api_connector
 
-    def _send(self, api_call: APICall, payload: Optional[Any] = None) -> APICallResponse:
+    def send(self, api_call: APICall, payload: Optional[Any] = None) -> APICallResponse:
         if payload is not None:
             payload = as_dict(payload)
         return self._api_connector.send(api_call, payload)
