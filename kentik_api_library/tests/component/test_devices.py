@@ -433,7 +433,7 @@ def test_get_device_router_success() -> None:
                 },
                 {
                     "interface_description": "testapi-interface-2",
-                    "initial_snmp_speed": 7,
+                    "initial_snmp_speed": "7",
                     "device_id": "42",
                     "snmp_speed": "7"
                 }
@@ -503,7 +503,7 @@ def test_get_device_router_success() -> None:
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == 74333
+    assert device.site.company_id == "74333"
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
     assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
@@ -546,6 +546,7 @@ def test_get_device_router_success() -> None:
     assert device.all_interfaces[1].snmp_speed == 7
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"
     assert device.sending_ips[1] == "128.0.0.12"
@@ -676,6 +677,7 @@ def test_get_device_dns_success() -> None:
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 0
     assert device.device_snmp_ip is None
     assert device.device_snmp_community == ""
@@ -1099,7 +1101,7 @@ def test_get_all_devices_success() -> None:
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == 74333
+    assert device.site.company_id == "74333"
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
     assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
@@ -1134,6 +1136,7 @@ def test_get_all_devices_success() -> None:
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"
     assert device.sending_ips[1] == "128.0.0.12"

@@ -8,12 +8,17 @@ from kentik_api.public.plan import Plan
 from kentik_api.public.device_label import DeviceLabel
 
 
-class DeviceType(Enum):
+class StrEnum(Enum):
+    def to_str(self) -> str:
+        return self.value
+
+
+class DeviceType(StrEnum):
     router = "router"
     host_nprobe_dns_www = "host-nprobe-dns-www"
 
 
-class DeviceSubtype(Enum):
+class DeviceSubtype(StrEnum):
     # for DeviceType = router
     router = "router"
     cisco_asa = "cisco_asa"
@@ -26,25 +31,25 @@ class DeviceSubtype(Enum):
     gcp_subnet = "gcp_subnet"
 
 
-class DeviceBGPType(Enum):
+class DeviceBGPType(StrEnum):
     none = "none"
     device = "device"
     other_device = "other_device"
 
 
-class CDNAttribute(Enum):
+class CDNAttribute(StrEnum):
     none = "None"
     yes = "Y"
     no = "N"
 
 
-class AuthenticationProtocol(Enum):
+class AuthenticationProtocol(StrEnum):
     no_auth = "NoAuth"
     md5 = "MD5"
     sha = "SHA"
 
 
-class PrivacyProtocol(Enum):
+class PrivacyProtocol(StrEnum):
     no_priv = "NoPriv"
     des = "DES"
     aes = "AES"
@@ -75,7 +80,11 @@ class SNMPv3Conf:
 
 class AllInterfaces:
     def __init__(
-        self, interface_description: str, device_id: int, snmp_speed: float, initial_snmp_speed: Optional[float] = None
+        self,
+        interface_description: str,
+        device_id: int,
+        snmp_speed: float,
+        initial_snmp_speed: Optional[float] = None,
     ) -> None:
         # read-only
         self._interface_description = interface_description
@@ -113,7 +122,7 @@ class Device:
         device_subtype: Optional[DeviceSubtype] = None,
         device_description: Optional[str] = None,
         device_sample_rate: Optional[int] = None,
-        sending_ips: List[str] = [],
+        sending_ips: Optional[List[str]] = None,
         device_snmp_ip: Optional[str] = None,
         device_snmp_community: Optional[str] = None,
         minimize_snmp: Optional[bool] = None,
@@ -137,8 +146,8 @@ class Device:
         bgp_peer_ip6: Optional[str] = None,
         plan: Optional[Plan] = None,
         site: Optional[Site] = None,
-        labels: List[DeviceLabel] = [],
-        all_interfaces: List[AllInterfaces] = [],
+        labels: Optional[List[DeviceLabel]] = None,
+        all_interfaces: Optional[List[AllInterfaces]] = None,
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 
@@ -238,11 +247,11 @@ class Device:
 
     @property
     def labels(self) -> List[DeviceLabel]:
-        return list(self._labels)
+        return list(self._labels) if self._labels is not None else []
 
     @property
     def all_interfaces(self) -> List[Any]:
-        return self._all_interfaces
+        return list(self._all_interfaces) if self._all_interfaces is not None else []
 
     @classmethod
     def new_router(
@@ -351,7 +360,7 @@ class AppliedLabels:
 
     @property
     def labels(self) -> List[DeviceLabel]:
-        return self._labels
+        return list(self._labels)
 
 
 class VRFAttributes:
@@ -501,4 +510,4 @@ class Interface:
 
     @property
     def top_nexthop_asns(self) -> List[TopNextHopASN]:
-        return self._top_nexthop_asns if self._top_nexthop_asns is not None else []
+        return list(self._top_nexthop_asns) if self._top_nexthop_asns is not None else []

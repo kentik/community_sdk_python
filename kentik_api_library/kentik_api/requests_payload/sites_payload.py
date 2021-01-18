@@ -1,7 +1,7 @@
-import json
-from typing import Optional, List
+from typing import Optional, Any, List, Dict
 from dataclasses import dataclass
 
+from kentik_api.requests_payload.conversions import from_json, from_dict
 from kentik_api.public.site import Site
 
 
@@ -19,31 +19,28 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        return cls(GetResponse._Site(**dic["site"]))
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        return cls.from_dict(dic=dic)
 
-    # pylint: disable=too-many-arguments
     @classmethod
-    def from_fields(cls, id: int, site_name: str, lat: Optional[float], lon: Optional[float], company_id: str):
-        return cls(GetResponse._Site(id, site_name, lat, lon, company_id))
+    def from_dict(cls, dic: Dict[str, Any]):
+        return cls(site=from_dict(data_class=GetResponse._Site, data=dic))
 
-    # pylint: enable=too-many-arguments
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, self.site.company_id)
+        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
 
 
-class GetAllResponse(List[GetResponse]):
+class GetAllResponse:
+    sites: List[GetResponse]
+
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        sites = cls()
-        for item in dic["sites"]:
-            s = GetResponse.from_fields(**item)
-            sites.append(s)
-        return sites
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="sites")
+        sites = [GetResponse.from_dict(item) for item in dic]
+        return cls(sites=sites)
 
     def to_sites(self) -> List[Site]:
-        return [s.to_site() for s in self]
+        return [item.to_site() for item in self.sites]
 
 
 class CreateRequest:
@@ -71,11 +68,11 @@ class CreateResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        return cls(CreateResponse._Site(**dic["site"]))
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        return cls(site=from_dict(data_class=CreateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, self.site.company_id)
+        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
 
 
 class UpdateRequest:
@@ -103,11 +100,11 @@ class UpdateResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        return cls(UpdateResponse._Site(**dic["site"]))
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        return cls(site=from_dict(data_class=UpdateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, self.site.company_id)
+        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
 
 
 @dataclass()

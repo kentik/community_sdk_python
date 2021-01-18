@@ -1,11 +1,12 @@
 from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
-from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.public.device import Interface, SecondaryIP, TopNextHopASN, VRFAttributes
 from kentik_api.public.errors import IncompleteObjectError
+from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.requests_payload.conversions import (
     from_dict,
     from_json,
+    convert,
     convert_or_none,
     convert_list_or_none,
 )
@@ -13,7 +14,7 @@ from kentik_api.requests_payload.conversions import (
 
 @dataclass
 class SecondaryIPPayload:
-    """ This datastructure represents JSON SecondaryIP payload as it is transmitted to and from KentikAPI """
+    """ This datastructure represents JSON Interface.SecondaryIP payload as it is transmitted to and from KentikAPI """
 
     # GET, POST, PUT request/response
     address: str
@@ -33,7 +34,7 @@ class SecondaryIPPayload:
 
 @dataclass
 class TopNextHopASNPayload:
-    """ This datastructure represents JSON TopNextHopASN payload as it is transmitted to and from KentikAPI """
+    """ This datastructure represents JSON Interface.TopNextHopASN payload as it is transmitted to and from KentikAPI """
 
     # GET, POST, PUT request/response
     ASN: int
@@ -49,7 +50,7 @@ class TopNextHopASNPayload:
 
 @dataclass
 class VRFAttributesPayload:
-    """ This datastructure represents JSON VRF Attributes payload as it is transmitted to and from KentikAPI """
+    """ This datastructure represents JSON Interface.VRFAttributes payload as it is transmitted to and from KentikAPI """
 
     # GET, POST, PUT request/response
     name: str
@@ -139,7 +140,7 @@ class InterfacePayload:
             # always returned fields
             id=dic["id"],
             snmp_id=dic["snmp_id"],
-            snmp_speed=convert_or_none(dic["snmp_speed"], int),
+            snmp_speed=convert(dic["snmp_speed"], int),
             interface_description=dic["interface_description"],
             company_id=dic["company_id"],
             device_id=dic["device_id"],
@@ -224,7 +225,7 @@ class GetAllResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+        dic = from_json(class_name=cls.__name__, json_string=json_string)
         interfaces = [GetResponse.from_dict(item) for item in dic]
         return cls(interfaces=interfaces)
 
@@ -241,12 +242,13 @@ class CreateRequest(InterfacePayload):
 
     @staticmethod
     def validate(interface: Interface) -> None:
+        class_op = "Create Interface"
         if interface.snmp_id is None:
-            raise IncompleteObjectError("Create Interface", "snmp_id is required")
+            raise IncompleteObjectError(class_op, "snmp_id is required")
         if interface.snmp_speed is None:
-            raise IncompleteObjectError("Create Interface", "snmp_speed is required")
+            raise IncompleteObjectError(class_op, "snmp_speed is required")
         if interface.interface_description is None:
-            raise IncompleteObjectError("Create Interface", "interface_description is required")
+            raise IncompleteObjectError(class_op, "interface_description is required")
 
 
 @dataclass

@@ -138,7 +138,7 @@ class Aggregate:
     fn: AggregateFunctionType
     sample_rate: int = 1
     rank: Optional[int] = None  # valid: number 5..99; only used when fn == percentile
-    raw: Optional[bool] = None  # requred for topxchart queries
+    raw: Optional[bool] = None  # required for topxchart queries
 
 
 @dataclass

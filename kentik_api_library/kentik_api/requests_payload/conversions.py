@@ -47,7 +47,8 @@ Data = Dict[str, Any]
 
 
 def from_dict(data_class: Type[T], data: Data) -> T:
-    """ Wrapper converting dacite errors into kentik library errors """
+    """ Wrapper converting dacite errors into DeserializationError """
+
     try:
         return dacite.from_dict(data_class=data_class, data=data)
     except dacite.DaciteError as err:
@@ -56,7 +57,7 @@ def from_dict(data_class: Type[T], data: Data) -> T:
 
 def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, Any]:
     """
-    Wrapper converting json errors into kentik library errors
+    Wrapper converting json errors into DeserializationError
     root - use it to extract data that is nested under a root object eg. "interface": {...}
     """
 
@@ -68,21 +69,26 @@ def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, An
         raise DeserializationError(class_name, str(err))
 
 
-def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
-    """ Convert if input is not None, else just return None. Convert exceptions to library specific """
-    if attr is None or attr == {}:
-        return None
+def convert(attr: Any, convert_func) -> Any:
+    """ Convert input using convert_func. Raise DataFormatError on failure """
+
     try:
         return convert_func(attr)
     except Exception as err:
         raise DataFormatError(str(err))
 
 
+def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
+    """ Convert if input is not None, else just return None. Raise DataFormatError on failure  """
+
+    if attr is None or attr == {}:
+        return None
+    return convert(attr, convert_func)
+
+
 def convert_list_or_none(items: Optional[Iterable[Any]], convert_func) -> Optional[List[Any]]:
-    """ Convert list if input list is not None, else just return None. Convert exceptions to library specific """
+    """ Convert list if input list is not None, else just return None. Raise DataFormatError on failure  """
+
     if items is None:
         return None
-    try:
-        return [convert_func(item) for item in items]
-    except Exception as err:
-        raise DataFormatError(str(err))
+    return [convert(item, convert_func) for item in items]

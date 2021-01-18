@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from kentik_api.requests_payload.conversions import (
     from_dict,
     from_json,
+    convert,
     convert_or_none,
     convert_list_or_none,
 )
@@ -120,6 +121,28 @@ def test_from_json_missing_root_raises_error() -> None:
     # when - then
     with pytest.raises(DeserializationError):
         _ = from_json("TestDataClass", json_string, "person")
+
+
+def test_convert_provided_valid_data_format_returns_value() -> None:
+    # given
+    attr = "128"
+    convert_func = int
+
+    # when
+    result = convert(attr, convert_func)
+
+    # then
+    assert result == 128
+
+
+def test_convert_provided_invalid_data_format_raises_error() -> None:
+    # given
+    attr = "0x18"  # cant convert 0x18 to int with base 10
+    convert_func = int
+
+    # when - then
+    with pytest.raises(DataFormatError):
+        _ = convert(attr, convert_func)
 
 
 def test_convert_or_none_provided_value_returns_value() -> None:

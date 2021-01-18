@@ -37,7 +37,7 @@ def test_create_site_success(client, connector) -> None:
     assert created.site_name == "apitest-site-1"
     assert created.latitude == 54.349276
     assert created.longitude == 18.659577
-    assert created.company_id == "3250"
+    assert created.company_id == 3250
 
 
 def test_get_site_success(client, connector) -> None:
@@ -69,7 +69,7 @@ def test_get_site_success(client, connector) -> None:
     assert site.site_name == "apitest-site-1"
     assert site.latitude == 54.349276
     assert site.longitude == 18.659577
-    assert site.company_id == "3250"
+    assert site.company_id == 3250
 
 
 def test_update_site_success(client, connector) -> None:
@@ -106,7 +106,7 @@ def test_update_site_success(client, connector) -> None:
     assert updated.site_name == "new-site"
     assert updated.latitude == -15.0
     assert updated.longitude == -45.0
-    assert updated.company_id == "3250"
+    assert updated.company_id == 3250
 
 
 def test_delete_site_success(client, connector) -> None:

@@ -9,7 +9,7 @@ class Site:
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
         id: Optional[int] = None,
-        company_id: Optional[str] = None,
+        company_id: Optional[int] = None,
     ) -> None:
         # read-write
         self.site_name = site_name
@@ -28,5 +28,5 @@ class Site:
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[int]:
         return self._company_id
