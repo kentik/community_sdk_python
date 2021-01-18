@@ -1,4 +1,4 @@
-from python_http_client import Client
+from python_http_client import Client  # type: ignore
 import client as kentik_fluent_api_client
 
 
