@@ -92,3 +92,8 @@ def convert_list_or_none(items: Optional[Iterable[Any]], convert_func) -> Option
     if items is None:
         return None
     return [convert(item, convert_func) for item in items]
+
+
+def enum_to_str(enum: Enum) -> str:
+    """ Convert enum value to str. To be used with convert* functions """
+    return str(enum.value)

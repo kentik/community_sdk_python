@@ -8,17 +8,12 @@ from kentik_api.public.plan import Plan
 from kentik_api.public.device_label import DeviceLabel
 
 
-class StrEnum(Enum):
-    def to_str(self) -> str:
-        return self.value
-
-
-class DeviceType(StrEnum):
+class DeviceType(Enum):
     router = "router"
     host_nprobe_dns_www = "host-nprobe-dns-www"
 
 
-class DeviceSubtype(StrEnum):
+class DeviceSubtype(Enum):
     # for DeviceType = router
     router = "router"
     cisco_asa = "cisco_asa"
@@ -31,25 +26,25 @@ class DeviceSubtype(StrEnum):
     gcp_subnet = "gcp_subnet"
 
 
-class DeviceBGPType(StrEnum):
+class DeviceBGPType(Enum):
     none = "none"
     device = "device"
     other_device = "other_device"
 
 
-class CDNAttribute(StrEnum):
+class CDNAttribute(Enum):
     none = "None"
     yes = "Y"
     no = "N"
 
 
-class AuthenticationProtocol(StrEnum):
+class AuthenticationProtocol(Enum):
     no_auth = "NoAuth"
     md5 = "MD5"
     sha = "SHA"
 
 
-class PrivacyProtocol(StrEnum):
+class PrivacyProtocol(Enum):
     no_priv = "NoPriv"
     des = "DES"
     aes = "AES"

@@ -1,4 +1,5 @@
 import pytest
+from enum import Enum
 from typing import Optional
 from dataclasses import dataclass
 
@@ -8,6 +9,7 @@ from kentik_api.requests_payload.conversions import (
     convert,
     convert_or_none,
     convert_list_or_none,
+    enum_to_str,
 )
 from kentik_api.public.errors import DeserializationError, DataFormatError
 
@@ -225,3 +227,19 @@ def test_convert_list_or_none_provided_invalid_data_format_raises_error() -> Non
     # when - then
     with pytest.raises(DataFormatError):
         result = convert_list_or_none(attrs, convert_func)
+
+
+def test_enum_to_str() -> None:
+    # given
+    class Colors(Enum):
+        red = "RED"
+        green = "GREEN"
+        blule = "BLUE"
+
+    color = Colors.green
+
+    # when
+    color_name = enum_to_str(color)
+
+    # then
+    assert color_name == "GREEN"
