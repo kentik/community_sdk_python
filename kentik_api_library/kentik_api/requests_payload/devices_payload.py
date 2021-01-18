@@ -260,7 +260,7 @@ class DevicePayload:
     def to_device(self) -> Device:
         return Device(
             id=self.id,
-            plan=convert_or_none(self.plan, PlanGetResponse.to_plan),
+            plan=convert_or_none(self.plan, PlanPayload.to_plan),
             site=convert_or_none(self.site, SitePayload.to_site),
             device_name=self.device_name,
             device_type=DeviceType(self.device_type),

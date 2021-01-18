@@ -1,6 +1,6 @@
 import pytest
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any, Dict
 from dataclasses import dataclass
 
 from kentik_api.requests_payload.conversions import (
@@ -173,7 +173,7 @@ def test_convert_or_none_provided_none_returns_none() -> None:
 
 def test_convert_or_none_provided_empty_returns_none() -> None:
     # given
-    attr = {}
+    attr: Dict[str, Any] = {}
     convert_func = dict
 
     # when
