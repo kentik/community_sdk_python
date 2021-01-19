@@ -19,7 +19,7 @@ def test_get_tenants_return_apiCall():
     assert call.method.name == "GET"
 
 
-def test_get_tenant_info__return_apiCall():
+def test_get_tenant_info_return_apiCall():
 
     # WHEN
     call = get_tenant_info(DUMMY_TEN_ID)
@@ -30,7 +30,7 @@ def test_get_tenant_info__return_apiCall():
     assert call.method.name == "GET"
 
 
-def test_create_tenant_user__return_apiCall():
+def test_create_tenant_user_return_apiCall():
 
     # WHEN
     call = create_tenant_user(DUMMY_TEN_ID)
@@ -41,7 +41,7 @@ def test_create_tenant_user__return_apiCall():
     assert call.method.name == "POST"
 
 
-def test_delete_tenant_user__return_apiCall():
+def test_delete_tenant_user_return_apiCall():
 
     # WHEN
     call = delete_tenant_user(DUMMY_TEN_ID, DUMMY_USR_ID)

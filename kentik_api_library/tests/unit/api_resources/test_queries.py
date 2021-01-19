@@ -16,7 +16,7 @@ from kentik_api.public.query_object import (
     ChartViewType,
     TimeFormat,
 )
-from tests.component.stub_api_connector import StubAPIConnector
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
 def test_query_sql_success() -> None:
