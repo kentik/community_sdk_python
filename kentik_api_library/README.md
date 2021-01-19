@@ -33,3 +33,10 @@ List of available examples:
 - [sites_example.py](./examples/sites_example.py) - create/update/get/delete/list Sites
 - [tags_example.py](./examples/tags_example.py) - create/update/get/delete/list Tags
 - [users_example.py](./examples/users_example.py) - create/update/get/delete/list Users
+
+## Open-source libraries
+
+This software uses the following open-source libraries:
+- [dacite](https://pypi.org/project/dacite/) by Konrad Hałas - MIT License
+- [requests](https://pypi.org/project/requests/) by Kenneth Reitz - Apache Software License (Apache 2.0)
+- [typing-extensions](https://pypi.org/project/typing-extensions/) by  Guido van Rossum, Jukka Lehtosalo, Lukasz Langa, Michael Lee - PSFL License
