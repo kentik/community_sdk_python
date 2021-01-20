@@ -1,7 +1,9 @@
 import json
 from enum import Enum
 from typing import TypeVar, Type, Dict, Any, Optional, List, Iterable
+
 import dacite
+
 from kentik_api.public.errors import DeserializationError, DataFormatError
 
 
