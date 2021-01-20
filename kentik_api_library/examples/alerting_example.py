@@ -6,8 +6,11 @@ Examples of using the alerting API
 import os
 import sys
 import logging
-from kentik_api import KentikAPI, ManualMitigation
+
 from typing import Tuple
+
+from kentik_api import KentikAPI, ManualMitigation
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,6 +30,16 @@ def run_crud():
 
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
+
+    print("### GET ALERTS")
+    alerts = client.alerting.get_active_alerts("2020-10-15T22:15:00", "2021-01-20T09:15:00")
+    for alert in alerts:
+        print(alert)
+
+    print("### GET ALERTS HISTORY")
+    alerts = client.alerting.get_alerts_history("2020-10-15T22:15:00", "2021-01-20T09:15:00", "alert_key", "443")
+    for alert in alerts:
+        print(alert)
 
     print("### CREATE")
     # below ManualMitigation values are invalid and will cause error 404
