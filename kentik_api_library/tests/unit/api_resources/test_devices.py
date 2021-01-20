@@ -15,7 +15,7 @@ from kentik_api.public.device import (
     SecondaryIP,
     VRFAttributes,
 )
-from tests.component.stub_api_connector import StubAPIConnector
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
 def test_create_device_router_success() -> None:
