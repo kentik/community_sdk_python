@@ -59,7 +59,7 @@ def from_dict(data_class: Type[T], data: Data) -> T:
 
 def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, Any]:
     """
-    Wrapper converting json errors into DeserializationError
+    Decodes given JSON to a dictionary. It converts json errors into DeserializationError.
     root - use it to extract data that is nested under a root object eg. "interface": {...}
     """
 
