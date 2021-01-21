@@ -49,7 +49,7 @@ Data = Dict[str, Any]
 
 
 def from_dict(data_class: Type[T], data: Data) -> T:
-    """ Wrapper converting dacite errors into DeserializationError """
+    """ Converts given dictionary to the data class of given type. It converts Dacite errors into DeserializationError """
 
     try:
         return dacite.from_dict(data_class=data_class, data=data)
