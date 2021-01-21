@@ -1,13 +1,15 @@
 from typing import List, Optional
 
+from kentik_api.public.types import ID
+
 
 class TenantUser:
     def __init__(
         self,
-        id: str,
+        id: ID,
         user_email: str,
-        tenant_id: str,
-        company_id: str,
+        tenant_id: ID,
+        company_id: ID,
         last_login: Optional[str] = None,
         user_name: Optional[str] = None,
         user_full_name: Optional[str] = None,
@@ -24,17 +26,17 @@ class TenantUser:
 class Tenant:
     def __init__(
         self,
-        id: int,
+        id: ID,
         users: List[TenantUser],
         created_date: str,
         updated_date: str,
         name: Optional[str] = None,
         description: Optional[str] = None,
     ) -> None:
-        self.id = int(id)
+        self.id = id
         self.company_id = users[0].company_id if len(users) > 0 else None
         self.name = name
         self.description = description
-        self.cdate = created_date
-        self.edate = updated_date
+        self.created_date = created_date
+        self.updated_date = updated_date
         self.users = users

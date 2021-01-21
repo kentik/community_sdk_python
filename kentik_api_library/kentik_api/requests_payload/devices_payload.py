@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
+from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.site import Site
@@ -81,11 +82,11 @@ class LabelPayload:
 
     def to_device_label(self) -> DeviceLabel:
         return DeviceLabel(
-            id=self.id,
+            id=convert(self.id, ID),
             color=self.color,
             name=self.name,
-            user_id=self.user_id,
-            company_id=self.company_id,
+            user_id=convert(self.user_id, ID),
+            company_id=convert(self.company_id, ID),
             created_date=self.cdate,
             updated_date=self.edate,
             devices=None,
@@ -111,8 +112,8 @@ class SitePayload:
             site_name=self.site_name,
             latitude=self.lat,
             longitude=self.lon,
-            id=self.id,
-            company_id=convert_or_none(self.company_id, str),
+            id=convert(self.id, ID),
+            company_id=convert_or_none(self.company_id, ID),
         )
 
 
@@ -134,7 +135,7 @@ class AllInterfacesPayload:
 
     def to_all_interfaces(self) -> AllInterfaces:
         return AllInterfaces(
-            device_id=convert(self.device_id, int),
+            device_id=convert(self.device_id, ID),
             snmp_speed=convert(self.snmp_speed, int),
             interface_description=self.interface_description,
             initial_snmp_speed=convert_or_none(self.initial_snmp_speed, int),
@@ -150,7 +151,7 @@ class DevicePayload:
     device_subtype: Optional[str] = None
     device_sample_rate: Optional[int] = None
     sending_ips: Optional[List[str]] = None
-    id: Optional[int] = None
+    id: Optional[str] = None
     plan: Optional[PlanPayload] = None
     site: Optional[SitePayload] = None
     plan_id: Optional[int] = None
@@ -197,7 +198,7 @@ class DevicePayload:
         # recreate GET/POST/PUT response payload: fill all available fields
         return cls(
             # always returned fields
-            id=convert(dic["id"], int),
+            id=dic["id"],
             company_id=dic["company_id"],
             device_name=dic["device_name"],
             device_type=dic["device_type"],
@@ -235,8 +236,8 @@ class DevicePayload:
     def from_device(cls, device: Device):
         # prepare POST/PUT request payload: fill only the user-provided fields
         return cls(
-            plan_id=device.plan_id,
-            site_id=device.site_id,
+            plan_id=convert_or_none(device.plan_id, int),
+            site_id=convert_or_none(device.site_id, int),
             device_name=device.device_name,
             device_type=convert_or_none(device.device_type, enum_to_str),
             device_subtype=convert_or_none(device.device_subtype, enum_to_str),
@@ -252,14 +253,14 @@ class DevicePayload:
             device_bgp_neighbor_asn=device.device_bgp_neighbor_asn,
             device_bgp_flowspec=device.device_bgp_flowspec,
             device_bgp_password=device.device_bgp_password,
-            use_bgp_device_id=device.use_bgp_device_id,
+            use_bgp_device_id=convert_or_none(device.use_bgp_device_id, int),
             device_snmp_v3_conf=convert_or_none(device.device_snmp_v3_conf, SNMPv3ConfPayload.from_conf),
             cdn_attr=convert_or_none(device.cdn_attr, enum_to_str),
         )
 
     def to_device(self) -> Device:
         return Device(
-            id=self.id,
+            id=convert_or_none(self.id, ID),
             plan=convert_or_none(self.plan, PlanPayload.to_plan),
             site=convert_or_none(self.site, SitePayload.to_site),
             device_name=self.device_name,
@@ -277,10 +278,10 @@ class DevicePayload:
             device_bgp_neighbor_asn=self.device_bgp_neighbor_asn,
             device_bgp_flowspec=self.device_bgp_flowspec,
             device_bgp_password=self.device_bgp_password,
-            use_bgp_device_id=self.use_bgp_device_id,
+            use_bgp_device_id=convert_or_none(self.use_bgp_device_id, ID),
             device_status=self.device_status,
             device_flow_type=self.device_flow_type,
-            company_id=self.company_id,
+            company_id=convert_or_none(self.company_id, ID),
             snmp_last_updated=self.snmp_last_updated,
             created_date=self.created_date,
             updated_date=self.updated_date,
@@ -429,8 +430,8 @@ class ApplyLabelsRequest:
     labels: List[LabelIDPayload]
 
     @classmethod
-    def from_id_list(cls, ids: List[int]):
-        labels = [LabelIDPayload(id=label_id) for label_id in ids]
+    def from_id_list(cls, ids: List[ID]):
+        labels = [LabelIDPayload(id=convert(label_id, int)) for label_id in ids]
         return cls(labels=labels)
 
 
@@ -448,11 +449,19 @@ class ApplyLabelsResponse:
         required_fields = ["id", "device_name", "labels"]
         validate_fields(class_name=cls.__name__, required_fields=required_fields, dic=dic)
         labels = [LabelPayload.from_dict(item) for item in dic["labels"]]
-        return cls(id=dic["id"], device_name=dic["device_name"], labels=labels)
+        return cls(
+            id=dic["id"],
+            device_name=dic["device_name"],
+            labels=labels,
+        )
 
     def to_applied_labels(self) -> AppliedLabels:
         labels = [l.to_device_label() for l in self.labels]
-        return AppliedLabels(id=self.id, device_name=self.device_name, labels=labels)
+        return AppliedLabels(
+            id=convert(self.id, ID),
+            device_name=self.device_name,
+            labels=labels,
+        )
 
 
 # pylint: enable=too-many-instance-attributes

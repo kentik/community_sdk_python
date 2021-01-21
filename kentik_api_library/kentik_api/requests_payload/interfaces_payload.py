@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
+from kentik_api.public.types import ID
 from kentik_api.public.device import Interface, SecondaryIP, TopNextHopASN, VRFAttributes
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.requests_payload.validation import validate_fields
@@ -89,9 +90,9 @@ class VRFAttributesPayload:
             route_target=self.route_target,
             route_distinguisher=self.route_distinguisher,
             ext_route_distinguisher=self.ext_route_distinguisher,
-            id=self.id,
-            company_id=self.company_id,
-            device_id=self.device_id,
+            id=convert_or_none(self.id, ID),
+            company_id=convert_or_none(self.company_id, ID),
+            device_id=convert_or_none(self.device_id, ID),
         )
 
 
@@ -136,6 +137,7 @@ class InterfacePayload:
 
         # recreate GET/POST/PUT response payload: fill all available fields
         # warning: snmp_speed comes back as str for GET, but as int for POST/PUT
+        # warning: initial_snmp_id comes back as empty string instead of null when not set
         return cls(
             # always returned fields
             id=dic["id"],
@@ -153,7 +155,7 @@ class InterfacePayload:
             vrf_id=dic.get("vrf_id"),
             vrf=convert_or_none(dic.get("vrf"), VRFAttributesPayload.from_dict),
             secondary_ips=convert_list_or_none(dic.get("secondary_ips"), SecondaryIPPayload.from_dict),
-            initial_snmp_id=dic.get("initial_snmp_id"),
+            initial_snmp_id=dic.get("initial_snmp_id") if dic.get("initial_snmp_id") != "" else None,
             initial_snmp_alias=dic.get("initial_snmp_alias"),
             initial_interface_description=dic.get("initial_interface_description"),
             initial_snmp_speed=dic.get("initial_snmp_speed"),
@@ -165,7 +167,7 @@ class InterfacePayload:
     def from_interface(cls, interface: Interface):
         # prepare POST/PUT request payload: fill only the user-provided fields
         return cls(
-            snmp_id=interface.snmp_id,
+            snmp_id=convert_or_none(interface.snmp_id, str),
             snmp_speed=interface.snmp_speed,
             interface_description=interface.interface_description,
             snmp_alias=interface.snmp_alias,
@@ -178,21 +180,21 @@ class InterfacePayload:
 
     def to_interface(self) -> Interface:
         return Interface(
-            id=convert_or_none(self.id, int),
-            snmp_id=self.snmp_id,
+            id=convert_or_none(self.id, ID),
+            snmp_id=convert_or_none(self.snmp_id, ID),
             snmp_speed=self.snmp_speed,
             snmp_alias=self.snmp_alias,
             interface_ip=self.interface_ip,
             interface_ip_netmask=self.interface_ip_netmask,
             interface_description=self.interface_description,
-            vrf_id=convert_or_none(self.vrf_id, int),
+            vrf_id=convert_or_none(self.vrf_id, ID),
             vrf=convert_or_none(self.vrf, VRFAttributesPayload.to_vrf_attributes),
             secondary_ips=convert_list_or_none(self.secondary_ips, SecondaryIPPayload.to_secondary_ip),
-            company_id=self.company_id,
-            device_id=convert_or_none(self.device_id, int),
+            company_id=convert_or_none(self.company_id, ID),
+            device_id=convert_or_none(self.device_id, ID),
             created_date=self.cdate,
             updated_date=self.edate,
-            initial_snmp_id=self.initial_snmp_id,
+            initial_snmp_id=convert_or_none(self.initial_snmp_id, ID),
             initial_snmp_alias=self.initial_snmp_alias,
             initial_interface_description=self.initial_interface_description,
             initial_snmp_speed=convert_or_none(self.initial_snmp_speed, int),

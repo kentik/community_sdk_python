@@ -1,5 +1,5 @@
 from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -10,7 +10,7 @@ def get_saved_filters() -> APICall:
 
 
 @get
-def get_saved_filter_info(saved_filter_id: int) -> APICall:
+def get_saved_filter_info(saved_filter_id: ResourceID) -> APICall:
     """Returns a saved-filter object containing
     information about an individual saved-filter"""
     url_path = f"/saved-filter/custom/{saved_filter_id}"
@@ -27,7 +27,7 @@ def create_saved_filter() -> APICall:
 
 @put
 @payload_type(dict)
-def update_saved_filter(saved_filter_id: int) -> APICall:
+def update_saved_filter(saved_filter_id: ResourceID) -> APICall:
     """Updates and returns a saved-filter object containing
     information about an individual saved-filter"""
     url_path = f"/saved-filter/custom/{saved_filter_id}"
@@ -35,7 +35,7 @@ def update_saved_filter(saved_filter_id: int) -> APICall:
 
 
 @delete
-def delete_saved_filter(saved_filter_id: int) -> APICall:
+def delete_saved_filter(saved_filter_id: ResourceID) -> APICall:
     """Deletes a saved-filter."""
     url_path = f"/saved-filter/custom/{saved_filter_id}"
     return APICall(url_path)

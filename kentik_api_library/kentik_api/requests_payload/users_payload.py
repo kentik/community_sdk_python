@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import json
 from typing import Optional, Dict, List
 
+from kentik_api.requests_payload.conversions import convert
+from kentik_api.public.types import ID
 from kentik_api.public.user import User
 
 # pylint: disable=too-many-instance-attributes
@@ -26,7 +28,7 @@ class _User:
 
     def to_user(self) -> User:
         return User(
-            id=int(self.id),
+            id=convert(self.id, ID),
             username=self.username,
             full_name=self.user_full_name,
             email=self.user_email,
@@ -36,7 +38,7 @@ class _User:
             last_login=self.last_login,
             created_date=self.created_date,
             updated_date=self.updated_date,
-            company_id=int(self.company_id),
+            company_id=convert(self.company_id, ID),
             api_token=self.user_api_token,
             filters=dict(self.filters),
             saved_filters=list(self.saved_filters),

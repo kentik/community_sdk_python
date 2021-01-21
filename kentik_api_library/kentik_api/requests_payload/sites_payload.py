@@ -1,7 +1,8 @@
 from typing import Optional, Any, List, Dict
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import from_json, from_dict
+from kentik_api.requests_payload.conversions import from_json, from_dict, convert
+from kentik_api.public.types import ID
 from kentik_api.public.site import Site
 
 
@@ -13,7 +14,7 @@ class GetResponse:
         site_name: str
         lat: Optional[float]
         lon: Optional[float]
-        company_id: str
+        company_id: int
 
     site: _Site  # sites api payload is embedded under "site" key
 
@@ -27,7 +28,13 @@ class GetResponse:
         return cls(site=from_dict(data_class=GetResponse._Site, data=dic))
 
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
+        return Site(
+            self.site.site_name,
+            self.site.lat,
+            self.site.lon,
+            convert(self.site.id, ID),
+            convert(self.site.company_id, ID),
+        )
 
 
 class GetAllResponse:
@@ -72,7 +79,13 @@ class CreateResponse:
         return cls(site=from_dict(data_class=CreateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
+        return Site(
+            self.site.site_name,
+            self.site.lat,
+            self.site.lon,
+            convert(self.site.id, ID),
+            convert(self.site.company_id, ID),
+        )
 
 
 class UpdateRequest:
@@ -90,7 +103,7 @@ class UpdateRequest:
 class UpdateResponse:
     @dataclass
     class _Site:
-        id: int
+        id: str
         site_name: str
         lat: Optional[float]
         lon: Optional[float]
@@ -104,7 +117,13 @@ class UpdateResponse:
         return cls(site=from_dict(data_class=UpdateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
-        return Site(self.site.site_name, self.site.lat, self.site.lon, self.site.id, int(self.site.company_id))
+        return Site(
+            self.site.site_name,
+            self.site.lat,
+            self.site.lon,
+            convert(self.site.id, ID),
+            convert(self.site.company_id, ID),
+        )
 
 
 @dataclass()

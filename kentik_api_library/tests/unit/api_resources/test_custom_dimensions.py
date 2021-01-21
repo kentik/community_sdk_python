@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from kentik_api.api_resources.custom_dimensions_api import CustomDimensionsAPI
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import CustomDimension, Populator
 from tests.unit.stub_api_connector import StubAPIConnector
 
@@ -39,11 +40,11 @@ def test_create_custom_dimension_success() -> None:
     assert connector.last_payload["type"] == "string"
 
     # and response properly parsed
-    assert created.id == 42
+    assert created.id == ID(42)
     assert created.name == "c_testapi_dimension_1"
     assert created.display_name == "dimension_display_name"
     assert created.type == "string"
-    assert created.company_id == "74333"
+    assert created.company_id == ID(74333)
     assert created.populators is not None
     assert len(created.populators) == 0
 
@@ -109,7 +110,7 @@ def test_get_custom_dimension_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    dimension_id = 42
+    dimension_id = ID(42)
     dimension = custom_dimensions_api.get(dimension_id)
 
     # then request properly formed
@@ -118,22 +119,22 @@ def test_get_custom_dimension_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert dimension.id == 42
+    assert dimension.id == ID(42)
     assert dimension.name == "c_testapi_dimension_1"
     assert dimension.display_name == "dimension_display_name"
     assert dimension.type == "string"
-    assert dimension.company_id == "74333"
+    assert dimension.company_id == ID(74333)
     assert dimension.populators is not None
     assert len(dimension.populators) == 2
-    assert dimension.populators[1].id == 1510862280
-    assert dimension.populators[1].dimension_id == 24001
+    assert dimension.populators[1].id == ID(1510862280)
+    assert dimension.populators[1].dimension_id == ID(24001)
     assert dimension.populators[1].value == "testapi-dimension-value-3"
     assert dimension.populators[1].direction == Populator.Direction.SRC
     assert dimension.populators[1].addr_count == 0
     assert dimension.populators[1].user == "144319"
     assert dimension.populators[1].created_date == "2020-12-15T07:55:23.911095Z"
     assert dimension.populators[1].updated_date == "2020-12-15T11:11:30.300681Z"
-    assert dimension.populators[1].company_id == "74333"
+    assert dimension.populators[1].company_id == ID(74333)
     assert dimension.populators[1].site == "site3"
     assert dimension.populators[1].mac_count == 0
 
@@ -155,7 +156,7 @@ def test_update_custom_dimension_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    dimension_id = 42
+    dimension_id = ID(42)
     dimension = CustomDimension(id=dimension_id, display_name="dimension_display_name2")
     updated = custom_dimensions_api.update(dimension)
 
@@ -166,11 +167,11 @@ def test_update_custom_dimension_success() -> None:
     assert connector.last_payload["display_name"] == "dimension_display_name2"
 
     # and response properly parsed
-    assert updated.id == 42
+    assert updated.id == ID(42)
     assert updated.name == "c_testapi_dimension_1"
     assert updated.display_name == "dimension_display_name2"
     assert updated.type == "string"
-    assert updated.company_id == "74333"
+    assert updated.company_id == ID(74333)
     assert updated.populators is not None
     assert len(updated.populators) == 0
 
@@ -182,7 +183,7 @@ def test_delete_custom_dimension_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    dimension_id = 42
+    dimension_id = ID(42)
     delete_successful = custom_dimensions_api.delete(dimension_id)
 
     # then request properly formed
@@ -246,15 +247,15 @@ def test_get_all_custom_dimensions_success() -> None:
 
     # and response properly parsed
     assert len(dimensions) == 2
-    assert dimensions[1].id == 43
+    assert dimensions[1].id == ID(43)
     assert dimensions[1].name == "c_testapi_dimension_2"
     assert dimensions[1].display_name == "dimension_display_name2"
     assert dimensions[1].type == "uint32"
-    assert dimensions[1].company_id == "74334"
+    assert dimensions[1].company_id == ID(74334)
     assert dimensions[1].populators is not None
     assert len(dimensions[1].populators) == 1
-    assert dimensions[1].populators[0].id == 1510862280
-    assert dimensions[1].populators[0].dimension_id == 24001
+    assert dimensions[1].populators[0].id == ID(1510862280)
+    assert dimensions[1].populators[0].dimension_id == ID(24001)
     assert dimensions[1].populators[0].value == "testapi-dimension-value-3"
     assert dimensions[1].populators[0].direction == Populator.Direction.SRC
     assert dimensions[1].populators[0].interface_name == "interface3"
@@ -262,7 +263,7 @@ def test_get_all_custom_dimensions_success() -> None:
     assert dimensions[1].populators[0].user == "144319"
     assert dimensions[1].populators[0].created_date == "2020-12-15T07:55:23.911095Z"
     assert dimensions[1].populators[0].updated_date == "2020-12-15T10:50:22.35787Z"
-    assert dimensions[1].populators[0].company_id == "74333"
+    assert dimensions[1].populators[0].company_id == ID(74333)
     assert dimensions[1].populators[0].device_type == "device-type3"
     assert dimensions[1].populators[0].site == "site3"
     assert dimensions[1].populators[0].mac_count == 0
@@ -307,7 +308,7 @@ def test_create_populator_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    dimension_id = 24001
+    dimension_id = ID(24001)
     populator = Populator(
         dimension_id=dimension_id,
         value="testapi-dimension-value-1",
@@ -360,7 +361,7 @@ def test_create_populator_success() -> None:
     assert connector.last_payload["populator"]["vlans"] == "2001,2002"
 
     # and response properly parsed
-    assert created.dimension_id == 24001
+    assert created.dimension_id == ID(24001)
     assert created.value == "testapi-dimension-value-1"
     assert created.direction == Populator.Direction.DST
     assert created.device_name == "128.0.0.100,device1"
@@ -381,8 +382,8 @@ def test_create_populator_success() -> None:
     assert created.mac == "FF:FF:FF:FF:FF:FA,FF:FF:FF:FF:FF:FF"
     assert created.country == "NL,SE"
     assert created.vlans == "2001,2002"
-    assert created.id == 1510862280
-    assert created.company_id == "74333"
+    assert created.id == ID(1510862280)
+    assert created.company_id == ID(74333)
     assert created.user == "144319"
     assert created.mac_count == 2
     assert created.addr_count == 2
@@ -416,8 +417,8 @@ def test_update_populator_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    populator_id = 1510862280
-    dimension_id = 24001
+    populator_id = ID(1510862280)
+    dimension_id = ID(24001)
     populator = Populator(
         id=populator_id,
         dimension_id=dimension_id,
@@ -458,8 +459,8 @@ def test_update_populator_success() -> None:
     assert "vlans" not in connector.last_payload["populator"]
 
     # and response properly parsed
-    assert updated.id == 1510862280
-    assert updated.dimension_id == 24001
+    assert updated.id == ID(1510862280)
+    assert updated.dimension_id == ID(24001)
     assert updated.value == "testapi-dimension-value-3"
     assert updated.direction == Populator.Direction.SRC
     assert updated.interface_name == "interface3"
@@ -469,7 +470,7 @@ def test_update_populator_success() -> None:
     assert updated.user == "144319"
     assert updated.created_date == "2020-12-15T07:55:23.911095Z"
     assert updated.updated_date == "2020-12-15T10:50:22.35787Z"
-    assert updated.company_id == "74333"
+    assert updated.company_id == ID(74333)
     assert updated.device_type == "device-type3"
     assert updated.site == "site3"
     assert updated.mac_count == 0
@@ -482,8 +483,8 @@ def test_delete_populator_success() -> None:
     custom_dimensions_api = CustomDimensionsAPI(connector)
 
     # when
-    populator_id = 42
-    dimension_id = 4002
+    populator_id = ID(42)
+    dimension_id = ID(4002)
     delete_successful = custom_dimensions_api.populators.delete(dimension_id, populator_id)
 
     # then request properly formed

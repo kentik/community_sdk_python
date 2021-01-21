@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.plan import Plan
 
 
@@ -71,8 +72,8 @@ def test_get_all_plans_success(client, connector) -> None:
     # then response properly parsed
     assert len(plans) == 1
     assert plans[0].active is True
-    assert plans[0].company_id == 74333
-    assert len(plans[0].deviceTypes) == 2
-    assert plans[0].deviceTypes[0].device_type == "router"
+    assert plans[0].company_id == ID(74333)
+    assert len(plans[0].device_types) == 2
+    assert plans[0].device_types[0].device_type == "router"
     assert len(plans[0].devices) == 4
-    assert plans[0].devices[0].id == 77714
+    assert plans[0].devices[0].id == ID(77714)
