@@ -33,4 +33,8 @@ from .device import (
     DeviceSubtype,
     SNMPv3Conf,
     AppliedLabels,
+    Interface,
+    TopNextHopASN,
+    SecondaryIP,
+    VRFAttributes,
 )

@@ -11,6 +11,9 @@ from kentik_api.public.device import (
     PrivacyProtocol,
     SNMPv3Conf,
     CDNAttribute,
+    Interface,
+    SecondaryIP,
+    VRFAttributes,
 )
 from tests.unit.stub_api_connector import StubAPIConnector
 
@@ -421,7 +424,20 @@ def test_get_device_router_success() -> None:
                             "_pivot_label_id": "2751"
                         }
                     ],
-            "all_interfaces": [],
+            "all_interfaces": [
+                {
+                    "interface_description": "testapi-interface-1",
+                    "initial_snmp_speed": null,
+                    "device_id": "42",
+                    "snmp_speed": "75"
+                },
+                {
+                    "interface_description": "testapi-interface-2",
+                    "initial_snmp_speed": "7",
+                    "device_id": "42",
+                    "snmp_speed": "7"
+                }
+            ],
             "device_flow_type": "auto",
             "device_sample_rate": "1001",
             "sending_ips": [
@@ -487,7 +503,7 @@ def test_get_device_router_success() -> None:
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == 74333
+    assert device.site.company_id == "74333"
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
     assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
@@ -519,9 +535,18 @@ def test_get_device_router_success() -> None:
     assert device.labels[1].user_id == "136885"
     assert device.labels[1].company_id == "74333"
     assert device.labels[1].color == "#5289D9"
-    assert len(device.all_interfaces) == 0
+    assert len(device.all_interfaces) == 2
+    assert device.all_interfaces[0].interface_description == "testapi-interface-1"
+    assert device.all_interfaces[0].initial_snmp_speed == None
+    assert device.all_interfaces[0].device_id == 42
+    assert device.all_interfaces[0].snmp_speed == 75
+    assert device.all_interfaces[1].interface_description == "testapi-interface-2"
+    assert device.all_interfaces[1].initial_snmp_speed == 7
+    assert device.all_interfaces[1].device_id == 42
+    assert device.all_interfaces[1].snmp_speed == 7
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"
     assert device.sending_ips[1] == "128.0.0.12"
@@ -652,6 +677,7 @@ def test_get_device_dns_success() -> None:
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 0
     assert device.device_snmp_ip is None
     assert device.device_snmp_community == ""
@@ -1075,7 +1101,7 @@ def test_get_all_devices_success() -> None:
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == 74333
+    assert device.site.company_id == "74333"
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
     assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
@@ -1110,6 +1136,7 @@ def test_get_all_devices_success() -> None:
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
+    assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"
     assert device.sending_ips[1] == "128.0.0.12"
@@ -1207,3 +1234,677 @@ def test_apply_labels_success() -> None:
     assert apply_result.labels[1].user_id == "144319"
     assert apply_result.labels[1].company_id == "74333"
     assert apply_result.labels[1].color == "#0000FF"
+
+
+def test_create_interface_minimal_success() -> None:
+    # given
+    create_response_payload = """
+    {
+        "snmp_id": "2",
+        "snmp_speed": 8,
+        "interface_description": "testapi-interface-2",
+        "interface_kvs": "",
+        "company_id": "74333",
+        "device_id": "42",
+        "edate": "2021-01-13T08:41:16.191Z",
+        "cdate": "2021-01-13T08:41:16.191Z",
+        "id": "43"
+    }"""
+    connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface = Interface(
+        device_id=device_id,
+        snmp_id="2",
+        snmp_speed=15,
+        interface_description="testapi-interface-2",
+    )
+    created = devices_api.interfaces.create(interface)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface"
+    assert connector.last_method == APICallMethods.POST
+    assert connector.last_payload is not None
+    assert connector.last_payload["snmp_id"] == "2"
+    assert connector.last_payload["interface_description"] == "testapi-interface-2"
+    assert connector.last_payload["snmp_speed"] == 15
+    # and response properly parsed
+    assert created.snmp_id == "2"
+    assert created.snmp_alias is None
+    assert created.snmp_speed == 8
+    assert created.interface_description == "testapi-interface-2"
+    assert created.interface_ip is None
+    assert created.interface_ip_netmask is None
+    assert created.company_id == "74333"
+    assert created.device_id == 42
+    assert created.updated_date == "2021-01-13T08:41:16.191Z"
+    assert created.created_date == "2021-01-13T08:41:16.191Z"
+    assert created.id == 43
+    assert created.vrf_id is None
+    assert created.vrf is None
+    assert created.secondary_ips is None
+
+
+def test_create_interface_full_success() -> None:
+    # given
+    create_response_payload = """
+    {
+        "snmp_id": "243205880",
+        "snmp_alias": "interace-description-1",
+        "snmp_speed": 8,
+        "interface_description": "testapi-interface-1",
+        "interface_ip": "127.0.0.1",
+        "interface_ip_netmask": "255.255.255.0",
+        "interface_kvs": "",
+        "company_id": "74333",
+        "device_id": "42",
+        "edate": "2021-01-13T08:31:40.629Z",
+        "cdate": "2021-01-13T08:31:40.619Z",
+        "id": "43",
+        "vrf_id": 39903,
+        "secondary_ips": [
+            {
+                "address": "198.186.193.51",
+                "netmask": "255.255.255.240"
+            },
+            {
+                "address": "198.186.193.63",
+                "netmask": "255.255.255.225"
+            }
+        ]
+    }"""
+    connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    vrf = VRFAttributes(
+        name="vrf-name",
+        description="vrf-description",
+        route_target="101:100",
+        route_distinguisher="11.121.111.13:3254",
+        ext_route_distinguisher=15,
+    )
+    secondary_ip1 = SecondaryIP(address="127.0.0.2", netmask="255.255.255.0")
+    secondary_ip2 = SecondaryIP(address="127.0.0.3", netmask="255.255.255.0")
+    device_id = 42
+    interface = Interface(
+        device_id=device_id,
+        snmp_id="1",
+        interface_description="testapi-interface-1",
+        snmp_alias="interace-description-1",
+        interface_ip="127.0.0.1",
+        interface_ip_netmask="255.255.255.0",
+        snmp_speed=15,
+        vrf=vrf,
+        secondary_ips=[secondary_ip1, secondary_ip2],
+    )
+    created = devices_api.interfaces.create(interface)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface"
+    assert connector.last_method == APICallMethods.POST
+    assert connector.last_payload is not None
+    assert connector.last_payload["snmp_id"] == "1"
+    assert connector.last_payload["interface_description"] == "testapi-interface-1"
+    assert connector.last_payload["snmp_alias"] == "interace-description-1"
+    assert connector.last_payload["interface_ip"] == "127.0.0.1"
+    assert connector.last_payload["interface_ip_netmask"] == "255.255.255.0"
+    assert connector.last_payload["snmp_speed"] == 15
+    assert connector.last_payload["vrf"]["name"] == "vrf-name"
+    assert connector.last_payload["vrf"]["description"] == "vrf-description"
+    assert connector.last_payload["vrf"]["route_target"] == "101:100"
+    assert connector.last_payload["vrf"]["route_distinguisher"] == "11.121.111.13:3254"
+    assert connector.last_payload["vrf"]["ext_route_distinguisher"] == 15
+    assert connector.last_payload["secondary_ips"][0]["address"] == "127.0.0.2"
+    assert connector.last_payload["secondary_ips"][0]["netmask"] == "255.255.255.0"
+    assert connector.last_payload["secondary_ips"][1]["address"] == "127.0.0.3"
+    assert connector.last_payload["secondary_ips"][1]["netmask"] == "255.255.255.0"
+
+    # and response properly parsed
+    assert created.snmp_id == "243205880"
+    assert created.snmp_alias == "interace-description-1"
+    assert created.snmp_speed == 8
+    assert created.interface_description == "testapi-interface-1"
+    assert created.interface_ip == "127.0.0.1"
+    assert created.interface_ip_netmask == "255.255.255.0"
+    assert created.company_id == "74333"
+    assert created.device_id == 42
+    assert created.updated_date == "2021-01-13T08:31:40.629Z"
+    assert created.created_date == "2021-01-13T08:31:40.619Z"
+    assert created.id == 43
+    assert created.vrf_id == 39903
+    assert created.secondary_ips is not None
+    assert len(created.secondary_ips) == 2
+    assert created.secondary_ips[0].address == "198.186.193.51"
+    assert created.secondary_ips[0].netmask == "255.255.255.240"
+    assert created.secondary_ips[1].address == "198.186.193.63"
+    assert created.secondary_ips[1].netmask == "255.255.255.225"
+
+
+def test_update_interface_minimal_success() -> None:
+    # given
+    update_response_payload = """
+    {
+        "id": "43",
+        "company_id": "74333",
+        "device_id": "42",
+        "snmp_id": "1",
+        "snmp_speed": 75,
+        "snmp_type": null,
+        "snmp_alias": "interace-description-1",
+        "interface_ip": "127.0.0.1",
+        "interface_description": "testapi-interface-1",
+        "interface_kvs": "",
+        "interface_tags": "",
+        "interface_status": "V",
+        "cdate": "2021-01-13T08:50:37.068Z",
+        "edate": "2021-01-13T08:58:27.276Z",
+        "initial_snmp_id": "",
+        "initial_snmp_alias": null,
+        "initial_interface_description": null,
+        "initial_snmp_speed": null,
+        "interface_ip_netmask": "255.255.255.0",
+        "secondary_ips": null,
+        "connectivity_type": "",
+        "network_boundary": "",
+        "initial_connectivity_type": "",
+        "initial_network_boundary": "",
+        "top_nexthop_asns": null,
+        "provider": "",
+        "initial_provider": "",
+        "vrf_id": "39902",
+        "initial_interface_ip": null,
+        "initial_interface_ip_netmask": null
+    }"""
+    connector = StubAPIConnector(update_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface_id = 43
+    interface = Interface(snmp_speed=75, device_id=device_id, id=interface_id)
+    updated = devices_api.interfaces.update(interface)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface/{interface_id}"
+    assert connector.last_method == APICallMethods.PUT
+    assert connector.last_payload is not None
+    assert connector.last_payload["snmp_speed"] == 75
+    assert "secondary_ips" not in connector.last_payload
+
+    # and response properly parsed
+    assert updated.id == 43
+    assert updated.company_id == "74333"
+    assert updated.device_id == 42
+    assert updated.snmp_id == "1"
+    assert updated.snmp_speed == 75
+    assert updated.snmp_alias == "interace-description-1"
+    assert updated.interface_ip == "127.0.0.1"
+    assert updated.interface_description == "testapi-interface-1"
+    assert updated.created_date == "2021-01-13T08:50:37.068Z"
+    assert updated.updated_date == "2021-01-13T08:58:27.276Z"
+    assert updated.initial_snmp_id == ""
+    assert updated.initial_snmp_alias is None
+    assert updated.initial_interface_description is None
+    assert updated.initial_snmp_speed is None
+    assert updated.interface_ip_netmask == "255.255.255.0"
+    assert updated.secondary_ips is None
+    assert updated.top_nexthop_asns == []
+    assert updated.provider == ""
+    assert updated.vrf_id == 39902
+
+
+def test_update_interface_full_success() -> None:
+    # given
+    update_response_payload = """
+    {
+        "id": "43",
+        "company_id": "74333",
+        "device_id": "42",
+        "snmp_id": "4",
+        "snmp_speed": 44,
+        "snmp_type": null,
+        "snmp_alias": "interace-description-44",
+        "interface_ip": "127.0.44.55",
+        "interface_description": "testapi-interface-44",
+        "interface_kvs": "",
+        "interface_tags": "",
+        "interface_status": "V",
+        "cdate": "2021-01-14T14:43:43.104Z",
+        "edate": "2021-01-14T14:46:21.200Z",
+        "initial_snmp_id": "",
+        "initial_snmp_alias": null,
+        "initial_interface_description": null,
+        "initial_snmp_speed": null,
+        "interface_ip_netmask": "255.255.255.0",
+        "secondary_ips": [],
+        "connectivity_type": "",
+        "network_boundary": "",
+        "initial_connectivity_type": "",
+        "initial_network_boundary": "",
+        "top_nexthop_asns": null,
+        "provider": "",
+        "initial_provider": "",
+        "vrf_id": 40055,
+        "initial_interface_ip": null,
+        "initial_interface_ip_netmask": null
+    }"""
+    connector = StubAPIConnector(update_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface_id = 43
+    vrf = VRFAttributes(
+        name="vrf-name-44",
+        description="vrf-description-44",
+        route_target="101:100",
+        route_distinguisher="11.121.111.13:444",
+        ext_route_distinguisher=44,
+    )
+    interface = Interface(
+        device_id=device_id,
+        id=interface_id,
+        snmp_id="4",
+        snmp_speed=44,
+        snmp_alias="interace-description-44",
+        interface_ip="127.0.44.55",
+        interface_ip_netmask="255.255.255.0",
+        interface_description="testapi-interface-44",
+        vrf=vrf,
+        secondary_ips=[],
+    )
+    updated = devices_api.interfaces.update(interface)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface/{interface_id}"
+    assert connector.last_method == APICallMethods.PUT
+    assert connector.last_payload is not None
+    assert connector.last_payload["interface_description"] == "testapi-interface-44"
+    assert connector.last_payload["snmp_alias"] == "interace-description-44"
+    assert connector.last_payload["interface_ip"] == "127.0.44.55"
+    assert connector.last_payload["interface_ip_netmask"] == "255.255.255.0"
+    assert connector.last_payload["snmp_speed"] == 44
+    assert connector.last_payload["vrf"]["name"] == "vrf-name-44"
+    assert connector.last_payload["vrf"]["description"] == "vrf-description-44"
+    assert connector.last_payload["vrf"]["route_target"] == "101:100"
+    assert connector.last_payload["vrf"]["route_distinguisher"] == "11.121.111.13:444"
+    assert connector.last_payload["vrf"]["ext_route_distinguisher"] == 44
+    assert connector.last_payload["secondary_ips"] == []
+
+    # and response properly parsed
+    assert updated.id == 43
+    assert updated.company_id == "74333"
+    assert updated.device_id == 42
+    assert updated.snmp_id == "4"
+    assert updated.snmp_speed == 44
+    assert updated.snmp_alias == "interace-description-44"
+    assert updated.interface_ip == "127.0.44.55"
+    assert updated.interface_description == "testapi-interface-44"
+    assert updated.created_date == "2021-01-14T14:43:43.104Z"
+    assert updated.updated_date == "2021-01-14T14:46:21.200Z"
+    assert updated.initial_snmp_id == ""
+    assert updated.initial_snmp_alias is None
+    assert updated.initial_interface_description is None
+    assert updated.initial_snmp_speed is None
+    assert updated.interface_ip_netmask == "255.255.255.0"
+    assert updated.secondary_ips == []
+    assert updated.top_nexthop_asns == []
+    assert updated.provider == ""
+    assert updated.vrf_id == 40055
+
+
+def test_get_interface_minimal_success() -> None:
+    # given
+    get_response_payload = """
+    {
+        "interface": {
+            "id": "43",
+            "company_id": "74333",
+            "device_id": "42",
+            "snmp_id": "1",
+            "snmp_speed": "15",
+            "snmp_type": null,
+            "snmp_alias": null,
+            "interface_ip": null,
+            "interface_description": null,
+            "cdate": "2021-01-13T08:50:37.068Z",
+            "edate": "2021-01-13T08:55:59.403Z",
+            "initial_snmp_id": null,
+            "initial_snmp_alias": null,
+            "initial_interface_description": null,
+            "initial_snmp_speed": null,
+            "interface_ip_netmask": null,
+            "top_nexthop_asns": null,
+            "provider": null,
+            "vrf_id": null,
+            "vrf": null,
+            "secondary_ips": null
+        }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface_id = 43
+    interface = devices_api.interfaces.get(device_id, interface_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface/{interface_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert interface.id == 43
+    assert interface.company_id == "74333"
+    assert interface.device_id == 42
+    assert interface.snmp_id == "1"
+    assert interface.snmp_speed == 15
+    assert interface.snmp_alias is None
+    assert interface.interface_ip is None
+    assert interface.interface_description is None
+    assert interface.created_date == "2021-01-13T08:50:37.068Z"
+    assert interface.updated_date == "2021-01-13T08:55:59.403Z"
+    assert interface.initial_snmp_id is None
+    assert interface.initial_snmp_alias is None
+    assert interface.initial_interface_description is None
+    assert interface.initial_snmp_speed is None
+    assert interface.interface_ip_netmask is None
+    assert len(interface.top_nexthop_asns) == 0
+    assert interface.provider is None
+    assert interface.vrf_id is None
+    assert interface.vrf is None
+    assert interface.secondary_ips is None
+
+
+def test_get_interface_full_success() -> None:
+    # given
+    get_response_payload = """
+    {
+        "interface": {
+            "id": "43",
+            "company_id": "74333",
+            "device_id": "42",
+            "snmp_id": "1",
+            "snmp_speed": "15",
+            "snmp_type": null,
+            "snmp_alias": "interace-description-1",
+            "interface_ip": "127.0.0.1",
+            "interface_description": "testapi-interface-1",
+            "interface_kvs": "",
+            "interface_tags": "",
+            "interface_status": "V",
+            "extra_info": {},
+            "cdate": "2021-01-13T08:50:37.068Z",
+            "edate": "2021-01-13T08:55:59.403Z",
+            "initial_snmp_id": "150",
+            "initial_snmp_alias": "initial-interace-description-1",
+            "initial_interface_description": "initial-testapi-interface-1",
+            "initial_snmp_speed": "7",
+            "interface_ip_netmask": "255.255.255.0",
+            "connectivity_type": "",
+            "network_boundary": "",
+            "initial_connectivity_type": "",
+            "initial_network_boundary": "",
+            "top_nexthop_asns": [
+                {
+                    "ASN": 20,
+                    "packets":30100
+                },
+                {
+                    "ASN": 21,
+                    "fala": "hala",
+                    "packets":30101
+                }
+            ],
+            "provider": "",
+            "initial_provider": "",
+            "vrf_id": "39902",
+            "vrf": {
+                "id": 39902,
+                "company_id": "74333",
+                "description": "vrf-description",
+                "device_id": "79175",
+                "name": "vrf-name",
+                "route_distinguisher": "11.121.111.13:3254",
+                "route_target": "101:100"
+            },
+            "secondary_ips": [
+                {
+                "address": "198.186.193.51",
+                "netmask": "255.255.255.240"
+                },
+                {
+                "address": "198.186.193.63",
+                "netmask": "255.255.255.225"
+                }
+            ]
+        }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface_id = 43
+    interface = devices_api.interfaces.get(device_id, interface_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface/{interface_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert interface.id == 43
+    assert interface.company_id == "74333"
+    assert interface.device_id == 42
+    assert interface.snmp_id == "1"
+    assert interface.snmp_speed == 15
+    assert interface.snmp_alias == "interace-description-1"
+    assert interface.interface_ip == "127.0.0.1"
+    assert interface.interface_description == "testapi-interface-1"
+    assert interface.created_date == "2021-01-13T08:50:37.068Z"
+    assert interface.updated_date == "2021-01-13T08:55:59.403Z"
+    assert interface.initial_snmp_id == "150"
+    assert interface.initial_snmp_alias == "initial-interace-description-1"
+    assert interface.initial_interface_description == "initial-testapi-interface-1"
+    assert interface.initial_snmp_speed == 7
+    assert interface.interface_ip_netmask == "255.255.255.0"
+    assert len(interface.top_nexthop_asns) == 2
+    assert interface.top_nexthop_asns[0].asn == 20
+    assert interface.top_nexthop_asns[0].packets == 30100
+    assert interface.top_nexthop_asns[1].asn == 21
+    assert interface.top_nexthop_asns[1].packets == 30101
+    assert interface.provider == ""
+    assert interface.vrf_id == 39902
+    assert interface.vrf is not None
+    assert interface.vrf.company_id == "74333"
+    assert interface.vrf.description == "vrf-description"
+    assert interface.vrf.device_id == "79175"
+    assert interface.vrf.name == "vrf-name"
+    assert interface.vrf.route_distinguisher == "11.121.111.13:3254"
+    assert interface.vrf.route_target == "101:100"
+    assert interface.secondary_ips is not None
+    assert len(interface.secondary_ips) == 2
+    assert interface.secondary_ips[0].address == "198.186.193.51"
+    assert interface.secondary_ips[0].netmask == "255.255.255.240"
+    assert interface.secondary_ips[1].address == "198.186.193.63"
+    assert interface.secondary_ips[1].netmask == "255.255.255.225"
+
+
+def test_delete_interface_success() -> None:
+    # given
+    delete_response_payload = "{}"  # deleting device responds with empty dictionary
+    connector = StubAPIConnector(delete_response_payload, HTTPStatus.OK)  # responds with 200 OK
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interface_id = 43
+    delete_successful = devices_api.interfaces.delete(device_id, interface_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interface/{interface_id}"
+    assert connector.last_method == APICallMethods.DELETE
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert delete_successful
+
+
+def test_get_all_interfaces_success() -> None:
+    # given
+    get_response_payload = """
+    [
+        {
+            "id": "43",
+            "company_id": "74333",
+            "device_id": "42",
+            "snmp_id": "1",
+            "snmp_speed": "15",
+            "snmp_type": null,
+            "snmp_alias": "interace-description-1",
+            "interface_ip": "127.0.0.1",
+            "interface_description": "testapi-interface-1",
+            "interface_kvs": "",
+            "interface_tags": "",
+            "interface_status": "V",
+            "extra_info": {},
+            "cdate": "2021-01-13T08:50:37.068Z",
+            "edate": "2021-01-13T08:55:59.403Z",
+            "initial_snmp_id": "150",
+            "initial_snmp_alias": "initial-interace-description-1",
+            "initial_interface_description": "initial-testapi-interface-1",
+            "initial_snmp_speed": "7",
+            "interface_ip_netmask": "255.255.255.0",
+            "connectivity_type": "",
+            "network_boundary": "",
+            "initial_connectivity_type": "",
+            "initial_network_boundary": "",
+            "top_nexthop_asns": [
+                {
+                    "ASN": 20,
+                    "packets":30100
+                },
+                {
+                    "ASN": 21,
+                    "packets":30101
+                }
+            ],
+            "provider": "",
+            "initial_provider": "",
+            "vrf_id": "39902",
+            "vrf": {
+                "id": 39902,
+                "company_id": "74333",
+                "description": "vrf-description",
+                "device_id": "79175",
+                "name": "vrf-name",
+                "route_distinguisher": "11.121.111.13:3254",
+                "route_target": "101:100"
+            },
+            "secondary_ips": [
+                {
+                "address": "198.186.193.51",
+                "netmask": "255.255.255.240"
+                },
+                {
+                "address": "198.186.193.63",
+                "netmask": "255.255.255.225"
+                }
+            ]
+        },
+        {
+            "id": "44",
+            "company_id": "74333",
+            "device_id": "42",
+            "snmp_id": "1",
+            "snmp_speed": "15",
+            "snmp_type": null,
+            "snmp_alias": "interace-description-1",
+            "interface_ip": "127.0.0.1",
+            "interface_description": "testapi-interface-1",
+            "interface_kvs": "",
+            "interface_tags": "",
+            "interface_status": "V",
+            "extra_info": {},
+            "cdate": "2021-01-13T08:50:37.068Z",
+            "edate": "2021-01-13T08:50:37.074Z",
+            "initial_snmp_id": "",
+            "initial_snmp_alias": null,
+            "initial_interface_description": null,
+            "initial_snmp_speed": null,
+            "interface_ip_netmask": "255.255.255.0",
+            "secondary_ips": null,
+            "connectivity_type": "",
+            "network_boundary": "",
+            "initial_connectivity_type": "",
+            "initial_network_boundary": "",
+            "top_nexthop_asns": null,
+            "provider": "",
+            "initial_provider": "",
+            "vrf_id": "39902",
+            "vrf": {
+                "id": 39902,
+                "company_id": "74333",
+                "description": "vrf-description",
+                "device_id": "42",
+                "name": "vrf-name",
+                "route_distinguisher": "11.121.111.13:3254",
+                "route_target": "101:100"
+            }
+        }
+    ]"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = 42
+    interfaces = devices_api.interfaces.get_all(device_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}/interfaces"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert len(interfaces) == 2
+    interface = interfaces[0]
+    assert interface.id == 43
+    assert interface.company_id == "74333"
+    assert interface.device_id == 42
+    assert interface.snmp_id == "1"
+    assert interface.snmp_speed == 15
+    assert interface.snmp_alias == "interace-description-1"
+    assert interface.interface_ip == "127.0.0.1"
+    assert interface.interface_description == "testapi-interface-1"
+    assert interface.created_date == "2021-01-13T08:50:37.068Z"
+    assert interface.updated_date == "2021-01-13T08:55:59.403Z"
+    assert interface.initial_snmp_id == "150"
+    assert interface.initial_snmp_alias == "initial-interace-description-1"
+    assert interface.initial_interface_description == "initial-testapi-interface-1"
+    assert interface.initial_snmp_speed == 7
+    assert interface.interface_ip_netmask == "255.255.255.0"
+    assert len(interface.top_nexthop_asns) == 2
+    assert interface.top_nexthop_asns[0].asn == 20
+    assert interface.top_nexthop_asns[0].packets == 30100
+    assert interface.top_nexthop_asns[1].asn == 21
+    assert interface.top_nexthop_asns[1].packets == 30101
+    assert interface.provider == ""
+    assert interface.vrf_id == 39902
+    assert interface.vrf is not None
+    assert interface.vrf.company_id == "74333"
+    assert interface.vrf.description == "vrf-description"
+    assert interface.vrf.device_id == "79175"
+    assert interface.vrf.name == "vrf-name"
+    assert interface.vrf.route_distinguisher == "11.121.111.13:3254"
+    assert interface.vrf.route_target == "101:100"
+    assert interface.secondary_ips is not None
+    assert len(interface.secondary_ips) == 2
+    assert interface.secondary_ips[0].address == "198.186.193.51"
+    assert interface.secondary_ips[0].netmask == "255.255.255.240"
+    assert interface.secondary_ips[1].address == "198.186.193.63"
+    assert interface.secondary_ips[1].netmask == "255.255.255.225"

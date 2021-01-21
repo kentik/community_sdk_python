@@ -73,6 +73,37 @@ class SNMPv3Conf:
         return self
 
 
+class AllInterfaces:
+    def __init__(
+        self,
+        interface_description: str,
+        device_id: int,
+        snmp_speed: float,
+        initial_snmp_speed: Optional[float] = None,
+    ) -> None:
+        # read-only
+        self._interface_description = interface_description
+        self._device_id = device_id
+        self._snmp_speed = snmp_speed
+        self._initial_snmp_speed = initial_snmp_speed
+
+    @property
+    def interface_description(self) -> str:
+        return self._interface_description
+
+    @property
+    def device_id(self) -> int:
+        return self._device_id
+
+    @property
+    def snmp_speed(self) -> float:
+        return self._snmp_speed
+
+    @property
+    def initial_snmp_speed(self) -> Optional[float]:
+        return self._initial_snmp_speed
+
+
 class Device:
     def __init__(
         self,
@@ -86,7 +117,7 @@ class Device:
         device_subtype: Optional[DeviceSubtype] = None,
         device_description: Optional[str] = None,
         device_sample_rate: Optional[int] = None,
-        sending_ips: List[str] = [],
+        sending_ips: Optional[List[str]] = None,
         device_snmp_ip: Optional[str] = None,
         device_snmp_community: Optional[str] = None,
         minimize_snmp: Optional[bool] = None,
@@ -110,8 +141,8 @@ class Device:
         bgp_peer_ip6: Optional[str] = None,
         plan: Optional[Plan] = None,
         site: Optional[Site] = None,
-        labels: List[DeviceLabel] = [],
-        all_interfaces: List[Any] = [],
+        labels: Optional[List[DeviceLabel]] = None,
+        all_interfaces: Optional[List[AllInterfaces]] = None,
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 
@@ -211,11 +242,11 @@ class Device:
 
     @property
     def labels(self) -> List[DeviceLabel]:
-        return list(self._labels)
+        return list(self._labels) if self._labels is not None else []
 
     @property
     def all_interfaces(self) -> List[Any]:
-        return self._all_interfaces
+        return list(self._all_interfaces) if self._all_interfaces is not None else []
 
     @classmethod
     def new_router(
@@ -324,4 +355,154 @@ class AppliedLabels:
 
     @property
     def labels(self) -> List[DeviceLabel]:
-        return self._labels
+        return list(self._labels)
+
+
+class VRFAttributes:
+    def __init__(
+        self,
+        # user-provided
+        name: str,
+        route_target: str,
+        route_distinguisher: str,
+        description: Optional[str] = None,
+        ext_route_distinguisher: Optional[int] = None,
+        # sever-provided
+        id: Optional[int] = None,
+        company_id: Optional[str] = None,
+        device_id: Optional[str] = None,
+    ):
+        # read-write properties (can be updated in update call)
+        self.name = name
+        self.description = description
+        self.route_target = route_target
+        self.route_distinguisher = route_distinguisher
+        self.ext_route_distinguisher = ext_route_distinguisher
+
+        # read-only properties (can't be updated in update call)
+        self._id = id
+        self._company_id = company_id
+        self._device_id = device_id
+
+    @property
+    def id(self) -> int:
+        assert self._id is not None
+        return self._id
+
+    @property
+    def company_id(self) -> Optional[str]:
+        return self._company_id
+
+    @property
+    def device_id(self) -> Optional[str]:
+        return self._device_id
+
+
+@dataclass
+class SecondaryIP:
+    address: str
+    netmask: str
+
+
+@dataclass
+class TopNextHopASN:
+    asn: int
+    packets: int
+
+
+class Interface:
+    def __init__(
+        self,
+        # user-provided when updating interface, server-provided when creating interface
+        id: Optional[int] = None,
+        # user-provided
+        snmp_id: Optional[str] = None,
+        snmp_speed: Optional[int] = None,
+        snmp_alias: Optional[str] = None,
+        interface_ip: Optional[str] = None,
+        interface_ip_netmask: Optional[str] = None,
+        interface_description: Optional[str] = None,
+        vrf_id: Optional[int] = None,
+        vrf: Optional[VRFAttributes] = None,
+        secondary_ips: Optional[List[SecondaryIP]] = None,
+        # sever-provided
+        company_id: Optional[str] = None,
+        device_id: Optional[int] = None,
+        created_date: Optional[str] = None,
+        updated_date: Optional[str] = None,
+        initial_snmp_id: Optional[str] = None,
+        initial_snmp_alias: Optional[str] = None,
+        initial_interface_description: Optional[str] = None,
+        initial_snmp_speed: Optional[int] = None,
+        provider: Any = None,
+        top_nexthop_asns: Optional[List[TopNextHopASN]] = None,
+    ):
+        # read-write properties (can be updated in update call)
+        self.snmp_id = snmp_id
+        self.snmp_speed = snmp_speed
+        self.snmp_alias = snmp_alias
+        self.interface_ip = interface_ip
+        self.interface_ip_netmask = interface_ip_netmask
+        self.interface_description = interface_description
+        self.vrf_id = vrf_id
+        self.vrf = vrf
+        self.secondary_ips = secondary_ips
+
+        # read-only properties (can't be updated in update call)
+        self._id = id
+        self._company_id = company_id
+        self._device_id = device_id
+        self._created_date = created_date
+        self._updated_date = updated_date
+        self._initial_snmp_id = initial_snmp_id
+        self._initial_snmp_alias = initial_snmp_alias
+        self._initial_interface_description = initial_interface_description
+        self._initial_snmp_speed = initial_snmp_speed
+        self._provider = provider
+        self._top_nexthop_asns = top_nexthop_asns
+
+    @property
+    def id(self) -> int:
+        assert self._id is not None
+        return self._id
+
+    @property
+    def company_id(self) -> Optional[str]:
+        return self._company_id
+
+    @property
+    def device_id(self) -> int:
+        assert self._device_id is not None
+        return self._device_id
+
+    @property
+    def created_date(self) -> Optional[str]:
+        return self._created_date
+
+    @property
+    def updated_date(self) -> Optional[str]:
+        return self._updated_date
+
+    @property
+    def initial_snmp_id(self) -> Optional[str]:
+        return self._initial_snmp_id
+
+    @property
+    def initial_snmp_alias(self) -> Optional[str]:
+        return self._initial_snmp_alias
+
+    @property
+    def initial_interface_description(self) -> Optional[str]:
+        return self._initial_interface_description
+
+    @property
+    def initial_snmp_speed(self) -> Optional[float]:
+        return self._initial_snmp_speed
+
+    @property
+    def provider(self) -> Any:
+        return self._provider
+
+    @property
+    def top_nexthop_asns(self) -> List[TopNextHopASN]:
+        return list(self._top_nexthop_asns) if self._top_nexthop_asns is not None else []

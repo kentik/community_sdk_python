@@ -9,5 +9,5 @@ class AlertingAPI(BaseAPI):
 
     def create_manual_mitigation(self, manual_mitigation: ManualMitigation) -> bool:
         api_call = alerts.create_manual_mitigation()
-        response = self._send(api_call, manual_mitigation)
+        response = self.send(api_call, manual_mitigation)
         return manual_mitigations_payload.CreateResponse.from_json(response.text).status() == "OK"

@@ -56,7 +56,7 @@ def apply_device_labels(device_id: int) -> APICall:
 def get_device_interfaces(device_id: int) -> APICall:
     """Returns an array of interface objects that each contain information about an interface
     from a specified device."""
-    url_path = f"/devices/{device_id}/interfaces"
+    url_path = f"/device/{device_id}/interfaces"
     return APICall(url_path)
 
 
@@ -87,7 +87,7 @@ def update_interface(device_id: int, interface_id: int) -> APICall:
 
 
 @delete
-def delete_interfaces(device_id: int, interface_id: int) -> APICall:
+def delete_interface(device_id: int, interface_id: int) -> APICall:
     """Deletes an interface from a given device."""
     url_path = f"/device/{device_id}/interface/{interface_id}"
     return APICall(url_path)

@@ -81,7 +81,7 @@ def test_get_device_interfaces__return_apiCall():
 
     # THEN
     assert isinstance(call, APICall)
-    assert call.url_path == f"{DUMMY_API_URL}s/{DUMMY_DEV_ID}/{DUMMY_INT_URL}s"
+    assert call.url_path == f"{DUMMY_API_URL}/{DUMMY_DEV_ID}/{DUMMY_INT_URL}s"
     assert call.method.name == "GET"
 
 
@@ -121,7 +121,7 @@ def test_update_interface__return_apiCall():
 def test_delete_interface__return_apiCall():
 
     # WHEN
-    call = delete_interfaces(DUMMY_DEV_ID, DUMMY_INT_ID)
+    call = delete_interface(DUMMY_DEV_ID, DUMMY_INT_ID)
 
     # THEN
     assert isinstance(call, APICall)
