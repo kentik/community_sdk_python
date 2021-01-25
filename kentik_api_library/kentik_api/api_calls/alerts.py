@@ -14,38 +14,38 @@ def create_manual_mitigation() -> APICall:
 
 @get
 def get_active_alerts(
-    startTime: str,
-    endTime: str,
-    filterBy: str,
-    filterVal: str,
-    showMitigations: int,
-    showAlarms: int,
-    showMatches: int,
-    learningMode: int,
+    start_time: str,
+    end_time: str,
+    filter_by: str,
+    filter_val: str,
+    show_mitigations: int,
+    show_alarms: int,
+    show_matches: int,
+    learning_mode: int,
 ) -> APICall:
     """ Returns active alerts (alarms)."""
     return APICall(
-        f"/alerts-active/alarms?startTime={startTime}&endTime={endTime}&filterBy={filterBy}&"
-        f"filterVal={filterVal}&showMitigations={showMitigations}&showAlarms={showAlarms}&"
-        f"showMatches={showMatches}&learningMode={learningMode}"
+        f"/alerts-active/alarms?startTime={start_time}&endTime={end_time}&filterBy={filter_by}&"
+        f"filterVal={filter_val}&showMitigations={show_mitigations}&showAlarms={show_alarms}&"
+        f"showMatches={show_matches}&learningMode={learning_mode}"
     )
 
 
 @get
 def get_alerts_history(
-    startTime: str,
-    endTime: str,
-    filterBy: str,
-    filterVal: str,
-    sortOrder: Optional[str],
-    showMitigations: int,
-    showAlarms: int,
-    showMatches: int,
-    learningMode: int,
+    start_time: str,
+    end_time: str,
+    filter_by: str,
+    filter_val: str,
+    sort_order: Optional[str],
+    show_mitigations: int,
+    show_alarms: int,
+    show_matches: int,
+    learning_mode: int,
 ) -> APICall:
     """ Returns active alerts (alarms)."""
     return APICall(
-        f"/alerts-active/alerts-history?startTime={startTime}&endTime={endTime}&filterBy={filterBy}&"
-        f"filterVal={filterVal}&sortOrder={sortOrder}&showMitigations={showMitigations}&showAlarms={showAlarms}&"
-        f"showMatches={showMatches}&learningMode={learningMode}"
+        f"/alerts-active/alerts-history?startTime={start_time}&endTime={end_time}&filterBy={filter_by}&"
+        f"filterVal={filter_val}&sortOrder={sort_order}&showMitigations={show_mitigations}&showAlarms={show_alarms}&"
+        f"showMatches={show_matches}&learningMode={learning_mode}"
     )

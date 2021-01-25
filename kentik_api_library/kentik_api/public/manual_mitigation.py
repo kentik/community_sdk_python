@@ -46,7 +46,7 @@ class Alarm:
 
 
 @dataclass
-class HiscoricalAlert:
+class HistoricalAlert:
     row_type: str
     old_alarm_state: str
     new_alarm_state: str
@@ -65,7 +65,7 @@ class HiscoricalAlert:
     baseline_used: int
     learning_mode: int
     debug_mode: int
-    ctime: datetime
+    creation_time: datetime
     alarm_start_time: datetime
     comment: Optional[str]
     mitigation_id: Optional[int]

@@ -8,6 +8,11 @@ DUMMY_START_DATE = "2018-10-15T22:15:00"
 DUMMY_END_DATE = "2020-10-15T22:15:00"
 DUMMY_FILTER_BY = "old_state"
 DUMMY_FILTER_VALUE = "state_val"
+DUMMY_SHOW_MITIGATIONS = 1
+DUMMY_SHOW_ALARMS = 1
+DUMMY_SHOW_MATCHES = 0
+DUMMY_LEARNING_MODE = 0
+DUMMY_SORT_ORDER = 2
 
 
 def test_create_manual_mitigation__return_apiCall():
@@ -29,10 +34,10 @@ def test_get_active_alerts_return_apiCall():
         DUMMY_END_DATE,
         DUMMY_FILTER_BY,
         DUMMY_FILTER_VALUE,
-        1,
-        1,
-        0,
-        0,
+        DUMMY_SHOW_MITIGATIONS,
+        DUMMY_SHOW_ALARMS,
+        DUMMY_SHOW_MATCHES,
+        DUMMY_LEARNING_MODE,
     )
 
     # THEN
@@ -52,11 +57,11 @@ def test_get_alerts_history_return_apiCall():
         DUMMY_END_DATE,
         DUMMY_FILTER_BY,
         DUMMY_FILTER_VALUE,
-        2,
-        1,
-        1,
-        0,
-        0,
+        DUMMY_SORT_ORDER,
+        DUMMY_SHOW_MITIGATIONS,
+        DUMMY_SHOW_ALARMS,
+        DUMMY_SHOW_MATCHES,
+        DUMMY_LEARNING_MODE,
     )
 
     # THEN

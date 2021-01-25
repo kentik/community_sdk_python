@@ -6,6 +6,7 @@ Examples of using the alerting API
 import os
 import sys
 import logging
+from datetime import datetime
 
 from typing import Tuple
 
@@ -31,13 +32,17 @@ def run_crud():
     email, token = get_auth_email_token()
     client = KentikAPI(email, token)
 
+    start_time = datetime(2020, 10, 15, 22, 15, 0)
+    end_time = datetime(2021, 1, 20, 9, 15, 0)
+
     print("### GET ALERTS")
-    alerts = client.alerting.get_active_alerts("2020-10-15T22:15:00", "2021-01-20T09:15:00")
+    alerts = client.alerting.get_active_alerts(start_time, end_time)
     for alert in alerts:
         print(alert)
 
     print("### GET ALERTS HISTORY")
-    alerts = client.alerting.get_alerts_history("2020-10-15T22:15:00", "2021-01-20T09:15:00", "alert_key", "443")
+
+    alerts = client.alerting.get_alerts_history(start_time, end_time, "alert_key", "443")
     for alert in alerts:
         print(alert)
 
