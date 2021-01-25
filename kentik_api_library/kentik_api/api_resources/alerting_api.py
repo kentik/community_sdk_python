@@ -38,7 +38,7 @@ class AlertingAPI(BaseAPI):
             show_matches=show_matches,
             learning_mode=learning_mode,
         )
-        response = self._send(api_call)
+        response = self.send(api_call)
         return manual_mitigations_payload.GetActiveAlertsResponse.from_json(response.text).to_alarms()
 
     def get_alerts_history(
@@ -66,5 +66,5 @@ class AlertingAPI(BaseAPI):
             show_matches=show_matches,
             learning_mode=learning_mode,
         )
-        response = self._send(api_call)
+        response = self.send(api_call)
         return manual_mitigations_payload.GetHistoricalAlertsResponse.from_json(response.text).to_alerts()
