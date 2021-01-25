@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from kentik_api.api_resources.custom_applications_api import CustomApplicationsAPI
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.custom_application import CustomApplication
 from tests.unit.stub_api_connector import StubAPIConnector
 
@@ -52,9 +53,9 @@ def test_create_custom_application_success() -> None:
     assert created.protocol == "6,17"
     assert created.port == "9001,9002,9003"
     assert created.asn == "asn1,asn2,asn3"
-    assert created.id == 207
-    assert created.user_id == "144319"
-    assert created.company_id == "74333"
+    assert created.id == ID(207)
+    assert created.user_id == ID(144319)
+    assert created.company_id == ID(74333)
 
 
 def test_update_custom_application_success() -> None:
@@ -77,7 +78,7 @@ def test_update_custom_application_success() -> None:
     custom_applications_api = CustomApplicationsAPI(connector)
 
     # when
-    app_id = 207
+    app_id = ID(207)
     app = CustomApplication(
         id=app_id,
         name="apitest-customapp-one",
@@ -105,11 +106,11 @@ def test_update_custom_application_success() -> None:
     assert updated.protocol == "6,17"
     assert updated.port == "9011,9012,9013"
     assert updated.asn == "asn1,asn2,asn3"
-    assert updated.id == 207
-    assert updated.user_id == "144319"
-    assert updated.company_id == "74333"
-    assert updated.cdate == "2020-12-11T07:07:20.968Z"
-    assert updated.edate == "2020-12-11T07:07:20.968Z"
+    assert updated.id == ID(207)
+    assert updated.user_id == ID(144319)
+    assert updated.company_id == ID(74333)
+    assert updated.created_date == "2020-12-11T07:07:20.968Z"
+    assert updated.updated_date == "2020-12-11T07:07:20.968Z"
 
 
 def test_delete_custom_application_success() -> None:
@@ -119,7 +120,7 @@ def test_delete_custom_application_success() -> None:
     custom_applications_api = CustomApplicationsAPI(connector)
 
     # when
-    app_id = 42
+    app_id = ID(42)
     delete_successful = custom_applications_api.delete(app_id)
 
     # then request properly formed
@@ -175,14 +176,14 @@ def test_get_all_custom_applications_success() -> None:
 
     # and response properly parsed
     assert len(apps) == 2
-    assert apps[1].id == 43
-    assert apps[1].company_id == "74333"
-    assert apps[1].user_id == "144319"
+    assert apps[1].id == ID(43)
+    assert apps[1].company_id == ID(74333)
+    assert apps[1].user_id == ID(144319)
     assert apps[1].name == "apitest-customapp-2"
     assert apps[1].description == "TESTING CUSTOM APPS 2"
     assert apps[1].ip_range == "192.168.0.3,192.168.0.4"
     assert apps[1].protocol == "6,17"
     assert apps[1].port == "9011,9012,9013"
     assert apps[1].asn == "asn4,asn5,asn6"
-    assert apps[1].cdate == "2020-12-11T07:08:20.968Z"
-    assert apps[1].edate == "2020-12-11T07:08:20.968Z"
+    assert apps[1].created_date == "2020-12-11T07:08:20.968Z"
+    assert apps[1].updated_date == "2020-12-11T07:08:20.968Z"

@@ -1,6 +1,8 @@
 from typing import Optional, List
 from enum import Enum
 
+from kentik_api.public.types import ID
+
 # pylint: disable=too-many-instance-attributes
 
 
@@ -34,10 +36,10 @@ class Populator:
         mac: Optional[str] = None,
         country: Optional[str] = None,
         vlans: Optional[str] = None,
-        id: Optional[int] = None,
-        company_id: Optional[str] = None,
+        id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
         user: Optional[str] = None,
-        dimension_id: Optional[int] = None,
+        dimension_id: Optional[ID] = None,
         mac_count: Optional[int] = None,
         addr_count: Optional[int] = None,
         created_date: Optional[str] = None,
@@ -78,16 +80,16 @@ class Populator:
     # pylint: enable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id
 
     @property
-    def dimension_id(self) -> int:
+    def dimension_id(self) -> ID:
         assert self._dimension_id is not None
         return self._dimension_id
 
@@ -123,8 +125,8 @@ class CustomDimension:
         display_name: Optional[str] = None,
         type: Optional[str] = None,
         populators: Optional[List[Populator]] = None,
-        id: Optional[int] = None,
-        company_id: Optional[str] = None,
+        id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
     ) -> None:
         # read-write
         self.name = name  # must start with c_ and be unique even against deleted dimensions (deleted names are retained for 1 year)
@@ -139,10 +141,10 @@ class CustomDimension:
     # pylint: enable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id

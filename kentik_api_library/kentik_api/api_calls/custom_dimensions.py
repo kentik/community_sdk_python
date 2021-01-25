@@ -1,6 +1,6 @@
 # Local application imports
 from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -11,7 +11,7 @@ def get_custom_dimensions() -> APICall:
 
 
 @get
-def get_custom_dimension_info(custom_dimension_id: int) -> APICall:
+def get_custom_dimension_info(custom_dimension_id: ResourceID) -> APICall:
     """Returns a custom dimension object containing
     information about an individual custom dimension"""
     url_path = f"/customdimension/{custom_dimension_id}"
@@ -28,7 +28,7 @@ def create_custom_dimension() -> APICall:
 
 @put
 @payload_type(dict)
-def update_custom_dimension(custom_dimension_id: int) -> APICall:
+def update_custom_dimension(custom_dimension_id: ResourceID) -> APICall:
     """Updates and returns a custom dimension object
     containing information about an individual custom dimension"""
     url_path = f"/customdimension/{custom_dimension_id}"
@@ -36,7 +36,7 @@ def update_custom_dimension(custom_dimension_id: int) -> APICall:
 
 
 @delete
-def delete_custom_dimension(custom_dimension_id: int) -> APICall:
+def delete_custom_dimension(custom_dimension_id: ResourceID) -> APICall:
     """Deletes a custom dimension."""
     url_path = f"/customdimension/{custom_dimension_id}"
     return APICall(url_path)
@@ -44,7 +44,7 @@ def delete_custom_dimension(custom_dimension_id: int) -> APICall:
 
 @post
 @payload_type(dict)
-def create_populator(custom_dimension_id: int) -> APICall:
+def create_populator(custom_dimension_id: ResourceID) -> APICall:
     """Creates and returns a populator object containing
     information about an individual populator"""
     return APICall(f"/customdimension/{custom_dimension_id}/populator")
@@ -52,7 +52,7 @@ def create_populator(custom_dimension_id: int) -> APICall:
 
 @put
 @payload_type(dict)
-def update_populator(custom_dimension_id: int, populator_id: int) -> APICall:
+def update_populator(custom_dimension_id: ResourceID, populator_id: ResourceID) -> APICall:
     """Updates and returns a populator object containing
     information about an individual populator"""
     url_path = f"/customdimension/{custom_dimension_id}/populator/{populator_id}"
@@ -60,7 +60,7 @@ def update_populator(custom_dimension_id: int, populator_id: int) -> APICall:
 
 
 @delete
-def delete_populator(custom_dimension_id: int, populator_id: int) -> APICall:
+def delete_populator(custom_dimension_id: ResourceID, populator_id: ResourceID) -> APICall:
     """Deletes a populator"""
     url_path = f"/customdimension/{custom_dimension_id}/populator/{populator_id}"
     return APICall(url_path)

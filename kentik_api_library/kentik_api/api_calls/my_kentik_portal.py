@@ -1,6 +1,6 @@
 # Local application imports
 from kentik_api.api_calls.api_call_decorators import get, post, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -11,7 +11,7 @@ def get_tenants() -> APICall:
 
 
 @get
-def get_tenant_info(tenant_id: int) -> APICall:
+def get_tenant_info(tenant_id: ResourceID) -> APICall:
     """Returns a tenant object containing information about an individual tenant"""
     url_path = f"/mykentik/tenant/{tenant_id}"
     return APICall(url_path)
@@ -19,7 +19,7 @@ def get_tenant_info(tenant_id: int) -> APICall:
 
 @post
 @payload_type(dict)
-def create_tenant_user(tenant_id: int) -> APICall:
+def create_tenant_user(tenant_id: ResourceID) -> APICall:
     """Creates and returns a tenant user object containing
     information about an individual tenant user"""
     url_path = f"/mykentik/tenant/{tenant_id}/user"
@@ -27,7 +27,7 @@ def create_tenant_user(tenant_id: int) -> APICall:
 
 
 @delete
-def delete_tenant_user(tenant_id: int, user_id: str) -> APICall:
+def delete_tenant_user(tenant_id: ResourceID, user_id: ResourceID) -> APICall:
     """Deletes a tenant user from the system"""
     url_path = f"/mykentik/tenant/{tenant_id}/user/{user_id}"
     return APICall(url_path)

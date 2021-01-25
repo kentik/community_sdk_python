@@ -1,6 +1,6 @@
 # Local application imports
 from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -10,7 +10,7 @@ def get_tags() -> APICall:
 
 
 @get
-def get_tag_info(tag_id: int) -> APICall:
+def get_tag_info(tag_id: ResourceID) -> APICall:
     """Returns a tag object containing information about an individual tag"""
     url_path = f"/tag/{tag_id}"
     return APICall(url_path)
@@ -25,14 +25,14 @@ def create_tag() -> APICall:
 
 @put
 @payload_type(dict)
-def update_tag(tag_id: int) -> APICall:
+def update_tag(tag_id: ResourceID) -> APICall:
     """Updates and returns a tag object containing information about an individual tag"""
     url_path = f"/tag/{tag_id}"
     return APICall(url_path)
 
 
 @delete
-def delete_tag(tag_id: int) -> APICall:
+def delete_tag(tag_id: ResourceID) -> APICall:
     """Deletes a tag."""
     url_path = f"/tag/{tag_id}"
     return APICall(url_path)

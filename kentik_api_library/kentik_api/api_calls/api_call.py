@@ -1,6 +1,9 @@
 # Standard library imports
 from enum import Enum
 
+# ID that identifies resource in URL
+ResourceID = int
+
 
 class APICallMethods(Enum):
     GET = 1

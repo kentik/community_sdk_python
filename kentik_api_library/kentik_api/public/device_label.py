@@ -1,11 +1,13 @@
 from typing import List, Any, Optional
 from dataclasses import dataclass
 
+from kentik_api.public.types import ID
+
 
 @dataclass
 class DeviceItem:
 
-    id: str
+    id: ID
     device_name: str
     device_subtype: str
     device_type: Optional[str]
@@ -20,9 +22,9 @@ class DeviceLabel:
         self,
         name: str,
         color: Optional[str] = None,
-        id: Optional[int] = None,
-        user_id: Optional[str] = None,
-        company_id: Optional[str] = None,
+        id: Optional[ID] = None,
+        user_id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
         devices: Optional[List[DeviceItem]] = None,
         created_date: Optional[str] = None,
         updated_date: Optional[str] = None,
@@ -42,16 +44,16 @@ class DeviceLabel:
     # pylint: enable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def user_id(self) -> Optional[str]:
+    def user_id(self) -> Optional[ID]:
         return self._user_id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id
 
     @property

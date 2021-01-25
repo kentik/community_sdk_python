@@ -1,6 +1,8 @@
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 
+from kentik_api.public.types import ID
+
 # pylint: disable=too-many-instance-attributes
 
 
@@ -13,24 +15,24 @@ class PlanDeviceType:
 class PlanDevice:
     device_name: str
     device_type: str
-    id: int
+    id: ID
 
 
 @dataclass()
 class Plan:
-    id: int
-    company_id: int
-    name: str
-    description: str
-    active: bool
-    max_devices: int
-    max_fps: int
-    bgp_enabled: bool
-    fast_retention: int
-    full_retention: int
-    cdate: str
-    edate: Optional[str]
-    max_bigdata_fps: int
-    deviceTypes: List[PlanDeviceType]
-    devices: List[PlanDevice]
-    metadata: Dict[str, Any]
+    id: ID
+    company_id: Optional[ID] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    active: Optional[bool] = None
+    max_devices: Optional[int] = None
+    max_fps: Optional[int] = None
+    bgp_enabled: Optional[bool] = None
+    fast_retention: Optional[int] = None
+    full_retention: Optional[int] = None
+    created_date: Optional[str] = None
+    updated_date: Optional[str] = None
+    max_bigdata_fps: Optional[int] = None
+    device_types: Optional[List[PlanDeviceType]] = None
+    devices: Optional[List[PlanDevice]] = None
+    metadata: Optional[Dict[str, Any]] = None
