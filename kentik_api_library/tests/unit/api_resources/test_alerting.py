@@ -78,7 +78,10 @@ def test_get_active_alerts() -> None:
     alerting_api = AlertingAPI(connector)
 
     # when
-    alarms = alerting_api.get_active_alerts("2020-10-15T22:15:00", "2021-01-20T09:15:00")
+    start_time = datetime(2020, 10, 15, 22, 15, 0)
+    end_time = datetime(2021, 1, 20, 9, 15, 0)
+
+    alarms = alerting_api.get_active_alerts(start_time, end_time)
 
     # then
     assert connector.last_url_path == (
@@ -135,7 +138,12 @@ def test_get_alerts_history() -> None:
     alerting_api = AlertingAPI(connector)
 
     # when
-    alerts = alerting_api.get_alerts_history("2020-10-15T22:15:00", "2021-01-20T09:15:00", "alert_key", "443")
+    start_time = datetime(2020, 10, 15, 22, 15, 0)
+    end_time = datetime(2021, 1, 20, 9, 15, 0)
+    filter_by = "alert_key"
+    filter_val = "443"
+
+    alerts = alerting_api.get_alerts_history(start_time, end_time, filter_by, filter_val)
 
     # then
     assert connector.last_url_path == (

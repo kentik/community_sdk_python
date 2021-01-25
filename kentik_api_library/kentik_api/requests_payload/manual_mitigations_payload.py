@@ -1,10 +1,11 @@
+from copy import deepcopy
 import json
 from dataclasses import dataclass
 from typing import Optional, List
 from dacite import from_dict
 from datetime import datetime
 
-from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HiscoricalAlert
+from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert
 
 
 CreateRequest = ManualMitigation
@@ -80,7 +81,7 @@ class GetActiveAlertsResponse(List[_Alarm]):
 
 
 @dataclass
-class _HiscoricalAlert:
+class _HistoricalAlert:
     row_type: str
     old_alarm_state: str
     new_alarm_state: str
@@ -110,22 +111,23 @@ class _HiscoricalAlert:
     policy_name: str
     alert_key_lookup: str
 
-    def to_alert(self) -> HiscoricalAlert:
-        dic = self.__dict__
-        dic["ctime"] = datetime.strptime(self.ctime, "%Y-%m-%dT%H:%M:%S.000Z")
+    def to_alert(self) -> HistoricalAlert:
+        dic = deepcopy(self.__dict__)
+        dic.pop("ctime")
+        dic["creation_time"] = datetime.strptime(self.ctime, "%Y-%m-%dT%H:%M:%S.000Z")
         dic["alarm_start_time"] = datetime.strptime(self.alarm_start_time, "%Y-%m-%d %H:%M:%S")
-        return HiscoricalAlert(**dic)
+        return HistoricalAlert(**dic)
 
 
-class GetHistoricalAlertsResponse(List[_HiscoricalAlert]):
+class GetHistoricalAlertsResponse(List[_HistoricalAlert]):
     @classmethod
     def from_json(cls, json_string):
         dic = json.loads(json_string)
         obj = cls()
         for i in dic:
-            obj.append(from_dict(data_class=_HiscoricalAlert, data=i))
+            obj.append(from_dict(data_class=_HistoricalAlert, data=i))
         return obj
 
-    def to_alerts(self) -> List[HiscoricalAlert]:
+    def to_alerts(self) -> List[HistoricalAlert]:
         alarms = [i.to_alert() for i in self]
         return alarms
