@@ -3,7 +3,7 @@ from datetime import datetime
 
 from kentik_api.api_resources.alerting_api import AlertingAPI
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.manual_mitigation import ManualMitigation
+from kentik_api.public.manual_mitigation import ManualMitigation, AlertFilter
 from tests.unit.stub_api_connector import StubAPIConnector
 
 
@@ -140,7 +140,7 @@ def test_get_alerts_history() -> None:
     # when
     start_time = datetime(2020, 10, 15, 22, 15, 0)
     end_time = datetime(2021, 1, 20, 9, 15, 0)
-    filter_by = "alert_key"
+    filter_by = AlertFilter.ALERT_KEY
     filter_val = "443"
 
     alerts = alerting_api.get_alerts_history(start_time, end_time, filter_by, filter_val)

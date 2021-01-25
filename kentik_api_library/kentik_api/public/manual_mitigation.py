@@ -1,6 +1,7 @@
 from typing import Optional, List
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 
 
 @dataclass()
@@ -75,3 +76,15 @@ class HistoricalAlert:
     policy_id: int
     policy_name: str
     alert_key_lookup: str
+
+
+class AlertFilter(Enum):
+    OLD_STATE = "old_state"
+    NEW_STATE = "new_state"
+    ANY_STATE = "any_state"
+    ALERT_KEY_PARTIAL = "alert_key_partial"
+    DIMENSION_KEY = "dimension_key"
+    MITIGATION_ID = "mitigation_id"
+    ALERT_ID = "alert_id"
+    ALERT_KEY = "alert_key"
+    ALARM_ID = "alarm_id"

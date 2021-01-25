@@ -6,6 +6,8 @@ from dacite import from_dict
 from datetime import datetime
 
 from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert
+from kentik_api.public.errors import DataFormatError
+from kentik_api.requests_payload.conversions import convert, from_json
 
 
 CreateRequest = ManualMitigation
@@ -58,18 +60,24 @@ class _Alarm:
 
     def to_alarm(self) -> Alarm:
         dic = self.__dict__
-        try:
+        try:  # when alarm end is not specified, the alarm_end is set to "0000-00-00 00:00:00" then converted to None
             dic["alarm_end"] = datetime.strptime(self.alarm_end, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            dic["alarm_end"] = None
-        dic["alarm_start"] = datetime.strptime(self.alarm_start, "%Y-%m-%dT%H:%M:%S.000Z")
+        except ValueError as err:
+            if dic["alarm_end"] == "0000-00-00 00:00:00":
+                dic["alarm_end"] = None
+            else:
+                raise DataFormatError(str(err))
+
+        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000Z")
+        dic["alarm_start"] = convert(self.alarm_start, date_parse)
+
         return Alarm(**dic)
 
 
 class GetActiveAlertsResponse(List[_Alarm]):
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(cls.__name__, json_string)
         obj = cls()
         for i in dic:
             obj.append(from_dict(data_class=_Alarm, data=i))
@@ -114,15 +122,20 @@ class _HistoricalAlert:
     def to_alert(self) -> HistoricalAlert:
         dic = deepcopy(self.__dict__)
         dic.pop("ctime")
-        dic["creation_time"] = datetime.strptime(self.ctime, "%Y-%m-%dT%H:%M:%S.000Z")
-        dic["alarm_start_time"] = datetime.strptime(self.alarm_start_time, "%Y-%m-%d %H:%M:%S")
+
+        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000Z")
+        dic["creation_time"] = convert(self.ctime, date_parse)
+
+        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+        dic["alarm_start_time"] = convert(self.alarm_start_time, date_parse)
+
         return HistoricalAlert(**dic)
 
 
 class GetHistoricalAlertsResponse(List[_HistoricalAlert]):
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(cls.__name__, json_string)
         obj = cls()
         for i in dic:
             obj.append(from_dict(data_class=_HistoricalAlert, data=i))

@@ -10,7 +10,7 @@ from datetime import datetime
 
 from typing import Tuple
 
-from kentik_api import KentikAPI, ManualMitigation
+from kentik_api import KentikAPI, ManualMitigation, AlertFilter
 
 
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +42,7 @@ def run_crud():
 
     print("### GET ALERTS HISTORY")
 
-    alerts = client.alerting.get_alerts_history(start_time, end_time, "alert_key", "443")
+    alerts = client.alerting.get_alerts_history(start_time, end_time, AlertFilter.ALERT_KEY, "443")
     for alert in alerts:
         print(alert)
 
