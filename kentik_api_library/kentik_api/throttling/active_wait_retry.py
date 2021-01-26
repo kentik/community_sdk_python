@@ -13,7 +13,6 @@ def active_wait_retry(cmd: Cmd, num_attempts: int, retry_delay_seconds: float) -
             result = cmd.execute()
             return result
         except Exception as err:
-            print(f'execution failed with "{err}". Retrying in {retry_delay_seconds} seconds...')
             last_error = err
             time.sleep(retry_delay_seconds)
 

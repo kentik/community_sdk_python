@@ -56,7 +56,6 @@ class BackgroundCmdQueue:
             item.num_attempts_left -= 1
             if item.num_attempts_left > 0:
                 self._queue.put(item)
-                print(f'execution failed with "{err}". Retrying in {self._retry_delay} seconds...')
                 time.sleep(self._retry_delay)
             else:
                 item.abort(err)
