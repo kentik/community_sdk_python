@@ -1,5 +1,7 @@
 from typing import Optional
 
+from kentik_api.public.types import ID
+
 # pylint: disable=too-many-instance-attributes
 
 
@@ -26,10 +28,10 @@ class Tag:
         mac: Optional[str] = None,
         country: Optional[str] = None,
         vlans: Optional[str] = None,
-        id: Optional[int] = None,
-        company_id: Optional[str] = None,
+        id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
         addr_count: Optional[int] = None,
-        user: Optional[str] = None,
+        user_id: Optional[ID] = None,
         mac_count: Optional[int] = None,
         edited_by: Optional[str] = None,
         created_date: Optional[str] = None,
@@ -60,7 +62,7 @@ class Tag:
         self._id = id
         self._company_id = company_id
         self._addr_count = addr_count
-        self._user = user
+        self._user_id = user_id
         self._mac_count = mac_count
         self._edited_by = edited_by
         self._created_date = created_date
@@ -69,12 +71,12 @@ class Tag:
     # pylint: enable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id
 
     @property
@@ -82,8 +84,8 @@ class Tag:
         return self._addr_count
 
     @property
-    def user(self) -> Optional[str]:
-        return self._user
+    def user_id(self) -> Optional[ID]:
+        return self._user_id
 
     @property
     def mac_count(self) -> Optional[int]:

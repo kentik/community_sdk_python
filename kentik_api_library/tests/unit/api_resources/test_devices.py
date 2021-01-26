@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from kentik_api.api_resources.devices_api import DevicesAPI
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.device import (
     Device,
     DeviceType,
@@ -112,8 +113,8 @@ def test_create_device_router_success() -> None:
         device_sample_rate=1,
         device_description="testapi router with full config",
         device_snmp_ip="127.0.0.1",
-        plan_id=11466,
-        site_id=8483,
+        plan_id=ID(11466),
+        site_id=ID(8483),
         minimize_snmp=False,
         device_snmp_v3_conf=snmp_v3_conf,
         device_bgp_flowspec=True,
@@ -153,29 +154,29 @@ def test_create_device_router_success() -> None:
     assert connector.last_payload["device"]["device_bgp_flowspec"] == True
 
     # and response properly parsed
-    assert created.id == 42
-    assert created.company_id == "74333"
+    assert created.id == ID(42)
+    assert created.company_id == ID(74333)
     assert created.device_name == "testapi_router_router_full"
     assert created.device_type == DeviceType.router
     assert created.device_status == "V"
     assert created.device_description == "testapi router with full config"
     assert created.site is not None
-    assert created.site.id == 8483
+    assert created.site.id == ID(8483)
     assert created.site.site_name is None
     assert created.site.latitude is None
     assert created.site.longitude is None
     assert created.site.company_id is None
     assert created.plan.active is None
     assert created.plan.bgp_enabled is None
-    assert created.plan.cdate is None
+    assert created.plan.created_date is None
     assert created.plan.company_id is None
     assert created.plan.description is None
-    assert created.plan.deviceTypes == []
+    assert created.plan.device_types == []
     assert created.plan.devices == []
-    assert created.plan.edate is None
+    assert created.plan.updated_date is None
     assert created.plan.fast_retention is None
     assert created.plan.full_retention is None
-    assert created.plan.id == 11466
+    assert created.plan.id == ID(11466)
     assert created.plan.max_bigdata_fps is None
     assert created.plan.max_devices is None
     assert created.plan.max_fps is None
@@ -185,6 +186,7 @@ def test_create_device_router_success() -> None:
     assert len(created.all_interfaces) == 0
     assert created.device_flow_type == "auto"
     assert created.device_sample_rate == "1"
+    assert created.sending_ips is not None
     assert len(created.sending_ips) == 1
     assert created.sending_ips[0] == "128.0.0.10"
     assert created.device_snmp_ip == "127.0.0.1"
@@ -288,10 +290,10 @@ def test_create_device_dns_success() -> None:
         cdn_attr=CDNAttribute.yes,
         device_sample_rate=1,
         device_description="testapi dns with minimal config",
-        plan_id=11466,
-        site_id=8483,
+        plan_id=ID(11466),
+        site_id=ID(8483),
         device_bgp_flowspec=True,
-    ).with_bgp_type_other_device(use_bgp_device_id=42)
+    ).with_bgp_type_other_device(use_bgp_device_id=ID(42))
     created = devices_api.create(device)
 
     # then request properly formed
@@ -312,29 +314,29 @@ def test_create_device_dns_success() -> None:
     assert connector.last_payload["device"]["device_bgp_flowspec"] == True
 
     # and response properly parsed
-    assert created.id == 43
-    assert created.company_id == "74333"
+    assert created.id == ID(43)
+    assert created.company_id == ID(74333)
     assert created.device_name == "testapi_dns_aws_subnet_bgp_other_device"
     assert created.device_type == DeviceType.host_nprobe_dns_www
     assert created.device_status == "V"
     assert created.device_description == "testapi dns with minimal config"
     assert created.site is not None
-    assert created.site.id == 8483
+    assert created.site.id == ID(8483)
     assert created.site.site_name is None
     assert created.site.latitude is None
     assert created.site.longitude is None
     assert created.site.company_id is None
     assert created.plan.active is None
     assert created.plan.bgp_enabled is None
-    assert created.plan.cdate is None
+    assert created.plan.created_date is None
     assert created.plan.company_id is None
     assert created.plan.description is None
-    assert created.plan.deviceTypes == []
+    assert created.plan.device_types == []
     assert created.plan.devices == []
-    assert created.plan.edate is None
+    assert created.plan.updated_date is None
     assert created.plan.fast_retention is None
     assert created.plan.full_retention is None
-    assert created.plan.id == 11466
+    assert created.plan.id == ID(11466)
     assert created.plan.max_bigdata_fps is None
     assert created.plan.max_devices is None
     assert created.plan.max_fps is None
@@ -344,13 +346,13 @@ def test_create_device_dns_success() -> None:
     assert len(created.all_interfaces) == 0
     assert created.device_flow_type == "auto"
     assert created.device_sample_rate == "1"
-    assert len(created.sending_ips) == 0
+    assert created.sending_ips == []
     assert created.device_snmp_ip is None
     assert created.device_snmp_community == ""
     assert created.minimize_snmp == False
     assert created.device_bgp_type == DeviceBGPType.other_device
     assert created.device_bgp_flowspec == True
-    assert created.use_bgp_device_id == 42
+    assert created.use_bgp_device_id == ID(42)
     assert created.created_date == "2021-01-08T11:10:33.465Z"
     assert created.updated_date == "2021-01-08T11:10:33.465Z"
     assert created.device_snmp_v3_conf is None
@@ -483,7 +485,7 @@ def test_get_device_router_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
+    device_id = ID(42)
     device = devices_api.get(device_id)
 
     # then request properly formed
@@ -492,57 +494,57 @@ def test_get_device_router_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert device.id == 42
-    assert device.company_id == "74333"
+    assert device.id == ID(42)
+    assert device.company_id == ID(74333)
     assert device.device_name == "testapi_router_full_1"
     assert device.device_type == DeviceType.router
     assert device.device_status == "V"
     assert device.device_description == "testapi router with full config"
     assert device.site is not None
-    assert device.site.id == 8483
+    assert device.site.id == ID(8483)
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == "74333"
+    assert device.site.company_id == ID(74333)
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
-    assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
-    assert device.plan.company_id == 74333
+    assert device.plan.created_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.company_id == ID(74333)
     assert device.plan.description == "Your Free Trial includes 6 devices (...)"
-    assert device.plan.deviceTypes == []
+    assert device.plan.device_types == []
     assert device.plan.devices == []
-    assert device.plan.edate == "2020-09-03T08:41:57.489Z"
+    assert device.plan.updated_date == "2020-09-03T08:41:57.489Z"
     assert device.plan.fast_retention == 30
     assert device.plan.full_retention == 30
-    assert device.plan.id == 11466
+    assert device.plan.id == ID(11466)
     assert device.plan.max_bigdata_fps == 30
     assert device.plan.max_devices == 6
     assert device.plan.max_fps == 1000
     assert device.plan.name == "Free Trial Plan"
     assert device.plan.metadata == {}
     assert len(device.labels) == 2
-    assert device.labels[0].id == 2590
+    assert device.labels[0].id == ID(2590)
     assert device.labels[0].name == "AWS: terraform-demo-aws"
     assert device.labels[0].updated_date == "2020-10-05T15:28:00.276Z"
     assert device.labels[0].created_date == "2020-10-05T15:28:00.276Z"
-    assert device.labels[0].user_id == "133210"
-    assert device.labels[0].company_id == "74333"
+    assert device.labels[0].user_id == ID(133210)
+    assert device.labels[0].company_id == ID(74333)
     assert device.labels[0].color == "#5340A5"
-    assert device.labels[1].id == 2751
+    assert device.labels[1].id == ID(2751)
     assert device.labels[1].name == "GCP: traffic-generator-gcp"
     assert device.labels[1].updated_date == "2020-11-20T12:54:49.575Z"
     assert device.labels[1].created_date == "2020-11-20T12:54:49.575Z"
-    assert device.labels[1].user_id == "136885"
-    assert device.labels[1].company_id == "74333"
+    assert device.labels[1].user_id == ID(136885)
+    assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
     assert len(device.all_interfaces) == 2
     assert device.all_interfaces[0].interface_description == "testapi-interface-1"
     assert device.all_interfaces[0].initial_snmp_speed == None
-    assert device.all_interfaces[0].device_id == 42
+    assert device.all_interfaces[0].device_id == ID(42)
     assert device.all_interfaces[0].snmp_speed == 75
     assert device.all_interfaces[1].interface_description == "testapi-interface-2"
     assert device.all_interfaces[1].initial_snmp_speed == 7
-    assert device.all_interfaces[1].device_id == 42
+    assert device.all_interfaces[1].device_id == ID(42)
     assert device.all_interfaces[1].snmp_speed == 7
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == "1001"
@@ -641,7 +643,7 @@ def test_get_device_dns_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 43
+    device_id = ID(43)
     device = devices_api.get(device_id)
 
     # then request properly formed
@@ -650,8 +652,8 @@ def test_get_device_dns_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert device.id == 43
-    assert device.company_id == "74333"
+    assert device.id == ID(43)
+    assert device.company_id == ID(74333)
     assert device.device_name == "testapi_dns_minimal_1"
     assert device.device_type == DeviceType.host_nprobe_dns_www
     assert device.device_status == "V"
@@ -659,15 +661,15 @@ def test_get_device_dns_success() -> None:
     assert device.site is None
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
-    assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
-    assert device.plan.company_id == 74333
+    assert device.plan.created_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.company_id == ID(74333)
     assert device.plan.description == "Your Free Trial includes 6 devices (...)"
-    assert device.plan.deviceTypes == []
+    assert device.plan.device_types == []
     assert device.plan.devices == []
-    assert device.plan.edate == "2020-09-03T08:41:57.489Z"
+    assert device.plan.updated_date == "2020-09-03T08:41:57.489Z"
     assert device.plan.fast_retention == 30
     assert device.plan.full_retention == 30
-    assert device.plan.id == 11466
+    assert device.plan.id == ID(11466)
     assert device.plan.max_bigdata_fps == 30
     assert device.plan.max_devices == 6
     assert device.plan.max_fps == 1000
@@ -787,15 +789,15 @@ def test_update_device_router_success() -> None:
         .with_authentication(protocol=AuthenticationProtocol.sha, passphrase="Auth_Pass")
         .with_privacy(protocol=PrivacyProtocol.aes, passphrase="Priv_Pass")
     )
-    device_id = 42
+    device_id = ID(42)
     device = Device(
         id=device_id,
         sending_ips=["128.0.0.10", "128.0.0.11"],
         device_sample_rate=10,
         device_description="updated description",
         device_snmp_ip="127.0.0.10",
-        plan_id=11466,
-        site_id=8483,
+        plan_id=ID(11466),
+        site_id=ID(8483),
         minimize_snmp=True,
         device_snmp_v3_conf=snmp_v3_conf,
         device_bgp_type=DeviceBGPType.device,
@@ -833,29 +835,29 @@ def test_update_device_router_success() -> None:
     assert connector.last_payload["device"]["device_bgp_flowspec"] == True
 
     # and response properly parsed
-    assert updated.id == 42
-    assert updated.company_id == "74333"
+    assert updated.id == ID(42)
+    assert updated.company_id == ID(74333)
     assert updated.device_name == "testapi_router_paloalto_minimal"
     assert updated.device_type == DeviceType.router
     assert updated.device_status == "V"
     assert updated.device_description == "updated description"
     assert updated.site is not None
-    assert updated.site.id == 8483
+    assert updated.site.id == ID(8483)
     assert updated.site.site_name is None
     assert updated.site.latitude is None
     assert updated.site.longitude is None
     assert updated.site.company_id is None
     assert updated.plan.active is None
     assert updated.plan.bgp_enabled is None
-    assert updated.plan.cdate is None
+    assert updated.plan.created_date is None
     assert updated.plan.company_id is None
     assert updated.plan.description is None
-    assert updated.plan.deviceTypes == []
+    assert updated.plan.device_types == []
     assert updated.plan.devices == []
-    assert updated.plan.edate is None
+    assert updated.plan.updated_date is None
     assert updated.plan.fast_retention is None
     assert updated.plan.full_retention is None
-    assert updated.plan.id == 11466
+    assert updated.plan.id == ID(11466)
     assert updated.plan.max_bigdata_fps is None
     assert updated.plan.max_devices is None
     assert updated.plan.max_fps is None
@@ -865,6 +867,7 @@ def test_update_device_router_success() -> None:
     assert len(updated.all_interfaces) == 0
     assert updated.device_flow_type == "auto"
     assert updated.device_sample_rate == "10"
+    assert updated.sending_ips is not None
     assert len(updated.sending_ips) == 2
     assert updated.sending_ips[0] == "128.0.0.10"
     assert updated.sending_ips[1] == "128.0.0.11"
@@ -898,7 +901,7 @@ def test_delete_device_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
+    device_id = ID(42)
     delete_successful = devices_api.delete(device_id)
 
     # then request properly formed
@@ -1090,48 +1093,48 @@ def test_get_all_devices_success() -> None:
     # and response properly parsed
     assert len(devices) == 2
     device = devices[0]
-    assert device.id == 42
-    assert device.company_id == "74333"
+    assert device.id == ID(42)
+    assert device.company_id == ID(74333)
     assert device.device_name == "testapi_router_full_1"
     assert device.device_type == DeviceType.router
     assert device.device_status == "V"
     assert device.device_description == "testapi router with full config"
     assert device.site is not None
-    assert device.site.id == 8483
+    assert device.site.id == ID(8483)
     assert device.site.site_name == "marina gdańsk"
     assert device.site.latitude == 54.348972
     assert device.site.longitude == 18.659791
-    assert device.site.company_id == "74333"
+    assert device.site.company_id == ID(74333)
     assert device.plan.active == True
     assert device.plan.bgp_enabled == True
-    assert device.plan.cdate == "2020-09-03T08:41:57.489Z"
-    assert device.plan.company_id == 74333
+    assert device.plan.created_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.company_id == ID(74333)
     assert device.plan.description == "Your Free Trial includes 6 devices (...)"
-    assert device.plan.deviceTypes == []
+    assert device.plan.device_types == []
     assert device.plan.devices == []
-    assert device.plan.edate == "2020-09-03T08:41:57.489Z"
+    assert device.plan.updated_date == "2020-09-03T08:41:57.489Z"
     assert device.plan.fast_retention == 30
     assert device.plan.full_retention == 30
-    assert device.plan.id == 11466
+    assert device.plan.id == ID(11466)
     assert device.plan.max_bigdata_fps == 30
     assert device.plan.max_devices == 6
     assert device.plan.max_fps == 1000
     assert device.plan.name == "Free Trial Plan"
     assert device.plan.metadata == {}
     assert len(device.labels) == 2
-    assert device.labels[0].id == 2590
+    assert device.labels[0].id == ID(2590)
     assert device.labels[0].name == "AWS: terraform-demo-aws"
     assert device.labels[0].updated_date == "2020-10-05T15:28:00.276Z"
     assert device.labels[0].created_date == "2020-10-05T15:28:00.276Z"
-    assert device.labels[0].user_id == "133210"
-    assert device.labels[0].company_id == "74333"
+    assert device.labels[0].user_id == ID(133210)
+    assert device.labels[0].company_id == ID(74333)
     assert device.labels[0].color == "#5340A5"
-    assert device.labels[1].id == 2751
+    assert device.labels[1].id == ID(2751)
     assert device.labels[1].name == "GCP: traffic-generator-gcp"
     assert device.labels[1].updated_date == "2020-11-20T12:54:49.575Z"
     assert device.labels[1].created_date == "2020-11-20T12:54:49.575Z"
-    assert device.labels[1].user_id == "136885"
-    assert device.labels[1].company_id == "74333"
+    assert device.labels[1].user_id == ID(136885)
+    assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
@@ -1204,7 +1207,7 @@ def test_apply_labels_success() -> None:
 
     # when
     device_id = 42
-    labels = [3011, 3012]
+    labels = [ID(3011), ID(3012)]
     apply_result = devices_api.apply_labels(device_id, labels)
 
     # then request properly formed
@@ -1217,22 +1220,22 @@ def test_apply_labels_success() -> None:
     assert connector.last_payload["labels"][1]["id"] == 3012
 
     # and response properly parsed
-    assert apply_result.id == "42"
+    assert apply_result.id == ID(42)
     assert apply_result.device_name == "test_router"
     assert len(apply_result.labels) == 2
-    assert apply_result.labels[0].id == 3011
+    assert apply_result.labels[0].id == ID(3011)
     assert apply_result.labels[0].name == "apitest-label-red"
     assert apply_result.labels[0].created_date == "2021-01-11T08:38:08.678Z"
     assert apply_result.labels[0].updated_date == "2021-01-11T08:38:08.678Z"
-    assert apply_result.labels[0].user_id == "144319"
-    assert apply_result.labels[0].company_id == "74333"
+    assert apply_result.labels[0].user_id == ID(144319)
+    assert apply_result.labels[0].company_id == ID(74333)
     assert apply_result.labels[0].color == "#FF0000"
-    assert apply_result.labels[1].id == 3012
+    assert apply_result.labels[1].id == ID(3012)
     assert apply_result.labels[1].name == "apitest-label-blue"
     assert apply_result.labels[1].created_date == "2021-01-11T08:38:42.627Z"
     assert apply_result.labels[1].updated_date == "2021-01-11T08:38:42.627Z"
-    assert apply_result.labels[1].user_id == "144319"
-    assert apply_result.labels[1].company_id == "74333"
+    assert apply_result.labels[1].user_id == ID(144319)
+    assert apply_result.labels[1].company_id == ID(74333)
     assert apply_result.labels[1].color == "#0000FF"
 
 
@@ -1254,10 +1257,10 @@ def test_create_interface_minimal_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
+    device_id = ID(42)
     interface = Interface(
         device_id=device_id,
-        snmp_id="2",
+        snmp_id=ID(2),
         snmp_speed=15,
         interface_description="testapi-interface-2",
     )
@@ -1271,17 +1274,17 @@ def test_create_interface_minimal_success() -> None:
     assert connector.last_payload["interface_description"] == "testapi-interface-2"
     assert connector.last_payload["snmp_speed"] == 15
     # and response properly parsed
-    assert created.snmp_id == "2"
+    assert created.snmp_id == ID(2)
     assert created.snmp_alias is None
     assert created.snmp_speed == 8
     assert created.interface_description == "testapi-interface-2"
     assert created.interface_ip is None
     assert created.interface_ip_netmask is None
-    assert created.company_id == "74333"
-    assert created.device_id == 42
+    assert created.company_id == ID(74333)
+    assert created.device_id == ID(42)
     assert created.updated_date == "2021-01-13T08:41:16.191Z"
     assert created.created_date == "2021-01-13T08:41:16.191Z"
-    assert created.id == 43
+    assert created.id == ID(43)
     assert created.vrf_id is None
     assert created.vrf is None
     assert created.secondary_ips is None
@@ -1328,10 +1331,10 @@ def test_create_interface_full_success() -> None:
     )
     secondary_ip1 = SecondaryIP(address="127.0.0.2", netmask="255.255.255.0")
     secondary_ip2 = SecondaryIP(address="127.0.0.3", netmask="255.255.255.0")
-    device_id = 42
+    device_id = ID(42)
     interface = Interface(
         device_id=device_id,
-        snmp_id="1",
+        snmp_id=ID(1),
         interface_description="testapi-interface-1",
         snmp_alias="interace-description-1",
         interface_ip="127.0.0.1",
@@ -1363,18 +1366,18 @@ def test_create_interface_full_success() -> None:
     assert connector.last_payload["secondary_ips"][1]["netmask"] == "255.255.255.0"
 
     # and response properly parsed
-    assert created.snmp_id == "243205880"
+    assert created.snmp_id == ID(243205880)
     assert created.snmp_alias == "interace-description-1"
     assert created.snmp_speed == 8
     assert created.interface_description == "testapi-interface-1"
     assert created.interface_ip == "127.0.0.1"
     assert created.interface_ip_netmask == "255.255.255.0"
-    assert created.company_id == "74333"
-    assert created.device_id == 42
+    assert created.company_id == ID(74333)
+    assert created.device_id == ID(42)
     assert created.updated_date == "2021-01-13T08:31:40.629Z"
     assert created.created_date == "2021-01-13T08:31:40.619Z"
-    assert created.id == 43
-    assert created.vrf_id == 39903
+    assert created.id == ID(43)
+    assert created.vrf_id == ID(39903)
     assert created.secondary_ips is not None
     assert len(created.secondary_ips) == 2
     assert created.secondary_ips[0].address == "198.186.193.51"
@@ -1422,8 +1425,8 @@ def test_update_interface_minimal_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
-    interface_id = 43
+    device_id = ID(42)
+    interface_id = ID(43)
     interface = Interface(snmp_speed=75, device_id=device_id, id=interface_id)
     updated = devices_api.interfaces.update(interface)
 
@@ -1435,17 +1438,17 @@ def test_update_interface_minimal_success() -> None:
     assert "secondary_ips" not in connector.last_payload
 
     # and response properly parsed
-    assert updated.id == 43
-    assert updated.company_id == "74333"
-    assert updated.device_id == 42
-    assert updated.snmp_id == "1"
+    assert updated.id == ID(43)
+    assert updated.company_id == ID(74333)
+    assert updated.device_id == ID(42)
+    assert updated.snmp_id == ID(1)
     assert updated.snmp_speed == 75
     assert updated.snmp_alias == "interace-description-1"
     assert updated.interface_ip == "127.0.0.1"
     assert updated.interface_description == "testapi-interface-1"
     assert updated.created_date == "2021-01-13T08:50:37.068Z"
     assert updated.updated_date == "2021-01-13T08:58:27.276Z"
-    assert updated.initial_snmp_id == ""
+    assert updated.initial_snmp_id is None
     assert updated.initial_snmp_alias is None
     assert updated.initial_interface_description is None
     assert updated.initial_snmp_speed is None
@@ -1453,7 +1456,7 @@ def test_update_interface_minimal_success() -> None:
     assert updated.secondary_ips is None
     assert updated.top_nexthop_asns == []
     assert updated.provider == ""
-    assert updated.vrf_id == 39902
+    assert updated.vrf_id == ID(39902)
 
 
 def test_update_interface_full_success() -> None:
@@ -1495,8 +1498,8 @@ def test_update_interface_full_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
-    interface_id = 43
+    device_id = ID(42)
+    interface_id = ID(43)
     vrf = VRFAttributes(
         name="vrf-name-44",
         description="vrf-description-44",
@@ -1507,7 +1510,7 @@ def test_update_interface_full_success() -> None:
     interface = Interface(
         device_id=device_id,
         id=interface_id,
-        snmp_id="4",
+        snmp_id=ID(4),
         snmp_speed=44,
         snmp_alias="interace-description-44",
         interface_ip="127.0.44.55",
@@ -1535,17 +1538,17 @@ def test_update_interface_full_success() -> None:
     assert connector.last_payload["secondary_ips"] == []
 
     # and response properly parsed
-    assert updated.id == 43
-    assert updated.company_id == "74333"
-    assert updated.device_id == 42
-    assert updated.snmp_id == "4"
+    assert updated.id == ID(43)
+    assert updated.company_id == ID(74333)
+    assert updated.device_id == ID(42)
+    assert updated.snmp_id == ID(4)
     assert updated.snmp_speed == 44
     assert updated.snmp_alias == "interace-description-44"
     assert updated.interface_ip == "127.0.44.55"
     assert updated.interface_description == "testapi-interface-44"
     assert updated.created_date == "2021-01-14T14:43:43.104Z"
     assert updated.updated_date == "2021-01-14T14:46:21.200Z"
-    assert updated.initial_snmp_id == ""
+    assert updated.initial_snmp_id is None
     assert updated.initial_snmp_alias is None
     assert updated.initial_interface_description is None
     assert updated.initial_snmp_speed is None
@@ -1553,7 +1556,7 @@ def test_update_interface_full_success() -> None:
     assert updated.secondary_ips == []
     assert updated.top_nexthop_asns == []
     assert updated.provider == ""
-    assert updated.vrf_id == 40055
+    assert updated.vrf_id == ID(40055)
 
 
 def test_get_interface_minimal_success() -> None:
@@ -1588,8 +1591,8 @@ def test_get_interface_minimal_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
-    interface_id = 43
+    device_id = ID(42)
+    interface_id = ID(43)
     interface = devices_api.interfaces.get(device_id, interface_id)
 
     # then request properly formed
@@ -1598,10 +1601,10 @@ def test_get_interface_minimal_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert interface.id == 43
-    assert interface.company_id == "74333"
-    assert interface.device_id == 42
-    assert interface.snmp_id == "1"
+    assert interface.id == ID(43)
+    assert interface.company_id == ID(74333)
+    assert interface.device_id == ID(42)
+    assert interface.snmp_id == ID(1)
     assert interface.snmp_speed == 15
     assert interface.snmp_alias is None
     assert interface.interface_ip is None
@@ -1688,8 +1691,8 @@ def test_get_interface_full_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
-    interface_id = 43
+    device_id = ID(42)
+    interface_id = ID(43)
     interface = devices_api.interfaces.get(device_id, interface_id)
 
     # then request properly formed
@@ -1698,17 +1701,17 @@ def test_get_interface_full_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert interface.id == 43
-    assert interface.company_id == "74333"
-    assert interface.device_id == 42
-    assert interface.snmp_id == "1"
+    assert interface.id == ID(43)
+    assert interface.company_id == ID(74333)
+    assert interface.device_id == ID(42)
+    assert interface.snmp_id == ID(1)
     assert interface.snmp_speed == 15
     assert interface.snmp_alias == "interace-description-1"
     assert interface.interface_ip == "127.0.0.1"
     assert interface.interface_description == "testapi-interface-1"
     assert interface.created_date == "2021-01-13T08:50:37.068Z"
     assert interface.updated_date == "2021-01-13T08:55:59.403Z"
-    assert interface.initial_snmp_id == "150"
+    assert interface.initial_snmp_id == ID(150)
     assert interface.initial_snmp_alias == "initial-interace-description-1"
     assert interface.initial_interface_description == "initial-testapi-interface-1"
     assert interface.initial_snmp_speed == 7
@@ -1719,11 +1722,11 @@ def test_get_interface_full_success() -> None:
     assert interface.top_nexthop_asns[1].asn == 21
     assert interface.top_nexthop_asns[1].packets == 30101
     assert interface.provider == ""
-    assert interface.vrf_id == 39902
+    assert interface.vrf_id == ID(39902)
     assert interface.vrf is not None
-    assert interface.vrf.company_id == "74333"
+    assert interface.vrf.company_id == ID(74333)
     assert interface.vrf.description == "vrf-description"
-    assert interface.vrf.device_id == "79175"
+    assert interface.vrf.device_id == ID(79175)
     assert interface.vrf.name == "vrf-name"
     assert interface.vrf.route_distinguisher == "11.121.111.13:3254"
     assert interface.vrf.route_target == "101:100"
@@ -1742,8 +1745,8 @@ def test_delete_interface_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
-    interface_id = 43
+    device_id = ID(42)
+    interface_id = ID(43)
     delete_successful = devices_api.interfaces.delete(device_id, interface_id)
 
     # then request properly formed
@@ -1862,7 +1865,7 @@ def test_get_all_interfaces_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
+    device_id = ID(42)
     interfaces = devices_api.interfaces.get_all(device_id)
 
     # then request properly formed
@@ -1873,17 +1876,17 @@ def test_get_all_interfaces_success() -> None:
     # and response properly parsed
     assert len(interfaces) == 2
     interface = interfaces[0]
-    assert interface.id == 43
-    assert interface.company_id == "74333"
-    assert interface.device_id == 42
-    assert interface.snmp_id == "1"
+    assert interface.id == ID(43)
+    assert interface.company_id == ID(74333)
+    assert interface.device_id == ID(42)
+    assert interface.snmp_id == ID(1)
     assert interface.snmp_speed == 15
     assert interface.snmp_alias == "interace-description-1"
     assert interface.interface_ip == "127.0.0.1"
     assert interface.interface_description == "testapi-interface-1"
     assert interface.created_date == "2021-01-13T08:50:37.068Z"
     assert interface.updated_date == "2021-01-13T08:55:59.403Z"
-    assert interface.initial_snmp_id == "150"
+    assert interface.initial_snmp_id == ID(150)
     assert interface.initial_snmp_alias == "initial-interace-description-1"
     assert interface.initial_interface_description == "initial-testapi-interface-1"
     assert interface.initial_snmp_speed == 7
@@ -1894,11 +1897,11 @@ def test_get_all_interfaces_success() -> None:
     assert interface.top_nexthop_asns[1].asn == 21
     assert interface.top_nexthop_asns[1].packets == 30101
     assert interface.provider == ""
-    assert interface.vrf_id == 39902
+    assert interface.vrf_id == ID(39902)
     assert interface.vrf is not None
-    assert interface.vrf.company_id == "74333"
+    assert interface.vrf.company_id == ID(74333)
     assert interface.vrf.description == "vrf-description"
-    assert interface.vrf.device_id == "79175"
+    assert interface.vrf.device_id == ID(79175)
     assert interface.vrf.name == "vrf-name"
     assert interface.vrf.route_distinguisher == "11.121.111.13:3254"
     assert interface.vrf.route_target == "101:100"

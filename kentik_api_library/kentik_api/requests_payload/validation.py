@@ -3,7 +3,7 @@ from kentik_api.public.errors import DeserializationError
 
 
 def validate_fields(class_name: str, required_fields: Iterable[str], dic: Mapping[str, Any]) -> None:
-    """ Check if all requred_fields are present in dic. Raise error otherwise """
+    """ Check if all required_fields are present in dic. Raise error otherwise """
     missing_fields = []
     for f in required_fields:
         if f not in dic:

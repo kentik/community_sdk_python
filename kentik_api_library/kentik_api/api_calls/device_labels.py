@@ -1,6 +1,6 @@
 # Local application imports
 from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -11,7 +11,7 @@ def get_device_labels() -> APICall:
 
 
 @get
-def get_device_label_info(device_label_id: int) -> APICall:
+def get_device_label_info(device_label_id: ResourceID) -> APICall:
     """Returns a device_label object
     containing information about an individual device_label"""
     url_path = f"/deviceLabels/{device_label_id}"
@@ -28,7 +28,7 @@ def create_device_label() -> APICall:
 
 @put
 @payload_type(dict)
-def update_device_label(device_label_id: int) -> APICall:
+def update_device_label(device_label_id: ResourceID) -> APICall:
     """Updates and returns a device_label object
     containing information about an individual device_label"""
     url_path = f"/deviceLabels/{device_label_id}"
@@ -36,7 +36,7 @@ def update_device_label(device_label_id: int) -> APICall:
 
 
 @delete
-def delete_device_label(device_label_id: int) -> APICall:
+def delete_device_label(device_label_id: ResourceID) -> APICall:
     """Deletes a device_label."""
     url_path = f"/deviceLabels/{device_label_id}"
     return APICall(url_path)

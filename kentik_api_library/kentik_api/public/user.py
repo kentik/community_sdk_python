@@ -1,5 +1,7 @@
 from typing import List, Dict, Optional
 
+from kentik_api.public.types import ID
+
 # pylint: disable=too-many-instance-attributes
 
 
@@ -13,12 +15,12 @@ class User:
         role: Optional[str] = None,
         email_service: Optional[bool] = None,
         email_product: Optional[bool] = None,
-        id: Optional[int] = None,
+        id: Optional[ID] = None,
         password: Optional[str] = None,
         last_login: Optional[str] = None,
         created_date: Optional[str] = None,
         updated_date: Optional[str] = None,
-        company_id: Optional[int] = None,
+        company_id: Optional[ID] = None,
         api_token: Optional[str] = None,
         filters: Optional[Dict] = None,
         saved_filters: Optional[List] = None,
@@ -42,7 +44,7 @@ class User:
 
     # pylint: enable=too-many-arguments
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 

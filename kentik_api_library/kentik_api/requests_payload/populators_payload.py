@@ -2,7 +2,10 @@ import json
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
+from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import Populator
+from kentik_api.requests_payload.conversions import convert
+
 
 # pylint: disable=too-many-instance-attributes
 
@@ -41,9 +44,9 @@ class _Populator:
 
     def to_populator(self) -> Populator:
         return Populator(
-            dimension_id=self.dimension_id,
+            dimension_id=convert(self.dimension_id, ID),
             value=self.value,
-            direction=Populator.Direction(self.direction.upper()),
+            direction=convert(self.direction.upper(), Populator.Direction),
             device_name=self.device_name,
             interface_name=self.interface_name,
             addr=self.addr,
@@ -62,8 +65,8 @@ class _Populator:
             mac=self.mac,
             country=self.country,
             vlans=self.vlans,
-            id=self.id,
-            company_id=self.company_id,
+            id=convert(self.id, ID),
+            company_id=convert(self.company_id, ID),
             user=self.user,
             mac_count=self.mac_count,
             addr_count=self.addr_count,

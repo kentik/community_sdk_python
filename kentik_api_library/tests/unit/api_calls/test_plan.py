@@ -1,6 +1,5 @@
 from kentik_api.api_calls.api_call import APICall
-from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.api_calls.plan import *
+from kentik_api.api_calls.plans import get_plans
 
 DUMMY_API_URL = "/plans"
 

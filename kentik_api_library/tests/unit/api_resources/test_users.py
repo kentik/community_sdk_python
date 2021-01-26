@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.user import User
 
 
@@ -44,11 +45,11 @@ def test_create_user_success(client, connector) -> None:
     assert connector.last_payload["user"]["email_product"] is True
 
     # and response properly parsed
-    assert created.id == 145985
+    assert created.id == ID(145985)
     assert created.username == "test@user.example"
     assert created.full_name == "Test User"
     assert created.email == "test@user.example"
-    assert created.company_id == 74333
+    assert created.company_id == ID(74333)
     assert created.role == "Member"
     assert created.password is None
     assert created.email_service is True
@@ -81,7 +82,7 @@ def test_get_user_success(client, connector) -> None:
     connector.response_code = HTTPStatus.OK
 
     # when
-    user_id = 145999
+    user_id = ID(145999)
     user = client.users.get(user_id)
 
     # then request properly formed
@@ -94,7 +95,7 @@ def test_get_user_success(client, connector) -> None:
     assert user.username == "test@user.example"
     assert user.full_name == "Test User"
     assert user.email == "test@user.example"
-    assert user.company_id == 74333
+    assert user.company_id == ID(74333)
     assert user.role == "Member"
     assert user.password is None
     assert user.email_service is True
@@ -127,7 +128,7 @@ def test_update_user_success(client, connector) -> None:
     connector.response_code = HTTPStatus.OK
 
     # when
-    user_id = 146034
+    user_id = ID(146034)
     user = User(
         id=user_id,
         full_name="User Testing",
@@ -142,7 +143,7 @@ def test_update_user_success(client, connector) -> None:
     assert connector.last_payload["user"]["user_full_name"] == "User Testing"
 
     # then response properly parsed
-    assert updated.id == 146034
+    assert updated.id == ID(146034)
     assert updated.full_name == "User Testing"
     assert updated.email == "test@user.example"
 
@@ -154,7 +155,7 @@ def test_delete_user_success(client, connector) -> None:
     connector.response_code = HTTPStatus.NO_CONTENT
 
     # when
-    user_id = 146034
+    user_id = ID(146034)
     delete_successful = client.users.delete(user_id)
 
     # then request properly formed

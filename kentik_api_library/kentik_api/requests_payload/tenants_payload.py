@@ -1,7 +1,22 @@
-from dataclasses import dataclass
 import json
-from typing import Optional, Dict, List
+from dataclasses import dataclass
+from typing import Optional, Any, Dict, List
+
+from kentik_api.requests_payload.conversions import convert
+from kentik_api.public.types import ID
 from kentik_api.public.tenant import Tenant, TenantUser
+
+
+def tenant_user_from_dict(dic: Dict[str, Any]) -> TenantUser:
+    return TenantUser(
+        id=convert(dic["id"], ID),
+        user_email=dic["user_email"],
+        tenant_id=convert(dic["tenant_id"], ID),
+        company_id=convert(dic["company_id"], ID),
+        last_login=dic.get("last_login"),
+        user_name=dic.get("user_name"),
+        user_full_name=dic.get("user_full_name"),
+    )
 
 
 @dataclass()
@@ -9,7 +24,7 @@ class GetResponse:
     id: int
     name: str
     description: str
-    users: List[Dict]
+    users: List[Dict[str, Any]]
     created_date: str
     updated_date: str
 
@@ -19,9 +34,9 @@ class GetResponse:
         return cls(**dic)
 
     def to_tenant(self) -> Tenant:
-        users = [TenantUser(**i) for i in self.users]
+        users = [tenant_user_from_dict(i) for i in self.users]
         return Tenant(
-            id=self.id,
+            id=convert(self.id, ID),
             users=users,
             created_date=self.created_date,
             updated_date=self.updated_date,
@@ -65,4 +80,12 @@ class CreateUserResponse:
         return cls(**dic)
 
     def to_tenant_user(self):
-        return TenantUser(**self.__dict__)
+        return TenantUser(
+            id=convert(self.id, ID),
+            tenant_id=convert(self.tenant_id, ID),
+            company_id=convert(self.company_id, ID),
+            user_email=self.user_email,
+            last_login=self.last_login,
+            user_name=self.user_name,
+            user_full_name=self.user_full_name,
+        )

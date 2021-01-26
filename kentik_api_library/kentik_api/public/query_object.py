@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Dict
 from enum import Enum
 
+from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import Filters
 
 
@@ -111,7 +112,7 @@ class TimeFormat(Enum):
 
 @dataclass
 class SavedFilter:
-    filter_id: int
+    filter_id: ID
     is_not: bool = False
 
 

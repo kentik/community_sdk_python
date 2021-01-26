@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 
 
@@ -26,7 +27,7 @@ def test_create_saved_filter_success(client, connector) -> None:
             },
         "company_id":"74333",
         "filter_level":"company",
-        "edate":"2020-12-16T10:46:13.095Z",
+        "edate":"2020-12-26T10:46:13.095Z",
         "cdate":"2020-12-16T10:46:13.095Z",
         "id":8152
     }"""
@@ -53,12 +54,13 @@ def test_create_saved_filter_success(client, connector) -> None:
     assert connector.last_payload["filters"]["filterGroups"][0]["not"] is False
     assert connector.last_payload["filters"]["filterGroups"][0]["filters"][0]["filterField"] == "dst_as"
 
-    assert created.id == 8152
+    assert created.id == ID(8152)
     assert created.filter_name == "test_filter1"
     assert created.filter_description == "This is test filter description"
-    assert created.company_id == 74333
+    assert created.company_id == ID(74333)
     assert created.filter_level == "company"
-    assert created.cdate == "2020-12-16T10:46:13.095Z"
+    assert created.created_date == "2020-12-16T10:46:13.095Z"
+    assert created.updated_date == "2020-12-26T10:46:13.095Z"
     assert created.filters.connector == "All"
     assert created.filters.filterGroups[0].connector == "All"
     assert created.filters.filterGroups[0].not_ is False
@@ -89,12 +91,12 @@ def test_get_saved_filter_success(client, connector) -> None:
             "filter_name":"test_filter1",
             "filter_description":"This is test filter description",
             "cdate":"2020-12-16T11:26:18.578Z",
-            "edate":"2020-12-16T11:26:19.187Z",
+            "edate":"2020-12-26T11:26:19.187Z",
             "filter_level":"company"
         }"""
     connector.response_text = get_response_payload
     connector.response_code = HTTPStatus.OK
-    filter_id = 8153
+    filter_id = ID(8153)
 
     # when
     saved_filter = client.saved_filters.get(filter_id)
@@ -104,12 +106,13 @@ def test_get_saved_filter_success(client, connector) -> None:
     assert connector.last_method == APICallMethods.GET
     assert connector.last_payload is None
 
-    assert saved_filter.id == 8153
+    assert saved_filter.id == ID(8153)
     assert saved_filter.filter_name == "test_filter1"
     assert saved_filter.filter_description == "This is test filter description"
-    assert saved_filter.company_id == 74333
+    assert saved_filter.company_id == ID(74333)
     assert saved_filter.filter_level == "company"
-    assert saved_filter.cdate == "2020-12-16T11:26:18.578Z"
+    assert saved_filter.created_date == "2020-12-16T11:26:18.578Z"
+    assert saved_filter.updated_date == "2020-12-26T11:26:19.187Z"
     assert saved_filter.filters.connector == "All"
     assert saved_filter.filters.filterGroups[0].connector == "All"
     assert saved_filter.filters.filterGroups[0].not_ is False
@@ -147,7 +150,7 @@ def test_update_saved_filter_success(client, connector) -> None:
     connector.response_code = HTTPStatus.OK
 
     # when
-    filter_id = 8153
+    filter_id = ID(8153)
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
@@ -171,7 +174,7 @@ def test_delete_saved_filter_success(client, connector) -> None:
     connector.response_code = HTTPStatus.NO_CONTENT
 
     # when
-    filter_id = 8153
+    filter_id = ID(8153)
     delete_successful = client.saved_filters.delete(filter_id)
 
     # then

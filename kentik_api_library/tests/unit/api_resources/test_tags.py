@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from kentik_api.api_resources.tags_api import TagsAPI
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.tag import Tag
 from tests.unit.stub_api_connector import StubAPIConnector
 
@@ -112,10 +113,10 @@ def test_create_tag_success() -> None:
     assert created.mac == "FF:FF:FF:FF:FF:FE,FF:FF:FF:FF:FF:FF"
     assert created.country == "ES,IT"
     assert created.vlans == "4001,4002,4003"
-    assert created.id == 42
-    assert created.company_id == "74333"
+    assert created.id == ID(42)
+    assert created.company_id == ID(74333)
     assert created.addr_count == 2
-    assert created.user == "144319"
+    assert created.user_id == ID(144319)
     assert created.mac_count == 2
     assert created.edited_by == "john.doe@acme.com"
     assert created.created_date == "2020-12-10T11:53:48.752418Z"
@@ -160,7 +161,7 @@ def test_get_tag_success() -> None:
     tags_api = TagsAPI(connector)
 
     # when
-    tag_id = 42
+    tag_id = ID(42)
     tag = tags_api.get(tag_id)
 
     # then request properly formed
@@ -188,10 +189,10 @@ def test_get_tag_success() -> None:
     assert tag.mac == "FF:FF:FF:FF:FF:FE,FF:FF:FF:FF:FF:FF"
     assert tag.country == "ES,IT"
     assert tag.vlans == "4001,4002,4003"
-    assert tag.id == 42
-    assert tag.company_id == "74333"
+    assert tag.id == ID(42)
+    assert tag.company_id == ID(74333)
     assert tag.addr_count == 2
-    assert tag.user == "144319"
+    assert tag.user_id == ID(144319)
     assert tag.mac_count == 2
     assert tag.edited_by == "john.doe@acme.com"
     assert tag.created_date == "2020-12-10T11:53:48.752418Z"
@@ -236,7 +237,7 @@ def test_update_tag_success() -> None:
     tags_api = TagsAPI(connector)
 
     # when
-    tag_id = 42
+    tag_id = ID(42)
     tag = Tag(
         id=tag_id,
         flow_tag="APITEST-TAG-2",
@@ -296,10 +297,10 @@ def test_update_tag_success() -> None:
     assert updated.mac == "FF:FF:FF:FF:FF:FE,FF:FF:FF:FF:FF:FF"
     assert updated.country == "ES,IT"
     assert updated.vlans == "4011,4012,4013"
-    assert updated.id == 42
-    assert updated.company_id == "74333"
+    assert updated.id == ID(42)
+    assert updated.company_id == ID(74333)
     assert updated.addr_count == 2
-    assert updated.user == "144319"
+    assert updated.user_id == ID(144319)
     assert updated.mac_count == 2
     assert updated.edited_by == "john.doe@acme.com"
     assert updated.created_date == "2020-12-10T11:53:48.752418Z"
@@ -313,7 +314,7 @@ def test_delete_tag_success() -> None:
     tags_api = TagsAPI(connector)
 
     # when
-    tag_id = 42
+    tag_id = ID(42)
     delete_successful = tags_api.delete(tag_id)
 
     # then request properly formed

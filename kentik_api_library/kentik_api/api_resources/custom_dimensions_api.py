@@ -1,7 +1,9 @@
 from typing import List
+from http import HTTPStatus
 
 from kentik_api.api_calls import custom_dimensions
 from kentik_api.api_resources.base_api import BaseAPI
+from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import CustomDimension, Populator
 from kentik_api.requests_payload import custom_dimensions_payload, populators_payload
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
@@ -70,7 +72,7 @@ class PopulatorsAPI(BaseAPI):
         response = self.send(apicall, payload)
         return populators_payload.UpdateResponse.from_json(response.text).to_populator()
 
-    def delete(self, custom_dimension_id: int, populator_id: int) -> bool:
+    def delete(self, custom_dimension_id: ID, populator_id: ID) -> bool:
         apicall = custom_dimensions.delete_populator(custom_dimension_id, populator_id)
         response = self.send(apicall)
         return response.http_status_code == 204
@@ -83,7 +85,7 @@ class CustomDimensionsAPI(BaseAPI):
         super(CustomDimensionsAPI, self).__init__(api_connector)
         self._populators = PopulatorsAPI(api_connector)
 
-    def get(self, custom_dimension_id: int) -> CustomDimension:
+    def get(self, custom_dimension_id: ID) -> CustomDimension:
         apicall = custom_dimensions.get_custom_dimension_info(custom_dimension_id)
         response = self.send(apicall)
         return custom_dimensions_payload.GetResponse.from_json(response.text).to_custom_dimension()
@@ -115,10 +117,10 @@ class CustomDimensionsAPI(BaseAPI):
         response = self.send(apicall, payload)
         return custom_dimensions_payload.UpdateResponse.from_json(response.text).to_custom_dimension()
 
-    def delete(self, custom_dimension_id: int) -> bool:
+    def delete(self, custom_dimension_id: ID) -> bool:
         apicall = custom_dimensions.delete_custom_dimension(custom_dimension_id)
         response = self.send(apicall)
-        return response.http_status_code == 204
+        return response.http_status_code == HTTPStatus.NO_CONTENT
 
     @property
     def populators(self) -> PopulatorsAPI:

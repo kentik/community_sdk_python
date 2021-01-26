@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.public.types import ID
 from kentik_api.public.site import Site
 
 
@@ -33,11 +34,11 @@ def test_create_site_success(client, connector) -> None:
     assert connector.last_payload["site"]["lon"] == 18.659577
 
     # and response properly parsed
-    assert created.id == 42
+    assert created.id == ID(42)
     assert created.site_name == "apitest-site-1"
     assert created.latitude == 54.349276
     assert created.longitude == 18.659577
-    assert created.company_id == 3250
+    assert created.company_id == ID(3250)
 
 
 def test_get_site_success(client, connector) -> None:
@@ -49,14 +50,14 @@ def test_get_site_success(client, connector) -> None:
             "site_name": "apitest-site-1",
             "lat": 54.349276,
             "lon": 18.659577,
-            "company_id": "3250"
+            "company_id": 3250
         }
     }"""
     connector.response_text = get_response_payload
     connector.response_code = HTTPStatus.OK
 
     # when
-    site_id = 42
+    site_id = ID(42)
     site = client.sites.get(site_id)
 
     # then request properly formed
@@ -65,11 +66,11 @@ def test_get_site_success(client, connector) -> None:
     assert connector.last_payload is None
 
     # then response properly parsed
-    assert site.id == 42
+    assert site.id == ID(42)
     assert site.site_name == "apitest-site-1"
     assert site.latitude == 54.349276
     assert site.longitude == 18.659577
-    assert site.company_id == 3250
+    assert site.company_id == ID(3250)
 
 
 def test_update_site_success(client, connector) -> None:
@@ -77,7 +78,7 @@ def test_update_site_success(client, connector) -> None:
     update_response_payload = """
     {
         "site": {
-            "id": 42,
+            "id": "42",
             "site_name": "new-site",
             "lat": -15.0,
             "lon": -45.0,
@@ -88,7 +89,7 @@ def test_update_site_success(client, connector) -> None:
     connector.response_code = HTTPStatus.OK
 
     # when
-    site_id = 42
+    site_id = ID(42)
     site = Site(site_name="new-site", latitude=None, longitude=-45.0, id=site_id)
     updated = client.sites.update(site)
 
@@ -102,11 +103,11 @@ def test_update_site_success(client, connector) -> None:
     assert "lat" not in connector.last_payload["site"]
 
     # then response properly parsed
-    assert updated.id == 42
+    assert updated.id == ID(42)
     assert updated.site_name == "new-site"
     assert updated.latitude == -15.0
     assert updated.longitude == -45.0
-    assert updated.company_id == 3250
+    assert updated.company_id == ID(3250)
 
 
 def test_delete_site_success(client, connector) -> None:
@@ -116,7 +117,7 @@ def test_delete_site_success(client, connector) -> None:
     connector.response_code = HTTPStatus.NO_CONTENT
 
     # when
-    site_id = 42
+    site_id = ID(42)
     delete_successful = client.sites.delete(site_id)
 
     # then request properly formed
