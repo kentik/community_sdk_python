@@ -1,4 +1,4 @@
-from kentik_api.commands.cmd import Cmd
+from kentik_api.throttling.cmd import Cmd
 
 
 class _TestCalculator:

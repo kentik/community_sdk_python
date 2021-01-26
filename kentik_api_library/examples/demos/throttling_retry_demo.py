@@ -1,7 +1,5 @@
-import time
 from typing import Any, List
 
-from kentik_api.commands.cmd import Cmd
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_connection.api_call_response import APICallResponse
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
@@ -38,38 +36,40 @@ class WithErrorHandling:
 
         response = self._connector.send(api_call=api_call, payload=payload)
         if response.http_status_code == 429:
-            raise RequestLimitExceededError()
+            raise RequestLimitExceededError(response.text)
         return response
-
-
-def retry(cmd: Cmd, num_retries: int, delay_seconds: float) -> Any:
-    """ Retry executing "cmd" for a maximum of "num_retries" times if RequestLimitExceededError occurs """
-
-    last_error: Exception
-    for _ in range(num_retries):
-        try:
-            result = cmd.execute()
-            print("cmd execution success!")
-            return result
-        except RequestLimitExceededError as err:
-            print(f"cmd execution failed with RequestLimitExceededError. Retrying in {delay_seconds} seconds...")
-            last_error = err
-            time.sleep(delay_seconds)
-
-    print(f"cmd execution failed. Giving up after {num_retries} retries")
-    raise last_error
 
 
 def get_connector() -> APIConnectorProtocol:
     """ Returns error-aware connector with http responses preconfigured for demo purposes """
 
     conn = StubAPIConnector()
+
+    # first succcessful attempt
     conn.append_response(code=200, body=query_chart_response_body)
-    conn.append_response(code=429, body="")
-    conn.append_response(code=429, body="")
-    conn.append_response(code=429, body="")
-    conn.append_response(code=429, body="")
-    conn.append_response(code=429, body="")
+
+    # second, failed attempt
+    conn.append_response(code=429, body="too many requests")
+
+    # active waiting retry 5 times
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=200, body=query_chart_response_body)
+
+    # background queue retry 5 times
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=200, body=query_chart_response_body)
+
+    # one more run in case of repeat is wanted
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
+    conn.append_response(code=429, body="too many requests")
     conn.append_response(code=200, body=query_chart_response_body)
     return WithErrorHandling(conn)
 
