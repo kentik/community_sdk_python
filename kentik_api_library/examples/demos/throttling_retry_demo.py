@@ -1,77 +1,37 @@
-from typing import Any, List
-
-from kentik_api.api_calls.api_call import APICall
-from kentik_api.api_connection.api_call_response import APICallResponse
-from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+import httpretty
 
 
-class StubAPIConnector:
-    """ StubAPIConnector implements APIConnectorProtocol. Allows for stubbed responses for api requests. """
+def run_stub_api_server() -> None:
+    """ run stub server that will return pre-configured responses for demo purposes """
 
-    def __init__(self) -> None:
-        self._responses: List[APICallResponse] = []
+    URL = "http://www.stub-kentikapi-server.mm/query/topXchart"
 
-    def append_response(self, code: int, body: str) -> None:
-        response = APICallResponse(http_status_code=code, text=body)
-        self._responses.append(response)
-
-    def send(self, api_call: APICall, payload: Any = None) -> APICallResponse:
-        """ Implements APIConnectorProtocol.send """
-
-        return self._responses.pop(0)
-
-
-class RequestLimitExceededError(Exception):
-    """ Error representing HTTP 429 """
-
-
-class WithErrorHandling:
-    """ Decorator for APIConnectorProtocol that translates http error codes into exceptions """
-
-    def __init__(self, connector: APIConnectorProtocol) -> None:
-        self._connector = connector
-
-    def send(self, api_call: APICall, payload: Any = None) -> APICallResponse:
-        """ Implements APIConnectorProtocol.send """
-
-        response = self._connector.send(api_call=api_call, payload=payload)
-        if response.http_status_code == 429:
-            raise RequestLimitExceededError(response.text)
-        return response
-
-
-def get_connector() -> APIConnectorProtocol:
-    """ Returns error-aware connector with http responses preconfigured for demo purposes """
-
-    conn = StubAPIConnector()
-
-    # first succcessful attempt
-    conn.append_response(code=200, body=query_chart_response_body)
-
-    # second, failed attempt
-    conn.append_response(code=429, body="too many requests")
-
-    # active waiting retry 5 times
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=200, body=query_chart_response_body)
-
-    # background queue retry 5 times
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=200, body=query_chart_response_body)
-
-    # one more run in case of repeat is wanted
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=429, body="too many requests")
-    conn.append_response(code=200, body=query_chart_response_body)
-    return WithErrorHandling(conn)
+    responses = [
+        # first succcessful attempt
+        httpretty.Response(status=200, body=query_chart_response_body),
+        # second, failed attempt
+        httpretty.Response(status=429, body="too many requests"),
+        # active waiting - retry 5 times
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=200, body=query_chart_response_body),
+        # background queue - retry 5 times
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=200, body=query_chart_response_body),
+        # one more run in case of repeat is wanted
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=429, body="too many requests"),
+        httpretty.Response(status=200, body=query_chart_response_body),
+    ]
+    httpretty.register_uri(method=httpretty.POST, uri=URL, responses=responses)
+    httpretty.enable()
 
 
 # Real query chart response body from KentikAPI

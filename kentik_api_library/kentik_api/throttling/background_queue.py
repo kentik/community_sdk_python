@@ -4,6 +4,7 @@ from threading import Thread
 from typing import Callable, Any
 from dataclasses import dataclass
 
+from kentik_api.public.errors import IntermittentError
 from kentik_api.throttling.cmd import Cmd
 
 
@@ -28,7 +29,7 @@ class BackgroundCmdQueue:
 
     def __init__(self, retry_delay_seconds: float = 5.0) -> None:
         self._queue: "Queue[BackgroundCmd]" = Queue()
-        self._retry_delay = retry_delay_seconds
+        self._retry_delay_seconds = retry_delay_seconds
         Thread(target=self._worker, daemon=True).start()
 
     def put(self, cmd: Cmd, num_attempts: int = 1, on_success: SuccessFunc = nop, on_abort: AbortFunc = nop) -> None:
@@ -52,11 +53,11 @@ class BackgroundCmdQueue:
             item = self._queue.get()
             result = item.cmd.execute()
             item.success(result)
-        except Exception as err:
+        except IntermittentError as err:
             item.num_attempts_left -= 1
             if item.num_attempts_left > 0:
                 self._queue.put(item)
-                time.sleep(self._retry_delay)
+                time.sleep(self._retry_delay_seconds)
             else:
                 item.abort(err)
         finally:

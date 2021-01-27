@@ -1,9 +1,10 @@
 from unittest.mock import create_autospec, Mock
 
+from kentik_api.public.errors import IntermittentError
 from kentik_api.throttling.cmd import Cmd
 from kentik_api.throttling.background_queue import BackgroundCmdQueue
 
-FAIL = Exception("command failed")
+FAIL = IntermittentError("fail, try again")
 SUCCESS = "expected_cmd_call_result"
 
 
