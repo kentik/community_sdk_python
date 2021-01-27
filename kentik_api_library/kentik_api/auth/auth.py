@@ -2,7 +2,7 @@
 from requests.auth import AuthBase
 
 AUTH_EMAIL_KEY: str = "X-CH-Auth-Email"
-AUT_API_TOKEN_KEY: str = "X-CH-Auth-API-Token"
+AUTH_API_TOKEN_KEY: str = "X-CH-Auth-API-Token"
 
 
 class KentikAuth(AuthBase):
@@ -15,5 +15,5 @@ class KentikAuth(AuthBase):
     def __call__(self, r):
         # modify and return the request
         r.headers[AUTH_EMAIL_KEY] = self.auth_email
-        r.headers[AUT_API_TOKEN_KEY] = self.auth_token
+        r.headers[AUTH_API_TOKEN_KEY] = self.auth_token
         return r

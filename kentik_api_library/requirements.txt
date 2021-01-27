@@ -27,3 +27,4 @@ wrapt==1.12.1
 pytest-pylint==0.18.0
 mypy==0.790
 dacite>=1.6.0
+httpretty==1.0.5
