@@ -70,7 +70,7 @@ class NotFoundError(ProtocolError):
     It is raised on HTTP 404 Not Found API response."""
 
 
-class RateLimitExceededError(ProtocolError):
+class RateLimitExceededError(ProtocolError, IntermittentError):
     """RateLimitExceededError is raised when the user has sent too many requests in a given amount of time.
     It is raised on HTTP 429 Too Many Requests API response."""
 
@@ -79,6 +79,6 @@ class TimedOutError(IntermittentError):
     """TimedOutError is raised when there has been a request time out."""
 
 
-class UnavailabilityError(ProtocolError):
+class UnavailabilityError(ProtocolError, IntermittentError):
     """UnavailabilityError is raised when the Kentik API is unavailable.
     It is raised on HTTP 503 Service Unavailable and 504 Gateway Timeout API responses"""
