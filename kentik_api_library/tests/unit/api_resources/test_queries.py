@@ -16,16 +16,65 @@ from kentik_api.public.query_object import (
     ChartViewType,
     TimeFormat,
 )
+from kentik_api.public.query_sql import SQLQuery
 from tests.unit.stub_api_connector import StubAPIConnector
 
 
 def test_query_sql_success() -> None:
     # given
+    sql_query = """
+        SELECT i_start_time,
+        round(sum(in_pkts)/(3600)/1000) AS f_sum_in_pkts,
+        round(sum(in_bytes)/(3600)/1000)*8 AS f_sum_in_bytes
+        FROM all_devices
+        WHERE ctimestamp > 3660 AND ctimestamp < 60
+        GROUP by i_start_time
+        ORDER by i_start_time DESC
+        LIMIT 1000;"""
+    query_response_payload = """
+    {
+        "rows": [
+            {
+                "f_sum_in_bytes": 10,
+                "f_sum_in_pkts": 20,
+                "i_start_time": "2021-01-25T11:39:00Z"
+            },
+            {
+                "f_sum_in_bytes": 50,
+                "f_sum_in_pkts": 60,
+                "i_start_time": "2021-01-25T11:38:00Z"
+            },
+            {
+                "f_sum_in_bytes": 80,
+                "f_sum_in_pkts": 90,
+                "i_start_time": "2021-01-25T11:37:00Z"
+            }
+        ]
+    }"""
 
     # when
+    connector = StubAPIConnector(query_response_payload, HTTPStatus.OK)
+    query_api = QueryAPI(connector)
+    query = SQLQuery(query=sql_query)
+    result = query_api.sql(query=query)
 
-    # then
-    pass
+    # then request properly formed
+    assert connector.last_url_path == "/query/sql"
+    assert connector.last_method == APICallMethods.POST
+    assert connector.last_payload is not None
+    assert connector.last_payload["query"] == sql_query
+
+    # and response properly parsed
+    assert len(result.rows) == 3
+    assert result.rows[0]["f_sum_in_bytes"] == 10
+    assert result.rows[0]["f_sum_in_pkts"] == 20
+    assert result.rows[0]["i_start_time"] == "2021-01-25T11:39:00Z"
+    assert result.rows[1]["f_sum_in_bytes"] == 50
+    assert result.rows[1]["f_sum_in_pkts"] == 60
+    assert result.rows[1]["i_start_time"] == "2021-01-25T11:38:00Z"
+    assert result.rows[2]["f_sum_in_bytes"] == 80
+    assert result.rows[2]["f_sum_in_pkts"] == 90
+    assert result.rows[2]["i_start_time"] == "2021-01-25T11:37:00Z"
 
 
 def test_query_data_success() -> None:

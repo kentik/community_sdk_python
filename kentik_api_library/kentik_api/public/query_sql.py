@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import List, Dict
 
 
 @dataclass
@@ -10,7 +10,7 @@ class SQLQuery:
 
 @dataclass
 class SQLQueryResult:
-    rows: Sequence[Mapping]
+    rows: List[Dict]
 
     @classmethod
     def from_json(cls, json_string):
