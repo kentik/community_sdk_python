@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import json
 from typing import Optional, Dict, List, Any
 
+from kentik_api.requests_payload.conversions import convert, convert_or_none
+from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 
 # pylint: disable=too-many-instance-attributes
@@ -26,14 +28,14 @@ class GetResponse:
     def to_saved_filter(self) -> SavedFilter:
         filters_obj = self._to_filters(self.filters)
         return SavedFilter(
-            cdate=self.cdate,
-            company_id=int(self.company_id),
-            edate=self.edate,
+            company_id=convert(self.company_id, ID),
+            created_date=self.cdate,
+            updated_date=self.edate,
             filter_description=self.filter_description,
             filter_level=self.filter_level,
             filter_name=self.filter_name,
             filters=filters_obj,
-            id=int(self.id),
+            id=convert(self.id, ID),
         )
 
     def _to_filters(self, dic) -> Filters:
@@ -51,7 +53,7 @@ class GetResponse:
             connector=dic["connector"],
             filterString=dic.get("filterString"),
             filters=filters,
-            id=dic.get("id"),
+            id=convert_or_none(dic.get("id"), ID),
             metric=dic.get("metric"),
             not_=bool(dic["not"]),
         )
@@ -61,7 +63,7 @@ class GetResponse:
             filterField=dic["filterField"],
             filterValue=dic["filterValue"],
             operator=dic["operator"],
-            id=dic.get("id"),
+            id=convert_or_none(dic.get("id"), ID),
         )
 
 

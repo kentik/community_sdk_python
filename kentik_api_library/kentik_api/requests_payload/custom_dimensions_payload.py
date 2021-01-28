@@ -2,7 +2,9 @@ import json
 from typing import List, Any
 from dataclasses import dataclass
 
+from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import CustomDimension
+from kentik_api.requests_payload.conversions import convert
 from kentik_api.requests_payload.populators_payload import PopulatorArray
 
 
@@ -27,8 +29,8 @@ class GetResponse:
             display_name=self.display_name,
             type=self.type,
             populators=self.populators.to_populators(),
-            id=self.id,
-            company_id=self.company_id,
+            id=convert(self.id, ID),
+            company_id=convert(self.company_id, ID),
         )
 
 

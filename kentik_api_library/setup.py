@@ -74,7 +74,7 @@ class MypyCmd(distutils.cmd.Command):
 
     def initialize_options(self):
         """Set default values for option packages"""
-        self.packages = ["kentik_api", "tests/component", "examples"]
+        self.packages = ["kentik_api", "tests", "examples"]
 
     def finalize_options(self):
         """Post-process options."""

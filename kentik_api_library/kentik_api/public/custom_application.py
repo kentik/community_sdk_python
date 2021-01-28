@@ -1,5 +1,7 @@
 from typing import Optional
 
+from kentik_api.public.types import ID
+
 # pylint: disable=too-many-instance-attributes
 
 
@@ -13,11 +15,11 @@ class CustomApplication:
         protocol: Optional[str] = None,
         port: Optional[str] = None,
         asn: Optional[str] = None,
-        id: Optional[int] = None,
-        company_id: Optional[str] = None,
-        user_id: Optional[str] = None,
-        cdate: Optional[str] = None,
-        edate: Optional[str] = None,
+        id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
+        user_id: Optional[ID] = None,
+        created_date: Optional[str] = None,
+        updated_date: Optional[str] = None,
     ) -> None:
         # read-write
         self.name = name
@@ -31,31 +33,31 @@ class CustomApplication:
         self._id = id
         self._company_id = company_id
         self._user_id = user_id
-        self._cdate = cdate
-        self._edate = edate
+        self._created_date = created_date
+        self._updated_date = updated_date
 
     # pylint: disable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id
 
     @property
-    def user_id(self) -> Optional[str]:
+    def user_id(self) -> Optional[ID]:
         return self._user_id
 
     @property
-    def cdate(self) -> Optional[str]:
-        return self._cdate
+    def created_date(self) -> Optional[str]:
+        return self._created_date
 
     @property
-    def edate(self) -> Optional[str]:
-        return self._edate
+    def updated_date(self) -> Optional[str]:
+        return self._updated_date
 
 
 # pylint: enable=too-many-instance-attributes

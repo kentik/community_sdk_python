@@ -8,7 +8,7 @@ from .custom_dimension import CustomDimension, Populator
 from .custom_application import CustomApplication
 from .plan import Plan, PlanDevice, PlanDeviceType
 from .batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
-from .manual_mitigation import ManualMitigation
+from .manual_mitigation import ManualMitigation, Alarm, HistoricalAlert, AlertFilter
 from .query_sql import SQLQuery
 from .query_object import (
     QueryObject,
@@ -33,4 +33,8 @@ from .device import (
     DeviceSubtype,
     SNMPv3Conf,
     AppliedLabels,
+    Interface,
+    TopNextHopASN,
+    SecondaryIP,
+    VRFAttributes,
 )

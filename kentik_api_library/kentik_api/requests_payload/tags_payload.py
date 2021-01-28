@@ -2,6 +2,8 @@ import json
 from typing import Optional, List
 from dataclasses import dataclass
 
+from kentik_api.requests_payload.conversions import convert
+from kentik_api.public.types import ID
 from kentik_api.public.tag import Tag
 
 # pylint: disable=too-many-instance-attributes
@@ -59,7 +61,7 @@ class _ResponseTag:
     id: int
     company_id: str
     addr_count: int
-    user: str
+    user: str  # this is actually ID of user that created the tag
     mac_count: int
     edited_by: str
     created_date: str
@@ -164,10 +166,10 @@ class GetResponse:
             mac=self.tag.mac,
             country=self.tag.country,
             vlans=self.tag.vlans,
-            id=self.tag.id,
-            company_id=self.tag.company_id,
+            id=convert(self.tag.id, ID),
+            company_id=convert(self.tag.company_id, ID),
             addr_count=self.tag.addr_count,
-            user=self.tag.user,
+            user_id=convert(self.tag.user, ID),
             mac_count=self.tag.mac_count,
             edited_by=self.tag.edited_by,
             created_date=self.tag.created_date,

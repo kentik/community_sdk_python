@@ -4,6 +4,8 @@ from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
 
 # Local imports
+from kentik_api.requests_payload.conversions import convert
+from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel, DeviceItem
 
 
@@ -16,7 +18,10 @@ class _Device:
 
     def to_device_item(self) -> DeviceItem:
         return DeviceItem(
-            id=self.id, device_name=self.device_name, device_subtype=self.device_subtype, device_type=self.device_type
+            id=convert(self.id, ID),
+            device_name=self.device_name,
+            device_subtype=self.device_subtype,
+            device_type=self.device_type,
         )
 
 
@@ -56,14 +61,14 @@ class GetResponse:
 
     def to_device_label(self) -> DeviceLabel:
         return DeviceLabel(
-            self.name,
-            self.color,
-            self.id,
-            self.user_id,
-            self.company_id,
-            self.devices.to_device_items(),
-            self.created_date,
-            self.updated_date,
+            name=self.name,
+            color=self.color,
+            id=convert(self.id, ID),
+            user_id=convert(self.user_id, ID),
+            company_id=convert(self.company_id, ID),
+            devices=self.devices.to_device_items(),
+            created_date=self.created_date,
+            updated_date=self.updated_date,
         )
 
 

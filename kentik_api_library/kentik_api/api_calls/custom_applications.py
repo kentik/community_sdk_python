@@ -1,6 +1,6 @@
 # Local application imports
 from kentik_api.api_calls.api_call_decorators import get, post, put, delete, payload_type
-from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call import APICall, ResourceID
 
 
 @get
@@ -20,7 +20,7 @@ def create_custom_application() -> APICall:
 
 @put
 @payload_type(dict)
-def update_custom_application(custom_application_id: int) -> APICall:
+def update_custom_application(custom_application_id: ResourceID) -> APICall:
     """Updates and returns a customApplication object containing
     information about an individual customApplication"""
     url_path = f"/customApplications/{custom_application_id}"
@@ -28,7 +28,7 @@ def update_custom_application(custom_application_id: int) -> APICall:
 
 
 @delete
-def delete_custom_application(custom_application_id: int) -> APICall:
+def delete_custom_application(custom_application_id: ResourceID) -> APICall:
     """Deletes a customApplication."""
     url_path = f"/customApplications/{custom_application_id}"
     return APICall(url_path)

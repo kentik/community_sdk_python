@@ -12,12 +12,12 @@ class UsersAPI(BaseAPI):
 
     def get_all(self) -> List[User]:
         api_call = users.get_users()
-        response = self._send(api_call)
+        response = self.send(api_call)
         return users_payload.GetAllResponse.from_json(response.text).to_users()
 
     def get(self, user_id: int) -> User:
         api_call = users.get_user_info(user_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return users_payload.GetResponse.from_json(response.text).to_user()
 
     def create(self, user: User) -> User:
@@ -37,7 +37,7 @@ class UsersAPI(BaseAPI):
             email_service=user.email_service,
             email_product=user.email_product,
         )
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return users_payload.CreateResponse.from_json(response.text).to_user()
 
     def update(self, user: User) -> User:
@@ -52,10 +52,10 @@ class UsersAPI(BaseAPI):
             email_service=user.email_service,
             email_product=user.email_product,
         )
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return users_payload.UpdateResponse.from_json(response.text).to_user()
 
     def delete(self, user_id: int) -> bool:
         api_call = users.delete_user(user_id)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT

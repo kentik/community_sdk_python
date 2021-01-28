@@ -1,7 +1,6 @@
-import json
 from typing import Optional, List
 from dataclasses import dataclass
-from dacite import from_dict
+from kentik_api.requests_payload.conversions import from_dict, from_json
 
 
 @dataclass()
@@ -37,7 +36,7 @@ class BatchResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(class_name=cls.__name__, json_string=json_string)
         return cls(**dic)
 
 
@@ -93,5 +92,5 @@ class BatchStatusResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(class_name=cls.__name__, json_string=json_string)
         return from_dict(data_class=cls, data=dic)

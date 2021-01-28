@@ -2,6 +2,8 @@ import json
 from typing import Optional, List
 from dataclasses import dataclass
 
+from kentik_api.requests_payload.conversions import convert
+from kentik_api.public.types import ID
 from kentik_api.public.custom_application import CustomApplication
 
 # pylint: disable=too-many-instance-attributes
@@ -34,11 +36,11 @@ class GetResponse:
             protocol=self.protocol,
             port=self.port,
             asn=self.asn,
-            id=self.id,
-            company_id=self.company_id,
-            user_id=self.user_id,
-            cdate=self.cdate,
-            edate=self.edate,
+            id=convert(self.id, ID),
+            company_id=convert(self.company_id, ID),
+            user_id=convert(self.user_id, ID),
+            created_date=self.cdate,
+            updated_date=self.edate,
         )
 
 

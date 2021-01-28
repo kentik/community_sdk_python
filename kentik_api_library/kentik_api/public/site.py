@@ -1,5 +1,7 @@
 from typing import Optional
 
+from kentik_api.public.types import ID
+
 
 class Site:
     # pylint: disable=too-many-arguments
@@ -8,8 +10,8 @@ class Site:
         site_name: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        id: Optional[int] = None,
-        company_id: Optional[str] = None,
+        id: Optional[ID] = None,
+        company_id: Optional[ID] = None,
     ) -> None:
         # read-write
         self.site_name = site_name
@@ -23,10 +25,10 @@ class Site:
     # pylint: enable=too-many-arguments
 
     @property
-    def id(self) -> int:
+    def id(self) -> ID:
         assert self._id is not None
         return self._id
 
     @property
-    def company_id(self) -> Optional[str]:
+    def company_id(self) -> Optional[ID]:
         return self._company_id

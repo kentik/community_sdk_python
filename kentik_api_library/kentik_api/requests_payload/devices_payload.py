@@ -1,8 +1,19 @@
-import json
 from typing import List, Dict, Optional, Any
-from dataclasses import dataclass, field
-
-
+from dataclasses import dataclass
+from kentik_api.public.types import ID
+from kentik_api.public.device_label import DeviceLabel
+from kentik_api.public.errors import IncompleteObjectError
+from kentik_api.public.site import Site
+from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResponse
+from kentik_api.requests_payload.validation import validate_fields
+from kentik_api.requests_payload.conversions import (
+    from_dict,
+    from_json,
+    convert,
+    convert_or_none,
+    convert_list_or_none,
+    enum_to_str,
+)
 from kentik_api.public.device import (
     Device,
     DeviceType,
@@ -12,17 +23,17 @@ from kentik_api.public.device import (
     PrivacyProtocol,
     AuthenticationProtocol,
     CDNAttribute,
+    AllInterfaces,
     AppliedLabels,
 )
-from kentik_api.public.device_label import DeviceLabel
-from kentik_api.requests_payload.sites_payload import GetResponse as SiteGetResponse
-from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResponse
 
 # pylint: disable=too-many-instance-attributes
 
 
 @dataclass
-class _SNMPv3Conf:
+class SNMPv3ConfPayload:
+    """ This datastructure represents JSON Device.SNMPv3Conf payload as it is transmitted to and from KentikAPI """
+
     UserName: str
     AuthenticationProtocol: Optional[str] = None
     AuthenticationPassphrase: Optional[str] = None
@@ -31,77 +42,127 @@ class _SNMPv3Conf:
 
     @classmethod
     def from_dict(cls, dic: Dict[str, Any]):
-        return cls(**dic)
+        return from_dict(data_class=cls, data=dic)
 
     @classmethod
     def from_conf(cls, conf: SNMPv3Conf):
-        auth_proto = conf.authentication_protocol.value if conf.authentication_protocol is not None else None
-        priv_proto = conf.privacy_protocol.value if conf.privacy_protocol is not None else None
         return cls(
             UserName=conf.user_name,
-            AuthenticationProtocol=auth_proto,
+            AuthenticationProtocol=convert_or_none(conf.authentication_protocol, enum_to_str),
             AuthenticationPassphrase=conf.authentication_passphrase,
-            PrivacyProtocol=priv_proto,
+            PrivacyProtocol=convert_or_none(conf.privacy_protocol, enum_to_str),
             PrivacyPassphrase=conf.privacy_passphrase,
         )
 
     def to_conf(self) -> SNMPv3Conf:
-        auth_proto = (
-            AuthenticationProtocol(self.AuthenticationProtocol) if self.AuthenticationProtocol is not None else None
-        )
-        priv_proto = PrivacyProtocol(self.PrivacyProtocol) if self.PrivacyProtocol is not None else None
         return SNMPv3Conf(
             user_name=self.UserName,
-            authentication_protocol=auth_proto,
+            authentication_protocol=convert_or_none(self.AuthenticationProtocol, AuthenticationProtocol),
             authentication_passphrase=self.AuthenticationPassphrase,
-            privacy_protocol=priv_proto,
+            privacy_protocol=convert_or_none(self.PrivacyProtocol, PrivacyProtocol),
             privacy_passphrase=self.PrivacyPassphrase,
         )
 
 
 @dataclass
-class _Label:
-    label: Dict[str, Any]
+class LabelPayload:
+    """ This datastructure represents JSON Device.Label payload as it is transmitted to and from KentikAPI """
+
+    id: int
+    color: str
+    name: str
+    user_id: str
+    company_id: str
+    cdate: str
+    edate: str
 
     @classmethod
     def from_dict(cls, dic: Dict[str, Any]):
-        return cls(label=dic)
+        return from_dict(data_class=cls, data=dic)
 
-    def to_label(self) -> DeviceLabel:
-        label_dict = self.label
-
-        label = DeviceLabel(
-            id=int(label_dict["id"]),
-            color=label_dict["color"],
-            name=label_dict["name"],
-            user_id=label_dict["user_id"],
-            company_id=label_dict["company_id"],
-            created_date=label_dict["cdate"],
-            updated_date=label_dict["edate"],
+    def to_device_label(self) -> DeviceLabel:
+        return DeviceLabel(
+            id=convert(self.id, ID),
+            color=self.color,
+            name=self.name,
+            user_id=convert(self.user_id, ID),
+            company_id=convert(self.company_id, ID),
+            created_date=self.cdate,
+            updated_date=self.edate,
             devices=None,
         )
-        return label
 
 
-@dataclass()
-class GetResponse:
-    # reguired fields
+@dataclass
+class SitePayload:
+    """ This datastructure represents JSON Device.Site payload as it is transmitted to and from KentikAPI """
+
     id: int
-    plan: PlanGetResponse
-    site: SiteGetResponse
-    device_name: str
-    device_type: str
-    device_subtype: str
-    device_sample_rate: int
-    sending_ips: List[str]
-    labels: List[_Label] = field(default_factory=list)
-    all_interfaces: List[Any] = field(default_factory=list)
-    # optional fields
+    site_name: Optional[str]
+    lat: Optional[float]
+    lon: Optional[float]
+    company_id: Optional[int]
+
+    @classmethod
+    def from_dict(cls, dic: Dict[str, Any]):
+        return from_dict(data_class=cls, data=dic)
+
+    def to_site(self) -> Site:
+        return Site(
+            site_name=self.site_name,
+            latitude=self.lat,
+            longitude=self.lon,
+            id=convert(self.id, ID),
+            company_id=convert_or_none(self.company_id, ID),
+        )
+
+
+PlanPayload = PlanGetResponse  # Plan payload is same as in Plans API
+
+
+@dataclass
+class AllInterfacesPayload:
+    """ This datastructure represents JSON Device.AllInterfaces payload as it is transmitted from KentikAPI """
+
+    device_id: str
+    snmp_speed: str
+    interface_description: str
+    initial_snmp_speed: Optional[str]
+
+    @classmethod
+    def from_dict(cls, dic: Dict[str, Any]):
+        return from_dict(data_class=cls, data=dic)
+
+    def to_all_interfaces(self) -> AllInterfaces:
+        return AllInterfaces(
+            device_id=convert(self.device_id, ID),
+            snmp_speed=convert(self.snmp_speed, int),
+            interface_description=self.interface_description,
+            initial_snmp_speed=convert_or_none(self.initial_snmp_speed, int),
+        )
+
+
+@dataclass
+class DevicePayload:
+    """ This datastructure represents JSON Device payload as it is transmitted to and from KentikAPI """
+
+    device_name: Optional[str] = None
+    device_type: Optional[str] = None
+    device_subtype: Optional[str] = None
+    device_sample_rate: Optional[int] = None
+    sending_ips: Optional[List[str]] = None
+    id: Optional[str] = None
+    plan: Optional[PlanPayload] = None
+    site: Optional[SitePayload] = None
+    plan_id: Optional[int] = None
+    site_id: Optional[int] = None
+    labels: Optional[List[LabelPayload]] = None
+    all_interfaces: Optional[List[AllInterfacesPayload]] = None
     cdn_attr: Optional[str] = None
     device_description: Optional[str] = None
     device_snmp_ip: Optional[str] = None
     device_snmp_community: Optional[str] = None
-    device_snmp_v3_conf: Optional[_SNMPv3Conf] = None
+    device_snmp_v3_conf: Optional[SNMPv3ConfPayload] = None
     minimize_snmp: Optional[bool] = None
     device_bgp_type: Optional[str] = None
     device_bgp_neighbor_ip: Optional[str] = None
@@ -120,33 +181,42 @@ class GetResponse:
     bgpPeerIP6: Optional[str] = None
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = json.loads(json_string)["device"]
-        return cls.from_dict(dic)
-
-    @classmethod
     def from_dict(cls, dic: Dict[str, Any]):
-        snmp_v3_conf = (
-            _SNMPv3Conf.from_dict(dic["device_snmp_v3_conf"]) if attr_provided("device_snmp_v3_conf", dic) else None
-        )
-        site = SiteGetResponse.from_fields(**dic["site"]) if attr_provided("site", dic) else None
-        labels = [_Label.from_dict(d) for d in dic["labels"]]
+        required_fields = [
+            "id",
+            "company_id",
+            "device_name",
+            "device_type",
+            "device_subtype",
+            "plan",
+            "device_sample_rate",
+            "created_date",
+            "updated_date",
+        ]
+        validate_fields(class_name=cls.__name__, required_fields=required_fields, dic=dic)
+
+        # recreate GET/POST/PUT response payload: fill all available fields
         return cls(
-            id=int(dic["id"]),
-            plan=PlanGetResponse.from_dict(dic["plan"]),
-            site=site,
+            # always returned fields
+            id=dic["id"],
+            company_id=dic["company_id"],
             device_name=dic["device_name"],
             device_type=dic["device_type"],
             device_subtype=dic["device_subtype"],
+            plan=PlanPayload.from_dict(dic["plan"]),
             device_sample_rate=dic["device_sample_rate"],
-            sending_ips=dic["sending_ips"],
-            labels=labels,
-            all_interfaces=dic["all_interfaces"],
+            created_date=dic["created_date"],
+            updated_date=dic["updated_date"],
+            # optional fields
+            sending_ips=dic.get("sending_ips"),
+            site=convert_or_none(dic.get("site"), SitePayload.from_dict),
+            labels=convert_list_or_none(dic.get("labels"), LabelPayload.from_dict),
+            all_interfaces=convert_list_or_none(dic.get("all_interfaces"), AllInterfacesPayload.from_dict),
             cdn_attr=dic.get("cdn_attr"),
             device_description=dic.get("device_description"),
             device_snmp_ip=dic.get("device_snmp_ip"),
             device_snmp_community=dic.get("device_snmp_community"),
-            device_snmp_v3_conf=snmp_v3_conf,
+            device_snmp_v3_conf=convert_or_none(dic.get("device_snmp_v3_conf"), SNMPv3ConfPayload.from_dict),
             minimize_snmp=dic.get("minimize_snmp"),
             device_bgp_type=dic.get("device_bgp_type"),
             device_bgp_neighbor_ip=dic.get("device_bgp_neighbor_ip"),
@@ -157,22 +227,42 @@ class GetResponse:
             use_bgp_device_id=dic.get("use_bgp_device_id"),
             device_status=dic.get("device_status"),
             device_flow_type=dic.get("device_flow_type"),
-            company_id=dic.get("company_id"),
             snmp_last_updated=dic.get("snmp_last_updated"),
-            created_date=dic.get("created_date"),
-            updated_date=dic.get("updated_date"),
             bgpPeerIP4=dic.get("bgpPeerIP4"),
             bgpPeerIP6=dic.get("bgpPeerIP6"),
         )
 
+    @classmethod
+    def from_device(cls, device: Device):
+        # prepare POST/PUT request payload: fill only the user-provided fields
+        return cls(
+            plan_id=convert_or_none(device.plan_id, int),
+            site_id=convert_or_none(device.site_id, int),
+            device_name=device.device_name,
+            device_type=convert_or_none(device.device_type, enum_to_str),
+            device_subtype=convert_or_none(device.device_subtype, enum_to_str),
+            device_description=device.device_description,
+            device_sample_rate=device.device_sample_rate,
+            sending_ips=device.sending_ips,
+            device_snmp_ip=device.device_snmp_ip,
+            device_snmp_community=device.device_snmp_community,
+            minimize_snmp=device.minimize_snmp,
+            device_bgp_type=convert_or_none(device.device_bgp_type, enum_to_str),
+            device_bgp_neighbor_ip=device.device_bgp_neighbor_ip,
+            device_bgp_neighbor_ip6=device.device_bgp_neighbor_ip6,
+            device_bgp_neighbor_asn=device.device_bgp_neighbor_asn,
+            device_bgp_flowspec=device.device_bgp_flowspec,
+            device_bgp_password=device.device_bgp_password,
+            use_bgp_device_id=convert_or_none(device.use_bgp_device_id, int),
+            device_snmp_v3_conf=convert_or_none(device.device_snmp_v3_conf, SNMPv3ConfPayload.from_conf),
+            cdn_attr=convert_or_none(device.cdn_attr, enum_to_str),
+        )
+
     def to_device(self) -> Device:
-        snmp_v3_conf = self.device_snmp_v3_conf.to_conf() if self.device_snmp_v3_conf is not None else None
-        site = self.site.to_site() if self.site is not None else None
-        labels = [l.to_label() for l in self.labels]
         return Device(
-            id=self.id,
-            plan=self.plan.to_plan(),
-            site=site,
+            id=convert_or_none(self.id, ID),
+            plan=convert_or_none(self.plan, PlanPayload.to_plan),
+            site=convert_or_none(self.site, SitePayload.to_site),
             device_name=self.device_name,
             device_type=DeviceType(self.device_type),
             device_subtype=DeviceSubtype(self.device_subtype),
@@ -188,20 +278,38 @@ class GetResponse:
             device_bgp_neighbor_asn=self.device_bgp_neighbor_asn,
             device_bgp_flowspec=self.device_bgp_flowspec,
             device_bgp_password=self.device_bgp_password,
-            use_bgp_device_id=self.use_bgp_device_id,
+            use_bgp_device_id=convert_or_none(self.use_bgp_device_id, ID),
             device_status=self.device_status,
             device_flow_type=self.device_flow_type,
-            company_id=self.company_id,
+            company_id=convert_or_none(self.company_id, ID),
             snmp_last_updated=self.snmp_last_updated,
             created_date=self.created_date,
             updated_date=self.updated_date,
             bgp_peer_ip4=self.bgpPeerIP4,
             bgp_peer_ip6=self.bgpPeerIP6,
-            labels=labels,
-            all_interfaces=self.all_interfaces,
-            device_snmp_v3_conf=snmp_v3_conf,
-            cdn_attr=CDNAttribute(self.cdn_attr) if self.cdn_attr is not None else None,
+            labels=convert_list_or_none(self.labels, LabelPayload.to_device_label),
+            all_interfaces=convert_list_or_none(self.all_interfaces, AllInterfacesPayload.to_all_interfaces),
+            device_snmp_v3_conf=convert_or_none(self.device_snmp_v3_conf, SNMPv3ConfPayload.to_conf),
+            cdn_attr=convert_or_none(self.cdn_attr, CDNAttribute),
         )
+
+
+@dataclass
+class GetResponse:
+    device: DevicePayload
+
+    @classmethod
+    def from_json(cls, json_string):
+        # for GET response the payload json is like: "device": {...}
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="device")
+        return cls.from_dict(dic)
+
+    @classmethod
+    def from_dict(cls, dic: Dict[str, Any]):
+        return cls(device=DevicePayload.from_dict(dic))
+
+    def to_device(self) -> Device:
+        return self.device.to_device()
 
 
 @dataclass
@@ -210,118 +318,150 @@ class GetAllResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        devices = list()
-        for item in dic["devices"]:
-            d = GetResponse.from_dict(item)
-            devices.append(d)
+        dic = from_json(class_name=cls.__name__, json_string=json_string, root="devices")
+        devices = [GetResponse.from_dict(item) for item in dic]
         return cls(devices=devices)
 
     def to_devices(self) -> List[Device]:
-        return [d.to_device() for d in self.devices]
-
-
-@dataclass
-class _RequestDevice:
-    plan_id: Optional[int] = None
-    site_id: Optional[int] = None
-    device_name: Optional[str] = None
-    device_type: Optional[DeviceType] = None
-    device_subtype: Optional[DeviceSubtype] = None
-    device_description: Optional[str] = None
-    device_sample_rate: Optional[int] = None
-    sending_ips: List[str] = field(default_factory=list)
-    device_snmp_ip: Optional[str] = None
-    device_snmp_community: Optional[str] = None
-    minimize_snmp: Optional[bool] = None
-    device_bgp_type: Optional[DeviceBGPType] = None
-    device_bgp_neighbor_ip: Optional[str] = None
-    device_bgp_neighbor_ip6: Optional[str] = None
-    device_bgp_neighbor_asn: Optional[str] = None
-    device_bgp_flowspec: Optional[bool] = None
-    device_bgp_password: Optional[str] = None
-    use_bgp_device_id: Optional[int] = None
-    device_snmp_v3_conf: Optional[_SNMPv3Conf] = None
-    cdn_attr: Optional[CDNAttribute] = None
-
-    @classmethod
-    def from_device(cls, device: Device):
-        snmp_v3_conf = (
-            _SNMPv3Conf.from_conf(device.device_snmp_v3_conf) if device.device_snmp_v3_conf is not None else None
-        )
-        return cls(
-            plan_id=device.plan_id,
-            site_id=device.site_id,
-            device_name=device.device_name,
-            device_type=device.device_type,
-            device_subtype=device.device_subtype,
-            device_description=device.device_description,
-            device_sample_rate=device.device_sample_rate,
-            sending_ips=device.sending_ips,
-            device_snmp_ip=device.device_snmp_ip,
-            device_snmp_community=device.device_snmp_community,
-            minimize_snmp=device.minimize_snmp,
-            device_bgp_type=device.device_bgp_type,
-            device_bgp_neighbor_ip=device.device_bgp_neighbor_ip,
-            device_bgp_neighbor_ip6=device.device_bgp_neighbor_ip6,
-            device_bgp_neighbor_asn=device.device_bgp_neighbor_asn,
-            device_bgp_flowspec=device.device_bgp_flowspec,
-            device_bgp_password=device.device_bgp_password,
-            use_bgp_device_id=device.use_bgp_device_id,
-            device_snmp_v3_conf=snmp_v3_conf,
-            cdn_attr=device.cdn_attr,
-        )
+        return [item.to_device() for item in self.devices]
 
 
 @dataclass
 class CreateRequest:
-    device: _RequestDevice  # request device object is provided under key "device"
+    device: DevicePayload  # request device object is provided under key "device"
 
     @classmethod
     def from_device(cls, device: Device):
-        return cls(device=_RequestDevice.from_device(device))
+        CreateRequest.validate(device)
+        return cls(device=DevicePayload.from_device(device))
+
+    @staticmethod
+    def validate(device: Device) -> None:
+        class_op = "Create Device"
+        if device.device_name is None:
+            raise IncompleteObjectError(class_op, "device_name is required")
+        if device.device_subtype is None:
+            raise IncompleteObjectError(class_op, "device_subtype is required")
+        if device.device_sample_rate is None:
+            raise IncompleteObjectError(class_op, "device_sample_rate is required")
+
+        validate_device_bgp_snmp_conf(device, class_op)
+
+
+@dataclass
+class UpdateRequest:
+    device: DevicePayload  # request device object is provided under key "device"
+
+    @classmethod
+    def from_device(cls, device: Device):
+        UpdateRequest.validate(device)
+        return cls(device=DevicePayload.from_device(device))
+
+    @staticmethod
+    def validate(device: Device) -> None:
+        class_op = "Update Device"
+        validate_device_bgp_snmp_conf(device, class_op)
+
+
+def validate_device_bgp_snmp_conf(device: Device, class_op: str) -> None:
+    """ Common validations for CreateRequest and UpdateRequest """
+
+    # device-specific
+    if device.device_type == DeviceType.router:
+        if device.sending_ips == []:
+            raise IncompleteObjectError(class_op, "for device_type=router, sending_ips is required")
+        if device.minimize_snmp is None:
+            raise IncompleteObjectError(class_op, "for device_type=router, minimize_snmp is required")
+    elif device.device_type == DeviceType.host_nprobe_dns_www:
+        if device.cdn_attr is None:
+            raise IncompleteObjectError(class_op, "for device_type=host_nprobe_dns_www, cdn_attr is required")
+
+    # bgp-specific
+    if device.device_bgp_type == DeviceBGPType.device:
+        if device.device_bgp_neighbor_asn is None:
+            raise IncompleteObjectError(class_op, "for device_bgp_type=device, device_bgp_neighbor_asn is required")
+        if device.device_bgp_neighbor_ip is None and device.device_bgp_neighbor_ip6 is None:
+            raise IncompleteObjectError(
+                class_op,
+                "for device_bgp_type=device, either device_bgp_neighbor_ip or device_bgp_neighbor_ip6 is required",
+            )
+    elif device.device_bgp_type == DeviceBGPType.other_device:
+        if device.use_bgp_device_id is None:
+            raise IncompleteObjectError(class_op, "for device_bgp_type=other_device, use_bgp_device_id is required")
+
+    # snmp-specific
+    if device.device_snmp_v3_conf is not None:
+        if device.device_snmp_v3_conf.user_name is None:
+            raise IncompleteObjectError(class_op, "for specified device_snmp_v3_conf, user_name is required")
+        if (
+            device.device_snmp_v3_conf.authentication_protocol != AuthenticationProtocol.no_auth
+            and device.device_snmp_v3_conf.authentication_passphrase == ""
+        ):
+            raise IncompleteObjectError(
+                class_op,
+                "for device_snmp_v3_conf.authentication_protocol != no_auth, authentication_passphrase is required",
+            )
+        if (
+            device.device_snmp_v3_conf.privacy_protocol != PrivacyProtocol.no_priv
+            and device.device_snmp_v3_conf.privacy_passphrase == ""
+        ):
+            raise IncompleteObjectError(
+                class_op,
+                "for device_snmp_v3_conf.privacy_protocol != no_priv, privacy_passphrase is required",
+            )
 
 
 CreateResponse = GetResponse
 
-UpdateRequest = CreateRequest
 UpdateResponse = GetResponse
 
 
 @dataclass
-class LabelID:
+class LabelIDPayload:
+    """ This datastructure represents JSON ApplyLabels.LabelID payload as it is transmitted to KentikAPI """
+
     id: int
 
 
 @dataclass
 class ApplyLabelsRequest:
-    labels: List[LabelID]
+    """ This datastructure represents JSON ApplyLabelsRequest payload as it is transmitted to KentikAPI """
+
+    labels: List[LabelIDPayload]
 
     @classmethod
-    def from_id_list(cls, ids: List[int]):
-        labels = [LabelID(id=label_id) for label_id in ids]
+    def from_id_list(cls, ids: List[ID]):
+        labels = [LabelIDPayload(id=convert(label_id, int)) for label_id in ids]
         return cls(labels=labels)
 
 
 @dataclass
 class ApplyLabelsResponse:
+    """ This datastructure represents JSON ApplyLabelsResponse payload as it is transmitted from KentikAPI """
+
     id: str
     device_name: str
-    labels: List[_Label]
+    labels: List[LabelPayload]
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = json.loads(json_string)
-        labels = [_Label.from_dict(d) for d in dic["labels"]]
-        return cls(id=dic["id"], device_name=dic["device_name"], labels=labels)
+        dic = from_json(class_name=cls.__name__, json_string=json_string)
+        required_fields = ["id", "device_name", "labels"]
+        validate_fields(class_name=cls.__name__, required_fields=required_fields, dic=dic)
+        labels = [LabelPayload.from_dict(item) for item in dic["labels"]]
+        return cls(
+            id=dic["id"],
+            device_name=dic["device_name"],
+            labels=labels,
+        )
 
     def to_applied_labels(self) -> AppliedLabels:
-        labels = [l.to_label() for l in self.labels]
-        return AppliedLabels(id=self.id, device_name=self.device_name, labels=labels)
+        labels = [l.to_device_label() for l in self.labels]
+        return AppliedLabels(
+            id=convert(self.id, ID),
+            device_name=self.device_name,
+            labels=labels,
+        )
 
 
 # pylint: enable=too-many-instance-attributes
-
-
-def attr_provided(attr: str, dic: Dict[str, Any]) -> bool:
-    return attr in dic and dic[attr] is not None and dic[attr] != {}

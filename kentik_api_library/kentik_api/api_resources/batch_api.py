@@ -12,7 +12,7 @@ class BatchAPI(BaseAPI):
     ) -> batch_operations_payload.BatchResponse:
         api_call = batch.flow_tags_batch_operation()
         payload = self._get_payload(operation_part)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return batch_operations_payload.BatchResponse.from_json(response.text)
 
     def batch_operation_on_populators(
@@ -20,12 +20,12 @@ class BatchAPI(BaseAPI):
     ) -> batch_operations_payload.BatchResponse:
         api_call = batch.populators_batch_operation(dimension_name)
         payload = self._get_payload(operation_part)
-        response = self._send(api_call, payload)
+        response = self.send(api_call, payload)
         return batch_operations_payload.BatchResponse.from_json(response.text)
 
     def get_status(self, batch_operation_guid: str) -> batch_operations_payload.BatchStatusResponse:
         api_call = batch.get_batch_operation_status(batch_operation_guid)
-        response = self._send(api_call)
+        response = self.send(api_call)
         return batch_operations_payload.BatchStatusResponse.from_json(response.text)
 
     @staticmethod
