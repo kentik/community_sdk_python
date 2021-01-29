@@ -1,0 +1,21 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+
+title Kentik API Proxy - Containers
+LAYOUT_LEFT_RIGHT()
+HIDE_STEREOTYPE()
+
+Boundary(shared_account, "Kentik API\nshared account") {
+    Container(user1, "User 1", "client app")
+    Container(user2, "User 2", "client app")
+    Container(user3, "User 3", "client app")
+}
+Container(proxy, "Kentik API Proxy", "GO lang", "Manages request quotas per Kentik account to mitigate throttling effects on clients")
+Rel(user1, proxy, "connects to", "https+json")
+Rel(user2, proxy, "connects to", "https+json")
+Rel(user3, proxy, "connects to", "https+json")
+
+System(kentik, "Kentik API")
+Rel(proxy, kentik, "forwards requests to", "https+json")
+@enduml

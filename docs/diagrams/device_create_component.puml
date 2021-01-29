@@ -1,0 +1,38 @@
+@startuml device_create_component
+
+title Device create 
+top to bottom direction
+
+package "kentik_api" #pink  {
+    component KentikAPI
+     note left: Kentik API client:\nthe root object
+}
+[KentikAPI] -( APIConnector: require
+
+
+package "api_resources" {
+    [DevicesAPI]
+    [UsersAPI]
+    [PlansAPI]
+}
+
+package "public" {
+    [Device]
+}
+
+package "requests_payloads" {
+    [CreateRequest]
+}
+
+package "api_calls" {
+    [create_device]
+}
+
+[KentikAPI] -DOWN--> [DevicesAPI]: expose
+[KentikAPI] -DOWN--> [PlansAPI]: expose
+[KentikAPI] -DOWN-->  [UsersAPI]: expose
+[DevicesAPI] --> [create_device]: use
+[DevicesAPI] --> [Device]: use
+[DevicesAPI] --> [CreateRequest]: use
+[CreateRequest] -> [Device]: use
+@enduml
