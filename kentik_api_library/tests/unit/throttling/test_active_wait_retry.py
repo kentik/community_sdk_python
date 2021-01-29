@@ -36,12 +36,29 @@ def test_retry_execute_cmd_3x_retry_success() -> None:
     assert result == SUCCESS
 
 
+def test_retry_execute_cmd_2x_retry_abort() -> None:
+    # given
+    cmd = create_autospec(Cmd)
+    cmd.execute.side_effect = [FAIL, FAIL, SUCCESS]
+
+    # when
+    with pytest.raises(IntermittentError) as ctx:
+        active_wait_retry(cmd=cmd, num_attempts=2, retry_delay_seconds=0.0)
+
+    # then
+    assert cmd.execute.call_count == 2
+    assert ctx.value == FAIL
+
+
 def test_retry_execute_cmd_3x_retry_abort() -> None:
     # given
     cmd = create_autospec(Cmd)
     cmd.execute.side_effect = [FAIL, FAIL, FAIL]
 
-    # when-then
-    with pytest.raises(Exception) as ctx:
+    # when
+    with pytest.raises(IntermittentError) as ctx:
         active_wait_retry(cmd=cmd, num_attempts=3, retry_delay_seconds=0.0)
-        assert ctx == FAIL
+
+    # then
+    assert cmd.execute.call_count == 3
+    assert ctx.value == FAIL

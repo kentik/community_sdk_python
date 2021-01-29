@@ -20,6 +20,7 @@ def nop(*_) -> None:
 @dataclass
 class BackgroundCmd:
     cmd: Cmd
+    num_attempts_total: int
     num_attempts_left: int  # if 3, then this cmd will be attempted 3x execution before throwing it away
     success: SuccessFunc
     abort: AbortFunc
@@ -37,6 +38,7 @@ class BackgroundCmdQueue:
     def put(self, cmd: Cmd, num_attempts: int = 1, on_success: SuccessFunc = nop, on_abort: AbortFunc = nop) -> None:
         bcmd = BackgroundCmd(
             cmd=cmd,
+            num_attempts_total=num_attempts,
             num_attempts_left=num_attempts,
             success=on_success,
             abort=on_abort,
@@ -62,7 +64,7 @@ class BackgroundCmdQueue:
                 self._queue.put(item)
                 time.sleep(self._retry_delay_seconds)
             else:
-                self._log_abort(err)
+                self._log_abort(err, item)
                 item.abort(err)
         finally:
             self._queue.task_done()
@@ -70,5 +72,5 @@ class BackgroundCmdQueue:
     def _log_retry(self, err: Exception) -> None:
         self._logger.error('request failed with "%s". Retrying in %0.2f seconds...', err, self._retry_delay_seconds)
 
-    def _log_abort(self, err: Exception) -> None:
-        self._logger.error('request failed with "%s". All attempts used. Giving up', err)
+    def _log_abort(self, err: Exception, item: BackgroundCmd) -> None:
+        self._logger.error('request failed with "%s". Giving up after %d attempts', err, item.num_attempts_total)
