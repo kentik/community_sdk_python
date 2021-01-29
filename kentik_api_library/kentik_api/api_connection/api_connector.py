@@ -27,7 +27,8 @@ PROTOCOL_HTTP = "HTTP"
 class APIConnector:
     """ APIConnector implements APIConnectorProtocol. Allows sending authorized http requests to Kentik API """
 
-    DEFAULT_HEADERS = {"Content-Type": "application/json"}
+    HEADERS = {"Content-Type": "application/json"}
+    TIMEOUT = 30.0  # request timeout in seconds. Note: QueryAPI.chart easily takes 10 seconds to respond
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str) -> None:
         self._api_url = api_url
@@ -42,29 +43,33 @@ class APIConnector:
         except requests.RequestException as e:
             raise KentikAPIError(str(e)) from e
 
+        self._log_http_roundtrip(response)
+        self._raise_on_error(response)
+
+        return APICallResponse(response.status_code, response.text)
+
+    def _do_request(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> requests.Response:
+
+        url = self._get_api_query_url(api_call.url_path)
+        if api_call.method == APICallMethods.GET:
+            response = requests.get(url, auth=self._auth, headers=self.HEADERS, params=payload, timeout=self.TIMEOUT)
+        elif api_call.method == APICallMethods.POST:
+            response = requests.post(url, auth=self._auth, headers=self.HEADERS, json=payload, timeout=self.TIMEOUT)
+        elif api_call.method == APICallMethods.PUT:
+            response = requests.put(url, auth=self._auth, headers=self.HEADERS, json=payload, timeout=self.TIMEOUT)
+        elif api_call.method == APICallMethods.DELETE:
+            response = requests.delete(url, auth=self._auth, headers=self.HEADERS, json=payload, timeout=self.TIMEOUT)
+        else:
+            raise ValueError(f"Improper API call method: {api_call.method}")
+        return response
+
+    def _log_http_roundtrip(self, response: requests.Response) -> None:
         self._logger.debug(
             f"HTTP roundtrip finished - "
             f"request: {response.request.method} {response.request.url} {str(response.request.body)}, "
             f"response: {response.status_code} {response.text}, "
             f"elapsed: {response.elapsed}"
         )
-        self._raise_on_error(response)
-
-        return APICallResponse(response.status_code, response.text)
-
-    def _do_request(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> requests.Response:
-        url = self._get_api_query_url(api_call.url_path)
-        if api_call.method == APICallMethods.GET:
-            response = requests.get(url, auth=self._auth, headers=self.DEFAULT_HEADERS, params=payload)
-        elif api_call.method == APICallMethods.POST:
-            response = requests.post(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=payload)
-        elif api_call.method == APICallMethods.PUT:
-            response = requests.put(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=payload)
-        elif api_call.method == APICallMethods.DELETE:
-            response = requests.delete(url, auth=self._auth, headers=self.DEFAULT_HEADERS, json=payload)
-        else:
-            raise ValueError(f"Improper API call method: {api_call.method}")
-        return response
 
     def _get_api_query_url(self, url_path: str) -> str:
         return self._api_url + url_path
