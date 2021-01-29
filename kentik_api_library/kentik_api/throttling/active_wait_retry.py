@@ -21,4 +21,5 @@ def active_wait_retry(cmd: Cmd, num_attempts: int, retry_delay_seconds: float) -
             last_error = err
             time.sleep(retry_delay_seconds)
 
+    logger.error('request failed with "%s". All attempts used. Giving up', last_error)
     raise last_error
