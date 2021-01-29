@@ -1,4 +1,5 @@
 import time
+import logging
 from queue import Queue
 from threading import Thread
 from typing import Callable, Any
@@ -25,11 +26,12 @@ class BackgroundCmd:
 
 
 class BackgroundCmdQueue:
-    """ BackgroundCmdQueue enables retrying of commands in a background-processing manner"""
+    """ BackgroundCmdQueue enables retrying of commands in a background-processing manner (in background thread) """
 
     def __init__(self, retry_delay_seconds: float = 5.0) -> None:
         self._queue: "Queue[BackgroundCmd]" = Queue()
         self._retry_delay_seconds = retry_delay_seconds
+        self._logger = logging.getLogger(__name__)
         Thread(target=self._worker, daemon=True).start()
 
     def put(self, cmd: Cmd, num_attempts: int = 1, on_success: SuccessFunc = nop, on_abort: AbortFunc = nop) -> None:
@@ -56,9 +58,17 @@ class BackgroundCmdQueue:
         except IntermittentError as err:
             item.num_attempts_left -= 1
             if item.num_attempts_left > 0:
+                self._log_retry(err)
                 self._queue.put(item)
                 time.sleep(self._retry_delay_seconds)
             else:
+                self._log_abort(err)
                 item.abort(err)
         finally:
             self._queue.task_done()
+
+    def _log_retry(self, err: Exception) -> None:
+        self._logger.error('request failed with "%s". Retrying in %0.2f seconds...', err, self._retry_delay_seconds)
+
+    def _log_abort(self, err: Exception) -> None:
+        self._logger.error('request failed with "%s". All attempts used. Giving up', err)
