@@ -36,7 +36,7 @@ class DeviceLabel:
         color: str,
         devices: List[DeviceItem],
         id: ID,
-        user_id: ID,
+        user_id: Optional[ID],
         company_id: ID,
         created_date: str,
         updated_date: str,
@@ -58,7 +58,7 @@ class DeviceLabel:
         self._id = kwargs.get("id", DEFAULT_ID)
         self._user_id = kwargs.get("user_id", DEFAULT_ID)
         self._company_id = kwargs.get("company_id", DEFAULT_ID)
-        self._devices: List[DeviceItem] = kwargs.get("devices", [])
+        self._devices = kwargs.get("devices", [])
         self._created_date = kwargs.get("created_date", DEFAULT_DATE)
         self._updated_date = kwargs.get("updated_date", DEFAULT_DATE)
 
@@ -69,7 +69,7 @@ class DeviceLabel:
         return self._id
 
     @property
-    def user_id(self) -> ID:
+    def user_id(self) -> Optional[ID]:
         return self._user_id
 
     @property
