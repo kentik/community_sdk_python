@@ -23,7 +23,7 @@ def test_create_device_label_success(client, connector) -> None:
     connector.response_code = HTTPStatus.CREATED
 
     # when
-    device_label = DeviceLabel("apitest-device_label-1", "#00FF00")
+    device_label = DeviceLabel(name="apitest-device_label-1", color="#00FF00")
     created = client.device_labels.create(device_label)
 
     # then request properly formed
@@ -96,7 +96,7 @@ def test_update_device_label_success(client, connector) -> None:
     {
         "id": 42,
         "name": "apitest-device_label-one",
-        "color": "#00FF00",
+        "color": "#AA00FF",
         "user_id": "52",
         "company_id": "72",
         "devices": [],
@@ -108,7 +108,7 @@ def test_update_device_label_success(client, connector) -> None:
 
     # when
     device_label_id = ID(42)
-    device_label = DeviceLabel(id=device_label_id, name="apitest-device_label-one")
+    device_label = DeviceLabel(id=device_label_id, name="apitest-device_label-one", color="#AA00FF")
     updated = client.device_labels.update(device_label)
 
     # then request properly formed
@@ -116,12 +116,12 @@ def test_update_device_label_success(client, connector) -> None:
     assert connector.last_method == APICallMethods.PUT
     assert connector.last_payload is not None
     assert connector.last_payload["name"] == "apitest-device_label-one"
-    assert "color" not in connector.last_payload
+    assert connector.last_payload["color"] == "#AA00FF"
 
     # then response properly parsed
     assert updated.id == ID(42)
     assert updated.name == "apitest-device_label-one"
-    assert updated.color == "#00FF00"
+    assert updated.color == "#AA00FF"
     assert updated.user_id == ID(52)
     assert updated.company_id == ID(72)
     assert updated.created_date == "2018-05-16T20:21:10.406Z"

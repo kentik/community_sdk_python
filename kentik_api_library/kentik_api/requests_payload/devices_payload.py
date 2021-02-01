@@ -89,7 +89,7 @@ class LabelPayload:
             company_id=convert(self.company_id, ID),
             created_date=self.cdate,
             updated_date=self.edate,
-            devices=None,
+            devices=[],
         )
 
 
