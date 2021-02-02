@@ -7,6 +7,8 @@ import os
 import sys
 import logging
 from typing import Tuple
+
+from kentik_api.public.types import ID
 from kentik_api import (
     KentikAPI,
     Device,
@@ -100,7 +102,7 @@ def run_crud_router() -> None:
     print("### CREATE INTERFACE")
     interface = Interface(
         device_id=created_device.id,
-        snmp_id="2",
+        snmp_id=ID(2),
         snmp_speed=15,
         interface_description="testapi-interface",
     )

@@ -1,17 +1,17 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_resources.batch_api import BatchAPI
 from kentik_api.public.batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
-def test_batch_operation_on_flow_tags_success(client, connector) -> None:
+def test_batch_operation_on_flow_tags_success() -> None:
     # given
     response_payload = """{
             "message": "Successfully stored request. Batch queued for processing.",
             "guid": "guid1234"
         }"""
-    connector.response_text = response_payload
-    connector.response_code = HTTPStatus.OK
     criterion1 = Criterion(["192.168.0.2", "192.168.0.3"])
     criterion2 = Criterion(["192.168.0.4", "192.168.0.5"], Criterion.Direction.SRC)
     upsert1 = Upsert("value1", [criterion1, criterion2])
@@ -21,9 +21,11 @@ def test_batch_operation_on_flow_tags_success(client, connector) -> None:
     batch_operation = BatchOperationPart(
         replace_all=False, complete=True, upserts=[upsert1, upsert2], deletes=[deletion1, deletion2]
     )
+    connector = StubAPIConnector(response_payload, HTTPStatus.OK)
+    batch_api = BatchAPI(connector)
 
     # when
-    response = client.batch.batch_operation_on_flow_tags(batch_operation)
+    response = batch_api.batch_operation_on_flow_tags(batch_operation)
 
     # then
     assert connector.last_url_path == "/batch/tags"
@@ -44,23 +46,23 @@ def test_batch_operation_on_flow_tags_success(client, connector) -> None:
     assert response.guid == "guid1234"
 
 
-def test_batch_operation_on_populators_success(client, connector) -> None:
+def test_batch_operation_on_populators_success() -> None:
     # given
     response_payload = """{
             "message": "Successfully stored request. Batch queued for processing.",
             "guid": "guid2137"
         }"""
-    connector.response_text = response_payload
-    connector.response_code = HTTPStatus.OK
     criterion = Criterion(["192.168.0.2", "192.168.0.3"])
     upsert = Upsert("value", [criterion])
     deletion = Deletion("del_value")
     batch_operation = BatchOperationPart(
         replace_all=False, complete=True, upserts=[upsert], deletes=[deletion], guid="guid2137"
     )
+    connector = StubAPIConnector(response_payload, HTTPStatus.OK)
+    batch_api = BatchAPI(connector)
 
     # when
-    response = client.batch.batch_operation_on_populators("dimension_name", batch_operation)
+    response = batch_api.batch_operation_on_populators("dimension_name", batch_operation)
 
     # then
     assert connector.last_url_path == "/batch/customdimensions/dimension_name/populators"
@@ -76,7 +78,7 @@ def test_batch_operation_on_populators_success(client, connector) -> None:
     assert response.guid == "guid2137"
 
 
-def test_get_status_success(client, connector) -> None:
+def test_get_status_success() -> None:
     # given
     response_payload = """
         {
@@ -113,12 +115,12 @@ def test_get_status_success(client, connector) -> None:
               },
               "batch_date": "2018-09-25T21:41:18.88816Z"
         }"""
-    connector.response_text = response_payload
-    connector.response_code = HTTPStatus.OK
     batch_guid = "guid12345"
+    connector = StubAPIConnector(response_payload, HTTPStatus.OK)
+    batch_api = BatchAPI(connector)
 
     # when
-    status = client.batch.get_status(batch_guid)
+    status = batch_api.get_status(batch_guid)
 
     # then
     assert connector.last_url_path == "/batch/guid12345/status"

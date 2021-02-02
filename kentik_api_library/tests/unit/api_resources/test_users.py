@@ -3,9 +3,11 @@ from http import HTTPStatus
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.types import ID
 from kentik_api.public.user import User
+from kentik_api.api_resources.users_api import UsersAPI
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
-def test_create_user_success(client, connector) -> None:
+def test_create_user_success() -> None:
     # given
     create_response_payload = """
     {
@@ -26,12 +28,12 @@ def test_create_user_success(client, connector) -> None:
                     "saved_filters":[]
                 }
     }"""
-    connector.response_text = create_response_payload
-    connector.response_code = HTTPStatus.CREATED
+    connector = StubAPIConnector(create_response_payload, HTTPStatus.CREATED)
+    users_api = UsersAPI(connector)
 
     # when
     user = User(full_name="Test User", email="test@user.example", role="Member", email_service=True, email_product=True)
-    created = client.users.create(user)
+    created = users_api.create(user)
 
     # then request properly formed
     assert connector.last_url_path == "/user"
@@ -57,7 +59,7 @@ def test_create_user_success(client, connector) -> None:
     assert created.api_token is None
 
 
-def test_get_user_success(client, connector) -> None:
+def test_get_user_success() -> None:
     # given
     get_response_payload = """
         {
@@ -78,12 +80,12 @@ def test_get_user_success(client, connector) -> None:
                         "saved_filters":[]
                     }
         }"""
-    connector.response_text = get_response_payload
-    connector.response_code = HTTPStatus.OK
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    users_api = UsersAPI(connector)
 
     # when
     user_id = ID(145999)
-    user = client.users.get(user_id)
+    user = users_api.get(user_id)
 
     # then request properly formed
     assert connector.last_url_path == f"/user/{user_id}"
@@ -103,7 +105,7 @@ def test_get_user_success(client, connector) -> None:
     assert user.api_token == "****************************a997"
 
 
-def test_update_user_success(client, connector) -> None:
+def test_update_user_success() -> None:
     # given
     update_response_payload = """
     {
@@ -124,8 +126,8 @@ def test_update_user_success(client, connector) -> None:
                 "saved_filters":[]
                }
     }"""
-    connector.response_text = update_response_payload
-    connector.response_code = HTTPStatus.OK
+    connector = StubAPIConnector(update_response_payload, HTTPStatus.OK)
+    users_api = UsersAPI(connector)
 
     # when
     user_id = ID(146034)
@@ -133,7 +135,7 @@ def test_update_user_success(client, connector) -> None:
         id=user_id,
         full_name="User Testing",
     )
-    updated = client.users.update(user)
+    updated = users_api.update(user)
 
     # then request properly formed
     assert connector.last_url_path == f"/user/{user_id}"
@@ -148,15 +150,15 @@ def test_update_user_success(client, connector) -> None:
     assert updated.email == "test@user.example"
 
 
-def test_delete_user_success(client, connector) -> None:
+def test_delete_user_success() -> None:
     # given
     delete_response_payload = ""  # deleting user responds with empty body
-    connector.response_text = delete_response_payload
-    connector.response_code = HTTPStatus.NO_CONTENT
+    connector = StubAPIConnector(delete_response_payload, HTTPStatus.NO_CONTENT)
+    users_api = UsersAPI(connector)
 
     # when
     user_id = ID(146034)
-    delete_successful = client.users.delete(user_id)
+    delete_successful = users_api.delete(user_id)
 
     # then request properly formed
     assert connector.last_url_path == f"/user/{user_id}"

@@ -2,10 +2,11 @@ from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.types import ID
-from kentik_api.public.plan import Plan
+from kentik_api.api_resources.plans_api import PlansAPI
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
-def test_get_all_plans_success(client, connector) -> None:
+def test_get_all_plans_success() -> None:
     # given
     get_response_payload = """
     {
@@ -58,11 +59,11 @@ def test_get_all_plans_success(client, connector) -> None:
                 }
             }]
     }"""
-    connector.response_text = get_response_payload
-    connector.response_code = HTTPStatus.OK
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    plans_api = PlansAPI(connector)
 
     # when
-    plans = client.plans.get_all()
+    plans = plans_api.get_all()
 
     # then request properly formed
     assert connector.last_url_path == f"/plans"
@@ -73,7 +74,9 @@ def test_get_all_plans_success(client, connector) -> None:
     assert len(plans) == 1
     assert plans[0].active is True
     assert plans[0].company_id == ID(74333)
+    assert plans[0].device_types is not None
     assert len(plans[0].device_types) == 2
     assert plans[0].device_types[0].device_type == "router"
+    assert plans[0].devices is not None
     assert len(plans[0].devices) == 4
     assert plans[0].devices[0].id == ID(77714)

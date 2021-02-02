@@ -2,9 +2,11 @@ from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.public.types import ID
+from kentik_api.api_resources.tenants_api import MyKentikPortalAPI
+from tests.unit.stub_api_connector import StubAPIConnector
 
 
-def test_create_tenant_user_success(client, connector) -> None:
+def test_create_tenant_user_success() -> None:
     # given
     create_response_payload = """
     {
@@ -14,13 +16,13 @@ def test_create_tenant_user_success(client, connector) -> None:
         "tenant_id":"577",
         "company_id":"74333"
     }"""
-    connector.response_text = create_response_payload
-    connector.response_code = HTTPStatus.OK
+    connector = StubAPIConnector(create_response_payload, HTTPStatus.OK)
+    my_kentik_portal_api = MyKentikPortalAPI(connector)
 
     # when
     to_create_email = "user2@testtenant.com"
     tenant_id = ID(577)
-    created = client.my_kentik_portal.create_tenant_user(tenant_id, to_create_email)
+    created = my_kentik_portal_api.create_tenant_user(tenant_id, to_create_email)
 
     # then
     assert connector.last_url_path == "/mykentik/tenant/577/user"
@@ -35,36 +37,36 @@ def test_create_tenant_user_success(client, connector) -> None:
     assert created.company_id == ID(74333)
 
 
-def test_get_tenant_success(client, connector) -> None:
+def test_get_tenant_success() -> None:
     # given
     get_response_payload = """
-        {
-            "id":577,
-            "name":"test_tenant",
-            "description":"This is test tenant",
-            "users": [
-                {
-                    "id":"148099",
-                    "user_email":"test@tenant.user",
-                    "last_login":null,
-                    "tenant_id":"577",
-                    "company_id":"74333"
-                },{
-                    "id":"148113",
-                    "user_email":"user@testtenant.com",
-                    "last_login":null,
-                    "tenant_id":"577",
-                    "company_id":"74333"
-                }],
-            "created_date":"2020-12-21T10:55:52.449Z",
-            "updated_date":"2020-12-22T10:55:52.449Z"
-        }"""
-    connector.response_text = get_response_payload
-    connector.response_code = HTTPStatus.OK
+    {
+        "id":577,
+        "name":"test_tenant",
+        "description":"This is test tenant",
+        "users": [
+            {
+                "id":"148099",
+                "user_email":"test@tenant.user",
+                "last_login":null,
+                "tenant_id":"577",
+                "company_id":"74333"
+            },{
+                "id":"148113",
+                "user_email":"user@testtenant.com",
+                "last_login":null,
+                "tenant_id":"577",
+                "company_id":"74333"
+            }],
+        "created_date":"2020-12-21T10:55:52.449Z",
+        "updated_date":"2020-12-22T10:55:52.449Z"
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    my_kentik_portal_api = MyKentikPortalAPI(connector)
     tenant_id = ID(577)
 
     # when
-    tenant = client.my_kentik_portal.get(tenant_id)
+    tenant = my_kentik_portal_api.get(tenant_id)
 
     # then
     assert connector.last_url_path == f"/mykentik/tenant/577"
@@ -80,16 +82,16 @@ def test_get_tenant_success(client, connector) -> None:
     assert tenant.updated_date == "2020-12-22T10:55:52.449Z"
 
 
-def test_delete_tenant_user_success(client, connector) -> None:
+def test_delete_tenant_user_success() -> None:
     # given
     delete_response_payload = ""  # deleting user responds with empty body
-    connector.response_text = delete_response_payload
-    connector.response_code = HTTPStatus.NO_CONTENT
+    connector = StubAPIConnector(delete_response_payload, HTTPStatus.NO_CONTENT)
+    my_kentik_portal_api = MyKentikPortalAPI(connector)
 
     # when
     tenant_id = ID(577)
     tenant_user_id = ID(148099)
-    delete_successful = client.my_kentik_portal.delete_tenant_user(tenant_id, tenant_user_id)
+    delete_successful = my_kentik_portal_api.delete_tenant_user(tenant_id, tenant_user_id)
 
     # then
     assert connector.last_url_path == f"/mykentik/tenant/577/user/148099"
