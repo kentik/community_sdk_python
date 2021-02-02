@@ -4,6 +4,7 @@ from typing import List
 from kentik_api.api_calls import users
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.user import User
+from kentik_api.public.types import ID
 from kentik_api.requests_payload import users_payload
 
 
@@ -15,7 +16,7 @@ class UsersAPI(BaseAPI):
         response = self.send(api_call)
         return users_payload.GetAllResponse.from_json(response.text).to_users()
 
-    def get(self, user_id: int) -> User:
+    def get(self, user_id: ID) -> User:
         api_call = users.get_user_info(user_id)
         response = self.send(api_call)
         return users_payload.GetResponse.from_json(response.text).to_user()
@@ -55,7 +56,7 @@ class UsersAPI(BaseAPI):
         response = self.send(api_call, payload)
         return users_payload.UpdateResponse.from_json(response.text).to_user()
 
-    def delete(self, user_id: int) -> bool:
+    def delete(self, user_id: ID) -> bool:
         api_call = users.delete_user(user_id)
         response = self.send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT
