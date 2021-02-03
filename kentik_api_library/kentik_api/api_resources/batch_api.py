@@ -2,6 +2,7 @@ from kentik_api.api_calls import batch
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.batch_operation import BatchOperationPart
 from kentik_api.requests_payload import batch_operations_payload
+from kentik_api.requests_payload.conversions import convert, enum_to_str
 
 
 class BatchAPI(BaseAPI):
@@ -37,7 +38,9 @@ class BatchAPI(BaseAPI):
                 batch_operations_payload.BatchRequest.Upsert(
                     i.value,
                     [
-                        batch_operations_payload.BatchRequest.Upsert.Criterion(j.direction.value, j.addr)
+                        batch_operations_payload.BatchRequest.Upsert.Criterion(
+                            convert(j.direction, enum_to_str), j.addr
+                        )
                         for j in i.criteria
                     ],
                 )

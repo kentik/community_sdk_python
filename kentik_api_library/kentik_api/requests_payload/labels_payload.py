@@ -4,7 +4,7 @@ from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
 
 # Local imports
-from kentik_api.requests_payload.conversions import convert
+from kentik_api.requests_payload.conversions import convert, from_dict, from_json
 from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel, DeviceItem
 
@@ -30,7 +30,7 @@ class _DeviceArray(List[_Device]):
     def from_list(cls, items: List[Dict[str, Any]]):
         devices = cls()
         for item in items:
-            d = _Device(**item)
+            d = from_dict(_Device, item)
             devices.append(d)
         return devices
 
@@ -55,9 +55,9 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(cls.__name__, json_string)
         dic["devices"] = _DeviceArray.from_list(dic["devices"])
-        return cls(**dic)
+        return from_dict(cls, dic)
 
     def to_device_label(self) -> DeviceLabel:
         return DeviceLabel(
@@ -81,17 +81,8 @@ class GetAllResponse(List[GetResponse]):
         dic = json.loads(json_string)
         labels = cls()
         for item in dic:
-            l = GetResponse(
-                id=item["id"],
-                name=item["name"],
-                color=item["color"],
-                user_id=item["user_id"],
-                company_id=item["company_id"],
-                devices=_DeviceArray.from_list(item["devices"]),
-                created_date=item["created_date"],
-                updated_date=item["updated_date"],
-                order=item.get("order"),
-            )
+            item["devices"] = _DeviceArray.from_list(item["devices"])
+            l = from_dict(GetResponse, item)
             labels.append(l)
         return labels
 
@@ -123,5 +114,5 @@ class DeleteResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        return cls(**dic)
+        dic = from_json(cls.__name__, json_string)
+        return from_dict(cls, dic)

@@ -12,6 +12,7 @@ class Filter:
     id: Optional[ID] = None
 
 
+@dataclass()
 class FilterGroups:
     def __init__(
         self,
@@ -49,6 +50,7 @@ class Filters:
 # pylint: disable=too-many-instance-attributes
 
 
+@dataclass()
 class SavedFilter:
     # pylint: disable=too-many-arguments
     def __init__(
