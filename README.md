@@ -25,9 +25,4 @@ Implemented API resources:
 - query methods
 - plans
 - alerts
-
-Working on:
 - alerts active
-
-To be implemented:
-- [none]

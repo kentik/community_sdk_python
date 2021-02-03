@@ -1,0 +1,28 @@
+@startuml device_create_sequence
+
+title Device create
+hide footbox
+
+actor "api user" as user 
+participant KentikAPI  #pink
+
+user -> KentikAPI: devices.create(device) 
+note right: device is created using factory method:\n **Device.new_dns(...)**
+activate KentikAPI #pink
+    alt NO EXCEPTION
+        KentikAPI -> CreateRequest: payload = from_device(device)
+        activate CreateRequest #red
+            CreateRequest -> CreateRequest: validate(device)
+        return
+        KentikAPI -> api_calls: api_call = create_device()
+        KentikAPI -> APIConnector: response = send(api_call, payload)
+        KentikAPI -> CreateResponse: result = from_json(response.text).to_device()
+        activate CreateResponse #red
+            CreateResponse -> CreateResponse: validate(json)
+        return
+        user <-- KentikAPI: result (created device)
+    else KentikAPI exception
+        user <-- KentikAPI: exception
+    end
+deactivate
+@enduml

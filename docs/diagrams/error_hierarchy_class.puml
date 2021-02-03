@@ -1,0 +1,59 @@
+@startuml errors_class
+
+title Class diagram of kentik-api errors
+
+class Exception
+note left: All attributes omitted
+
+class kentik_api.public.errors.KentikAPIError
+class kentik_api.public.errors.ProtocolError {
+    +__init__(self, protocol: str, status_code: int, message: str)
+    +protocol(self): str
+    +status_code(self): int
+    -_protocol: str
+    -_status_code: int
+}
+class kentik_api.public.errors.IntermittentError
+class kentik_api.public.errors.AuthError
+class kentik_api.public.errors.BadRequestError
+class kentik_api.public.errors.DataFormatError
+class kentik_api.public.errors.DeserializationError{
+    +__init__(self, class_name: str, description: str)
+}
+class kentik_api.public.errors.IncompleteObjectError{
+    +__init__(self, operation_class_name: str, description: str)
+}
+class kentik_api.public.errors.NotFoundError
+class kentik_api.public.errors.RateLimitExceededError
+class kentik_api.public.errors.TimedOutError
+class kentik_api.public.errors.UnavailabilityError
+
+note "Private attributes omitted" as N1
+
+Exception <|-- kentik_api.public.errors.KentikAPIError
+
+kentik_api.public.errors.KentikAPIError <|-- kentik_api.public.errors.ProtocolError
+
+kentik_api.public.errors.KentikAPIError <|-- kentik_api.public.errors.IntermittentError
+
+kentik_api.public.errors.ProtocolError <|-- kentik_api.public.errors.AuthError
+
+kentik_api.public.errors.ProtocolError <|-- kentik_api.public.errors.BadRequestError
+
+kentik_api.public.errors.KentikAPIError <|-- kentik_api.public.errors.DataFormatError
+
+kentik_api.public.errors.KentikAPIError <|-- kentik_api.public.errors.DeserializationError
+
+kentik_api.public.errors.KentikAPIError <|-- kentik_api.public.errors.IncompleteObjectError
+
+kentik_api.public.errors.ProtocolError <|-- kentik_api.public.errors.NotFoundError
+
+kentik_api.public.errors.ProtocolError <|-- kentik_api.public.errors.RateLimitExceededError
+kentik_api.public.errors.IntermittentError <|-- kentik_api.public.errors.RateLimitExceededError
+
+kentik_api.public.errors.IntermittentError <|-- kentik_api.public.errors.TimedOutError
+
+kentik_api.public.errors.ProtocolError <|-- kentik_api.public.errors.UnavailabilityError
+kentik_api.public.errors.IntermittentError <|-- kentik_api.public.errors.UnavailabilityError
+
+@enduml
