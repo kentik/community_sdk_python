@@ -5,10 +5,10 @@
 Recommended steps:
 1. ensure you have python >= 3.6 installed
 1. create dedicated virtual environment with `virtualenv .venv && source .venv/bin/activate`
-1. install the library with `pip3 install kentik-api`
+1. clone the library repo with `git clone https://github.com/kentik/community_sdk_python.git`
 1. run unit tests with `pytest kentik_api_library/tests/unit/ kentik_api_library/tests/integration/`
 1. run mypy with `mypy kentik_api_library/kentik_api kentik_api_library/tests/ kentik_api_library/examples/`
-1. run black with `black --fast --line-length 120 --check kentik_api_library`
+1. run black check with `black --fast --line-length 120 --check kentik_api_library`
 
 ## Example
 
