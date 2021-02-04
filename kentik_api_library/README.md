@@ -16,9 +16,12 @@ For more information on how to interact with kentik resources using this library
   python3 examples/sites_example.py
   ```
 
-## Example - create a new device
+## Getting started
+
+The example below illustartes how to create a new device using the library:
 
 ```python
+# library-specific imports
 from kentik_api import (
     KentikAPI,
     Device,
@@ -48,16 +51,24 @@ created = api_client.devices.create(device)
 print(created.__dict__)
 ```
 
-## Where to find options related to given resource type
+As you can see, one can create a device using `KentikAPI.devices` interface.  
+Interfaces for manipulating all KentikAPI resources are available under `KentikAPI` object.  
+The general approach is that every single KentikAPI resource is represented in the library by a public class, and all the types/enums/constants related to given resource are collected together with the resource class (in the same source file):
+- [CustomApplication](./kentik_api/public/custom_application.py)
+- [CustomDimension](./kentik_api/public/custom_dimension.py)
+- [DeviceLabel](./kentik_api/public/device_label.py)
+- [Device](./kentik_api/public/device.py)
+- [ManualMitigation](./kentik_api/public/manual_mitigation.py)
+- [Plan](./kentik_api/public/plan.py)
+- [QueryObject](./kentik_api/public/query_object.py)
+- [QuerySQL](./kentik_api/public/query_sql.py)
+- [SavedFilter](./kentik_api/public/saved_filter.py)
+- [Site](./kentik_api/public/site.py)
+- [Tag](./kentik_api/public/tag.py)
+- [Tenant](./kentik_api/public/tenant.py)
+- [User](./kentik_api/public/user.py)
+## More examples
 
-The general approach is that all the types/enums/constants related to a given resource type are collected together with the resource class (in the same source file), e.g. all types describing:
-- Device - are located in kentik_api_library/kentik_api/public/device.py
-- DeviceLabel - are in kentik_api_library/kentik_api/public/device_label.py
-- QueryObject are in kentik_api_library/kentik_api/public/query_object.py.
-
-## More usage examples
-
-For library usage examples please see: examples/  
 List of available examples:
 - [alerting_example.py](./examples/alerting_example.py) - create Manual Mitigation
 - [applications_example.py](./examples/applications_example.py) - create/update/delete Custom Application
@@ -72,7 +83,6 @@ List of available examples:
 - [sites_example.py](./examples/sites_example.py) - create/update/get/delete/list Sites
 - [tags_example.py](./examples/tags_example.py) - create/update/get/delete/list Tags
 - [users_example.py](./examples/users_example.py) - create/update/get/delete/list Users
-
 
 ## Open-source libraries
 
