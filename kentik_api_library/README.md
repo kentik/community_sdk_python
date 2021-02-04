@@ -55,7 +55,7 @@ The general approach is that all the types/enums/constants related to a given re
 - DeviceLabel - are in kentik_api_library/kentik_api/public/device_label.py
 - QueryObject are in kentik_api_library/kentik_api/public/query_object.py.
 
-## Usage examples
+## More usage examples
 
 For library usage examples please see: examples/  
 List of available examples:
