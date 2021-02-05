@@ -19,11 +19,8 @@ Precondition: python3 and pip3 are already installed.
 1. Install the library from repo  
 `pip3 install -e kentik_api_library/`
 
-1. Install demo requirements  
-`pip3 install Pillow pandas httpretty`
-
-1. Install jupyter-notebook  
-`pip3 install notebook`
+1. Install demo requirements & jupyter-notebook   
+`pip3 install Pillow pandas notebook`
 
 1. Run throttling demo  
 `jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo.ipynb`
