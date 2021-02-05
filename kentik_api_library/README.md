@@ -18,7 +18,7 @@ For more information on how to interact with kentik resources using this library
 
 ## Getting started
 
-The example below illustartes how to create a new device using the library:
+The example below illustrates how to create a new device using the library:
 
 ```python
 # library-specific imports

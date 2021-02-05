@@ -6,13 +6,15 @@ Recommended steps:
 1. ensure you have python >= 3.6 installed
 1. create dedicated virtual environment with `virtualenv .venv && source .venv/bin/activate`
 1. clone the library repo with `git clone https://github.com/kentik/community_sdk_python.git`
+1. `cd community_sdk_python/`
+1. install requirements with `pip install -r kentik_api_library/requirements.txt`
 1. run unit tests with `pytest kentik_api_library/tests/unit/ kentik_api_library/tests/integration/`
 1. run mypy with `mypy kentik_api_library/kentik_api kentik_api_library/tests/ kentik_api_library/examples/`
 1. run black check with `black --fast --line-length 120 --check kentik_api_library`
 
 ## Example
 
-The example below illustartes how to create a new device using the library:
+The example below illustrates how to create a new device using the library:
 
 ```python
 # library-specific imports
@@ -68,7 +70,7 @@ A sequence of interactions that leads to creating a new device:
 For error handling there is an exception hierarchy that allows to handle:
 - validation errors - when library user tries to create an incomplete/invalid resource
 - deserialization erors - when invalid or incomplete resource json representation is received from KentikAPI
-- protocol errors - errors covering selected HTTP error codes, in particular
+- protocol errors - errors covering selected HTTP error codes, in particular:
   - `IntermittentError` - request can be reattempted and succeed after a delay
   - `RateLimitExceededError` - effect of throttling on KentikAPI side
 
