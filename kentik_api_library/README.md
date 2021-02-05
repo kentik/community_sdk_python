@@ -16,9 +16,59 @@ For more information on how to interact with kentik resources using this library
   python3 examples/sites_example.py
   ```
 
-## Usage examples
+## Getting started
 
-For library usage examples please see: examples/  
+The example below illustrates how to create a new device using the library:
+
+```python
+# library-specific imports
+from kentik_api import (
+    KentikAPI,
+    Device,
+    DeviceSubtype,
+    CDNAttribute,
+    ID,
+)
+
+# initialize Kentik API client
+api_client = KentikAPI("<API_EMAIL_STRING>", "<API_TOKEN_STRING>")
+
+# prepare device object
+device = Device.new_dns(
+    device_name="example-device-1",
+    device_subtype=DeviceSubtype.aws_subnet,
+    cdn_attr=CDNAttribute.yes,
+    device_sample_rate=100,
+    plan_id=ID(11466),
+    site_id=ID(8483),
+    device_bgp_flowspec=True,
+)
+
+# create the device
+created = api_client.devices.create(device)
+
+# print returned device's attributes
+print(created.__dict__)
+```
+
+As you can see, one can create a device using `KentikAPI.devices` interface.  
+Interfaces for manipulating all KentikAPI resources are available under `KentikAPI` object.  
+The general approach is that every single KentikAPI resource is represented in the library by a public class, and all the types/enums/constants related to given resource are collected together with the resource class (in the same source file):
+- [CustomApplication](./kentik_api/public/custom_application.py)
+- [CustomDimension](./kentik_api/public/custom_dimension.py)
+- [DeviceLabel](./kentik_api/public/device_label.py)
+- [Device](./kentik_api/public/device.py)
+- [ManualMitigation](./kentik_api/public/manual_mitigation.py)
+- [Plan](./kentik_api/public/plan.py)
+- [QueryObject](./kentik_api/public/query_object.py)
+- [QuerySQL](./kentik_api/public/query_sql.py)
+- [SavedFilter](./kentik_api/public/saved_filter.py)
+- [Site](./kentik_api/public/site.py)
+- [Tag](./kentik_api/public/tag.py)
+- [Tenant](./kentik_api/public/tenant.py)
+- [User](./kentik_api/public/user.py)
+## More examples
+
 List of available examples:
 - [alerting_example.py](./examples/alerting_example.py) - create Manual Mitigation
 - [applications_example.py](./examples/applications_example.py) - create/update/delete Custom Application
