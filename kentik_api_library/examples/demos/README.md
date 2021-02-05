@@ -5,7 +5,7 @@ Precondition: python3 and pip3 are already installed.
 1. Install virtualenv - this allows you to create a python sandbox for your project  
 `pip3 install virtualenv`
 
-1. Create new virtual environment   
+1. Create dedicated virtual environment  
 `virtualenv .venv`
 
 1. Activate virtualenv  
@@ -17,7 +17,7 @@ Precondition: python3 and pip3 are already installed.
 1. `cd community_sdk_python/`
 
 1. Install the library from repo  
-`pip install -e kentik_api_library/`
+`pip3 install -e kentik_api_library/`
 
 1. Install demo requirements  
 `pip3 install Pillow pandas httpretty`
