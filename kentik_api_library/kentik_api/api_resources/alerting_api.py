@@ -5,6 +5,7 @@ from kentik_api.api_calls import alerts
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert, AlertFilter
 from kentik_api.requests_payload import manual_mitigations_payload
+from kentik_api.requests_payload.conversions import convert, convert_or_none, enum_to_str
 
 
 class AlertingAPI(BaseAPI):
@@ -26,12 +27,15 @@ class AlertingAPI(BaseAPI):
         show_matches: bool = False,
         learning_mode: bool = False,
     ) -> List[Alarm]:
-        start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%S")
-        end_time_str = end_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+        date_to_str = lambda date: date.strftime("%Y-%m-%dT%H:%M:%S")
+        start_time_str = convert(start_time, date_to_str)
+        end_time_str = convert(end_time, date_to_str)
+
         api_call = alerts.get_active_alerts(
             start_time=start_time_str,
             end_time=end_time_str,
-            filter_by=filter_by.value if filter_by else None,
+            filter_by=convert_or_none(filter_by, enum_to_str),
             filter_val=filter_val,
             show_mitigations=1 if show_mitigations else 0,
             show_alarms=1 if show_alarms else 0,
@@ -53,12 +57,15 @@ class AlertingAPI(BaseAPI):
         show_matches: bool = False,
         learning_mode: bool = False,
     ) -> List[HistoricalAlert]:
-        start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%S")
-        end_time_str = end_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+        date_to_str = lambda date: date.strftime("%Y-%m-%dT%H:%M:%S")
+        start_time_str = convert(start_time, date_to_str)
+        end_time_str = convert(end_time, date_to_str)
+
         api_call = alerts.get_alerts_history(
             start_time=start_time_str,
             end_time=end_time_str,
-            filter_by=filter_by.value if filter_by is not None else None,
+            filter_by=convert_or_none(filter_by, enum_to_str),
             filter_val=filter_val,
             sort_order=sort_order,
             show_mitigations=1 if show_mitigations else 0,

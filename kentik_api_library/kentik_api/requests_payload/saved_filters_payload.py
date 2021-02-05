@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 import json
+from copy import deepcopy
 from typing import Optional, Dict, List, Any
 
-from kentik_api.requests_payload.conversions import convert, convert_or_none
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, from_json
 from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 
@@ -22,11 +23,12 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
-        return cls(**dic)
+        dic = from_json(cls.__name__, json_string)
+        dic["company_id"] = convert(dic["company_id"], ID)
+        return from_dict(cls, dic)
 
     def to_saved_filter(self) -> SavedFilter:
-        filters_obj = self._to_filters(self.filters)
+        filters_obj = self._to_filters(deepcopy(self.filters))
         return SavedFilter(
             company_id=convert(self.company_id, ID),
             created_date=self.cdate,
@@ -39,13 +41,8 @@ class GetResponse:
         )
 
     def _to_filters(self, dic) -> Filters:
-        filter_groups = [self._to_filtergroups(group) for group in dic["filterGroups"]]
-        return Filters(
-            connector=dic["connector"],
-            custom=dic.get("custom"),
-            filterGroups=filter_groups,
-            filterString=dic.get("filterString"),
-        )
+        dic["filterGroups"] = [self._to_filtergroups(group) for group in dic["filterGroups"]]
+        return from_dict(Filters, dic)
 
     def _to_filtergroups(self, dic) -> FilterGroups:
         filters = [self._to_filter(ftr) for ftr in dic["filters"]]
@@ -55,16 +52,12 @@ class GetResponse:
             filters=filters,
             id=convert_or_none(dic.get("id"), ID),
             metric=dic.get("metric"),
-            not_=bool(dic["not"]),
+            not_=convert(dic["not"], bool),
         )
 
     def _to_filter(self, dic) -> Filter:
-        return Filter(
-            filterField=dic["filterField"],
-            filterValue=dic["filterValue"],
-            operator=dic["operator"],
-            id=convert_or_none(dic.get("id"), ID),
-        )
+        dic["id"] = convert_or_none(dic.get("id"), ID)
+        return from_dict(Filter, dic)
 
 
 # pylint: enable=too-many-instance-attributes
@@ -73,10 +66,10 @@ class GetResponse:
 class GetAllResponse(List[GetResponse]):
     @classmethod
     def from_json(cls, json_string):
-        dic = json.loads(json_string)
+        dic = from_json(cls.__name__, json_string)
         saved_filters = cls()
         for item in dic:
-            saved_filter = GetResponse(**item)
+            saved_filter = from_dict(GetResponse, item)
             saved_filters.append(saved_filter)
         return saved_filters
 

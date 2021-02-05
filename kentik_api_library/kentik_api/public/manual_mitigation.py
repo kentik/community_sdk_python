@@ -31,7 +31,7 @@ class Alarm:
     alert_baseline: int
     alert_severity: str
     baseline_used: int
-    learning_mode: int
+    learning_mode: bool
     debug_mode: bool
     alarm_start: datetime
     alarm_end: Optional[datetime]
@@ -64,8 +64,8 @@ class HistoricalAlert:
     alert_value3rd: int
     alert_baseline: int
     baseline_used: int
-    learning_mode: int
-    debug_mode: int
+    learning_mode: bool
+    debug_mode: bool
     creation_time: datetime
     alarm_start_time: datetime
     comment: Optional[str]

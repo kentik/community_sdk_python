@@ -8,6 +8,7 @@ from kentik_api import KentikAPI
 from kentik_api.public.errors import (
     AuthError,
     BadRequestError,
+    DeserializationError,
     KentikAPIError,
     NotFoundError,
     ProtocolError,
@@ -281,8 +282,7 @@ def test_get_user_fails_when_invalid_response_body_received(kentik_api) -> None:
     )
 
     # when
-    # TODO(dfurman): transform implementation to use conversions.from_json wrapper
-    with pytest.raises(json.JSONDecodeError):
+    with pytest.raises(DeserializationError):
         kentik_api.users.get(DUMMY_USER_ID)
 
     # then
