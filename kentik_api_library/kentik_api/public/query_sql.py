@@ -4,12 +4,12 @@ from typing import List, Dict
 
 
 @dataclass
-class SQLQuery:
+class QuerySQL:
     query: str
 
 
 @dataclass
-class SQLQueryResult:
+class QuerySQLResult:
     rows: List[Dict]
 
     @classmethod

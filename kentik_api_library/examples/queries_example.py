@@ -11,7 +11,7 @@ from PIL import Image  # type: ignore
 from typing import Tuple
 from kentik_api import (
     KentikAPI,
-    SQLQuery,
+    QuerySQL,
     QueryObject,
     QueryArrayItem,
     Query,
@@ -178,7 +178,7 @@ def run_query_sql() -> None:
         "LIMIT 1000;"
     )
 
-    sql_query = SQLQuery(query_string)
+    sql_query = QuerySQL(query_string)
 
     print("Sending SQL query...")
     result = client.query.sql(sql_query)

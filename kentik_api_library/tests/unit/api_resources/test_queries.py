@@ -16,13 +16,13 @@ from kentik_api.public.query_object import (
     ChartViewType,
     TimeFormat,
 )
-from kentik_api.public.query_sql import SQLQuery
+from kentik_api.public.query_sql import QuerySQL
 from tests.unit.stub_api_connector import StubAPIConnector
 
 
 def test_query_sql_success() -> None:
     # given
-    sql_query = """
+    query_sql = """
         SELECT i_start_time,
         round(sum(in_pkts)/(3600)/1000) AS f_sum_in_pkts,
         round(sum(in_bytes)/(3600)/1000)*8 AS f_sum_in_bytes
@@ -55,14 +55,14 @@ def test_query_sql_success() -> None:
     # when
     connector = StubAPIConnector(query_response_payload, HTTPStatus.OK)
     query_api = QueryAPI(connector)
-    query = SQLQuery(query=sql_query)
+    query = QuerySQL(query=query_sql)
     result = query_api.sql(query=query)
 
     # then request properly formed
     assert connector.last_url_path == "/query/sql"
     assert connector.last_method == APICallMethods.POST
     assert connector.last_payload is not None
-    assert connector.last_payload["query"] == sql_query
+    assert connector.last_payload["query"] == query_sql
 
     # and response properly parsed
     assert len(result.rows) == 3
