@@ -3,6 +3,7 @@ from typing import List
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.api_calls import saved_filters
 from kentik_api.public.saved_filter import SavedFilter
+from kentik_api.public.types import ID
 from kentik_api.requests_payload import saved_filters_payload
 
 
@@ -14,7 +15,7 @@ class SavedFiltersAPI(BaseAPI):
         response = self.send(api_call)
         return saved_filters_payload.GetAllResponse.from_json(response.text).to_saved_filters()
 
-    def get(self, saved_filter_id: int) -> SavedFilter:
+    def get(self, saved_filter_id: ID) -> SavedFilter:
         api_call = saved_filters.get_saved_filter_info(saved_filter_id)
         response = self.send(api_call)
         return saved_filters_payload.GetResponse.from_json(response.text).to_saved_filter()
@@ -36,7 +37,7 @@ class SavedFiltersAPI(BaseAPI):
         response = self.send(api_call, payload)
         return saved_filters_payload.UpdateResponse.from_json(response.text).to_saved_filter()
 
-    def delete(self, saved_filter_id: int) -> bool:
+    def delete(self, saved_filter_id: ID) -> bool:
         api_call = saved_filters.delete_saved_filter(saved_filter_id)
         response = self.send(api_call)
         return response.http_status_code == HTTPStatus.NO_CONTENT

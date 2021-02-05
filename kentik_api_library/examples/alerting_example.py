@@ -51,8 +51,9 @@ def run_crud():
     new_manual_mitigation = ManualMitigation("192.168.0.0/24", "1234", "12345", "20", "This is comment")
     try:
         created = client.alerting.create_manual_mitigation(new_manual_mitigation)
-    except KeyError:
-        exit()
+    except Exception:
+        return
+
     print(created)
     print()
 
