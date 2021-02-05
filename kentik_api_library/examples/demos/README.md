@@ -2,6 +2,12 @@
 
 Precondition: python3 and pip3 are already installed.
 
+1. Open a new terminal
+
+1. Set environment variables to your KentikAPI credentials  
+`export KTAPI_AUTH_EMAIL=john.doe@acme.com`  
+`export KTAPI_AUTH_TOKEN=__KentikAPIToken__`  
+
 1. Install virtualenv - this allows you to create a python sandbox for your project  
 `pip3 install virtualenv`
 
@@ -20,7 +26,7 @@ Precondition: python3 and pip3 are already installed.
 `pip3 install -e kentik_api_library/`
 
 1. Install demo requirements & jupyter-notebook   
-`pip3 install Pillow pandas notebook`
+`pip3 install Pillow pandas httpretty notebook`
 
 1. Run throttling demo  
 `jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo.ipynb`
