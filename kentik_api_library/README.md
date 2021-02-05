@@ -83,6 +83,7 @@ List of available examples:
 - [sites_example.py](./examples/sites_example.py) - create/update/get/delete/list Sites
 - [tags_example.py](./examples/tags_example.py) - create/update/get/delete/list Tags
 - [users_example.py](./examples/users_example.py) - create/update/get/delete/list Users
+- [error_handling_example.py](./examples/error_handling_example.py) - handling errors raised by the library
 
 ## Open-source libraries
 

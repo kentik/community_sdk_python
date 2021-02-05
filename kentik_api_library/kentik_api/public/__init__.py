@@ -38,3 +38,17 @@ from .device import (
     SecondaryIP,
     VRFAttributes,
 )
+from .errors import (
+    KentikAPIError,
+    ProtocolError,
+    AuthError,
+    BadRequestError,
+    DataFormatError,
+    DeserializationError,
+    IncompleteObjectError,
+    IntermittentError,
+    NotFoundError,
+    RateLimitExceededError,
+    TimedOutError,
+    UnavailabilityError,
+)
