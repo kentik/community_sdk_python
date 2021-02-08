@@ -13,7 +13,7 @@ from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, F
 @dataclass()
 class GetResponse:
     id: int
-    company_id: int
+    company_id: str
     filters: Optional[Dict] = None
     filter_name: Optional[str] = None
     filter_description: Optional[str] = None
@@ -24,7 +24,6 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string):
         dic = from_json(cls.__name__, json_string)
-        dic["company_id"] = convert(dic["company_id"], ID)
         return from_dict(cls, dic)
 
     def to_saved_filter(self) -> SavedFilter:
