@@ -5,7 +5,7 @@ import pytest
 
 from kentik_api.requests_payload.conversions import (
     from_dict,
-    from_json,
+    dict_from_json,
     list_from_json,
     convert,
     convert_or_none,
@@ -89,7 +89,7 @@ def test_dict_from_json_valid_document_success() -> None:
     json_string = """{"name": "Liz", "age": 42}"""
 
     # when
-    dic = from_json("TestDataClass", json_string)
+    dic = dict_from_json("TestDataClass", json_string)
 
     # then
     assert dic["name"] == "Liz"
@@ -101,7 +101,7 @@ def test_dict_from_json_valid_document_with_root_success() -> None:
     json_string = """{"person":{"name": "Liz", "age": 42}}"""
 
     # when
-    dic = from_json("TestDataClass", json_string, "person")
+    dic = dict_from_json("TestDataClass", json_string, "person")
 
     # then
     assert dic["name"] == "Liz"
@@ -114,7 +114,7 @@ def test_dict_from_json_invalid_syntax_raises_error() -> None:
 
     # when - then
     with pytest.raises(DeserializationError):
-        _ = from_json("TestDataClass", json_string)
+        _ = dict_from_json("TestDataClass", json_string)
 
 
 def test_dict_from_json_invalid_type_raises_error() -> None:
@@ -123,7 +123,7 @@ def test_dict_from_json_invalid_type_raises_error() -> None:
 
     # when - then
     with pytest.raises(DeserializationError):
-        _ = from_json("TestDataClass", json_string)
+        _ = dict_from_json("TestDataClass", json_string)
 
 
 def test_dict_from_json_missing_root_raises_error() -> None:
@@ -132,7 +132,7 @@ def test_dict_from_json_missing_root_raises_error() -> None:
 
     # when - then
     with pytest.raises(DeserializationError):
-        _ = from_json("TestDataClass", json_string, "person")
+        _ = dict_from_json("TestDataClass", json_string, "person")
 
 
 def test_list_from_json_valid_document_success() -> None:

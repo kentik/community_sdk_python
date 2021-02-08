@@ -6,7 +6,7 @@ from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.requests_payload.conversions import (
     from_dict,
-    from_json,
+    dict_from_json,
     list_from_json,
     convert,
     convert_or_none,
@@ -211,7 +211,7 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string: str):
         # for GET response the payload json is like: "interface": {...}
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="interface")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="interface")
         return cls.from_dict(dic)
 
     @classmethod
@@ -268,7 +268,7 @@ class CreateResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(class_name=cls.__name__, json_string=json_string)
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string)
         return cls(interface=InterfacePayload.from_dict(dic))
 
     def to_interface(self) -> Interface:

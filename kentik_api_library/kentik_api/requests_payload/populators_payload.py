@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import Populator
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json
 
 
 # pylint: disable=too-many-instance-attributes
@@ -94,7 +94,7 @@ class GetResponse(_Populator):
     @classmethod
     def from_json(cls, json_string: str):
         # payload is embeded under "populator" key
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="populator")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="populator")
         return from_dict(data_class=cls, data=dic)
 
 

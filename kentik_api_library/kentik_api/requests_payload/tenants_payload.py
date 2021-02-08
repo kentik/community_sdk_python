@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Any, Dict, List
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.tenant import Tenant, TenantUser
 
@@ -29,7 +29,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string)
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_tenant(self) -> Tenant:
@@ -75,7 +75,7 @@ class CreateUserResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string)
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_tenant_user(self):

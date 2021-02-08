@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from base64 import b64decode
 
 from kentik_api.public.query_object import QueryDataResult, QueryChartResult, ImageType, QueryURLResult
-from kentik_api.requests_payload.conversions import from_dict, from_json
+from kentik_api.requests_payload.conversions import from_dict, dict_from_json
 
 
 @dataclass
@@ -21,7 +21,7 @@ class QueryDataResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        params = from_json(cls.__name__, json_string)
+        params = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, params)
 
     def to_query_data_result(self) -> QueryDataResult:
@@ -34,7 +34,7 @@ class QueryChartResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        params = from_json(cls.__name__, json_string)
+        params = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, params)
 
     def to_query_chart_result(self) -> QueryChartResult:

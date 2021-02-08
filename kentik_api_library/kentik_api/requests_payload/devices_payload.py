@@ -8,7 +8,7 @@ from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResp
 from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.requests_payload.conversions import (
     from_dict,
-    from_json,
+    dict_from_json,
     list_from_json,
     convert,
     convert_or_none,
@@ -302,7 +302,7 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string: str):
         # for GET response the payload json is like: "device": {...}
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="device")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="device")
         return cls.from_dict(dic)
 
     @classmethod
@@ -446,7 +446,7 @@ class ApplyLabelsResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(class_name=cls.__name__, json_string=json_string)
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string)
         required_fields = ["id", "device_name", "labels"]
         validate_fields(class_name=cls.__name__, required_fields=required_fields, dic=dic)
         labels = [LabelPayload.from_dict(item) for item in dic["labels"]]

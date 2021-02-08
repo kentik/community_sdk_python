@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Dict, List
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.user import User
 
@@ -53,7 +53,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string, "user")
+        dic = dict_from_json(cls.__name__, json_string, "user")
         dic["id"] = convert(dic["id"], ID)
         dic["company_id"] = convert(dic["company_id"], ID)
         dic["email_service"] = convert(dic["email_service"], bool)

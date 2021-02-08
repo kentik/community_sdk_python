@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import CustomDimension
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.requests_payload.populators_payload import PopulatorArray
 
 
@@ -18,7 +18,9 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string, "customDimension")  # payload is embeded under "customDimension" key
+        dic = dict_from_json(
+            cls.__name__, json_string, "customDimension"
+        )  # payload is embeded under "customDimension" key
         dic["populators"] = PopulatorArray.from_list(dic["populators"])
         return from_dict(cls, dic)
 

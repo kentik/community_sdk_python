@@ -1,7 +1,7 @@
 from typing import Optional, List
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.tag import Tag
 
@@ -76,7 +76,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string, "tag")
+        dic = dict_from_json(cls.__name__, json_string, "tag")
         return cls(from_dict(_ResponseTag, dic))
 
     # pylint: disable=too-many-arguments

@@ -58,7 +58,7 @@ def from_dict(data_class: Type[T], data: Data) -> T:
         raise DeserializationError(data_class.__name__, str(err)) from err
 
 
-def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, Any]:
+def dict_from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, Any]:
     """
     Decodes given JSON to a dictionary. It converts json errors into DeserializationError.
     root - use it to extract data that is nested under a root object e.g. "interface": {...}

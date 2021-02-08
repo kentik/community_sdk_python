@@ -5,7 +5,7 @@ from datetime import datetime
 
 from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert
 from kentik_api.public.errors import DataFormatError
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 
 
 CreateRequest = ManualMitigation
@@ -17,7 +17,7 @@ class CreateResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string, "response")
+        dic = dict_from_json(cls.__name__, json_string, "response")
         return cls(dic["result"])
 
     def status(self) -> str:

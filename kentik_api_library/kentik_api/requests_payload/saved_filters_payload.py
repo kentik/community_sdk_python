@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from copy import deepcopy
 from typing import Optional, Dict, List, Any
 
-from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 
@@ -22,7 +22,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string)
+        dic = dict_from_json(cls.__name__, json_string)
         dic["company_id"] = convert(dic["company_id"], ID)
         return from_dict(cls, dic)
 

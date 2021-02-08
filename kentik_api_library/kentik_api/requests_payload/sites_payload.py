@@ -1,7 +1,7 @@
 from typing import Optional, Any, List, Dict
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import from_json, list_from_json, from_dict, convert
+from kentik_api.requests_payload.conversions import dict_from_json, list_from_json, from_dict, convert
 from kentik_api.public.types import ID
 from kentik_api.public.site import Site
 
@@ -20,7 +20,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="site")
         return cls.from_dict(dic=dic)
 
     @classmethod
@@ -76,7 +76,7 @@ class CreateResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="site")
         return cls(site=from_dict(data_class=CreateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
@@ -114,7 +114,7 @@ class UpdateResponse:
 
     @classmethod
     def from_json(cls, json_string):
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="site")
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="site")
         return cls(site=from_dict(data_class=UpdateResponse._Site, data=dic))
 
     def to_site(self) -> Site:
