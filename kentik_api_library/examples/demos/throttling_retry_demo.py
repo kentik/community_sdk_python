@@ -13,7 +13,8 @@ def get_auth_email_token() -> Tuple[str, str]:
     except KeyError:
         print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
         sys.exit(1)
-        
+
+
 def run_stub_api_server() -> None:
     """ run stub server that will return pre-configured responses for demo purposes """
 
