@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-import json
 from copy import deepcopy
 from typing import Dict, List, Any
 
-from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.plan import Plan, PlanDeviceType, PlanDevice
 
@@ -44,8 +43,8 @@ class GetAllResponse:
     plans: List[Dict[str, Any]]
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_plans(self) -> List[Plan]:

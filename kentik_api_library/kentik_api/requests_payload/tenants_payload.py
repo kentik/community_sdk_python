@@ -1,8 +1,7 @@
-import json
 from dataclasses import dataclass
 from typing import Optional, Any, Dict, List
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.tenant import Tenant, TenantUser
 
@@ -29,8 +28,8 @@ class GetResponse:
     updated_date: str
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_tenant(self) -> Tenant:
@@ -47,10 +46,10 @@ class GetResponse:
 
 class GetAllResponse(List[GetResponse]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string)
         tenants = cls()
-        for item in dic:
+        for item in items:
             tenant = from_dict(GetResponse, item)
             tenants.append(tenant)
         return tenants
@@ -75,8 +74,8 @@ class CreateUserResponse:
     user_full_name: Optional[str] = None
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_tenant_user(self):

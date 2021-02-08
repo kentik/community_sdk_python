@@ -1,10 +1,9 @@
-import json
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
 from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import Populator
-from kentik_api.requests_payload.conversions import convert
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json
 
 
 # pylint: disable=too-many-instance-attributes
@@ -83,7 +82,7 @@ class PopulatorArray(List[_Populator]):
     def from_list(cls, items: List[Dict[str, Any]]):
         populators = cls()
         for item in items:
-            p = GetResponse(**item)
+            p = from_dict(data_class=GetResponse, data=item)
             populators.append(p)
         return populators
 
@@ -94,8 +93,9 @@ class PopulatorArray(List[_Populator]):
 class GetResponse(_Populator):
     @classmethod
     def from_json(cls, json_string: str):
-        dic = json.loads(json_string)
-        return cls(**dic["populator"])  # payload is embeded under "populator" key
+        # payload is embeded under "populator" key
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string, root="populator")
+        return from_dict(data_class=cls, data=dic)
 
 
 class CreateRequest:
@@ -126,8 +126,8 @@ class CreateRequest:
 
     # pylint: enable=too-many-instance-attributes
 
-    def __init__(self, **kwargs):
-        self.populator = CreateRequest._Populator(**kwargs)
+    def __init__(self, **kwargs) -> None:
+        self.populator = from_dict(data_class=CreateRequest._Populator, data=kwargs)
 
 
 CreateResponse = GetResponse
@@ -163,8 +163,8 @@ class UpdateRequest:
 
     # pylint: enable=too-many-instance-attributes
 
-    def __init__(self, **kwargs):
-        self.populator = UpdateRequest._Populator(**kwargs)
+    def __init__(self, **kwargs) -> None:
+        self.populator = from_dict(data_class=UpdateRequest._Populator, data=kwargs)
 
 
 UpdateResponse = GetResponse
