@@ -9,6 +9,7 @@ from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.requests_payload.conversions import (
     from_dict,
     from_json,
+    list_from_json,
     convert,
     convert_or_none,
     convert_list_or_none,
@@ -299,7 +300,7 @@ class GetResponse:
     device: DevicePayload
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         # for GET response the payload json is like: "device": {...}
         dic = from_json(class_name=cls.__name__, json_string=json_string, root="device")
         return cls.from_dict(dic)
@@ -317,9 +318,9 @@ class GetAllResponse:
     devices: List[GetResponse]
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(class_name=cls.__name__, json_string=json_string, root="devices")
-        devices = [GetResponse.from_dict(item) for item in dic]
+    def from_json(cls, json_string: str):
+        items = list_from_json(class_name=cls.__name__, json_string=json_string, root="devices")
+        devices = [GetResponse.from_dict(item) for item in items]
         return cls(devices=devices)
 
     def to_devices(self) -> List[Device]:

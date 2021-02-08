@@ -7,6 +7,7 @@ from kentik_api.requests_payload.validation import validate_fields
 from kentik_api.requests_payload.conversions import (
     from_dict,
     from_json,
+    list_from_json,
     convert,
     convert_or_none,
     convert_list_or_none,
@@ -208,7 +209,7 @@ class GetResponse:
     interface: InterfacePayload
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         # for GET response the payload json is like: "interface": {...}
         dic = from_json(class_name=cls.__name__, json_string=json_string, root="interface")
         return cls.from_dict(dic)
@@ -226,9 +227,9 @@ class GetAllResponse:
     interfaces: List[GetResponse]
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(class_name=cls.__name__, json_string=json_string)
-        interfaces = [GetResponse.from_dict(item) for item in dic]
+    def from_json(cls, json_string: str):
+        items = list_from_json(class_name=cls.__name__, json_string=json_string)
+        interfaces = [GetResponse.from_dict(item) for item in items]
         return cls(interfaces=interfaces)
 
     def to_interfaces(self) -> List[Interface]:
@@ -266,7 +267,7 @@ class CreateResponse:
     interface: InterfacePayload
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         dic = from_json(class_name=cls.__name__, json_string=json_string)
         return cls(interface=InterfacePayload.from_dict(dic))
 

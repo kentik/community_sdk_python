@@ -1,8 +1,7 @@
-import json
 from typing import Optional, List
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.tag import Tag
 
@@ -76,7 +75,7 @@ class GetResponse:
     tag: _ResponseTag  # tags api payload is embedded under "tag" key
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         dic = from_json(cls.__name__, json_string, "tag")
         return cls(from_dict(_ResponseTag, dic))
 
@@ -179,10 +178,10 @@ class GetResponse:
 
 class GetAllResponse(List[GetResponse]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string, "tags")
         tags = cls()
-        for item in dic["tags"]:
+        for item in items:
             s = GetResponse.from_fields(**item)
             tags.append(s)
         return tags

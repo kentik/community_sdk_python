@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from typing import TypeVar, Type, Dict, Any, Optional, List, Iterable
+from typing import TypeVar, Type, Iterable, List, Dict, Any, Optional
 
 import dacite
 
@@ -63,12 +63,38 @@ def from_json(class_name: str, json_string: str, root: str = "") -> Dict[str, An
     Decodes given JSON to a dictionary. It converts json errors into DeserializationError.
     root - use it to extract data that is nested under a root object e.g. "interface": {...}
     """
+    result = _from_json(class_name, json_string, root)
+    if not isinstance(result, dict):
+        raise DeserializationError(class_name, f"Expected dict, got {type(result)}")
+    return result
+
+
+def list_from_json(class_name: str, json_string: str, root: str = "") -> List[Any]:
+    """
+    Decodes given JSON to a list. It converts json errors into DeserializationError.
+    root - use it to extract data that is nested under a root object e.g. "interface": {...}
+    """
+    result = _from_json(class_name, json_string, root)
+    if not isinstance(result, list):
+        raise DeserializationError(class_name, f"Expected list, got {type(result)}")
+    return result
+
+
+def _from_json(class_name: str, json_string: str, root: str = "") -> Any:
+    """
+    Decodes given JSON to a python object. It converts json errors into DeserializationError.
+    root - use it to extract data that is nested under a root object e.g. "interface": {...}
+    """
 
     try:
         return json.loads(json_string) if root == "" else json.loads(json_string)[root]
     except json.JSONDecodeError as err:
         raise DeserializationError(class_name, str(err)) from err
-    except KeyError as err:
+    except KeyError as err:  # deserialized dict has no "root" key
+        raise DeserializationError(class_name, str(err)) from err
+    except TypeError as err:  # deserialized list indexed with root which is a string
+        raise DeserializationError(class_name, str(err)) from err
+    except Exception as err:
         raise DeserializationError(class_name, str(err)) from err
 
 

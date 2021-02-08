@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import json
 from copy import deepcopy
 from typing import Dict, List, Any
 
@@ -44,7 +43,7 @@ class GetAllResponse:
     plans: List[Dict[str, Any]]
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         dic = from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 

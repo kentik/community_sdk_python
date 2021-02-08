@@ -1,11 +1,12 @@
-import pytest
 from enum import Enum
 from typing import Optional, Any, Dict
 from dataclasses import dataclass
+import pytest
 
 from kentik_api.requests_payload.conversions import (
     from_dict,
     from_json,
+    list_from_json,
     convert,
     convert_or_none,
     convert_list_or_none,
@@ -83,7 +84,7 @@ def test_from_dict_different_casing_raises_error() -> None:
         _ = from_dict(data_class=_TestDataClass, data=dic)
 
 
-def test_from_json_valid_document_success() -> None:
+def test_dict_from_json_valid_document_success() -> None:
     # given
     json_string = """{"name": "Liz", "age": 42}"""
 
@@ -95,7 +96,7 @@ def test_from_json_valid_document_success() -> None:
     assert dic["age"] == 42
 
 
-def test_from_json_valid_document_with_root_success() -> None:
+def test_dict_from_json_valid_document_with_root_success() -> None:
     # given
     json_string = """{"person":{"name": "Liz", "age": 42}}"""
 
@@ -107,7 +108,7 @@ def test_from_json_valid_document_with_root_success() -> None:
     assert dic["age"] == 42
 
 
-def test_from_json_invalid_syntax_raises_error() -> None:
+def test_dict_from_json_invalid_syntax_raises_error() -> None:
     # given
     json_string = """{"name": "Liz" "age": 42}"""  # missing comma between fields
 
@@ -116,13 +117,75 @@ def test_from_json_invalid_syntax_raises_error() -> None:
         _ = from_json("TestDataClass", json_string)
 
 
-def test_from_json_missing_root_raises_error() -> None:
+def test_dict_from_json_invalid_type_raises_error() -> None:
+    # given
+    json_string = """[1, 2, 3]"""  # list instead of dict
+
+    # when - then
+    with pytest.raises(DeserializationError):
+        _ = from_json("TestDataClass", json_string)
+
+
+def test_dict_from_json_missing_root_raises_error() -> None:
     # given
     json_string = """{"name": "Liz", "age": 42}"""  # data not under "person" root
 
     # when - then
     with pytest.raises(DeserializationError):
         _ = from_json("TestDataClass", json_string, "person")
+
+
+def test_list_from_json_valid_document_success() -> None:
+    # given
+    json_string = """[0, 1, 2]"""
+
+    # when
+    items = list_from_json("TestDataClass", json_string)
+
+    # then
+    assert items[0] == 0
+    assert items[1] == 1
+    assert items[2] == 2
+
+
+def test_list_from_json_valid_document_with_root_success() -> None:
+    # given
+    json_string = """{"numbers":[0, 1, 2]}"""
+
+    # when
+    items = list_from_json("TestDataClass", json_string, "numbers")
+
+    # then
+    assert items[0] == 0
+    assert items[1] == 1
+    assert items[2] == 2
+
+
+def test_list_from_json_invalid_syntax_raises_error() -> None:
+    # given
+    json_string = """[1 2, 3]"""  # missing comma between fields
+
+    # when - then
+    with pytest.raises(DeserializationError):
+        _ = list_from_json("TestDataClass", json_string)
+
+
+def test_list_from_json_invalid_type_raises_error() -> None:
+    # given
+    json_string = """{"name": "Liz", "age": 42}"""  # dict instead of list
+
+    # when - then
+    with pytest.raises(DeserializationError):
+        _ = list_from_json("TestDataClass", json_string)
+
+
+def test_list_from_json_missing_root_raises_error() -> None:
+    # given
+    json_string = """[1,2,3]"""  # data not under "numbers" root
+
+    # when - then
+    with pytest.raises(DeserializationError):
+        _ = list_from_json("TestDataClass", json_string, "numbers")
 
 
 def test_convert_provided_valid_data_format_returns_value() -> None:

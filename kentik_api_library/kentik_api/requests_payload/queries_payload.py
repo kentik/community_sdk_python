@@ -1,4 +1,3 @@
-import json
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
 from base64 import b64decode
@@ -21,7 +20,7 @@ class QueryDataResponse:
     results: List[Dict]
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         params = from_json(cls.__name__, json_string)
         return from_dict(cls, params)
 
@@ -34,7 +33,7 @@ class QueryChartResponse:
     dataUri: str  # like: "data:image/png;base64,iVBORw0KGgoAAAA..."
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         params = from_json(cls.__name__, json_string)
         return from_dict(cls, params)
 

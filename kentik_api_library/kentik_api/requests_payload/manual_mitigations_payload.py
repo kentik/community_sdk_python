@@ -1,13 +1,11 @@
 from copy import deepcopy
-import json
 from dataclasses import dataclass
 from typing import Optional, List
-from dacite import from_dict
 from datetime import datetime
 
 from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert
 from kentik_api.public.errors import DataFormatError
-from kentik_api.requests_payload.conversions import convert, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, from_json, list_from_json
 
 
 CreateRequest = ManualMitigation
@@ -18,9 +16,9 @@ class CreateResponse:
         self.result = result
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
-        return cls(dic["response"]["result"])
+    def from_json(cls, json_string: str):
+        dic = from_json(cls.__name__, json_string, "response")
+        return cls(dic["result"])
 
     def status(self) -> str:
         return self.result
@@ -78,10 +76,10 @@ class _Alarm:
 
 class GetActiveAlertsResponse(List[_Alarm]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string)
         obj = cls()
-        for i in dic:
+        for i in items:
             obj.append(from_dict(data_class=_Alarm, data=i))
         return obj
 
@@ -138,10 +136,10 @@ class _HistoricalAlert:
 
 class GetHistoricalAlertsResponse(List[_HistoricalAlert]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string)
         obj = cls()
-        for i in dic:
+        for i in items:
             obj.append(from_dict(data_class=_HistoricalAlert, data=i))
         return obj
 

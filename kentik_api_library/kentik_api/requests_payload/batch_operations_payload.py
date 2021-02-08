@@ -35,7 +35,7 @@ class BatchResponse:
     guid: str
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         dic = from_json(class_name=cls.__name__, json_string=json_string)
         return cls(**dic)
 
@@ -91,6 +91,6 @@ class BatchStatusResponse:
     is_pending: Optional[bool] = None
 
     @classmethod
-    def from_json(cls, json_string):
+    def from_json(cls, json_string: str):
         dic = from_json(class_name=cls.__name__, json_string=json_string)
         return from_dict(data_class=cls, data=dic)
