@@ -1,6 +1,6 @@
 from typing import Optional, List
 from dataclasses import dataclass
-from kentik_api.requests_payload.conversions import from_dict, from_json
+from kentik_api.requests_payload.conversions import from_dict, dict_from_json
 
 
 @dataclass()
@@ -35,9 +35,9 @@ class BatchResponse:
     guid: str
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(class_name=cls.__name__, json_string=json_string)
-        return cls(**dic)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string)
+        return from_dict(data_class=cls, data=dic)
 
 
 @dataclass()
@@ -91,6 +91,6 @@ class BatchStatusResponse:
     is_pending: Optional[bool] = None
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(class_name=cls.__name__, json_string=json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(class_name=cls.__name__, json_string=json_string)
         return from_dict(data_class=cls, data=dic)

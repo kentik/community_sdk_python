@@ -1,8 +1,7 @@
-import json
 from typing import Optional, List
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.custom_application import CustomApplication
 
@@ -25,7 +24,7 @@ class GetResponse:
 
     @classmethod
     def from_json(cls, json_string: str):
-        dic = from_json(cls.__name__, json_string)
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_custom_application(self) -> CustomApplication:
@@ -50,7 +49,7 @@ class GetResponse:
 class GetAllResponse(List[GetResponse]):
     @classmethod
     def from_json(cls, json_string: str):
-        data = from_json(cls.__name__, json_string)
+        data = list_from_json(cls.__name__, json_string)
         apps = cls()
         for item in data:
             a = from_dict(GetResponse, item)

@@ -1,10 +1,9 @@
 # Standard library imports
-import json
 from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
 
 # Local imports
-from kentik_api.requests_payload.conversions import convert, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel, DeviceItem
 
@@ -54,8 +53,8 @@ class GetResponse:
     order: Optional[int] = None
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         dic["devices"] = _DeviceArray.from_list(dic["devices"])
         return from_dict(cls, dic)
 
@@ -77,10 +76,10 @@ class GetResponse:
 
 class GetAllResponse(List[GetResponse]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = json.loads(json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string)
         labels = cls()
-        for item in dic:
+        for item in items:
             item["devices"] = _DeviceArray.from_list(item["devices"])
             l = from_dict(GetResponse, item)
             labels.append(l)
@@ -113,6 +112,6 @@ class DeleteResponse:
     success: bool
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)

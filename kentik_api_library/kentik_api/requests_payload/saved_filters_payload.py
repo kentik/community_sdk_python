@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-import json
 from copy import deepcopy
 from typing import Optional, Dict, List, Any
 
-from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, from_json
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 
@@ -22,8 +21,8 @@ class GetResponse:
     filter_level: Optional[str] = None
 
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        dic = dict_from_json(cls.__name__, json_string)
         return from_dict(cls, dic)
 
     def to_saved_filter(self) -> SavedFilter:
@@ -64,10 +63,10 @@ class GetResponse:
 
 class GetAllResponse(List[GetResponse]):
     @classmethod
-    def from_json(cls, json_string):
-        dic = from_json(cls.__name__, json_string)
+    def from_json(cls, json_string: str):
+        items = list_from_json(cls.__name__, json_string)
         saved_filters = cls()
-        for item in dic:
+        for item in items:
             saved_filter = from_dict(GetResponse, item)
             saved_filters.append(saved_filter)
         return saved_filters
