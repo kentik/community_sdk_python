@@ -10,7 +10,7 @@ from kentik_api.public.user import User
 
 @dataclass()
 class _User:
-    id: int
+    id: str
     username: str
     user_full_name: str
     user_email: str
@@ -20,7 +20,7 @@ class _User:
     last_login: Optional[str]
     created_date: str
     updated_date: str
-    company_id: int
+    company_id: str
     user_api_token: Optional[str]
     filters: Dict
     saved_filters: List
@@ -54,8 +54,6 @@ class GetResponse:
     @classmethod
     def from_json(cls, json_string: str):
         dic = dict_from_json(cls.__name__, json_string, "user")
-        dic["id"] = convert(dic["id"], ID)
-        dic["company_id"] = convert(dic["company_id"], ID)
         dic["email_service"] = convert(dic["email_service"], bool)
         dic["email_product"] = convert(dic["email_product"], bool)
         return cls(from_dict(_User, dic))
