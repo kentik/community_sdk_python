@@ -1,13 +1,12 @@
 from typing import List, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from kentik_api.public.types import ID
 from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 
-@dataclass
+@dataclass(frozen=True)
 class DeviceItem:
-
     id: ID
     device_name: str
     device_subtype: str
@@ -17,58 +16,23 @@ class DeviceItem:
 # pylint: disable=too-many-instance-attributes
 
 
+@dataclass
 class DeviceLabel:
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        name: str,
-        color: str,
-        devices: List[DeviceItem],
-        id: ID,
-        user_id: ID,
-        company_id: ID,
-        created_date: str,
-        updated_date: str,
-    ) -> None:
-        # read-write
-        self.name = name
-        self.color = color
+    # read-write
+    name: str
+    color: str
 
-        # read-only
-        self._id = id
-        self._user_id = user_id
-        self._company_id = company_id
-        self._devices = devices
-        self._created_date = created_date
-        self._updated_date = updated_date
-
-    # pylint: enable=too-many-arguments
+    # read-only
+    _devices: List[DeviceItem] = field(default_factory=list)
+    _id: ID = DEFAULT_ID
+    _user_id: Optional[ID] = DEFAULT_ID
+    _company_id: ID = DEFAULT_ID
+    _created_date: str = DEFAULT_DATE
+    _updated_date: str = DEFAULT_DATE
 
     @classmethod
     def new(cls, name: str, color: str):
-        return cls(
-            name=name,
-            color=color,
-            devices=[],
-            id=DEFAULT_ID,
-            user_id=DEFAULT_ID,
-            company_id=DEFAULT_ID,
-            created_date=DEFAULT_DATE,
-            updated_date=DEFAULT_DATE,
-        )
-
-    @classmethod
-    def update(cls, id: ID, name: str, color: str):
-        return cls(
-            name=name,
-            color=color,
-            devices=[],
-            id=id,
-            user_id=DEFAULT_ID,
-            company_id=DEFAULT_ID,
-            created_date=DEFAULT_DATE,
-            updated_date=DEFAULT_DATE,
-        )
+        return cls(name=name, color=color)
 
     @property
     def id(self) -> ID:

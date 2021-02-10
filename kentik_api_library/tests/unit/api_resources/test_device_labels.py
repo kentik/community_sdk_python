@@ -104,15 +104,26 @@ def test_update_device_label_success() -> None:
         "company_id": "72",
         "devices": [],
         "created_date": "2018-05-16T20:21:10.406Z",
-        "updated_date": "2018-05-16T20:21:10.406Z"
+        "updated_date": "2018-06-16T20:21:10.406Z"
     }"""
     connector = StubAPIConnector(update_response_payload, HTTPStatus.OK)
     device_labels_api = DeviceLabelsAPI(connector)
+    device_label_id = ID(42)
+    existing_label = DeviceLabel(
+        name="apitest-device_label",
+        color="#00FF00",
+        _devices=[],
+        _id=device_label_id,
+        _user_id=ID(52),
+        _company_id=ID(72),
+        _created_date="2018-05-16T20:21:10.406Z",
+        _updated_date="2018-05-16T20:21:10.406Z",
+    )
 
     # when
-    device_label_id = ID(42)
-    device_label = DeviceLabel.update(id=device_label_id, name="apitest-device_label-one", color="#AA00FF")
-    updated = device_labels_api.update(device_label)
+    existing_label.name = "apitest-device_label-one"
+    existing_label.color = "#AA00FF"
+    updated = device_labels_api.update(existing_label)
 
     # then request properly formed
     assert connector.last_url_path == f"/deviceLabels/{device_label_id}"
@@ -128,7 +139,7 @@ def test_update_device_label_success() -> None:
     assert updated.user_id == ID(52)
     assert updated.company_id == ID(72)
     assert updated.created_date == "2018-05-16T20:21:10.406Z"
-    assert updated.updated_date == "2018-05-16T20:21:10.406Z"
+    assert updated.updated_date == "2018-06-16T20:21:10.406Z"
     assert len(updated.devices) == 0
 
 
@@ -162,7 +173,7 @@ def test_get_all_device_labels_success() -> None:
             "id": 41,
             "name": "device_labels_1",
             "color": "#5289D9",
-            "user_id": "136885",
+            "user_id": null,
             "company_id": "74333",
             "devices": [],
             "created_date": "2020-11-20T12:54:49.575Z",
@@ -205,6 +216,7 @@ def test_get_all_device_labels_success() -> None:
 
     # then response properly parsed
     assert len(labels) == 2
+    assert labels[0].user_id is None  # API allows user_id to be None
     assert labels[1].id == ID(42)
     assert labels[1].name == "device_labels_2"
     assert labels[1].color == "#3F4EA0"
