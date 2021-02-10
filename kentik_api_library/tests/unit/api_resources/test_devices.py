@@ -135,7 +135,7 @@ def test_create_device_router_success() -> None:
     assert connector.last_payload["device"]["device_subtype"] == "router"
     assert len(connector.last_payload["device"]["sending_ips"]) == 1
     assert connector.last_payload["device"]["sending_ips"][0] == "128.0.0.10"
-    assert connector.last_payload["device"]["device_sample_rate"] == 1
+    assert connector.last_payload["device"]["device_sample_rate"] == "1"
     assert connector.last_payload["device"]["device_description"] == "testapi router with full config"
     assert connector.last_payload["device"]["device_snmp_ip"] == "127.0.0.1"
     assert connector.last_payload["device"]["plan_id"] == 11466
@@ -185,7 +185,7 @@ def test_create_device_router_success() -> None:
     assert len(created.labels) == 0
     assert len(created.all_interfaces) == 0
     assert created.device_flow_type == "auto"
-    assert created.device_sample_rate == "1"
+    assert created.device_sample_rate == 1
     assert created.sending_ips is not None
     assert len(created.sending_ips) == 1
     assert created.sending_ips[0] == "128.0.0.10"
@@ -305,7 +305,7 @@ def test_create_device_dns_success() -> None:
     assert connector.last_payload["device"]["device_type"] == "host-nprobe-dns-www"
     assert connector.last_payload["device"]["device_subtype"] == "aws_subnet"
     assert connector.last_payload["device"]["cdn_attr"] == "Y"
-    assert connector.last_payload["device"]["device_sample_rate"] == 1
+    assert connector.last_payload["device"]["device_sample_rate"] == "1"
     assert connector.last_payload["device"]["device_description"] == "testapi dns with minimal config"
     assert connector.last_payload["device"]["plan_id"] == 11466
     assert connector.last_payload["device"]["site_id"] == 8483
@@ -345,7 +345,7 @@ def test_create_device_dns_success() -> None:
     assert len(created.labels) == 0
     assert len(created.all_interfaces) == 0
     assert created.device_flow_type == "auto"
-    assert created.device_sample_rate == "1"
+    assert created.device_sample_rate == 1
     assert created.sending_ips == []
     assert created.device_snmp_ip is None
     assert created.device_snmp_community == ""
@@ -547,7 +547,7 @@ def test_get_device_router_success() -> None:
     assert device.all_interfaces[1].device_id == ID(42)
     assert device.all_interfaces[1].snmp_speed == 7
     assert device.device_flow_type == "auto"
-    assert device.device_sample_rate == "1001"
+    assert device.device_sample_rate == 1001
     assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"
@@ -678,7 +678,7 @@ def test_get_device_dns_success() -> None:
     assert len(device.labels) == 0
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
-    assert device.device_sample_rate == "1"
+    assert device.device_sample_rate == 1
     assert device.sending_ips is not None
     assert len(device.sending_ips) == 0
     assert device.device_snmp_ip is None
@@ -816,7 +816,7 @@ def test_update_device_router_success() -> None:
     assert len(connector.last_payload["device"]["sending_ips"]) == 2
     assert connector.last_payload["device"]["sending_ips"][0] == "128.0.0.10"
     assert connector.last_payload["device"]["sending_ips"][1] == "128.0.0.11"
-    assert connector.last_payload["device"]["device_sample_rate"] == 10
+    assert connector.last_payload["device"]["device_sample_rate"] == "10"
     assert connector.last_payload["device"]["device_description"] == "updated description"
     assert connector.last_payload["device"]["device_snmp_ip"] == "127.0.0.10"
     assert connector.last_payload["device"]["plan_id"] == 11466
@@ -866,7 +866,7 @@ def test_update_device_router_success() -> None:
     assert len(updated.labels) == 0
     assert len(updated.all_interfaces) == 0
     assert updated.device_flow_type == "auto"
-    assert updated.device_sample_rate == "10"
+    assert updated.device_sample_rate == 10
     assert updated.sending_ips is not None
     assert len(updated.sending_ips) == 2
     assert updated.sending_ips[0] == "128.0.0.10"
@@ -1138,7 +1138,7 @@ def test_get_all_devices_success() -> None:
     assert device.labels[1].color == "#5289D9"
     assert len(device.all_interfaces) == 0
     assert device.device_flow_type == "auto"
-    assert device.device_sample_rate == "1001"
+    assert device.device_sample_rate == 1001
     assert device.sending_ips is not None
     assert len(device.sending_ips) == 2
     assert device.sending_ips[0] == "128.0.0.11"

@@ -98,7 +98,7 @@ class LabelPayload:
 class SitePayload:
     """ This datastructure represents JSON Device.Site payload as it is transmitted to and from KentikAPI """
 
-    id: int
+    id: Optional[int]
     site_name: Optional[str]
     lat: Optional[float]
     lon: Optional[float]
@@ -113,7 +113,7 @@ class SitePayload:
             site_name=self.site_name,
             latitude=self.lat,
             longitude=self.lon,
-            id=convert(self.id, ID),
+            id=convert_or_none(self.id, ID),
             company_id=convert_or_none(self.company_id, ID),
         )
 
@@ -150,7 +150,7 @@ class DevicePayload:
     device_name: Optional[str] = None
     device_type: Optional[str] = None
     device_subtype: Optional[str] = None
-    device_sample_rate: Optional[int] = None
+    device_sample_rate: Optional[str] = None
     sending_ips: Optional[List[str]] = None
     id: Optional[str] = None
     plan: Optional[PlanPayload] = None
@@ -243,7 +243,7 @@ class DevicePayload:
             device_type=convert_or_none(device.device_type, enum_to_str),
             device_subtype=convert_or_none(device.device_subtype, enum_to_str),
             device_description=device.device_description,
-            device_sample_rate=device.device_sample_rate,
+            device_sample_rate=convert_or_none(device.device_sample_rate, str),
             sending_ips=device.sending_ips,
             device_snmp_ip=device.device_snmp_ip,
             device_snmp_community=device.device_snmp_community,
@@ -267,7 +267,7 @@ class DevicePayload:
             device_name=self.device_name,
             device_type=DeviceType(self.device_type),
             device_subtype=DeviceSubtype(self.device_subtype),
-            device_sample_rate=self.device_sample_rate,
+            device_sample_rate=convert_or_none(self.device_sample_rate, int),
             sending_ips=self.sending_ips,
             device_description=self.device_description,
             device_snmp_ip=self.device_snmp_ip,
