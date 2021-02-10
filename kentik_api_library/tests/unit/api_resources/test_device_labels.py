@@ -26,7 +26,7 @@ def test_create_device_label_success() -> None:
     device_labels_api = DeviceLabelsAPI(connector)
 
     # when
-    device_label = DeviceLabel(name="apitest-device_label-1", color="#00FF00")
+    device_label = DeviceLabel.new(name="apitest-device_label-1", color="#00FF00")
     created = device_labels_api.create(device_label)
 
     # then request properly formed
@@ -111,7 +111,7 @@ def test_update_device_label_success() -> None:
 
     # when
     device_label_id = ID(42)
-    device_label = DeviceLabel(id=device_label_id, name="apitest-device_label-one", color="#AA00FF")
+    device_label = DeviceLabel.update(id=device_label_id, name="apitest-device_label-one", color="#AA00FF")
     updated = device_labels_api.update(device_label)
 
     # then request properly formed

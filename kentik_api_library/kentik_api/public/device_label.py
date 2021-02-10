@@ -1,7 +1,8 @@
-from typing import List, Any, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 from kentik_api.public.types import ID
+from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 
 @dataclass
@@ -21,13 +22,13 @@ class DeviceLabel:
     def __init__(
         self,
         name: str,
-        color: Optional[str] = None,
-        id: Optional[ID] = None,
-        user_id: Optional[ID] = None,
-        company_id: Optional[ID] = None,
-        devices: Optional[List[DeviceItem]] = None,
-        created_date: Optional[str] = None,
-        updated_date: Optional[str] = None,
+        color: str,
+        devices: List[DeviceItem],
+        id: ID,
+        user_id: ID,
+        company_id: ID,
+        created_date: str,
+        updated_date: str,
     ) -> None:
         # read-write
         self.name = name
@@ -43,9 +44,34 @@ class DeviceLabel:
 
     # pylint: enable=too-many-arguments
 
+    @classmethod
+    def new(cls, name: str, color: str):
+        return cls(
+            name=name,
+            color=color,
+            devices=[],
+            id=DEFAULT_ID,
+            user_id=DEFAULT_ID,
+            company_id=DEFAULT_ID,
+            created_date=DEFAULT_DATE,
+            updated_date=DEFAULT_DATE,
+        )
+
+    @classmethod
+    def update(cls, id: ID, name: str, color: str):
+        return cls(
+            name=name,
+            color=color,
+            devices=[],
+            id=id,
+            user_id=DEFAULT_ID,
+            company_id=DEFAULT_ID,
+            created_date=DEFAULT_DATE,
+            updated_date=DEFAULT_DATE,
+        )
+
     @property
     def id(self) -> ID:
-        assert self._id is not None
         return self._id
 
     @property
@@ -53,7 +79,7 @@ class DeviceLabel:
         return self._user_id
 
     @property
-    def company_id(self) -> Optional[ID]:
+    def company_id(self) -> ID:
         return self._company_id
 
     @property
@@ -61,11 +87,11 @@ class DeviceLabel:
         return [] if self._devices is None else self._devices
 
     @property
-    def created_date(self) -> Optional[str]:
+    def created_date(self) -> str:
         return self._created_date
 
     @property
-    def updated_date(self) -> Optional[str]:
+    def updated_date(self) -> str:
         return self._updated_date
 
 
