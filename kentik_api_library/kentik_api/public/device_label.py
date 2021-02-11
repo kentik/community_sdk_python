@@ -48,7 +48,7 @@ class DeviceLabel:
 
     @property
     def devices(self) -> List[DeviceItem]:
-        return [] if self._devices is None else self._devices
+        return self._devices
 
     @property
     def created_date(self) -> str:
