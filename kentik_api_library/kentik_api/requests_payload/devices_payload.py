@@ -83,14 +83,14 @@ class LabelPayload:
 
     def to_device_label(self) -> DeviceLabel:
         return DeviceLabel(
-            id=convert(self.id, ID),
             color=self.color,
             name=self.name,
-            user_id=convert(self.user_id, ID),
-            company_id=convert(self.company_id, ID),
-            created_date=self.cdate,
-            updated_date=self.edate,
-            devices=None,
+            _id=convert(self.id, ID),
+            _user_id=convert(self.user_id, ID),
+            _company_id=convert(self.company_id, ID),
+            _created_date=self.cdate,
+            _updated_date=self.edate,
+            _devices=[],
         )
 
 

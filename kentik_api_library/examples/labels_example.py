@@ -44,7 +44,7 @@ def run_crud() -> None:
     client = KentikAPI(email, token)
 
     print("### CREATE")
-    label = DeviceLabel("apitest-label-1", "#0000FF")
+    label = DeviceLabel.new("apitest-label-1", "#0000FF")
     created = client.device_labels.create(label)
     print(created.__dict__)
     print()

@@ -3,7 +3,7 @@ from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
 
 # Local imports
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel, DeviceItem
 
@@ -45,7 +45,7 @@ class GetResponse:
     id: int
     name: str
     color: str
-    user_id: str
+    user_id: Optional[str]
     company_id: str
     devices: _DeviceArray
     created_date: str
@@ -62,12 +62,12 @@ class GetResponse:
         return DeviceLabel(
             name=self.name,
             color=self.color,
-            id=convert(self.id, ID),
-            user_id=convert(self.user_id, ID),
-            company_id=convert(self.company_id, ID),
-            devices=self.devices.to_device_items(),
-            created_date=self.created_date,
-            updated_date=self.updated_date,
+            _id=convert(self.id, ID),
+            _user_id=convert_or_none(self.user_id, ID),
+            _company_id=convert(self.company_id, ID),
+            _devices=self.devices.to_device_items(),
+            _created_date=self.created_date,
+            _updated_date=self.updated_date,
         )
 
 

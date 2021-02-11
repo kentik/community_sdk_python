@@ -21,7 +21,6 @@ class DeviceLabelsAPI(BaseAPI):
         return labels_payload.GetResponse.from_json(response.text).to_device_label()
 
     def create(self, device_label: DeviceLabel) -> DeviceLabel:
-        assert device_label.color is not None
         apicall = device_labels.create_device_label()
         payload = labels_payload.CreateRequest(device_label.name, device_label.color)
         response = self.send(apicall, payload)

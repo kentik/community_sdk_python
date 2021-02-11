@@ -1,12 +1,12 @@
-from typing import List, Any, Optional
-from dataclasses import dataclass
+from typing import List, Optional
+from dataclasses import dataclass, field
 
 from kentik_api.public.types import ID
+from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 
-@dataclass
+@dataclass(frozen=True)
 class DeviceItem:
-
     id: ID
     device_name: str
     device_subtype: str
@@ -16,36 +16,26 @@ class DeviceItem:
 # pylint: disable=too-many-instance-attributes
 
 
+@dataclass
 class DeviceLabel:
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        name: str,
-        color: Optional[str] = None,
-        id: Optional[ID] = None,
-        user_id: Optional[ID] = None,
-        company_id: Optional[ID] = None,
-        devices: Optional[List[DeviceItem]] = None,
-        created_date: Optional[str] = None,
-        updated_date: Optional[str] = None,
-    ) -> None:
-        # read-write
-        self.name = name
-        self.color = color
+    # read-write
+    name: str
+    color: str
 
-        # read-only
-        self._id = id
-        self._user_id = user_id
-        self._company_id = company_id
-        self._devices = devices
-        self._created_date = created_date
-        self._updated_date = updated_date
+    # read-only
+    _devices: List[DeviceItem] = field(default_factory=list)
+    _id: ID = DEFAULT_ID
+    _user_id: Optional[ID] = DEFAULT_ID
+    _company_id: ID = DEFAULT_ID
+    _created_date: str = DEFAULT_DATE
+    _updated_date: str = DEFAULT_DATE
 
-    # pylint: enable=too-many-arguments
+    @classmethod
+    def new(cls, name: str, color: str):
+        return cls(name=name, color=color)
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
         return self._id
 
     @property
@@ -53,19 +43,19 @@ class DeviceLabel:
         return self._user_id
 
     @property
-    def company_id(self) -> Optional[ID]:
+    def company_id(self) -> ID:
         return self._company_id
 
     @property
     def devices(self) -> List[DeviceItem]:
-        return [] if self._devices is None else self._devices
+        return self._devices
 
     @property
-    def created_date(self) -> Optional[str]:
+    def created_date(self) -> str:
         return self._created_date
 
     @property
-    def updated_date(self) -> Optional[str]:
+    def updated_date(self) -> str:
         return self._updated_date
 
 
