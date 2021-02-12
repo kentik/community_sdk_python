@@ -72,7 +72,7 @@ class LabelPayload:
     id: int
     color: str
     name: str
-    user_id: str
+    user_id: Optional[str]  # yes, user_id can be None
     company_id: str
     cdate: str
     edate: str
@@ -86,7 +86,7 @@ class LabelPayload:
             color=self.color,
             name=self.name,
             _id=convert(self.id, ID),
-            _user_id=convert(self.user_id, ID),
+            _user_id=convert_or_none(self.user_id, ID),
             _company_id=convert(self.company_id, ID),
             _created_date=self.cdate,
             _updated_date=self.edate,
@@ -96,7 +96,10 @@ class LabelPayload:
 
 @dataclass
 class SitePayload:
-    """ This datastructure represents JSON Device.Site payload as it is transmitted to and from KentikAPI """
+    """
+    This datastructure represents JSON Device.Site payload as it is transmitted to and from KentikAPI.
+    SitePayload embeddedd under Device differs from regular SitePayload in that all fields are optional.
+    """
 
     id: Optional[int]
     site_name: Optional[str]
