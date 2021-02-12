@@ -20,11 +20,27 @@ class DeviceSubtype(Enum):
     cisco_asa = "cisco_asa"
     paloalto = "paloalto"
     silverpeak = "silverpeak"
+    mpls = "mpls"
+    viptela = "viptela"
+    pfe_syslog = "pfe_syslog"
+    syslog = "syslog"
+    meraki = "meraki"
+    istio = "istio"
+    ios_xr = "ios_xr"
+    cisco_zone_based_firewall = "cisco_zone_based_firewall"
+    cisco_nbar = "cisco_nbar"
+    cisco_asa_syslog = "cisco_asa_syslog"
+    advanced_sflow = "advanced_sflow"
+    a10_cgn = "a10_cgn"
 
     # for DeviceType = host_nprobe_dns_www
+    kprobe = "kprobe"
+    nprobe = "nprobe"
     aws_subnet = "aws_subnet"
     azure_subnet = "azure_subnet"
     gcp_subnet = "gcp_subnet"
+    kappa = "kappa"  # not in api documentation
+    ibm_subnet = "ibm_subnet"  # not in api documentation
 
 
 class DeviceBGPType(Enum):
