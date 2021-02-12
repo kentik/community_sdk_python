@@ -75,7 +75,7 @@ class PopulatorsAPI(BaseAPI):
     def delete(self, custom_dimension_id: ID, populator_id: ID) -> bool:
         apicall = custom_dimensions.delete_populator(custom_dimension_id, populator_id)
         response = self.send(apicall)
-        return response.http_status_code == 204
+        return response.http_status_code == HTTPStatus.NO_CONTENT
 
 
 class CustomDimensionsAPI(BaseAPI):

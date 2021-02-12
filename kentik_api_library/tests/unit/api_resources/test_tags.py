@@ -388,6 +388,18 @@ def test_get_all_tags_success() -> None:
                 "country": "ES,IT",
                 "edited_by": "john.doe@acme.com",
                 "vlans": "4001,4002,4003"
+            },
+            {
+                "id": 452718,
+                "flow_tag": "DNS_TRAFFIC",
+                "addr_count": 0,
+                "port": "53",
+                "user": "39242",
+                "created_date": "2018-10-04T23:39:29.158284Z",
+                "updated_date": "2018-10-04T23:39:29.158284Z",
+                "company_id": "26393",
+                "mac_count": 0,
+                "edited_by": "el.celebes@acme.com"
             }
         ]
     }"""
@@ -403,4 +415,4 @@ def test_get_all_tags_success() -> None:
     assert connector.last_payload is None
 
     # and response properly parsed
-    assert len(tags) == 2
+    assert len(tags) == 3
