@@ -1,7 +1,7 @@
 from typing import Optional, List
 from dataclasses import dataclass
 
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
+from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.custom_application import CustomApplication
 
@@ -18,7 +18,7 @@ class GetResponse:
     asn: str
     id: int
     company_id: str
-    user_id: str
+    user_id: Optional[str] = None  # yes API happens to return user_id = null
     cdate: Optional[str] = None
     edate: Optional[str] = None
 
@@ -37,7 +37,7 @@ class GetResponse:
             asn=self.asn,
             id=convert(self.id, ID),
             company_id=convert(self.company_id, ID),
-            user_id=convert(self.user_id, ID),
+            user_id=convert_or_none(self.user_id, ID),
             created_date=self.cdate,
             updated_date=self.edate,
         )
