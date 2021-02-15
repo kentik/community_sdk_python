@@ -970,7 +970,7 @@ def test_get_all_devices_success() -> None:
                                 "description": null,
                                 "edate": "2020-11-20T12:54:49.575Z",
                                 "cdate": "2020-11-20T12:54:49.575Z",
-                                "user_id": "136885",
+                                "user_id": null,
                                 "company_id": "74333",
                                 "color": "#5289D9",
                                 "order": null,
@@ -1026,7 +1026,13 @@ def test_get_all_devices_success() -> None:
                 "device_type": "host-nprobe-dns-www",
                 "device_status": "V",
                 "device_description": "testapi dns with minimal config",
-                "site": {},
+                "site": {
+                    "id": null,
+                    "site_name": null,
+                    "lat": null,
+                    "lon": null,
+                    "company_id": null
+                },
                 "plan": {
                     "active": true,
                     "bgp_enabled": true,
@@ -1133,7 +1139,7 @@ def test_get_all_devices_success() -> None:
     assert device.labels[1].name == "GCP: traffic-generator-gcp"
     assert device.labels[1].updated_date == "2020-11-20T12:54:49.575Z"
     assert device.labels[1].created_date == "2020-11-20T12:54:49.575Z"
-    assert device.labels[1].user_id == ID(136885)
+    assert device.labels[1].user_id is None
     assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
     assert len(device.all_interfaces) == 0

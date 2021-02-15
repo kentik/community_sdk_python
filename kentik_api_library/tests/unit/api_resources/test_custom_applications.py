@@ -139,7 +139,7 @@ def test_get_all_custom_applications_success() -> None:
         {
             "id": 42,
             "company_id": "74333",
-            "user_id": "144319",
+            "user_id": null,
             "name": "apitest-customapp-1",
             "description": "TESTING CUSTOM APPS 1",
             "ip_range": "192.168.0.1,192.168.0.2",
@@ -176,6 +176,7 @@ def test_get_all_custom_applications_success() -> None:
 
     # and response properly parsed
     assert len(apps) == 2
+    assert apps[0].user_id is None
     assert apps[1].id == ID(43)
     assert apps[1].company_id == ID(74333)
     assert apps[1].user_id == ID(144319)

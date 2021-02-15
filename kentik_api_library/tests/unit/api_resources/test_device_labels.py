@@ -54,7 +54,7 @@ def test_get_device_label_success() -> None:
         "id": 32,
         "name": "ISP",
         "color": "#f1d5b9",
-        "user_id": "52",
+        "user_id": null,
         "company_id": "72",
         "order": 0,
         "devices": [
@@ -83,7 +83,7 @@ def test_get_device_label_success() -> None:
     assert device_label.id == ID(32)
     assert device_label.name == "ISP"
     assert device_label.color == "#f1d5b9"
-    assert device_label.user_id == ID(52)
+    assert device_label.user_id is None
     assert device_label.company_id == ID(72)
     assert device_label.created_date == "2018-05-16T20:21:10.406Z"
     assert device_label.updated_date == "2018-05-16T20:21:10.406Z"

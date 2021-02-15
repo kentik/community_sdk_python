@@ -1,4 +1,5 @@
 from typing import List
+from http import HTTPStatus
 
 from kentik_api.api_calls import sites
 from kentik_api.api_resources.base_api import BaseAPI
@@ -36,4 +37,4 @@ class SitesAPI(BaseAPI):
     def delete(self, site_id: ID) -> bool:
         apicall = sites.delete_site(site_id)
         response = self.send(apicall)
-        return response.http_status_code == 204
+        return response.http_status_code == HTTPStatus.NO_CONTENT
