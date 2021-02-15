@@ -31,11 +31,12 @@ def run_crud() -> None:
     client = KentikAPI(email, token)
 
     print("### CREATE")
-    user = User(
+    user = User.new(
+        username="testuser",
         full_name="Test User",
-        email="test@user.example",
+        user_email="test@user.example",
         role="Member",
-        password="test_password",
+        user_password="test_password",
         email_service=True,
         email_product=True,
     )
@@ -50,11 +51,8 @@ def run_crud() -> None:
     print()
 
     print("### UPDATE")
-    user = User(
-        id=created.id,
-        full_name="User Testing",
-    )
-    got = client.users.update(user)
+    created.full_name = "User Testing"
+    got = client.users.update(created)
     print(got.__dict__)
     print()
 

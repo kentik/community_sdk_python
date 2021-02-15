@@ -27,20 +27,20 @@ class _User:
 
     def to_user(self) -> User:
         return User(
-            id=convert(self.id, ID),
+            _id=convert(self.id, ID),
             username=self.username,
             full_name=self.user_full_name,
             email=self.user_email,
             role=self.role,
             email_service=bool(self.email_service),
             email_product=bool(self.email_product),
-            last_login=self.last_login,
-            created_date=self.created_date,
-            updated_date=self.updated_date,
-            company_id=convert(self.company_id, ID),
-            api_token=self.user_api_token,
-            filters=dict(self.filters),
-            saved_filters=list(self.saved_filters),
+            _last_login=self.last_login if self.last_login is not None else "",
+            _created_date=self.created_date,
+            _updated_date=self.updated_date,
+            _company_id=convert(self.company_id, ID),
+            _api_token=self.user_api_token if self.user_api_token is not None else "",
+            _filters=dict(self.filters),
+            _saved_filters=list(self.saved_filters),
         )
 
 

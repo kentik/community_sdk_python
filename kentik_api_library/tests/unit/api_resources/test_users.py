@@ -32,7 +32,15 @@ def test_create_user_success() -> None:
     users_api = UsersAPI(connector)
 
     # when
-    user = User(full_name="Test User", email="test@user.example", role="Member", email_service=True, email_product=True)
+    email = "test@user.example"
+    user = User.new(
+        username=email,
+        full_name="Test User",
+        user_email=email,
+        role="Member",
+        email_service=True,
+        email_product=True,
+    )
     created = users_api.create(user)
 
     # then request properly formed
@@ -53,10 +61,10 @@ def test_create_user_success() -> None:
     assert created.email == "test@user.example"
     assert created.company_id == ID(74333)
     assert created.role == "Member"
-    assert created.password is None
+    assert created.password == ""
     assert created.email_service is True
     assert created.email_product is True
-    assert created.api_token is None
+    assert created.api_token == ""
 
 
 def test_get_user_success() -> None:
@@ -99,7 +107,7 @@ def test_get_user_success() -> None:
     assert user.email == "test@user.example"
     assert user.company_id == ID(74333)
     assert user.role == "Member"
-    assert user.password is None
+    assert user.password == ""
     assert user.email_service is True
     assert user.email_product is True
     assert user.api_token == "****************************a997"
@@ -128,13 +136,18 @@ def test_update_user_success() -> None:
     }"""
     connector = StubAPIConnector(update_response_payload, HTTPStatus.OK)
     users_api = UsersAPI(connector)
-
-    # when
     user_id = ID(146034)
     user = User(
-        id=user_id,
-        full_name="User Testing",
+        _id=user_id,
+        username="testname",
+        email="test@ema.il",
+        email_service=True,
+        email_product=True,
+        full_name="User Test",
     )
+
+    # when
+    user.full_name = "User Testing"
     updated = users_api.update(user)
 
     # then request properly formed
