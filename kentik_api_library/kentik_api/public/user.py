@@ -1,63 +1,84 @@
-from typing import List, Dict, Optional
+from typing import List, Dict
+from dataclasses import dataclass, field
 
 from kentik_api.public.types import ID
+from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 # pylint: disable=too-many-instance-attributes
 
 
+@dataclass
 class User:
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        username: Optional[str] = None,
-        full_name: Optional[str] = None,
-        email: Optional[str] = None,
-        role: Optional[str] = None,
-        email_service: Optional[bool] = None,
-        email_product: Optional[bool] = None,
-        id: Optional[ID] = None,
-        password: Optional[str] = None,
-        last_login: Optional[str] = None,
-        created_date: Optional[str] = None,
-        updated_date: Optional[str] = None,
-        company_id: Optional[ID] = None,
-        api_token: Optional[str] = None,
-        filters: Optional[Dict] = None,
-        saved_filters: Optional[List] = None,
-    ) -> None:
-        self.username = username
-        self.full_name = full_name
-        self.email = email
-        self.password = password
-        self.role = role
-        self.email_service = email_service
-        self.email_product = email_product
-        self.company_id = company_id
-        self.api_token = api_token
-        self.filters = filters
-        self.saved_filters = saved_filters
+    # read-write
+    username: str
+    full_name: str
+    email: str
+    email_service: bool
+    email_product: bool
+    password: str = ""
+    role: str = ""
 
-        self._id = id
-        self._last_login = last_login
-        self._created_date = created_date
-        self._updated_date = updated_date
+    # read-only
+    _company_id: ID = DEFAULT_ID
+    _api_token: str = ""
+    _filters: Dict = field(default_factory=dict)
+    _saved_filters: List = field(default_factory=list)
+    _id: ID = DEFAULT_ID
+    _last_login: str = DEFAULT_DATE
+    _created_date: str = DEFAULT_DATE
+    _updated_date: str = DEFAULT_DATE
 
-    # pylint: enable=too-many-arguments
+    @classmethod
+    def new(
+        cls,
+        username: str,
+        full_name: str,
+        user_email: str,
+        email_service: bool,
+        email_product: bool,
+        user_password: str = "",
+        role: str = "",
+    ):
+        return cls(
+            username=username,
+            full_name=full_name,
+            email=user_email,
+            email_service=email_service,
+            email_product=email_product,
+            password=user_password,
+            role=role,
+        )
+
+    @property
+    def company_id(self) -> ID:
+        return self._company_id
+
+    @property
+    def api_token(self) -> str:
+        return self._api_token
+
+    @property
+    def filters(self) -> Dict:
+        return self._filters
+
+    @property
+    def saved_filters(self) -> List:
+        return self._saved_filters
+
     @property
     def id(self) -> ID:
-        assert self._id is not None
         return self._id
 
     @property
-    def last_login(self) -> Optional[str]:
+    def last_login(self) -> str:
         return self._last_login
 
     @property
-    def created_date(self) -> Optional[str]:
+    def created_date(self) -> str:
         return self._created_date
 
     @property
-    def updated_date(self) -> Optional[str]:
+    def updated_date(self) -> str:
         return self._updated_date
 
 

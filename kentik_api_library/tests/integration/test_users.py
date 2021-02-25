@@ -25,34 +25,6 @@ DUMMY_USER_ID: int = 1337
 FAKE_API_URL: str = "https://api.fakekentik.com/api/v5"
 
 
-def test_create_user_fails_when_no_email_given(kentik_api) -> None:
-    user = User(role="Member", email_service=True, email_product=True)
-
-    with pytest.raises(AssertionError, match="User email has to be provided"):
-        kentik_api.users.create(user)
-
-
-def test_create_user_fails_when_no_role_given(kentik_api) -> None:
-    user = User(email="test@user.example", email_service=True, email_product=True)
-
-    with pytest.raises(AssertionError, match="User role has to be provided"):
-        kentik_api.users.create(user)
-
-
-def test_create_user_fails_when_no_email_service_given(kentik_api) -> None:
-    user = User(email="test@user.example", role="Member", email_product=True)
-
-    with pytest.raises(AssertionError, match="Email service has to be provided"):
-        kentik_api.users.create(user)
-
-
-def test_create_user_fails_when_no_email_product_given(kentik_api) -> None:
-    user = User(email="test@user.example", role="Member", email_service=True)
-
-    with pytest.raises(AssertionError, match="Email product has to be provided"):
-        kentik_api.users.create(user)
-
-
 @httpretty.activate
 def test_get_user_fails_when_uncommon_http_error_received(kentik_api) -> None:
     # given

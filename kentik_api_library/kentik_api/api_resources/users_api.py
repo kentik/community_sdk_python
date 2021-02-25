@@ -22,12 +22,6 @@ class UsersAPI(BaseAPI):
         return users_payload.GetResponse.from_json(response.text).to_user()
 
     def create(self, user: User) -> User:
-        # Checking if required data is provided
-        assert user.email is not None, "User email has to be provided"
-        assert user.role is not None, "User role has to be provided"
-        assert user.email_service is not None, "Email service has to be provided"
-        assert user.email_product is not None, "Email product has to be provided"
-
         api_call = users.create_user()
         payload = users_payload.CreateRequest(
             user_name=user.username,
@@ -42,8 +36,6 @@ class UsersAPI(BaseAPI):
         return users_payload.CreateResponse.from_json(response.text).to_user()
 
     def update(self, user: User) -> User:
-        assert user.id is not None, "User ID has to be provided"
-
         api_call = users.update_user(user.id)
         payload = users_payload.UpdateRequest(
             user_name=user.username,
