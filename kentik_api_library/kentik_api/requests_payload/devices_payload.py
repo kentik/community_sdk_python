@@ -67,7 +67,11 @@ class SNMPv3ConfPayload:
 
 @dataclass
 class LabelPayload:
-    """ This datastructure represents JSON Device.Label payload as it is transmitted to and from KentikAPI """
+    """
+    This datastructure represents JSON Device.Label payload as it is transmitted to and from KentikAPI
+    LabelPayload embedded under Device differs from standalone LabelPayload in that it lacks devices list, and in field names,
+    eg. cdate vs created_date, edate vs updated_date
+    """
 
     id: int
     color: str
