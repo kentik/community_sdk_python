@@ -1,7 +1,10 @@
 # Running jupyter-notebook demos
 
-Precondition: python3 and pip3 are already installed.
+Preconditions: 
+- python3 and pip3 are already installed
+- your IP is on ACL whitelist. See: <https://portal.kentik.com/v4/settings/access>
 
+Steps:
 1. Open a new terminal
 
 1. Set environment variables to your KentikAPI credentials  
@@ -28,5 +31,8 @@ Precondition: python3 and pip3 are already installed.
 1. Install demo requirements & jupyter-notebook   
 `pip3 install Pillow pandas httpretty notebook`
 
-1. Run throttling demo  
-`jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo.ipynb`
+1. Run throttling demo against stub server  
+`jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_stub.ipynb`
+
+1. Run throttling demo against live server (make sure that there is any data that can be retrieved)
+`jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_live.ipynb`
