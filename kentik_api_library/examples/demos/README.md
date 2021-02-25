@@ -34,5 +34,5 @@ Steps:
 1. Run throttling demo against stub server  
 `jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_stub.ipynb`
 
-1. Run throttling demo against live server (make sure that there is any data that can be retrieved)
+1. Run throttling demo against live server (make sure that there is any data that can be retrieved)  
 `jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_live.ipynb`
