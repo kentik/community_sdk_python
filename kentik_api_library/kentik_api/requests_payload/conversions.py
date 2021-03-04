@@ -110,7 +110,7 @@ def convert(attr: Any, convert_func) -> Any:
 def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
     """ Convert if input is not None, else just return None. Raise DataFormatError on failure  """
 
-    if attr is None or attr == {}:
+    if not attr:
         return None
     return convert(attr, convert_func)
 
