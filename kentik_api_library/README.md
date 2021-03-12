@@ -67,6 +67,7 @@ The general approach is that every single KentikAPI resource is represented in t
 - [Tag](./kentik_api/public/tag.py)
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
+
 ## More examples
 
 List of available examples:

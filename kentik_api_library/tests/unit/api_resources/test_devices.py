@@ -1,21 +1,21 @@
 from http import HTTPStatus
 
-from kentik_api.api_resources.devices_api import DevicesAPI
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
+from kentik_api.api_resources.devices_api import DevicesAPI
 from kentik_api.public.device import (
-    Device,
-    DeviceType,
-    DeviceSubtype,
-    DeviceBGPType,
     AuthenticationProtocol,
+    CDNAttribute,
+    Device,
+    DeviceBGPType,
+    DeviceSubtype,
+    DeviceType,
+    Interface,
     PrivacyProtocol,
     SNMPv3Conf,
-    CDNAttribute,
-    Interface,
     SecondaryIP,
     VRFAttributes,
 )
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 
@@ -699,6 +699,222 @@ def test_get_device_dns_success() -> None:
     assert device.bgp_peer_ip6 is None
     assert device.snmp_last_updated is None
     assert device.device_subtype == DeviceSubtype.aws_subnet
+
+
+def test_get_device_with_unknown_enum_fields() -> None:
+    # given
+    get_response_payload = """
+    {
+        "device": {
+                "id": "43",
+                "company_id": "74333",
+                "device_name": "testapi_dns_minimal_1",
+                "device_type": "dt_teapot",
+                "plan": {
+                    "active": true,
+                    "bgp_enabled": true,
+                    "cdate": "2020-09-03T08:41:57.489Z",
+                    "company_id": 74333,
+                    "description": "Your Free Trial includes 6 devices (...)",
+                    "deviceTypes": [],
+                    "devices": [],
+                    "edate": "2020-09-03T08:41:57.489Z",
+                    "fast_retention": 30,
+                    "full_retention": 30,
+                    "id": 11466,
+                    "max_bigdata_fps": 30,
+                    "max_devices": 6,
+                    "max_fps": 1000,
+                    "name": "Free Trial Plan",
+                    "metadata": {}
+                },
+                "device_sample_rate": "1",
+                "device_bgp_type": "dbt_teapot",
+                "created_date": "2020-12-17T12:53:01.025Z",
+                "updated_date": "2020-12-17T12:53:01.025Z",
+                "device_snmp_v3_conf": {
+                    "UserName": "John",
+                    "AuthenticationProtocol": "ap_teapot",
+                    "AuthenticationPassphrase": "Auth_Pass",
+                    "PrivacyProtocol": "pp_teapot",
+                    "PrivacyPassphrase": "******ass"
+                },
+                "cdn_attr": "cdna_teapot",
+                "device_subtype": "ds_teapot"
+            }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = ID(43)
+    device = devices_api.get(device_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert device.id == device_id
+    assert device.company_id == ID(74333)
+    assert device.device_name == "testapi_dns_minimal_1"
+    assert device.device_type == "dt_teapot"
+    assert device.device_status is None
+    assert device.device_description is None
+    assert device.site is None
+    assert device.plan.active is True
+    assert device.plan.bgp_enabled is True
+    assert device.plan.created_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.company_id == ID(74333)
+    assert device.plan.description == "Your Free Trial includes 6 devices (...)"
+    assert device.plan.device_types == []
+    assert device.plan.devices == []
+    assert device.plan.updated_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.fast_retention == 30
+    assert device.plan.full_retention == 30
+    assert device.plan.id == ID(11466)
+    assert device.plan.max_bigdata_fps == 30
+    assert device.plan.max_devices == 6
+    assert device.plan.max_fps == 1000
+    assert device.plan.name == "Free Trial Plan"
+    assert device.plan.metadata == {}
+    assert len(device.labels) == 0
+    assert len(device.all_interfaces) == 0
+    assert device.device_flow_type is None
+    assert device.device_sample_rate == 1
+    assert device.sending_ips is None
+    assert device.device_snmp_ip is None
+    assert device.device_snmp_community is None
+    assert device.minimize_snmp is None
+    assert device.device_bgp_type == "dbt_teapot"
+    assert device.device_bgp_neighbor_ip is None
+    assert device.device_bgp_neighbor_ip6 is None
+    assert device.device_bgp_neighbor_asn is None
+    assert device.device_bgp_flowspec is None
+    assert device.device_bgp_password is None
+    assert device.use_bgp_device_id is None
+    assert device.created_date == "2020-12-17T12:53:01.025Z"
+    assert device.updated_date == "2020-12-17T12:53:01.025Z"
+    assert device.device_snmp_v3_conf is not None
+    assert device.device_snmp_v3_conf.user_name == "John"
+    assert device.device_snmp_v3_conf.authentication_protocol == "ap_teapot"
+    assert device.device_snmp_v3_conf.authentication_passphrase == "Auth_Pass"
+    assert device.device_snmp_v3_conf.privacy_protocol == "pp_teapot"
+    assert device.device_snmp_v3_conf.privacy_passphrase == "******ass"
+    assert device.cdn_attr == "cdna_teapot"
+    assert device.bgp_peer_ip4 is None
+    assert device.bgp_peer_ip6 is None
+    assert device.snmp_last_updated is None
+    assert device.device_subtype == "ds_teapot"
+
+
+def test_get_device_with_empty_enum_fields() -> None:
+    # given
+    get_response_payload = """
+    {
+        "device": {
+                "id": "43",
+                "company_id": "74333",
+                "device_name": "testapi_dns_minimal_1",
+                "device_type": "",
+                "plan": {
+                    "active": true,
+                    "bgp_enabled": true,
+                    "cdate": "2020-09-03T08:41:57.489Z",
+                    "company_id": 74333,
+                    "description": "Your Free Trial includes 6 devices (...)",
+                    "deviceTypes": [],
+                    "devices": [],
+                    "edate": "2020-09-03T08:41:57.489Z",
+                    "fast_retention": 30,
+                    "full_retention": 30,
+                    "id": 11466,
+                    "max_bigdata_fps": 30,
+                    "max_devices": 6,
+                    "max_fps": 1000,
+                    "name": "Free Trial Plan",
+                    "metadata": {}
+                },
+                "device_sample_rate": "1",
+                "device_bgp_type": "",
+                "created_date": "2020-12-17T12:53:01.025Z",
+                "updated_date": "2020-12-17T12:53:01.025Z",
+                "device_snmp_v3_conf": {
+                    "UserName": "John",
+                    "AuthenticationProtocol": "",
+                    "AuthenticationPassphrase": "Auth_Pass",
+                    "PrivacyProtocol": "",
+                    "PrivacyPassphrase": "******ass"
+                },
+                "cdn_attr": "",
+                "device_subtype": ""
+            }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    devices_api = DevicesAPI(connector)
+
+    # when
+    device_id = ID(43)
+    device = devices_api.get(device_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/device/{device_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert device.id == device_id
+    assert device.company_id == ID(74333)
+    assert device.device_name == "testapi_dns_minimal_1"
+    assert device.device_type == ""
+    assert device.device_status is None
+    assert device.device_description is None
+    assert device.site is None
+    assert device.plan.active is True
+    assert device.plan.bgp_enabled is True
+    assert device.plan.created_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.company_id == ID(74333)
+    assert device.plan.description == "Your Free Trial includes 6 devices (...)"
+    assert device.plan.device_types == []
+    assert device.plan.devices == []
+    assert device.plan.updated_date == "2020-09-03T08:41:57.489Z"
+    assert device.plan.fast_retention == 30
+    assert device.plan.full_retention == 30
+    assert device.plan.id == ID(11466)
+    assert device.plan.max_bigdata_fps == 30
+    assert device.plan.max_devices == 6
+    assert device.plan.max_fps == 1000
+    assert device.plan.name == "Free Trial Plan"
+    assert device.plan.metadata == {}
+    assert len(device.labels) == 0
+    assert len(device.all_interfaces) == 0
+    assert device.device_flow_type is None
+    assert device.device_sample_rate == 1
+    assert device.sending_ips is None
+    assert device.device_snmp_ip is None
+    assert device.device_snmp_community is None
+    assert device.minimize_snmp is None
+    assert device.device_bgp_type == ""
+    assert device.device_bgp_neighbor_ip is None
+    assert device.device_bgp_neighbor_ip6 is None
+    assert device.device_bgp_neighbor_asn is None
+    assert device.device_bgp_flowspec is None
+    assert device.device_bgp_password is None
+    assert device.use_bgp_device_id is None
+    assert device.created_date == "2020-12-17T12:53:01.025Z"
+    assert device.updated_date == "2020-12-17T12:53:01.025Z"
+    assert device.device_snmp_v3_conf is not None
+    assert device.device_snmp_v3_conf.user_name == "John"
+    assert device.device_snmp_v3_conf.authentication_protocol is None
+    assert device.device_snmp_v3_conf.authentication_passphrase == "Auth_Pass"
+    assert device.device_snmp_v3_conf.privacy_protocol is None
+    assert device.device_snmp_v3_conf.privacy_passphrase == "******ass"
+    assert device.cdn_attr is None
+    assert device.bgp_peer_ip4 is None
+    assert device.bgp_peer_ip6 is None
+    assert device.snmp_last_updated is None
+    assert device.device_subtype == ""
 
 
 def test_update_device_router_success() -> None:
