@@ -15,7 +15,7 @@ class Criterion:
 
     def __init__(self, addr: List[str], direction: Direction = Direction.EITHER) -> None:
         if len(addr) <= 0:
-            raise ValueError("Criterion adderss list is empty")
+            raise ValueError("Criterion address list is empty")
 
         self.direction = direction
         self.addr = addr
