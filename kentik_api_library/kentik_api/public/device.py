@@ -1,20 +1,19 @@
-from typing import Optional, List, Any
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any, List, Optional
 
-from kentik_api.public.site import Site
-from kentik_api.public.plan import Plan
-
-from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel
+from kentik_api.public.plan import Plan
+from kentik_api.public.site import Site
+from kentik_api.public.types import ID, PermissiveEnumMeta
 
 
-class DeviceType(Enum):
+class DeviceType(Enum, metaclass=PermissiveEnumMeta):
     router = "router"
     host_nprobe_dns_www = "host-nprobe-dns-www"
 
 
-class DeviceSubtype(Enum):
+class DeviceSubtype(Enum, metaclass=PermissiveEnumMeta):
     # for DeviceType = router
     router = "router"
     cisco_asa = "cisco_asa"
@@ -43,25 +42,25 @@ class DeviceSubtype(Enum):
     ibm_subnet = "ibm_subnet"  # not in api documentation
 
 
-class DeviceBGPType(Enum):
+class DeviceBGPType(Enum, metaclass=PermissiveEnumMeta):
     none = "none"
     device = "device"
     other_device = "other_device"
 
 
-class CDNAttribute(Enum):
+class CDNAttribute(Enum, metaclass=PermissiveEnumMeta):
     none = "None"
     yes = "Y"
     no = "N"
 
 
-class AuthenticationProtocol(Enum):
+class AuthenticationProtocol(Enum, metaclass=PermissiveEnumMeta):
     no_auth = "NoAuth"
     md5 = "MD5"
     sha = "SHA"
 
 
-class PrivacyProtocol(Enum):
+class PrivacyProtocol(Enum, metaclass=PermissiveEnumMeta):
     no_priv = "NoPriv"
     des = "DES"
     aes = "AES"

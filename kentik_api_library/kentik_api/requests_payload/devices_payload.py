@@ -1,32 +1,34 @@
-from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
-from kentik_api.public.types import ID
+from typing import Any, Dict, List, Optional
+
+from kentik_api.public.device import (
+    AllInterfaces,
+    AppliedLabels,
+    AuthenticationProtocol,
+    CDNAttribute,
+    Device,
+    DeviceBGPType,
+    DeviceSubtype,
+    DeviceType,
+    PrivacyProtocol,
+    SNMPv3Conf,
+)
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.site import Site
+from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import (
+    convert,
+    convert_list_or_none,
+    convert_or_none,
+    dict_from_json,
+    enum_to_str,
+    from_dict,
+    list_from_json,
+)
 from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResponse
 from kentik_api.requests_payload.validation import validate_fields
-from kentik_api.requests_payload.conversions import (
-    from_dict,
-    dict_from_json,
-    list_from_json,
-    convert,
-    convert_or_none,
-    convert_list_or_none,
-    enum_to_str,
-)
-from kentik_api.public.device import (
-    Device,
-    DeviceType,
-    DeviceSubtype,
-    DeviceBGPType,
-    SNMPv3Conf,
-    PrivacyProtocol,
-    AuthenticationProtocol,
-    CDNAttribute,
-    AllInterfaces,
-    AppliedLabels,
-)
+
 
 # pylint: disable=too-many-instance-attributes
 

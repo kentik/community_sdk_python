@@ -204,5 +204,5 @@ def run_list() -> None:
 
 if __name__ == "__main__":
     run_crud_router()
-    # run_crud_dns()
-    # run_list()
+    run_crud_dns()
+    run_list()
