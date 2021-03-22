@@ -1,10 +1,10 @@
 import json
 from enum import Enum
-from typing import TypeVar, Type, Iterable, List, Dict, Any, Optional
+from typing import Any, Dict, Iterable, List, Optional, Type, TypeVar
 
 import dacite
 
-from kentik_api.public.errors import DeserializationError, DataFormatError
+from kentik_api.public.errors import DataFormatError, DeserializationError
 
 
 def as_dict(obj: Any) -> Dict[str, Any]:
@@ -125,4 +125,13 @@ def convert_list_or_none(items: Optional[Iterable[Any]], convert_func) -> Option
 
 def enum_to_str(enum: Enum) -> str:
     """ Convert enum value to str. To be used with convert* functions """
+    return str(enum.value)
+
+
+def permissive_enum_to_str(enum: Any) -> str:
+    """Convert enum created from PermissiveEnumMeta to str. To be used with convert* functions.
+    It handles the corner case, when value returned by enum call is not enum member, but string.
+    """
+    if isinstance(enum, str):
+        return enum
     return str(enum.value)

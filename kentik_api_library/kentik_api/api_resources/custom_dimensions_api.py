@@ -7,6 +7,7 @@ from kentik_api.public.types import ID
 from kentik_api.public.custom_dimension import CustomDimension, Populator
 from kentik_api.requests_payload import custom_dimensions_payload, populators_payload
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+from kentik_api.requests_payload.conversions import convert, permissive_enum_to_str
 
 
 class PopulatorsAPI(BaseAPI):
@@ -49,7 +50,7 @@ class PopulatorsAPI(BaseAPI):
         apicall = custom_dimensions.update_populator(populator.dimension_id, populator.id)
         payload = populators_payload.UpdateRequest(
             value=populator.value,
-            direction=populator.direction.value,
+            direction=convert(populator.direction, permissive_enum_to_str),
             device_name=populator.device_name,
             interface_name=populator.interface_name,
             addr=populator.addr,
