@@ -1,13 +1,14 @@
-from typing import Optional, List
 from enum import Enum
+from typing import List, Optional
 
-from kentik_api.public.types import ID
+from kentik_api.public.types import ID, PermissiveEnumMeta
+
 
 # pylint: disable=too-many-instance-attributes
 
 
 class Populator:
-    class Direction(Enum):
+    class Direction(Enum, metaclass=PermissiveEnumMeta):
         SRC = "SRC"
         DST = "DST"
         EITHER = "EITHER"

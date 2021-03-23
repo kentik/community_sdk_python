@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from kentik_api.api_resources.custom_dimensions_api import CustomDimensionsAPI
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
+from kentik_api.api_resources.custom_dimensions_api import CustomDimensionsAPI
 from kentik_api.public.custom_dimension import CustomDimension, Populator
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 
@@ -137,6 +137,122 @@ def test_get_custom_dimension_success() -> None:
     assert dimension.populators[1].company_id == ID(74333)
     assert dimension.populators[1].site == "site3"
     assert dimension.populators[1].mac_count == 0
+
+
+def test_get_custom_dimension_with_unknown_enum_fields() -> None:
+    # given
+    get_response_payload = """
+    {
+        "customDimension": {
+            "id": 42,
+            "name": "c_testapi_dimension_1",
+            "display_name": "dimension_display_name",
+            "type": "string",
+            "company_id": "74333",
+            "populators": [
+                {
+                    "id": 1510862280,
+                    "dimension_id": 24001,
+                    "value": "testapi-dimension-value-3",
+                    "direction": "d_teapot",
+                    "addr_count": 0,
+                    "user": "144319",
+                    "created_date": "2020-12-15T07:55:23.911095Z",
+                    "updated_date": "2020-12-15T11:11:30.300681Z",
+                    "company_id": "74333",
+                    "mac_count": 0
+                }
+            ]
+        }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    custom_dimensions_api = CustomDimensionsAPI(connector)
+
+    # when
+    dimension_id = ID(42)
+    dimension = custom_dimensions_api.get(dimension_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/customdimension/{dimension_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert dimension.id == ID(42)
+    assert dimension.name == "c_testapi_dimension_1"
+    assert dimension.display_name == "dimension_display_name"
+    assert dimension.type == "string"
+    assert dimension.company_id == ID(74333)
+    assert dimension.populators is not None
+    assert len(dimension.populators) == 1
+    assert dimension.populators[0].id == ID(1510862280)
+    assert dimension.populators[0].dimension_id == ID(24001)
+    assert dimension.populators[0].value == "testapi-dimension-value-3"
+    assert dimension.populators[0].direction == "D_TEAPOT"
+    assert dimension.populators[0].addr_count == 0
+    assert dimension.populators[0].user == "144319"
+    assert dimension.populators[0].created_date == "2020-12-15T07:55:23.911095Z"
+    assert dimension.populators[0].updated_date == "2020-12-15T11:11:30.300681Z"
+    assert dimension.populators[0].company_id == ID(74333)
+    assert dimension.populators[0].mac_count == 0
+
+
+def test_get_custom_dimension_with_empty_enum_fields() -> None:
+    # given
+    get_response_payload = """
+    {
+        "customDimension": {
+            "id": 42,
+            "name": "c_testapi_dimension_1",
+            "display_name": "dimension_display_name",
+            "type": "string",
+            "company_id": "74333",
+            "populators": [
+                {
+                    "id": 1510862280,
+                    "dimension_id": 24001,
+                    "value": "testapi-dimension-value-3",
+                    "direction": "",
+                    "addr_count": 0,
+                    "user": "144319",
+                    "created_date": "2020-12-15T07:55:23.911095Z",
+                    "updated_date": "2020-12-15T11:11:30.300681Z",
+                    "company_id": "74333",
+                    "mac_count": 0
+                }
+            ]
+        }
+    }"""
+    connector = StubAPIConnector(get_response_payload, HTTPStatus.OK)
+    custom_dimensions_api = CustomDimensionsAPI(connector)
+
+    # when
+    dimension_id = ID(42)
+    dimension = custom_dimensions_api.get(dimension_id)
+
+    # then request properly formed
+    assert connector.last_url_path == f"/customdimension/{dimension_id}"
+    assert connector.last_method == APICallMethods.GET
+    assert connector.last_payload is None
+
+    # and response properly parsed
+    assert dimension.id == ID(42)
+    assert dimension.name == "c_testapi_dimension_1"
+    assert dimension.display_name == "dimension_display_name"
+    assert dimension.type == "string"
+    assert dimension.company_id == ID(74333)
+    assert dimension.populators is not None
+    assert len(dimension.populators) == 1
+    assert dimension.populators[0].id == ID(1510862280)
+    assert dimension.populators[0].dimension_id == ID(24001)
+    assert dimension.populators[0].value == "testapi-dimension-value-3"
+    assert dimension.populators[0].direction == ""
+    assert dimension.populators[0].addr_count == 0
+    assert dimension.populators[0].user == "144319"
+    assert dimension.populators[0].created_date == "2020-12-15T07:55:23.911095Z"
+    assert dimension.populators[0].updated_date == "2020-12-15T11:11:30.300681Z"
+    assert dimension.populators[0].company_id == ID(74333)
+    assert dimension.populators[0].mac_count == 0
 
 
 def test_update_custom_dimension_success() -> None:
