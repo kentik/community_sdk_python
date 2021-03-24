@@ -25,6 +25,7 @@ from kentik_api.requests_payload.conversions import (
     enum_to_str,
     from_dict,
     list_from_json,
+    permissive_enum_to_str,
 )
 from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResponse
 from kentik_api.requests_payload.validation import validate_fields
@@ -51,9 +52,9 @@ class SNMPv3ConfPayload:
     def from_conf(cls, conf: SNMPv3Conf):
         return cls(
             UserName=conf.user_name,
-            AuthenticationProtocol=convert_or_none(conf.authentication_protocol, enum_to_str),
+            AuthenticationProtocol=convert_or_none(conf.authentication_protocol, permissive_enum_to_str),
             AuthenticationPassphrase=conf.authentication_passphrase,
-            PrivacyProtocol=convert_or_none(conf.privacy_protocol, enum_to_str),
+            PrivacyProtocol=convert_or_none(conf.privacy_protocol, permissive_enum_to_str),
             PrivacyPassphrase=conf.privacy_passphrase,
         )
 
@@ -249,15 +250,15 @@ class DevicePayload:
             plan_id=convert_or_none(device.plan_id, int),
             site_id=convert_or_none(device.site_id, int),
             device_name=device.device_name,
-            device_type=convert_or_none(device.device_type, enum_to_str),
-            device_subtype=convert_or_none(device.device_subtype, enum_to_str),
+            device_type=convert_or_none(device.device_type, permissive_enum_to_str),
+            device_subtype=convert_or_none(device.device_subtype, permissive_enum_to_str),
             device_description=device.device_description,
             device_sample_rate=convert_or_none(device.device_sample_rate, str),
             sending_ips=device.sending_ips,
             device_snmp_ip=device.device_snmp_ip,
             device_snmp_community=device.device_snmp_community,
             minimize_snmp=device.minimize_snmp,
-            device_bgp_type=convert_or_none(device.device_bgp_type, enum_to_str),
+            device_bgp_type=convert_or_none(device.device_bgp_type, permissive_enum_to_str),
             device_bgp_neighbor_ip=device.device_bgp_neighbor_ip,
             device_bgp_neighbor_ip6=device.device_bgp_neighbor_ip6,
             device_bgp_neighbor_asn=device.device_bgp_neighbor_asn,
@@ -265,7 +266,7 @@ class DevicePayload:
             device_bgp_password=device.device_bgp_password,
             use_bgp_device_id=convert_or_none(device.use_bgp_device_id, int),
             device_snmp_v3_conf=convert_or_none(device.device_snmp_v3_conf, SNMPv3ConfPayload.from_conf),
-            cdn_attr=convert_or_none(device.cdn_attr, enum_to_str),
+            cdn_attr=convert_or_none(device.cdn_attr, permissive_enum_to_str),
         )
 
     def to_device(self) -> Device:
