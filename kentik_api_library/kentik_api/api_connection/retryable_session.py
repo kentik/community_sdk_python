@@ -22,4 +22,4 @@ class RetryableSession(Session):
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.mount("https://", adapter)
         self.mount("http://", adapter)
-        log.debug('%s: retry_strategy: %s', self.__class__, retry_strategy)
+        log.debug("%s: retry_strategy: %s", self.__class__, retry_strategy)
