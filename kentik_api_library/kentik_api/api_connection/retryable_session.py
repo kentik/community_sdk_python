@@ -6,7 +6,7 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 
-
+# mypy: ignore-errors
 class RetryableSession(Session):
     DEFAULT_RETRY_STRATEGY = Retry(
         total = 3,
