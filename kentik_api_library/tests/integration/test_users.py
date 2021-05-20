@@ -4,7 +4,7 @@ from http import HTTPStatus
 import httpretty
 import pytest
 
-from kentik_api import KentikAPI
+from kentik_api import KentikAPI, Retry
 from kentik_api.public.errors import (
     AuthError,
     BadRequestError,
@@ -274,4 +274,5 @@ def test_get_user_fails_when_server_is_down(kentik_api) -> None:
 
 @pytest.fixture
 def kentik_api():
-    return KentikAPI(DUMMY_AUTH_EMAIL, DUMMY_TOKEN, api_url=FAKE_API_URL)
+    return KentikAPI(DUMMY_AUTH_EMAIL, DUMMY_TOKEN, api_url=FAKE_API_URL,
+                     retry_strategy=Retry(total=1))
