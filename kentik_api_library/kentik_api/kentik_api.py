@@ -19,14 +19,19 @@ from .api_connection.retryable_session import Retry
 
 
 class KentikAPI:
-    """ Root object for operating KentikAPI """
+    """Root object for operating KentikAPI"""
 
     API_URL_EU = "https://api.kentik.eu/api/v5"
     API_URL_US = "https://api.kentik.com/api/v5"
 
-    def __init__(self, auth_email: str, auth_token: str, api_url: str = API_URL_US,
-                 timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
-                 retry_strategy: Optional[Retry] = None) -> None:
+    def __init__(
+        self,
+        auth_email: str,
+        auth_token: str,
+        api_url: str = API_URL_US,
+        timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
+        retry_strategy: Optional[Retry] = None,
+    ) -> None:
         connector = new_connector(api_url, auth_email, auth_token, timeout, retry_strategy)
 
         self.device_labels = DeviceLabelsAPI(connector)
@@ -47,6 +52,11 @@ class KentikAPI:
 # pylint: enable=too-many-instance-attributes
 
 
-def new_connector(api_url: str, auth_email: str, auth_token: str, timeout: Union[float, Tuple[float, float]],
-                  retry_strategy: Optional[Retry]) -> APIConnector:
+def new_connector(
+    api_url: str,
+    auth_email: str,
+    auth_token: str,
+    timeout: Union[float, Tuple[float, float]],
+    retry_strategy: Optional[Retry],
+) -> APIConnector:
     return APIConnector(api_url, auth_email, auth_token, timeout, retry_strategy)

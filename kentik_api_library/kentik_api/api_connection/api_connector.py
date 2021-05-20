@@ -26,11 +26,16 @@ PROTOCOL_HTTP = "HTTP"
 
 
 class APIConnector:
-    """ APIConnector implements APIConnectorProtocol. Allows sending authorized http requests to Kentik API """
+    """APIConnector implements APIConnectorProtocol. Allows sending authorized http requests to Kentik API"""
 
-    def __init__(self, api_url: str, auth_email: str, auth_token: str,
-                 timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
-                 retry_strategy: Optional[Retry] = None) -> None:
+    def __init__(
+        self,
+        api_url: str,
+        auth_email: str,
+        auth_token: str,
+        timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
+        retry_strategy: Optional[Retry] = None,
+    ) -> None:
         self._api_url = api_url
         self._logger = logging.getLogger(__name__)
         self._session = RetryableSession(retry_strategy=retry_strategy)

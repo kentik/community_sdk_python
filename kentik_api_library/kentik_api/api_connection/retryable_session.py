@@ -9,10 +9,10 @@ log = logging.getLogger(__name__)
 # mypy: ignore-errors
 class RetryableSession(Session):
     DEFAULT_RETRY_STRATEGY = Retry(
-        total = 3,
-        backoff_factor = 1,
-        status_forcelist = [429, 500, 502, 503, 504],
-        allowed_methods = ["HEAD", "GET", "PUT", "OPTIONS", "POST"]
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "PUT", "OPTIONS", "POST"],
     )
 
     def __init__(self, retry_strategy: Optional[Retry] = None) -> None:
