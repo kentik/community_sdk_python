@@ -12,7 +12,7 @@ class RetryableSession(Session):
         total=3,
         backoff_factor=1,
         status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["HEAD", "GET", "PUT", "OPTIONS", "POST"],
+        allowed_methods=["DELETE", "HEAD", "GET", "PUT", "OPTIONS", "PATCH", "POST"],
     )
 
     def __init__(self, retry_strategy: Optional[Retry] = None) -> None:
