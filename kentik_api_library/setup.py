@@ -109,7 +109,7 @@ setup(
     include_package_data=True,
     install_requires=["requests>=2.25.0", "typing-extensions>=3.7.4.3", "dacite>=1.6.0"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
-    tests_require=["pytest", "pylint"],
+    tests_require=["httpretty", "pytest", "pylint"],
     packages=PACKAGES,
     package_dir=PACKAGE_DIR,
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
