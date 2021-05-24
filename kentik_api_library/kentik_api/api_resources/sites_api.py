@@ -9,7 +9,7 @@ from kentik_api.requests_payload import sites_payload
 
 
 class SitesAPI(BaseAPI):
-    """ Exposes Kentik API operations related to sites """
+    """Exposes Kentik API operations related to sites"""
 
     def get_all(self) -> List[Site]:
         apicall = sites.get_sites()

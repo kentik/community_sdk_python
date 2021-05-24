@@ -9,7 +9,7 @@ from kentik_api.requests_payload.conversions import convert, convert_or_none, en
 
 
 class AlertingAPI(BaseAPI):
-    """Exposes Kentik API operations related to manual mitigation. """
+    """Exposes Kentik API operations related to manual mitigation."""
 
     def create_manual_mitigation(self, manual_mitigation: ManualMitigation) -> bool:
         api_call = alerts.create_manual_mitigation()

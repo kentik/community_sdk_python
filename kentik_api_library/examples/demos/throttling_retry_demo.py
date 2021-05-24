@@ -16,7 +16,7 @@ def get_auth_email_token() -> Tuple[str, str]:
 
 
 def run_stub_api_server() -> None:
-    """ run stub server that will return pre-configured responses for demo purposes """
+    """run stub server that will return pre-configured responses for demo purposes"""
 
     URL = "http://www.stub-kentikapi-server.mm/query/topXchart"
 

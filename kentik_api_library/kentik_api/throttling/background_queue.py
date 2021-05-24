@@ -14,7 +14,7 @@ AbortFunc = Callable[[Any, Exception], None]  # input: exception thrown by cmd, 
 
 
 def nop(*_) -> None:
-    """ no-operation """
+    """no-operation"""
 
 
 @dataclass
@@ -27,7 +27,7 @@ class BackgroundCmd:
 
 
 class BackgroundCmdQueue:
-    """ BackgroundCmdQueue enables retrying of commands in a background-processing manner (in background thread) """
+    """BackgroundCmdQueue enables retrying of commands in a background-processing manner (in background thread)"""
 
     def __init__(self, retry_delay_seconds: float = 5.0) -> None:
         self._queue: "Queue[BackgroundCmd]" = Queue()

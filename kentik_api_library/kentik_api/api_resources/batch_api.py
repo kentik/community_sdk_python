@@ -6,7 +6,7 @@ from kentik_api.requests_payload.conversions import convert, enum_to_str
 
 
 class BatchAPI(BaseAPI):
-    """ Exposes Kentik API batch operations """
+    """Exposes Kentik API batch operations"""
 
     def batch_operation_on_flow_tags(
         self, operation_part: BatchOperationPart

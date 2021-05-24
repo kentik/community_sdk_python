@@ -8,7 +8,7 @@ from kentik_api.requests_payload import saved_filters_payload
 
 
 class SavedFiltersAPI(BaseAPI):
-    """Exposes Kentik API operations related to saved filters. """
+    """Exposes Kentik API operations related to saved filters."""
 
     def get_all(self) -> List[SavedFilter]:
         api_call = saved_filters.get_saved_filters()

@@ -7,7 +7,7 @@ from kentik_api.requests_payload import plans_payload
 
 
 class PlansAPI(BaseAPI):
-    """Exposes Kentik API operations related to plans. """
+    """Exposes Kentik API operations related to plans."""
 
     def get_all(self) -> List[Plan]:
         api_call = plans.get_plans()

@@ -11,7 +11,7 @@ from kentik_api.requests_payload.conversions import convert, permissive_enum_to_
 
 
 class PopulatorsAPI(BaseAPI):
-    """ Exposes Kentik API operations related to populators (belong to custom dimensions) """
+    """Exposes Kentik API operations related to populators (belong to custom dimensions)"""
 
     def create(self, populator: Populator) -> Populator:
         assert populator.value is not None
@@ -80,7 +80,7 @@ class PopulatorsAPI(BaseAPI):
 
 
 class CustomDimensionsAPI(BaseAPI):
-    """ Exposes Kentik API operations related to custom dimensions """
+    """Exposes Kentik API operations related to custom dimensions"""
 
     def __init__(self, api_connector: APIConnectorProtocol) -> None:
         super(CustomDimensionsAPI, self).__init__(api_connector)

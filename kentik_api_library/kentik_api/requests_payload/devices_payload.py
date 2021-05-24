@@ -36,7 +36,7 @@ from kentik_api.requests_payload.validation import validate_fields
 
 @dataclass
 class SNMPv3ConfPayload:
-    """ This datastructure represents JSON Device.SNMPv3Conf payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Device.SNMPv3Conf payload as it is transmitted to and from KentikAPI"""
 
     UserName: str
     AuthenticationProtocol: Optional[str] = None
@@ -133,7 +133,7 @@ PlanPayload = PlanGetResponse  # Plan payload is same as in Plans API
 
 @dataclass
 class AllInterfacesPayload:
-    """ This datastructure represents JSON Device.AllInterfaces payload as it is transmitted from KentikAPI """
+    """This datastructure represents JSON Device.AllInterfaces payload as it is transmitted from KentikAPI"""
 
     device_id: str
     snmp_speed: str
@@ -155,7 +155,7 @@ class AllInterfacesPayload:
 
 @dataclass
 class DevicePayload:
-    """ This datastructure represents JSON Device payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Device payload as it is transmitted to and from KentikAPI"""
 
     device_name: Optional[str] = None
     device_type: Optional[str] = None
@@ -375,7 +375,7 @@ class UpdateRequest:
 
 
 def validate_device_bgp_snmp_conf(device: Device, class_op: str) -> None:
-    """ Common validations for CreateRequest and UpdateRequest """
+    """Common validations for CreateRequest and UpdateRequest"""
 
     # device-specific
     if device.device_type == DeviceType.router:
@@ -429,14 +429,14 @@ UpdateResponse = GetResponse
 
 @dataclass
 class LabelIDPayload:
-    """ This datastructure represents JSON ApplyLabels.LabelID payload as it is transmitted to KentikAPI """
+    """This datastructure represents JSON ApplyLabels.LabelID payload as it is transmitted to KentikAPI"""
 
     id: int
 
 
 @dataclass
 class ApplyLabelsRequest:
-    """ This datastructure represents JSON ApplyLabelsRequest payload as it is transmitted to KentikAPI """
+    """This datastructure represents JSON ApplyLabelsRequest payload as it is transmitted to KentikAPI"""
 
     labels: List[LabelIDPayload]
 
@@ -448,7 +448,7 @@ class ApplyLabelsRequest:
 
 @dataclass
 class ApplyLabelsResponse:
-    """ This datastructure represents JSON ApplyLabelsResponse payload as it is transmitted from KentikAPI """
+    """This datastructure represents JSON ApplyLabelsResponse payload as it is transmitted from KentikAPI"""
 
     id: str
     device_name: str

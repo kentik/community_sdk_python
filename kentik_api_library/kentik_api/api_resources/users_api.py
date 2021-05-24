@@ -9,7 +9,7 @@ from kentik_api.requests_payload import users_payload
 
 
 class UsersAPI(BaseAPI):
-    """Exposes Kentik API operations related to users. """
+    """Exposes Kentik API operations related to users."""
 
     def get_all(self) -> List[User]:
         api_call = users.get_users()

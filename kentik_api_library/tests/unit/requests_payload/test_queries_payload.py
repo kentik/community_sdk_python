@@ -84,7 +84,7 @@ def test_query_chart_response_unknown_encoding_raises_error() -> None:
 
 
 def capture_exception(f, *args):
-    """ unittest helper. call f and return exception or None """
+    """unittest helper. call f and return exception or None"""
 
     try:
         f(*args)

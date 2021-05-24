@@ -23,7 +23,7 @@ def get_active_alerts(
     show_matches: int,
     learning_mode: int,
 ) -> APICall:
-    """ Returns active alerts (alarms)."""
+    """Returns active alerts (alarms)."""
     return APICall(
         f"/alerts-active/alarms?startTime={start_time}&endTime={end_time}&filterBy={filter_by}&"
         f"filterVal={filter_val}&showMitigations={show_mitigations}&showAlarms={show_alarms}&"
@@ -43,7 +43,7 @@ def get_alerts_history(
     show_matches: int,
     learning_mode: int,
 ) -> APICall:
-    """ Returns active alerts (alarms)."""
+    """Returns active alerts (alarms)."""
     return APICall(
         f"/alerts-active/alerts-history?startTime={start_time}&endTime={end_time}&filterBy={filter_by}&"
         f"filterVal={filter_val}&sortOrder={sort_order}&showMitigations={show_mitigations}&showAlarms={show_alarms}&"

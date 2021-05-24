@@ -8,7 +8,7 @@ from kentik_api.requests_payload import labels_payload
 
 
 class DeviceLabelsAPI(BaseAPI):
-    """ Exposes Kentik API operations related to device labels """
+    """Exposes Kentik API operations related to device labels"""
 
     def get_all(self) -> List[DeviceLabel]:
         apicall = device_labels.get_device_labels()

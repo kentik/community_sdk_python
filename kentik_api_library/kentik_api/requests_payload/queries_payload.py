@@ -61,7 +61,7 @@ class QueryChartResponse:
 
 
 def _parse_uri(uri_string: str) -> Tuple[str, str, str]:
-    """ Returns: (mime type, encoding type, payload data) """
+    """Returns: (mime type, encoding type, payload data)"""
     uri = uri_string  # eg. "data:image/png;base64,iVBORw0KGgoAAAA..."
     data_type, uri = _cut_head(uri, ":")
     mime_type, uri = _cut_head(uri, ";")

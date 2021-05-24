@@ -348,7 +348,7 @@ class Device:
         return self
 
     def with_bgp_type_other_device(self, use_bgp_device_id: ID):
-        """ This is alternative to with_bgp_type_device. """
+        """This is alternative to with_bgp_type_device."""
         self.device_bgp_type = DeviceBGPType.other_device
         self.use_bgp_device_id = use_bgp_device_id
         return self
