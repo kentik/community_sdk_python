@@ -9,7 +9,7 @@ from kentik_api.requests_payload import tenants_payload
 
 
 class MyKentikPortalAPI(BaseAPI):
-    """Exposes Kentik API operations related to My Kentik Portal. """
+    """Exposes Kentik API operations related to My Kentik Portal."""
 
     def get_all(self) -> List[Tenant]:
         api_call = my_kentik_portal.get_tenants()

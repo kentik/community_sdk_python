@@ -9,7 +9,7 @@ from kentik_api.requests_payload import custom_applications_payload
 
 
 class CustomApplicationsAPI(BaseAPI):
-    """ Exposes Kentik API operations related to custom applications """
+    """Exposes Kentik API operations related to custom applications"""
 
     def get_all(self) -> List[CustomApplication]:
         apicall = custom_applications.get_custom_applications()

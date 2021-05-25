@@ -8,7 +8,7 @@ from kentik_api.public.errors import DataFormatError, DeserializationError
 
 
 def as_dict(obj: Any) -> Dict[str, Any]:
-    """ Convert obj to dict, removing all keys with None values """
+    """Convert obj to dict, removing all keys with None values"""
 
     assert hasattr(obj, "__dict__") or isinstance(obj, dict), f"Input should be either class or dict , got: {type(obj)}"
 
@@ -99,7 +99,7 @@ def _from_json(class_name: str, json_string: str, root: str = "") -> Any:
 
 
 def convert(attr: Any, convert_func) -> Any:
-    """ Convert input using convert_func. Raise DataFormatError on failure """
+    """Convert input using convert_func. Raise DataFormatError on failure"""
 
     try:
         return convert_func(attr)
@@ -108,7 +108,7 @@ def convert(attr: Any, convert_func) -> Any:
 
 
 def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
-    """ Convert if input is not None, else just return None. Raise DataFormatError on failure  """
+    """Convert if input is not None, else just return None. Raise DataFormatError on failure"""
 
     if not attr:
         return None
@@ -116,7 +116,7 @@ def convert_or_none(attr: Any, convert_func) -> Optional[Any]:
 
 
 def convert_list_or_none(items: Optional[Iterable[Any]], convert_func) -> Optional[List[Any]]:
-    """ Convert list if input list is not None, else just return None. Raise DataFormatError on failure  """
+    """Convert list if input list is not None, else just return None. Raise DataFormatError on failure"""
 
     if items is None:
         return None
@@ -124,7 +124,7 @@ def convert_list_or_none(items: Optional[Iterable[Any]], convert_func) -> Option
 
 
 def enum_to_str(enum: Enum) -> str:
-    """ Convert enum value to str. To be used with convert* functions """
+    """Convert enum value to str. To be used with convert* functions"""
     return str(enum.value)
 
 

@@ -9,7 +9,7 @@ from kentik_api.requests_payload import tags_payload
 
 
 class TagsAPI(BaseAPI):
-    """ Exposes Kentik API operations related to tags """
+    """Exposes Kentik API operations related to tags"""
 
     def get_all(self) -> List[Tag]:
         apicall = tags.get_tags()

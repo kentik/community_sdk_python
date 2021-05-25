@@ -37,7 +37,7 @@ def test_from_dict_required_and_optional_fields_success() -> None:
 
 
 def test_from_dict_required_optional_extra_fields_success() -> None:
-    """ Unexpected dictionary fields should just be ignored """
+    """Unexpected dictionary fields should just be ignored"""
 
     # given
     dic = {"name": "Liz", "age": 42, "hobby": "papercut", "origin": "Sierra Leone"}

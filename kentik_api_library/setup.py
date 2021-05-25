@@ -101,11 +101,11 @@ setup(
         "root": "..",
         "relative_to": __file__,
     },
-    description="API Library to help using Kenti API",
+    description="SDK library for Kentik API",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
-    license="GPLv3+",
+    license="Apache-2.0",
     include_package_data=True,
     install_requires=["requests>=2.25.0", "typing-extensions>=3.7.4.3", "dacite>=1.6.0"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
@@ -114,6 +114,6 @@ setup(
     package_dir=PACKAGE_DIR,
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
     classifiers=[
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "License :: OSI Approved :: Apache License, Version 2.0",
     ],
 )

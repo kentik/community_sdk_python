@@ -16,7 +16,7 @@ from kentik_api.requests_payload.conversions import (
 
 @dataclass
 class SecondaryIPPayload:
-    """ This datastructure represents JSON Interface.SecondaryIP payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Interface.SecondaryIP payload as it is transmitted to and from KentikAPI"""
 
     # GET, POST, PUT request/response
     address: str
@@ -36,7 +36,7 @@ class SecondaryIPPayload:
 
 @dataclass
 class TopNextHopASNPayload:
-    """ This datastructure represents JSON Interface.TopNextHopASN payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Interface.TopNextHopASN payload as it is transmitted to and from KentikAPI"""
 
     # GET, POST, PUT request/response
     ASN: int
@@ -52,7 +52,7 @@ class TopNextHopASNPayload:
 
 @dataclass
 class VRFAttributesPayload:
-    """ This datastructure represents JSON Interface.VRFAttributes payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Interface.VRFAttributes payload as it is transmitted to and from KentikAPI"""
 
     # GET, POST, PUT request/response
     name: str
@@ -99,7 +99,7 @@ class VRFAttributesPayload:
 
 @dataclass
 class InterfacePayload:
-    """ This datastructure represents JSON Interface payload as it is transmitted to and from KentikAPI """
+    """This datastructure represents JSON Interface payload as it is transmitted to and from KentikAPI"""
 
     snmp_id: Optional[str] = None
     snmp_speed: Optional[int] = None  # caveat: GET returns snmp_speed as str and must be manually converted

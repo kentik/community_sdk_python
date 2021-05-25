@@ -9,7 +9,7 @@ from kentik_api.api_connection.api_connector_protocol import APIConnectorProtoco
 
 
 class InterfacesAPI(BaseAPI):
-    """ Exposes Kentik API operations related to interfaces """
+    """Exposes Kentik API operations related to interfaces"""
 
     def get_all(self, device_id: ID) -> List[Interface]:
         api_call = devices.get_device_interfaces(device_id)
@@ -40,7 +40,7 @@ class InterfacesAPI(BaseAPI):
 
 
 class DevicesAPI(BaseAPI):
-    """ Exposes Kentik API operations related to devices """
+    """Exposes Kentik API operations related to devices"""
 
     def __init__(self, api_connector: APIConnectorProtocol) -> None:
         super(DevicesAPI, self).__init__(api_connector)

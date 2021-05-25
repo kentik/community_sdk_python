@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def active_wait_retry(cmd: Cmd, num_attempts: int, retry_delay_seconds: float) -> Any:
-    """ active_wait_retry enables retrying command in an active-waiting manner (in main thread) """
+    """active_wait_retry enables retrying command in an active-waiting manner (in main thread)"""
 
     last_error: Exception
     for num_retries_left in reversed(range(num_attempts)):

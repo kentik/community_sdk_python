@@ -129,4 +129,4 @@ class UpdateResponse:
 
 @dataclass()
 class DeleteResponse:
-    """ Currently site delete response carries no body data just http code 204 for succcess """
+    """Currently site delete response carries no body data just http code 204 for succcess"""
