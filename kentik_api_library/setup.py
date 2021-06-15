@@ -14,22 +14,15 @@ README = (HERE / "README.md").read_text()
 
 PACKAGES = [
     "kentik_api",
+    "kentik_api.analytics",
     "kentik_api.auth",
     "kentik_api.api_calls",
     "kentik_api.api_connection",
     "kentik_api.api_resources",
     "kentik_api.requests_payload",
     "kentik_api.public",
+    "kentik_api.utils",
 ]
-PACKAGE_DIR = {
-    "kentik_api": "kentik_api",
-    "kentik_api.auth": "kentik_api/auth",
-    "kentik_api.api_calls": "kentik_api/api_calls",
-    "kentik_api.api_connection": "kentik_api/api_connection",
-    "kentik_api.api_resources": "kentik_api/api_resources",
-    "kentik_api.requests_payload": "kentik_api/requests_payload",
-    "kentik_api.public": "kentik_api/public",
-}
 
 
 class PylintCmd(distutils.cmd.Command):
@@ -111,7 +104,7 @@ setup(
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
     tests_require=["httpretty", "pytest", "pylint"],
     packages=PACKAGES,
-    package_dir=PACKAGE_DIR,
+    package_dir={pkg:os.path.join(*pkg.split('.')) for pkg in PACKAGES},
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",

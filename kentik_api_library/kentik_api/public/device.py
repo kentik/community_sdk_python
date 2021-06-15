@@ -89,7 +89,7 @@ class SNMPv3Conf:
         return self
 
 
-class AllInterfaces:
+class DeviceInterface:
     def __init__(
         self,
         interface_description: str,
@@ -102,6 +102,9 @@ class AllInterfaces:
         self._device_id = device_id
         self._snmp_speed = snmp_speed
         self._initial_snmp_speed = initial_snmp_speed
+
+    def __repr__(self):
+        return f'{self.name} (owner: {self.device_id})'
 
     @property
     def interface_description(self) -> str:
@@ -118,6 +121,17 @@ class AllInterfaces:
     @property
     def initial_snmp_speed(self) -> Optional[float]:
         return self._initial_snmp_speed
+
+    @property
+    def name(self):
+        return self._interface_description
+
+    @property
+    def speed(self):
+        speed = max([float(x) for x in (self.snmp_speed, self.initial_snmp_speed) if x is not None])
+        if not speed:
+            return float('NaN')
+        return float(speed * 10e6 * 8)
 
 
 class Device:
@@ -158,7 +172,7 @@ class Device:
         plan: Optional[Plan] = None,
         site: Optional[Site] = None,
         labels: Optional[List[DeviceLabel]] = None,
-        all_interfaces: Optional[List[AllInterfaces]] = None,
+        interfaces: Optional[List[DeviceInterface]] = None,
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 
@@ -196,7 +210,11 @@ class Device:
         self._plan = plan
         self._site = site
         self._labels = labels
-        self._all_interfaces = all_interfaces
+        self._interfaces = interfaces
+        self._interface_by_name = {i.name: i for i in interfaces}
+
+    def __repr__(self):
+        return f'{self.device_name} (id: {self.id} type: {self.device_type.value})'
 
     @property
     def id(self) -> ID:
@@ -261,8 +279,11 @@ class Device:
         return list(self._labels) if self._labels is not None else []
 
     @property
-    def all_interfaces(self) -> List[Any]:
-        return list(self._all_interfaces) if self._all_interfaces is not None else []
+    def interfaces(self) -> List[DeviceInterface]:
+        return list(self._interfaces) if self._interfaces is not None else []
+
+    def get_interface(self, name):
+        return self._interface_by_name.get(name)
 
     @classmethod
     def new_router(

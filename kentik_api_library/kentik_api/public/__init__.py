@@ -9,7 +9,7 @@ from .custom_application import CustomApplication
 from .plan import Plan, PlanDevice, PlanDeviceType
 from .batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
 from .manual_mitigation import ManualMitigation, Alarm, HistoricalAlert, AlertFilter
-from .query_sql import QuerySQL
+from .query_sql import QuerySQL, QueryDefinition
 from .query_object import (
     QueryObject,
     QueryArrayItem,
