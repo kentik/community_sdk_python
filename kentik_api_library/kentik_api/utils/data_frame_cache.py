@@ -146,7 +146,8 @@ class DFCache:
             log.debug('get: cache is empty')
             return None
         log.debug('get: start: %s end: %s', start, end)
-        out = pd.concat([pd.read_parquet(f) for f in self.files_in_range(start, end)])[start:end]
+        df = pd.concat([pd.read_parquet(f) for f in self.files_in_range(start, end)])
+        out = pd.DataFrame(data=df.loc[(df.index >= start) & (df.index <= end)])
         if dedup_columns:
             # Deduplicate the data based on specified columns
             # Remember current index fields
@@ -175,16 +176,57 @@ class DFCache:
             log.debug('drop: deleting %s', f.name)
             f.unlink()
 
+    def fetch(self, api: KentikAPI, query_def: QueryDefinition, start: datetime, end: datetime,
+              step: Optional[timedelta] = None,
+              dedup_columns: Optional[List[str]] = None, **kwargs) -> Optional[pd.DataFrame]:
+        """
+        Retrieve data using specified query definition and time period
+        Newly retrieved data are added to the cache
+        :param api: KentikAPI instance to use to fetch data
+        :param query_def: query definition object
+        :param start: timestamp of the beginning of the target time period
+        :param end: timestamp of the end of the target time period
+        :param step: time chunks in which to retrieve new data (longer time periods result in lower time resolution)
+        :param dedup_columns: list of column names used for row deduplication
+        :param kwargs: addition key/value args passed to QuerySQL.from_query_definition
+        :return: DataFrame containing new data
+        """
+        if step is None:
+            log.debug('fetch: fetching from: %s to: %s', start, end)
+            query = QuerySQL.from_query_definition(query_def, start=start, end=end, **kwargs)
+            df = api.query.sql(query).to_dataframe(query_def)
+            if df is None:
+                log.warning('fetch: got no data for %s -> %s', start, end)
+                return None
+            else:
+                log.debug('fetch: got %d rows for %s -> %s', df.shape[0], start, end)
+                self.store(df)
+                return df
+        else:
+            log.debug('fetch: fetching from: %s to: %s in %s steps', start, end, step)
+            for t in time_seq(start, end, step):
+                log.debug('fetch: fetching from: %s to: %s', t, t + step)
+                query = QuerySQL.from_query_definition(query_def, start=start, end=t + step, **kwargs)
+                df = api.query.sql(query).to_dataframe(query_def)
+                if df is None:
+                    log.debug('fetch: got no data for %s -> %s', t, t + step)
+                else:
+                    log.debug('fetch: got %d rows for %s -> %s', df.shape[0], t, t + step)
+                    self.store(df)
+            return self.get(start, end, dedup_columns)
+
     def fetch_latest(self, api: KentikAPI, query_def: QueryDefinition,
-                     step: Optional[timedelta] = None, **kwargs) -> Optional[pd.DataFrame]:
+                     step: Optional[timedelta] = None, dedup_columns: Optional[List[str]] = None,
+                     **kwargs) -> Optional[pd.DataFrame]:
         """
         Retrieve data using specified query definition with start time = newest in cache and end time = now
         If the cache is empty, last day of data is retrieved
         Newly retrieved data are added to the cache
         :param api: KentikAPI instance to use to fetch data
-        :param query_def: query definition dictionary (see KTAPIClient.sql_to_df)
+        :param query_def: query definition object
         :param step: time chunks in which to retrieve new data (longer time periods result in lower time resolution)
-        :param kwargs: addition key/value args passed to KTAPIClient.sql_to_df
+        :param dedup_columns: list of column names used for row deduplication
+        :param kwargs: addition key/value args passed to QuerySQL.from_query_definition
         :return: DataFrame containing new data
         """
         now = datetime.now(timezone.utc)
@@ -193,26 +235,4 @@ class DFCache:
             start = now - timedelta(days=1)
         else:
             start = self.newest
-        if step is None:
-            log.debug('fetch_latest: fetching from: %s to: %s', start, now)
-            query = QuerySQL.from_query_definition(query_def, start=start, end=now, **kwargs)
-            df = api.query.sql(query).to_dataframe(query_def)
-            if df is None:
-                log.warning('fetch_latest: got no data for %s -> %s', start, now)
-                return None
-            else:
-                log.debug('fetch_latest: got %d rows for %s -> %s', df.shape[0], start, now)
-                self.store(df)
-                return df
-        else:
-            log.debug('fetch_latest: fetching from: %s to: %s in %s steps', start, now, step)
-            for t in time_seq(start, now, step):
-                log.debug('fetch_latest: fetching from: %s to: %s', t, t + step)
-                query = QuerySQL.from_query_definition(query_def, start=start, end=t + step, **kwargs)
-                df = api.query.sql(query).to_dataframe(query_def)
-                if df is None:
-                    log.debug('fetch_latest: got no data for %s -> %s', t, t + step)
-                else:
-                    log.debug('fetch_latest: got %d rows for %s -> %s', df.shape[0], t, t + step)
-                    self.store(df)
-            return self.get(start, now)
+        return self.fetch(api, query_def, start=start, end=now, step=step, dedup_columns=dedup_columns, **kwargs)

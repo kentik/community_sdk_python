@@ -95,6 +95,8 @@ setup(
         "relative_to": __file__,
     },
     description="SDK library for Kentik API",
+    maintainer="Martin Machacek",
+    maintainer_email="martin.machacek@kentik.com",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
@@ -105,6 +107,7 @@ setup(
     tests_require=["httpretty", "pytest", "pylint"],
     packages=PACKAGES,
     package_dir={pkg:os.path.join(*pkg.split('.')) for pkg in PACKAGES},
+    scripts=["kentik_cli/kentik_cli.py"],
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",

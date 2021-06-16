@@ -31,8 +31,9 @@ class KentikAPI:
         api_url: str = API_URL_US,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
+        proxy: Optional[str] = None
     ) -> None:
-        connector = new_connector(api_url, auth_email, auth_token, timeout, retry_strategy)
+        connector = APIConnector(api_url, auth_email, auth_token, timeout, retry_strategy, proxy)
 
         self.device_labels = DeviceLabelsAPI(connector)
         self.sites = SitesAPI(connector)
@@ -50,13 +51,3 @@ class KentikAPI:
 
 
 # pylint: enable=too-many-instance-attributes
-
-
-def new_connector(
-    api_url: str,
-    auth_email: str,
-    auth_token: str,
-    timeout: Union[float, Tuple[float, float]],
-    retry_strategy: Optional[Retry],
-) -> APIConnector:
-    return APIConnector(api_url, auth_email, auth_token, timeout, retry_strategy)

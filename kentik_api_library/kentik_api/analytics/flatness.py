@@ -3,12 +3,62 @@ import json
 import logging
 import numpy as np
 import pandas as pd
-from kentik_api.utils import DeviceCache
+import sys
+from collections import namedtuple
+from dataclasses import dataclass
+from kentik_api.utils import DeviceCache, DFCache
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 
-log = logging.getLogger('ktapi_analytics')
+log = logging.getLogger('analytics')
+
+Interval = namedtuple('Interval', ['start', 'end'])
+
+
+class FlatnessResults:
+    """
+    Class storing results of traffic flatness analysis on set of links
+    The events attribute contains dictionary keyed by link name containing list intervals in which traffic was
+    deemed to be 'flat'. Each interval is instance of 'Interval' named tuple.
+    """
+
+    def __init__(self, links: List[str]):
+        self.events: Dict[str, List[Interval]] = {link: [] for link in links}
+
+    def __getitem__(self, link):
+        return self.events.get(link)
+
+    @property
+    def stats(self) -> Dict[str, int]:
+        return dict(
+            total_events=sum(len(i) for i in self.events.values()),
+            max_per_link=max(len(i) for i in self.events.values()),
+        )
+
+    @property
+    def affected_links(self) -> List[str]:
+        return [link for link, intervals in self.events.items() if len(intervals) > 0]
+
+    def to_json(self, filename: Optional[str] = None) -> Optional[str]:
+        r = {
+            link: [(i.start.isoformat(), i.end.isoformat()) for i in intervals]
+            for link, intervals in self.events.items()
+            if len(intervals) > 0
+        }
+        if filename:
+            with Path(filename).open('w') as f:
+                json.dump(r, f, indent=2)
+        else:
+            return json.dumps(r, indent=2)
+
+    def to_text(self, out=sys.stdout) -> None:
+        for link, intervals in self.events.items():
+            if len(intervals) < 1:
+                continue
+            print(link, file=out)
+            for i in intervals:
+                print(f"\t[{i.start}, {i.end}]", file=out)
 
 
 def set_link_utilization(df: pd.DataFrame, devices: DeviceCache, link_col: Optional[str] = 'link',
@@ -75,7 +125,7 @@ def compute_flatness(df: pd.DataFrame,
         raise RuntimeError(f'No {data} column in DataFrame')
     mean = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples).mean()
     if method == 'range':
-        y = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples)\
+        y = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples) \
             .apply(lambda x: np.max(x) - np.min(x), raw=True)
     elif method == 'variance':
         y = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples).var()
@@ -87,7 +137,7 @@ def compute_flatness(df: pd.DataFrame,
 def compute_stats(df: pd.DataFrame,
                   pivot: str = 'link',
                   data: str = 'utilization',
-                  window: str = '1H',
+                  window: timedelta = timedelta(hours=1),
                   min_samples: int = 3,
                   closed: str = 'right') -> pd.DataFrame:
     """
@@ -114,7 +164,7 @@ def compute_stats(df: pd.DataFrame,
     if data not in df:
         raise RuntimeError(f'No {data} column in DataFrame')
     return df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples).agg(
-                                                                        {'mean': 'mean', 'max': 'max', 'min': 'min'})
+        {'mean': 'mean', 'max': 'max', 'min': 'min'})
 
 
 def analyze_flatness(df: pd.DataFrame,
@@ -125,7 +175,7 @@ def analyze_flatness(df: pd.DataFrame,
                      link_index: str = 'link',
                      mean_column: str = 'mean',
                      max_column: str = 'max',
-                     min_column: str = 'min') -> Dict[str, List[Tuple[datetime, datetime]]]:
+                     min_column: str = 'min') -> FlatnessResults:
     """
     Analyze flatness measure and means in the DataFrame to find intervals where utilization was 'flat' based
     on specified criteria
@@ -140,7 +190,7 @@ def analyze_flatness(df: pd.DataFrame,
     :param max_column: name of the column containing maximum of the observed variable
     :param min_column: name of the column containing minimum of the observed variable
     :param link_index: name of index level containing link names
-    :return: dictionary keyed by link names with values being List of Tuples of start, end timestamps of intervals
+    :return: FlatnessResults object
     """
     if log.level == logging.DEBUG:
         with io.StringIO() as f:
@@ -149,10 +199,10 @@ def analyze_flatness(df: pd.DataFrame,
             log.debug('flatness_limit: %f, window: %s, min_valid: %f, max_valid: %f',
                       flatness_limit, window, min_valid, max_valid)
             log.debug('mean_column: %s, min_column: %s, max_column: %s,  link_index: %s',
-                      mean_column, min_column, max_column, link_index,)
+                      mean_column, min_column, max_column, link_index, )
 
     links = df.index.get_level_values(link_index).unique()
-    results: Dict[str, List[Tuple[datetime, datetime]]] = {link: [] for link in links}
+    results = FlatnessResults(links)
     suspects = (min_valid < df[mean_column]) & (df[mean_column] < max_valid) & \
                ((df[max_column] - df[min_column]) < flatness_limit)
     if not suspects.any():
@@ -173,33 +223,45 @@ def analyze_flatness(df: pd.DataFrame,
                 log.debug('link: %s, overlap at: %s, combined range: %f', link, ts, agg_max - agg_min)
                 if agg_max - agg_min < flatness_limit:
                     merged += 1
-                    log.debug('link: %s, merging: [%s, %s]', link, results[link][-1][0], ts)
-                    results[link][-1][1] = ts
+                    log.debug('link: %s, merging: [%s, %s]', link, results[link][-1].start, ts)
+                    results[link][-1]._replace(end=ts)
                     continue
             log.debug('link: %s, adding: [%s, %s]', link, s, ts)
-            results[link].append([s, ts])
+            results[link].append(Interval(start=s, end=ts))
             last = results[link][-1]
     # remove intervals shorter than window
     # such intervals can occur at the beginning of the observation
     removed = 0
-    for link, intervals in results.items():
-        for interval in [i for i in intervals if i[1] - i[0] < window]:
-            log.debug('link: %s, removing: %s', link, f'[{interval[0]} {interval[1]}]')
+    for link, intervals in results.events.items():
+        for interval in [i for i in intervals if i.end - i.start < window]:
+            log.debug('link: %s, removing: %s', link, f'[{interval.start} {interval.end}]')
             intervals.remove(interval)
             removed += 1
-    log.debug('total events: %d', sum(len(x) for x in results.values()))
+    log.debug('total events: %d', results.stats['total_events'])
     log.debug('merged %s intervals', merged)
     log.debug('removed %s intervals', removed)
     return results
 
 
-def flatness_results_to_json(results: Dict, filename: str) -> None:
-    r = dict()
-    for link, intervals in results.items():
-        if len(intervals) < 1:
-            continue
-        r[link] = list()
-        for i in intervals:
-            r[link].append([i[0].isoformat(), i[1].isoformat()])
-    with Path(filename).open('w') as f:
-        json.dump(r, f, indent=2)
+def flatness_analysis(devices: DeviceCache,
+                      data: DFCache,
+                      start: datetime,
+                      end: datetime,
+                      flatness_limit: float,
+                      window: timedelta,
+                      min_valid: float = 0,
+                      max_valid: float = 100,
+                      ) -> FlatnessResults:
+    log.info('Getting traffic data start: %s end: %s', start, end)
+    df = data.get(start, end, ['ts', 'link'])
+    log.debug('Got %d entries for %d links', df.shape[0], len(df['link'].unique()))
+    log.info('Computing link utilization')
+    set_link_utilization(df, devices)
+    log.info('Computing traffic statistics')
+    stats = compute_stats(df, window=window)
+    log.info('Analyzing flatness')
+    return analyze_flatness(stats,
+                            flatness_limit=flatness_limit,
+                            window=window,
+                            min_valid=min_valid,
+                            max_valid=max_valid)

@@ -6,6 +6,8 @@ from kentik_api import KentikAPI
 from kentik_api.public import Device
 from typing import Dict, List, Generator, Optional, TypeVar
 
+log = logging.getLogger('device_cache')
+
 
 class DeviceCacheIterator:
     def __init__(self, devices) -> None:
@@ -25,14 +27,14 @@ T = TypeVar('T')
 class DeviceCache:
     @classmethod
     def from_api(cls, api: KentikAPI, labels: Optional[List[str]] = None) -> T:
-        logging.debug('Fetching all devices')
+        log.debug('Fetching all devices')
         devices = api.devices.get_all()
         return cls(devices, labels)
 
     @classmethod
     def from_pickle(cls, filename: str) -> T:
         file = Path(filename)
-        logging.debug(f'Reading device data from {file.resolve()}')
+        log.debug(f'Reading device data from {file.resolve()}')
         return pickle.load(file.open('rb'))
 
     def __init__(self, devices: List[Device], labels: Optional[List[str]] = None) -> None:
@@ -47,18 +49,18 @@ class DeviceCache:
             label_set = frozenset()
         for device in devices:
             if label_set and not label_set.issubset(set([label.name for label in device.labels])):
-                logging.debug('Ignoring device: %s (id: %d)', device.device_name, device.id)
+                log.debug('Ignoring device: %s (id: %d)', device.device_name, device.id)
                 continue
             if device.device_name in self._devices_by_name:
-                logging.critical('Duplicate device name: %s', device.device_name)
+                log.critical('Duplicate device name: %s', device.device_name)
                 self.duplicate_names += 1
             else:
                 self._devices_by_name[device.device_name] = device
             if device.id in self._devices_by_id:
-                logging.critical('Duplicate device id: %%d', device.id)
+                log.critical('Duplicate device id: %%d', device.id)
             else:
                 self._devices_by_id[device.id] = device
-        logging.debug('Got %d devices (%d duplicate names)', len(self._devices_by_name), self.duplicate_names)
+        log.debug('Got %d devices (%d duplicate names)', len(self._devices_by_name), self.duplicate_names)
 
     def __repr__(self) -> str:
         return f'DeviceCache: {self.count} devices'
@@ -67,7 +69,6 @@ class DeviceCache:
         return DeviceCacheIterator(self)
 
     def __getitem__(self, item):
-        logging.debug('__getitem__: item: %s', item)
         if type(item) == int:
             return self._devices_by_id.get(item)
         else:
@@ -111,12 +112,12 @@ class DeviceCache:
                 d, i = link.split(':', maxsplit=1)
                 device = self._devices_by_name.get(d)
                 if device is None:
-                    logging.critical('Device %s not in cache', d)
+                    log.critical('Device %s not in cache', d)
                     speeds[link] = float('NaN')
                 else:
                     ifc = device.get_interface(i)
                     if ifc is None:
-                        logging.critical('Device %s had no interface named %s', device.device_name, i)
+                        log.critical('Device %s had no interface named %s', device.device_name, i)
                     speeds[link] = ifc.speed
         return speeds
 
