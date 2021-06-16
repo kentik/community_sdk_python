@@ -211,7 +211,10 @@ class Device:
         self._site = site
         self._labels = labels
         self._interfaces = interfaces
-        self._interface_by_name = {i.name: i for i in interfaces}
+        if self._interfaces:
+            self._interface_by_name = {i.name: i for i in interfaces}
+        else:
+            self._interfaces_by_name = {}
 
     def __repr__(self):
         return f'{self.device_name} (id: {self.id} type: {self.device_type.value})'
