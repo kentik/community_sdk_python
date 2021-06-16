@@ -10,7 +10,7 @@ class DebugOut:
         self.orig_level: Optional[int] = None
 
     def __enter__(self) -> None:
-        self.logger.debug('Switching log output to: %s', self.output)
+        self.logger.debug("Switching log output to: %s", self.output)
         self.orig_handler = self.logger.handlers[0]
         self.orig_level = self.logger.getEffectiveLevel()
         self.logger.removeHandler(self.logger.handlers[0])
@@ -21,7 +21,7 @@ class DebugOut:
         self.logger.setLevel(logging.DEBUG)
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        self.logger.debug('Restoring logger settings: handler: %s, level: %s', self.orig_handler, self.orig_level)
+        self.logger.debug("Restoring logger settings: handler: %s, level: %s", self.orig_handler, self.orig_level)
         self.logger.removeHandler(self.logger.handlers[0])
         self.logger.addHandler(self.orig_handler)
         self.logger.setLevel(self.orig_level)

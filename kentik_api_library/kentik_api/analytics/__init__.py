@@ -1,1 +1,1 @@
-from .flatness import (FlatnessResults, flatness_analysis)
+from .flatness import FlatnessResults, flatness_analysis

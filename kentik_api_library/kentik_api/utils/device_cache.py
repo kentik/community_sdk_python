@@ -2,11 +2,12 @@ import logging
 import pickle
 import sys
 from pathlib import Path
+from typing import Dict, Generator, List, Optional, TypeVar
+
 from kentik_api import KentikAPI
 from kentik_api.public import Device
-from typing import Dict, List, Generator, Optional, TypeVar
 
-log = logging.getLogger('device_cache')
+log = logging.getLogger("device_cache")
 
 
 class DeviceCacheIterator:
@@ -21,21 +22,21 @@ class DeviceCacheIterator:
             raise StopIteration
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class DeviceCache:
     @classmethod
     def from_api(cls, api: KentikAPI, labels: Optional[List[str]] = None) -> T:
-        log.debug('Fetching all devices')
+        log.debug("Fetching all devices")
         devices = api.devices.get_all()
         return cls(devices, labels)
 
     @classmethod
     def from_pickle(cls, filename: str) -> T:
         file = Path(filename)
-        log.debug(f'Reading device data from {file.resolve()}')
-        return pickle.load(file.open('rb'))
+        log.debug(f"Reading device data from {file.resolve()}")
+        return pickle.load(file.open("rb"))
 
     def __init__(self, devices: List[Device], labels: Optional[List[str]] = None) -> None:
         self._devices_by_name = dict()
@@ -49,21 +50,21 @@ class DeviceCache:
             label_set = frozenset()
         for device in devices:
             if label_set and not label_set.issubset(set([label.name for label in device.labels])):
-                log.debug('Ignoring device: %s (id: %d)', device.device_name, device.id)
+                log.debug("Ignoring device: %s (id: %d)", device.device_name, device.id)
                 continue
             if device.device_name in self._devices_by_name:
-                log.critical('Duplicate device name: %s', device.device_name)
+                log.critical("Duplicate device name: %s", device.device_name)
                 self.duplicate_names += 1
             else:
                 self._devices_by_name[device.device_name] = device
             if device.id in self._devices_by_id:
-                log.critical('Duplicate device id: %%d', device.id)
+                log.critical("Duplicate device id: %%d", device.id)
             else:
                 self._devices_by_id[device.id] = device
-        log.debug('Got %d devices (%d duplicate names)', len(self._devices_by_name), self.duplicate_names)
+        log.debug("Got %d devices (%d duplicate names)", len(self._devices_by_name), self.duplicate_names)
 
     def __repr__(self) -> str:
-        return f'DeviceCache: {self.count} devices'
+        return f"DeviceCache: {self.count} devices"
 
     def __iter__(self):
         return DeviceCacheIterator(self)
@@ -75,10 +76,10 @@ class DeviceCache:
             return self._devices_by_name.get(item)
 
     def info(self, out=sys.stdout) -> None:
-        print('{:5} devices'.format(len(self._devices_by_name)), file=out)
+        print("{:5} devices".format(len(self._devices_by_name)), file=out)
         if self.labels is not None:
-            print('matching labels: {}'.format(','.join(self.labels)), file=out)
-        print('{:5} duplicate names'.format(self.duplicate_names), file=out)
+            print("matching labels: {}".format(",".join(self.labels)), file=out)
+        print("{:5} duplicate names".format(self.duplicate_names), file=out)
 
     @property
     def count(self) -> int:
@@ -105,19 +106,19 @@ class DeviceCache:
         if links is None:
             for device in self._devices_by_name.values():
                 for ifc in device.interfaces:
-                    speeds[':'.join((device.device_name, ifc.name))] = ifc.speed
+                    speeds[":".join((device.device_name, ifc.name))] = ifc.speed
         else:
             for link in links:
                 # interface names may contain colons, device names cannot
-                d, i = link.split(':', maxsplit=1)
+                d, i = link.split(":", maxsplit=1)
                 device = self._devices_by_name.get(d)
                 if device is None:
-                    log.critical('Device %s not in cache', d)
-                    speeds[link] = float('NaN')
+                    log.critical("Device %s not in cache", d)
+                    speeds[link] = float("NaN")
                 else:
                     ifc = device.get_interface(i)
                     if ifc is None:
-                        log.critical('Device %s had no interface named %s', device.device_name, i)
+                        log.critical("Device %s had no interface named %s", device.device_name, i)
                     speeds[link] = ifc.speed
         return speeds
 
@@ -126,5 +127,5 @@ class DeviceCache:
         Pickle device cache to file
         :param filename: Output file name
         """
-        with Path(filename).open('wb') as f:
+        with Path(filename).open("wb") as f:
             pickle.dump(self, f)

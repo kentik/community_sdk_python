@@ -2,8 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Generator
 
-
-log = logging.getLogger('time_sequence')
+log = logging.getLogger("time_sequence")
 
 
 def time_seq(start: datetime, end: datetime, step: timedelta) -> Generator[datetime, None, None]:
