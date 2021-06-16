@@ -39,15 +39,15 @@ class TopNextHopASNPayload:
     """This datastructure represents JSON Interface.TopNextHopASN payload as it is transmitted to and from KentikAPI"""
 
     # GET, POST, PUT request/response
-    ASN: int
-    packets: int
+    Asn: int
+    Packets: int
 
     @classmethod
     def from_dict(cls, dic: Dict[str, Any]):
         return from_dict(data_class=cls, data=dic)
 
     def to_top_next_hop_asn(self) -> TopNextHopASN:
-        return TopNextHopASN(asn=self.ASN, packets=self.packets)
+        return TopNextHopASN(asn=self.Asn, packets=self.Packets)
 
 
 @dataclass

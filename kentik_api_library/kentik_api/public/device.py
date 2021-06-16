@@ -288,6 +288,9 @@ class Device:
     def get_interface(self, name):
         return self._interface_by_name.get(name)
 
+    def has_label(self, label: str):
+        return label in [lbl.name for lbl in self.labels]
+
     @classmethod
     def new_router(
         cls,
