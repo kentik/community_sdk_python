@@ -264,6 +264,9 @@ class Device:
     def all_interfaces(self) -> List[Any]:
         return list(self._all_interfaces) if self._all_interfaces is not None else []
 
+    def has_label(self, label: str):
+        return label in [lbl.name for lbl in self.labels]
+
     @classmethod
     def new_router(
         cls,
