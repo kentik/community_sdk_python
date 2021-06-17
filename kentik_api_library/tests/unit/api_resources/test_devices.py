@@ -1673,13 +1673,13 @@ def test_get_interface_full_success() -> None:
             "initial_network_boundary": "",
             "top_nexthop_asns": [
                 {
-                    "ASN": 20,
-                    "packets":30100
+                    "Asn": 20,
+                    "Packets":30100
                 },
                 {
-                    "ASN": 21,
+                    "Asn": 21,
                     "fala": "hala",
-                    "packets":30101
+                    "Packets":30101
                 }
             ],
             "provider": "",
@@ -1808,12 +1808,12 @@ def test_get_all_interfaces_success() -> None:
             "initial_network_boundary": "",
             "top_nexthop_asns": [
                 {
-                    "ASN": 20,
-                    "packets":30100
+                    "Asn": 20,
+                    "Packets":30100
                 },
                 {
-                    "ASN": 21,
-                    "packets":30101
+                    "Asn": 21,
+                    "Packets":30101
                 }
             ],
             "provider": "",
