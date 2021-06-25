@@ -2,10 +2,10 @@ import logging
 import pickle
 import sys
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, TypeVar
+from typing import Dict, Generator, List, Optional, Tuple, Type, TypeVar
 
-from kentik_api import KentikAPI
-from kentik_api.public import Device
+from kentik_api import KentikAPI  # type: ignore
+from kentik_api.public import Device, DeviceInterface  # type: ignore
 
 log = logging.getLogger("device_cache")
 
@@ -22,25 +22,25 @@ class DeviceCacheIterator:
             raise StopIteration
 
 
-T = TypeVar("T")
+T = TypeVar("T", bound="DeviceCache")
 
 
 class DeviceCache:
     @classmethod
-    def from_api(cls, api: KentikAPI, labels: Optional[List[str]] = None) -> T:
+    def from_api(cls: Type[T], api: KentikAPI, labels: Optional[List[str]] = None) -> T:
         log.debug("Fetching all devices")
         devices = api.devices.get_all()
-        return cls(devices, labels)
+        return cls(devices, labels)  # type: ignore
 
     @classmethod
-    def from_pickle(cls, filename: str) -> T:
+    def from_pickle(cls: Type[T], filename: str) -> T:
         file = Path(filename)
         log.debug(f"Reading device data from {file.resolve()}")
         return pickle.load(file.open("rb"))
 
     def __init__(self, devices: List[Device], labels: Optional[List[str]] = None) -> None:
-        self._devices_by_name = dict()
-        self._devices_by_id = dict()
+        self._devices_by_name: Dict[str, Device] = dict()
+        self._devices_by_id: Dict[int, Device] = dict()
         self.duplicate_names = 0
         self.labels = labels
 
@@ -93,7 +93,23 @@ class DeviceCache:
     def get_by_id(self, device_id: int) -> Optional[Device]:
         return self._devices_by_id.get(device_id)
 
-    def get_link_speeds(self, links: Optional[str] = None) -> Dict:
+    @staticmethod
+    def make_link(device: Device, ifc: DeviceInterface) -> str:
+        return f"{device.device_name}:{ifc.name}"
+
+    def parse_link(self, link: str) -> Tuple[Optional[Device], Optional[DeviceInterface]]:
+        d, i = link.split(":", maxsplit=1)
+        device = self._devices_by_name.get(d)
+        if device is None:
+            log.critical("Device %s not in cache", d)
+            ifc = None
+        else:
+            ifc = device.get_interface(i)
+            if ifc is None:
+                log.critical("Device %s has no interface named %s", device.device_name, i)
+        return device, ifc
+
+    def get_link_speeds(self, links: Optional[str] = None) -> Dict[str, float]:
         """
         Return dictionary of link speeds. Link = '<device_name>:<interface_name>'
         :param links: List of links to consider. If None is provided, all interfaces of all devices in the cache are
@@ -102,23 +118,16 @@ class DeviceCache:
                  or does not have specified interface, or speed information is not available, the link has undefined
                  speed represented as floating point 'NaN'
         """
-        speeds = dict()
+        speeds: Dict[str, float] = dict()
         if links is None:
-            for device in self._devices_by_name.values():
-                for ifc in device.interfaces:
-                    speeds[":".join((device.device_name, ifc.name))] = ifc.speed
+            speeds = {self.make_link(d, i): i.speed for d in self.all for i in d.interfaces}
         else:
             for link in links:
                 # interface names may contain colons, device names cannot
-                d, i = link.split(":", maxsplit=1)
-                device = self._devices_by_name.get(d)
-                if device is None:
-                    log.critical("Device %s not in cache", d)
+                device, ifc = self.parse_link(link)
+                if device is None or ifc is None:
                     speeds[link] = float("NaN")
                 else:
-                    ifc = device.get_interface(i)
-                    if ifc is None:
-                        log.critical("Device %s had no interface named %s", device.device_name, i)
                     speeds[link] = ifc.speed
         return speeds
 

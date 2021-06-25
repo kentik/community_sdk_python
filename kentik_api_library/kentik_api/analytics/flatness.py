@@ -2,20 +2,24 @@ import io
 import json
 import logging
 import sys
-from collections import namedtuple
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import numpy as np
-import pandas as pd
+import pandas as pd  # type: ignore
 
-from kentik_api.utils import DeviceCache, DFCache
+from kentik_api.utils import DeviceCache  # type: ignore
 
-log = logging.getLogger("analytics")
+from .data_frame_cache import DFCache  # type: ignore
 
-Interval = namedtuple("Interval", ["start", "end"])
+log = logging.getLogger("flatness_analysis")
+
+
+@dataclass
+class Interval:
+    start: datetime
+    end: datetime
 
 
 class FlatnessResults:
@@ -38,6 +42,15 @@ class FlatnessResults:
             max_per_link=max(len(i) for i in self.events.values()),
         )
 
+    def last(self, link: str) -> Optional[Interval]:
+        if link in self.events and self.events[link]:
+            return self.events[link][-1]
+        else:
+            return None
+
+    def set_last(self, link: str, interval: Interval) -> None:
+        self.events[link][-1] = interval
+
     @property
     def affected_links(self) -> List[str]:
         return [link for link, intervals in self.events.items() if len(intervals) > 0]
@@ -51,10 +64,14 @@ class FlatnessResults:
         if filename:
             with Path(filename).open("w") as f:
                 json.dump(r, f, indent=2)
+                return None
         else:
             return json.dumps(r, indent=2)
 
     def to_text(self, out=sys.stdout) -> None:
+        for k, v in self.stats.items():
+            print(f"{k:20}: {v}", file=out)
+        print(file=out)
         for link, intervals in self.events.items():
             if len(intervals) < 1:
                 continue
@@ -100,55 +117,6 @@ def set_link_utilization(
     speeds = devices.get_link_speeds(df[link_col].unique())
     df[speed_col] = [speeds[link] for link in df[link_col]]
     df[util_col] = (df[data_col] / df[speed_col]) * 100
-
-
-def compute_flatness(
-    df: pd.DataFrame,
-    method: str = "range",
-    pivot: str = "link",
-    data: str = "utilization",
-    window: str = "1H",
-    min_samples: int = 3,
-    closed: str = "right",
-) -> pd.DataFrame:
-    """
-    Compute measure of flatness over DataFrame column using time window
-    :param df: pandas.DataFrame indexed by time with  2 columns:
-        - pivot: str or panda.object
-        - any numeric value (anything allowing to compute mean)
-    :param method: string identifying method to use for producing measure of flatness
-           available methods:
-           - range = use difference between min and max over utilization
-           - variance = uses variance over utilization
-    :param pivot: name of column for grouping results
-    :param data: name of column containing data over which to compute flatness score
-    :param window: window size specification for flatness computation (see pandas.Rolling)
-    :param min_samples: minimum number of samples in a window to have valid result (see pandas.Rolling min_period)
-    :param closed: parameter for rolling window interval calculation (see pandas.Rolling closed)
-    :return: pandas.DataFrame indexed with MultiIndex(pivot, time) and with 2 columns
-            - mean = mean value of data column for each rollup window
-            - flatness measure for each rollup window based on specified method
-    """
-    if log.level == logging.DEBUG:
-        with io.StringIO() as f:
-            df.info(buf=f)
-            log.debug("Evaluating DataFrame %s, window: %s, pivot: %s, data: %s", f.getvalue(), window, pivot, data)
-    if pivot not in df:
-        raise RuntimeError(f"No {pivot} columns in DataFrame")
-    if data not in df:
-        raise RuntimeError(f"No {data} column in DataFrame")
-    mean = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples).mean()
-    if method == "range":
-        y = (
-            df.groupby(by=pivot)[data]
-            .rolling(window=window, closed=closed, min_periods=min_samples)
-            .apply(lambda x: np.max(x) - np.min(x), raw=True)
-        )
-    elif method == "variance":
-        y = df.groupby(by=pivot)[data].rolling(window=window, closed=closed, min_periods=min_samples).var()
-    else:
-        raise RuntimeError(f'Unsupported flatness analysis method "{method}"')
-    return pd.DataFrame(index=mean.index, data={"mean": mean, "flatness": y})
 
 
 def compute_stats(
@@ -216,7 +184,7 @@ def analyze_flatness(
     :param link_index: name of index level containing link names
     :return: FlatnessResults object
     """
-    if log.level == logging.DEBUG:
+    if log.getEffectiveLevel() == logging.DEBUG:
         with io.StringIO() as f:
             df.info(buf=f)
             log.debug("Input DataFrame %s", f.getvalue())
@@ -246,26 +214,26 @@ def analyze_flatness(
         log.debug("No suspects")
         # Nothing to do
         return results
-    log.debug("%d suspects", len(suspects))
+    log.debug("%d suspects", suspects.value_counts().loc[True])
     merged = 0
     for link in links:
-        last = None
+        last = results.last(link)
         d = df.xs(link)
         for ts in suspects.xs(link)[suspects.xs(link)].index:
             log.debug("link: %s, ts: %s", link, ts)
-            s = d.loc[ts - window :].index[0]
-            if last is not None and last[1] >= s:
-                agg_min = min(d.loc[last[1]][min_column], d.loc[ts][min_column])
-                agg_max = max(d.loc[last[1]][max_column], d.loc[ts][max_column])
+            s = d.loc[(ts - window) :].index[0]
+            if last is not None and last.end >= s:
+                agg_min = min(d.loc[last.end][min_column], d.loc[ts][min_column])
+                agg_max = max(d.loc[last.end][max_column], d.loc[ts][max_column])
                 log.debug("link: %s, overlap at: %s, combined range: %f", link, ts, agg_max - agg_min)
                 if agg_max - agg_min < flatness_limit:
                     merged += 1
                     log.debug("link: %s, merging: [%s, %s]", link, results[link][-1].start, ts)
-                    results[link][-1]._replace(end=ts)
+                    results.last(link).end = ts  # type: ignore
                     continue
             log.debug("link: %s, adding: [%s, %s]", link, s, ts)
             results[link].append(Interval(start=s, end=ts))
-            last = results[link][-1]
+            last = results.last(link)
     # remove intervals shorter than window
     # such intervals can occur at the beginning of the observation
     removed = 0
@@ -282,22 +250,18 @@ def analyze_flatness(
 
 def flatness_analysis(
     devices: DeviceCache,
-    data: DFCache,
-    start: datetime,
-    end: datetime,
+    data: pd.DataFrame,
     flatness_limit: float,
     window: timedelta,
     min_valid: float = 0,
     max_valid: float = 100,
 ) -> FlatnessResults:
-    log.info("Getting traffic data start: %s end: %s", start, end)
-    df = data.get(start, end, ["ts", "link"])
-    log.debug("Got %d entries for %d links", df.shape[0], len(df["link"].unique()))
-    log.info("Computing link utilization")
-    set_link_utilization(df, devices)
-    log.info("Computing traffic statistics")
-    stats = compute_stats(df, window=window)
-    log.info("Analyzing flatness")
+    log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
+    log.debug("Computing link utilization")
+    set_link_utilization(data, devices)
+    log.debug("Computing traffic statistics")
+    stats = compute_stats(data, window=window)
+    log.debug("Analyzing flatness")
     return analyze_flatness(
         stats, flatness_limit=flatness_limit, window=window, min_valid=min_valid, max_valid=max_valid
     )

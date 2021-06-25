@@ -14,6 +14,6 @@ def time_seq(start: datetime, end: datetime, step: timedelta) -> Generator[datet
     :return: yields datetime objects
     """
     cur = start
-    while cur <= end:
+    while cur < end:
         yield cur
         cur += step

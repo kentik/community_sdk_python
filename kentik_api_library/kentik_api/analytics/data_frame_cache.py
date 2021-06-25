@@ -4,12 +4,12 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Generator, List, Optional, Tuple
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
-from kentik_api import KentikAPI
-from kentik_api.public import QueryDefinition, QuerySQL
+from kentik_api import KentikAPI  # type: ignore
+from kentik_api.utils.time_sequence import time_seq  # type: ignore
 
-from .time_sequence import time_seq
+from .mapped_query import MappedQueryFn  # type: ignore
 
 log = logging.getLogger("DFCache")
 
@@ -138,9 +138,9 @@ class DFCache:
             if fs is None or fe is None:
                 continue
             if contained:
-                if fs >= start and fe <= end:
+                if fs >= start and fe <= end:  # type: ignore
                     yield f
-            elif fs <= end and fe > start:
+            elif fs <= end and fe > start:  # type: ignore
                 yield f
 
     def get(
@@ -185,8 +185,7 @@ class DFCache:
 
     def fetch(
         self,
-        api: KentikAPI,
-        query_def: QueryDefinition,
+        query_fn: MappedQueryFn,
         start: datetime,
         end: datetime,
         step: Optional[timedelta] = None,
@@ -196,8 +195,7 @@ class DFCache:
         """
         Retrieve data using specified query definition and time period
         Newly retrieved data are added to the cache
-        :param api: KentikAPI instance to use to fetch data
-        :param query_def: query definition object
+        :param query_fn: function performing Kentik API query and returning DataFrame
         :param start: timestamp of the beginning of the target time period
         :param end: timestamp of the end of the target time period
         :param step: time chunks in which to retrieve new data (longer time periods result in lower time resolution)
@@ -207,8 +205,7 @@ class DFCache:
         """
         if step is None:
             log.debug("fetch: fetching from: %s to: %s", start, end)
-            query = QuerySQL.from_query_definition(query_def, start=start, end=end, **kwargs)
-            df = api.query.sql(query).to_dataframe(query_def)
+            df = query_fn(start=start, end=end, **kwargs)
             if df is None:
                 log.warning("fetch: got no data for %s -> %s", start, end)
                 return None
@@ -217,41 +214,43 @@ class DFCache:
                 self.store(df)
                 return df
         else:
-            log.debug("fetch: fetching from: %s to: %s in %s steps", start, end, step)
+            log.debug("fetch: fetching from: %s to: %s, step: %s", start, end, step)
+            last = start
             for t in time_seq(start, end, step):
-                log.debug("fetch: fetching from: %s to: %s", t, t + step)
-                query = QuerySQL.from_query_definition(query_def, start=start, end=t + step, **kwargs)
-                df = api.query.sql(query).to_dataframe(query_def)
+                s = min(t, last)
+                log.debug("fetch: fetching from: %s to: %s", s, t + step)
+                df = query_fn(start=s, end=t + step, **kwargs)
                 if df is None:
                     log.debug("fetch: got no data for %s -> %s", t, t + step)
+                    last = t + step
                 else:
-                    log.debug("fetch: got %d rows for %s -> %s", df.shape[0], t, t + step)
+                    last = df.index[-1]
+                    log.debug("fetch: got %d rows for %s -> %s", df.shape[0], s, last)
                     self.store(df)
             return self.get(start, end, dedup_columns)
 
     def fetch_latest(
         self,
-        api: KentikAPI,
-        query_def: QueryDefinition,
+        query_fn: MappedQueryFn,
         step: Optional[timedelta] = None,
         dedup_columns: Optional[List[str]] = None,
         **kwargs,
     ) -> Optional[pd.DataFrame]:
         """
         Retrieve data using specified query definition with start time = newest in cache and end time = now
-        If the cache is empty, last day of data is retrieved
+        If the cache is empty, last day of data is retrieved. More precisely 23 hours and 59 minutes of data are
+        retrieved in order to get 5 minute resolution.
         Newly retrieved data are added to the cache
-        :param api: KentikAPI instance to use to fetch data
-        :param query_def: query definition object
+        :param query_fn: function performing Kentik API query and returning DataFrame
         :param step: time chunks in which to retrieve new data (longer time periods result in lower time resolution)
         :param dedup_columns: list of column names used for row deduplication
         :param kwargs: addition key/value args passed to QuerySQL.from_query_definition
         :return: DataFrame containing new data
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc).replace(second=0, microsecond=0)
         if self.is_empty:
             log.debug("fetch_latest: cache is empty")
-            start = now - timedelta(days=1)
+            start = now - timedelta(hours=23, minutes=59)
         else:
-            start = self.newest
-        return self.fetch(api, query_def, start=start, end=now, step=step, dedup_columns=dedup_columns, **kwargs)
+            start = self.newest  # type: ignore
+        return self.fetch(query_fn, start=start, end=now, step=step, dedup_columns=dedup_columns, **kwargs)

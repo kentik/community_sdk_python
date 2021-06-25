@@ -102,12 +102,27 @@ setup(
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     license="Apache-2.0",
     include_package_data=True,
-    install_requires=["requests>=2.25.0", "typing-extensions>=3.7.4.3", "dacite>=1.6.0"],
-    setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
-    tests_require=["httpretty", "pytest", "pylint"],
+    install_requires=[
+        "dacite>=1.6.0",
+        "requests>=2.25.0",
+        "typing-extensions>=3.7.4.3"
+    ],
+    setup_requires=[
+        "pytest-runner",
+        "pylint-runner",
+        "setuptools_scm",
+        "wheel"
+    ],
+    tests_require=[
+        "httpretty",
+        "pytest",
+        "pylint"
+    ],
+    extras_require={
+        'analytics': ['pandas>=1.2.4', 'pyyaml>=5.4.1'],
+    },
     packages=PACKAGES,
-    package_dir={pkg:os.path.join(*pkg.split('.')) for pkg in PACKAGES},
-    scripts=["kentik_cli/kentik_cli.py"],
+    package_dir={pkg: os.path.join(*pkg.split('.')) for pkg in PACKAGES},
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",

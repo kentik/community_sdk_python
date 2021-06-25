@@ -22,7 +22,7 @@ def load_credential_profile(filename: str) -> Optional[Dict]:
         return None
 
 
-def get_credentials(profile: str = "default") -> Tuple[Optional[str], Optional[str]]:
+def get_credentials(profile: str = "default") -> Tuple[str, str]:
     email = os.environ.get("KTAPI_AUTH_EMAIL")
     token = os.environ.get("KTAPI_AUTH_TOKEN")
     home: str = os.environ.get("KHOME", os.environ.get("HOME", "."))
@@ -31,4 +31,7 @@ def get_credentials(profile: str = "default") -> Tuple[Optional[str], Optional[s
         if cfg is not None:
             email = cfg["email"]
             token = cfg["api-key"]
-    return email, token
+    if email and token:
+        return email, token
+    else:
+        raise RuntimeError("Failed to get API authentication credentials")

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.public.plan import Plan
@@ -104,7 +104,7 @@ class DeviceInterface:
         self._initial_snmp_speed = initial_snmp_speed
 
     def __repr__(self):
-        return f'{self.name} (owner: {self.device_id})'
+        return f"{self.name} (owner: {self.device_id})"
 
     @property
     def interface_description(self) -> str:
@@ -130,7 +130,7 @@ class DeviceInterface:
     def speed(self):
         speed = max([float(x) for x in (self.snmp_speed, self.initial_snmp_speed) if x is not None])
         if not speed:
-            return float('NaN')
+            return float("NaN")
         return float(speed * 10e6 * 8)
 
 
@@ -211,13 +211,12 @@ class Device:
         self._site = site
         self._labels = labels
         self._interfaces = interfaces
+        self._interfaces_by_name: Dict[str, DeviceInterface] = {}
         if self._interfaces:
-            self._interface_by_name = {i.name: i for i in interfaces}
-        else:
-            self._interfaces_by_name = {}
+            self._interfaces_by_name = {i.name: i for i in self._interfaces}
 
     def __repr__(self):
-        return f'{self.device_name} (id: {self.id} type: {self.device_type.value})'
+        return f"{self.device_name} (id: {self.id} type: {self.device_type.value})"
 
     @property
     def id(self) -> ID:
@@ -225,8 +224,11 @@ class Device:
         return self._id
 
     @property
-    def device_name(self) -> Optional[str]:
-        return self._device_name
+    def device_name(self) -> str:
+        if self._device_name:
+            return self._device_name
+        else:
+            return f"<id: {self.id}>"
 
     @property
     def device_type(self) -> Optional[DeviceType]:
@@ -286,7 +288,7 @@ class Device:
         return list(self._interfaces) if self._interfaces is not None else []
 
     def get_interface(self, name):
-        return self._interface_by_name.get(name)
+        return self._interfaces_by_name.get(name)
 
     def has_label(self, label: str):
         return label in [lbl.name for lbl in self.labels]
