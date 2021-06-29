@@ -820,6 +820,7 @@ def test_update_device_router_success() -> None:
             "sending_ips": ["128.0.0.10", "128.0.0.11"],
             "device_sample_rate": "10",
             "device_description": "updated description",
+            "device_name": "<id: 42>",
             "device_snmp_ip": "127.0.0.10",
             "plan_id": 11466,
             "site_id": 8483,

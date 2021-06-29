@@ -256,6 +256,19 @@ def flatness_analysis(
     min_valid: float = 0,
     max_valid: float = 100,
 ) -> FlatnessResults:
+    """
+    Detect intervals of constant traffic in data passed in DataFrame based on provided criteria.
+    :param devices: instance of kentik-api.utils.DeviceCache containing data for all devices references in the `link`
+                    column of the "data" DataFrame
+    :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bps_out". The "link" column is
+                 expected to contain names of network links as <device_name>:<interface_name> and :"bps_out" contains
+                 sum of outbound traffic rate (in bits per second) for the interval ending at the row timestamp
+    :param flatness_limit: maximum range of network link utilization in percents to deem traffic constant ("flat")
+    :param window: minimum time window over which link utilization must stay with flatness_limit
+    :param min_valid: minimum link utilization in percents for the interval to be considered as "flat traffic"
+    :param max_valid: maximum link utilization in percents for the interval to be considered as "flat traffic"
+    :return: FlatnessResults instance
+    """
     log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
     log.debug("Computing link utilization")
     set_link_utilization(data, devices)

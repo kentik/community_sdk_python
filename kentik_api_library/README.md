@@ -68,6 +68,32 @@ The general approach is that every single KentikAPI resource is represented in t
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
 
+## Additional utilities available in the `utils` sub-module
+### Authentication support
+- `get_credentials`: function for retrieving authentication credentials from the environment or a profile stored on disk.
+  API authentication credentials can be provided via environment variables `KTAPI_AUTH_EMAIL` and `KTAPI_AUTH_TOKEN`
+  or via named profile (specified as argument to the `get_credentials` functions, defaulting to `default`) which is
+  a JSON file with following format:
+```
+{
+  "email": "<email address>",
+  "api-key": "<the API key>"
+}
+```
+Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in 
+`${KHOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
+
+### Support for caching of device data
+The `DeviceCache` class allows caching of device related data obtained from the Kentik API. It internally builds
+index of devices by `name` and by `id`. Devices are represented by the [Device](./kentik_api/public/device.py) class which
+internally builds dictionary of device interfaces  (represented by the `DeviceInterface` class) by `name`.
+
+## Analytic support
+The `analytics` package provides support for processing Kentik time series data using Pandas Dataframes.
+The [pandas](https://pandas.pydata.org) and [PyYAML](https://pyyaml.org/) modules are required by the `analytics`
+sub-module and are automatically installed with the `kentik-api[analytics]` option.
+See [analytics readme](./kentik_api/analytics/README.md) for more details.
+
 ## More examples
 
 List of available examples:
@@ -85,6 +111,8 @@ List of available examples:
 - [tags_example.py](./examples/tags_example.py) - create/update/get/delete/list Tags
 - [users_example.py](./examples/users_example.py) - create/update/get/delete/list Users
 - [error_handling_example.py](./examples/error_handling_example.py) - handling errors raised by the library
+- [analytics_example.py](./examples/analytics_example.py) - use of the `flatness_analysis` method and the`DeviceCache`
+  (see also [analytics readme](./kentik_api/analytics/README.md))
 
 ## Open-source libraries
 
@@ -92,3 +120,5 @@ This software uses the following open-source libraries:
 - [dacite](https://pypi.org/project/dacite/) by Konrad Hałas - MIT License
 - [requests](https://pypi.org/project/requests/) by Kenneth Reitz - Apache Software License (Apache 2.0)
 - [typing-extensions](https://pypi.org/project/typing-extensions/) by  Guido van Rossum, Jukka Lehtosalo, Lukasz Langa, Michael Lee - PSFL License
+- [pandas](https://pandas.pydata.org) supported by NumFOCUS - BSD 3-Clause License
+- [pyyaml](https://pyyaml.org/) by Ingy döt Net and Kirill Simonov - MIT license

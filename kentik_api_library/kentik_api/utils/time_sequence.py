@@ -9,7 +9,7 @@ def time_seq(start: datetime, end: datetime, step: timedelta) -> Generator[datet
     """
     Generate datetime objects
     :param start: start timestamp
-    :param end: end timestamp (included in the range)
+    :param end: end timestamp (not included in the range)
     :param step: interval in which timestamps are generated
     :return: yields datetime objects
     """
