@@ -35,7 +35,7 @@ class APIConnector:
         auth_token: str,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
-        proxy: Optional[str] = None
+        proxy: Optional[str] = None,
     ) -> None:
         self._api_url = api_url
         self._logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class APIConnector:
         self._session.headers.update({"Content-Type": "application/json"})
         self._timeout = timeout
         if proxy:
-            self._logger.debug('Using proxy: %s', proxy)
+            self._logger.debug("Using proxy: %s", proxy)
             self._session.proxies = dict(http=proxy, https=proxy)
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:

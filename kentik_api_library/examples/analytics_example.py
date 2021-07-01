@@ -9,25 +9,16 @@ logging.basicConfig(level=logging.INFO)
 
 query_data = {
     "query": "SELECT i_start_time, i_device_name, i_output_interface_description,"
-             " sum(both_bytes) as f_sum_both_bytes FROM all_devices"
-             " WHERE app_protocol in (0, 1, 2, 3, 4) AND i_fast_dataset = FALSE"
-             " AND i_dst_network_bndry_name = $_kntq$external$_kntq$ AND i_trf_termination = $_kntq$outside$_kntq$"
-             " AND i_start_time >= '{start}' AND i_start_time <= '{end}'"
-             " GROUP BY i_start_time, i_device_name, i_output_interface_description ORDER BY f_sum_both_bytes DESC",
+    " sum(both_bytes) as f_sum_both_bytes FROM all_devices"
+    " WHERE app_protocol in (0, 1, 2, 3, 4) AND i_fast_dataset = FALSE"
+    " AND i_dst_network_bndry_name = $_kntq$external$_kntq$ AND i_trf_termination = $_kntq$outside$_kntq$"
+    " AND i_start_time >= '{start}' AND i_start_time <= '{end}'"
+    " GROUP BY i_start_time, i_device_name, i_output_interface_description ORDER BY f_sum_both_bytes DESC",
     "mapping": {
-        "bps_out": {
-            "type": "int64",
-            "source": "{f_sum_both_bytes}"
-        },
-        "link": {
-            "source": "{i_device_name}:{i_output_interface_description}"
-        },
-        "ts": {
-            "type": "time",
-            "source": "{i_start_time}",
-            "index": True
-        }
-    }
+        "bps_out": {"type": "int64", "source": "{f_sum_both_bytes}"},
+        "link": {"source": "{i_device_name}:{i_output_interface_description}"},
+        "ts": {"type": "time", "source": "{i_start_time}", "index": True},
+    },
 }
 
 
@@ -65,14 +56,16 @@ def main() -> None:
     print("\tmin_utilization: ", min_utilization)
     print("\tmax_utilization: ", max_utilization)
 
-    results = flatness_analysis(devices=devices,
-                                data=df,
-                                flatness_limit=flatness_limit,
-                                window=time_window,
-                                min_valid=min_utilization,
-                                max_valid=max_utilization)
+    results = flatness_analysis(
+        devices=devices,
+        data=df,
+        flatness_limit=flatness_limit,
+        window=time_window,
+        min_valid=min_utilization,
+        max_valid=max_utilization,
+    )
 
-    print("-"*25)
+    print("-" * 25)
     results.to_text()
 
 

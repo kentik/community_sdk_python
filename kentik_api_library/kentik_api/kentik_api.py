@@ -31,7 +31,7 @@ class KentikAPI:
         api_url: str = API_URL_US,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
-        proxy: Optional[str] = None
+        proxy: Optional[str] = None,
     ) -> None:
         connector = APIConnector(api_url, auth_email, auth_token, timeout, retry_strategy, proxy)
 
