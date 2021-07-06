@@ -5,8 +5,8 @@ from threading import Thread
 from typing import Callable, Any
 from dataclasses import dataclass
 
-from kentik_api.public.errors import IntermittentError  # type: ignore
-from kentik_api.throttling.cmd import Cmd  # type: ignore
+from kentik_api.public.errors import IntermittentError
+from kentik_api.throttling.cmd import Cmd
 
 
 SuccessFunc = Callable[[Any], None]  # input: successful cmd execution result, output: none

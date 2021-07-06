@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Generator, Optional, Tuple, Type, TypeVar
 
 import yaml
-from pandas import DataFrame, to_datetime  # type: ignore
+from pandas import DataFrame, to_datetime
 
-from kentik_api import KentikAPI  # type: ignore
-from kentik_api.public import QuerySQL, QuerySQLResult  # type: ignore
+from kentik_api import KentikAPI
+from kentik_api.public import QuerySQL, QuerySQLResult
 
 MappedQueryFn = Callable[..., DataFrame]
 

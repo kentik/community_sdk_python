@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from kentik_api import KentikAPI  # type: ignore
-from kentik_api.utils import get_credentials, DeviceCache  # type: ignore
-from kentik_api.analytics import DFCache, SQLQueryDefinition, flatness_analysis  # type: ignore
+from kentik_api import KentikAPI
+from kentik_api.utils import get_credentials, DeviceCache
+from kentik_api.analytics import SQLQueryDefinition, flatness_analysis
 
 
 logging.basicConfig(level=logging.INFO)

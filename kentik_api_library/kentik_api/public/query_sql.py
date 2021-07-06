@@ -7,15 +7,6 @@ from typing import List, Dict
 class QuerySQL:
     query: str
 
-    @classmethod
-    def from_file(cls, filename: str):
-        """
-        Load SQL query from a neatly formatted file
-        """
-        with open(filename) as f:
-            qs = " ".join([line.strip() for line in f.readlines()])
-        return cls(qs)
-
 
 @dataclass
 class QuerySQLResult:

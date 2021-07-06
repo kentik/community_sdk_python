@@ -1,5 +1,5 @@
 try:
-    import pandas as pd  # type: ignore
+    import pandas as pd
 except ImportError:
     raise RuntimeError("Analytics support requires 'pandas'")
 try:

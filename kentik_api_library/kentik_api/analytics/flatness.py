@@ -7,11 +7,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import pandas as pd  # type: ignore
+import pandas as pd
 
-from kentik_api.utils import DeviceCache  # type: ignore
+from kentik_api.utils import DeviceCache
 
-from .data_frame_cache import DFCache  # type: ignore
 
 log = logging.getLogger("flatness_analysis")
 

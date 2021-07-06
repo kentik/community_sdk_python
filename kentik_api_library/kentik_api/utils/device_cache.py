@@ -4,8 +4,8 @@ import sys
 from pathlib import Path
 from typing import Dict, Generator, List, Optional, Tuple, Type, TypeVar
 
-from kentik_api import KentikAPI  # type: ignore
-from kentik_api.public import Device, DeviceInterface  # type: ignore
+from kentik_api import KentikAPI
+from kentik_api.public import Device, DeviceInterface
 
 log = logging.getLogger("device_cache")
 
@@ -30,7 +30,7 @@ class DeviceCache:
     def from_api(cls: Type[T], api: KentikAPI, labels: Optional[List[str]] = None) -> T:
         log.debug("Fetching all devices")
         devices = api.devices.get_all()
-        return cls(devices, labels)  # type: ignore
+        return cls(devices, labels)
 
     @classmethod
     def from_pickle(cls: Type[T], filename: str) -> T:

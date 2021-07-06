@@ -15,8 +15,6 @@ from .api_resources.users_api import UsersAPI
 from typing import Optional, Tuple, Union
 from .api_connection.retryable_session import Retry
 
-# pylint: disable=too-many-instance-attributes
-
 
 class KentikAPI:
     """Root object for operating KentikAPI"""

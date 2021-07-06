@@ -4,12 +4,12 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Generator, List, Optional, Tuple
 
-import pandas as pd  # type: ignore
+import pandas as pd
 
-from kentik_api import KentikAPI  # type: ignore
-from kentik_api.utils.time_sequence import time_seq  # type: ignore
+from kentik_api import KentikAPI
+from kentik_api.utils.time_sequence import time_seq
 
-from .mapped_query import MappedQueryFn  # type: ignore
+from .mapped_query import MappedQueryFn
 
 log = logging.getLogger("DFCache")
 

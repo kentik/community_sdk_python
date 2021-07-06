@@ -74,7 +74,7 @@ The general approach is that every single KentikAPI resource is represented in t
   API authentication credentials can be provided via environment variables `KTAPI_AUTH_EMAIL` and `KTAPI_AUTH_TOKEN`
   or via named profile (specified as argument to the `get_credentials` functions, defaulting to `default`) which is
   a JSON file with following format:
-```
+```json
 {
   "email": "<email address>",
   "api-key": "<the API key>"
