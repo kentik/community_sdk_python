@@ -106,7 +106,7 @@ setup(
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm", "wheel"],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={
-        "analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1"],
+        "analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"],
     },
     packages=PACKAGES,
     package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},

@@ -124,10 +124,17 @@ class DFCache:
     def files_in_range(
         self, start: Optional[datetime] = None, end: Optional[datetime] = None, contained: bool = False
     ) -> Generator[Path, None, None]:
+        """
+        Generator yielding files with data in specific time interval
+        :param start - timestamp of the beginning of the interval
+        :param end - timestamp of the end of the interval
+        :param contained: if True yield only files with all data points in specified interval
+                          if False, yield files with any data point within the interval
+        """
         if start is not None and end is not None and not start < end:
             raise RuntimeError(f"Invalid arguments start {start} >= end {end}")
         if self.is_empty:
-            log.debug("files_in_range: No files data directory: %s", self.data_dir)
+            log.debug("files_in_range: No files in data directory: %s", self.data_dir)
             return
         if start is None:
             start = self.oldest
@@ -138,8 +145,10 @@ class DFCache:
             if fs is None or fe is None:
                 continue
             if contained:
+                # consider only files containing only data points in the interval
                 if fs >= start and fe <= end:  # type: ignore
                     yield f
+            # consider all files with any data in the specified interval
             elif fs <= end and fe > start:  # type: ignore
                 yield f
 
@@ -152,6 +161,10 @@ class DFCache:
         if self.is_empty:
             log.debug("get: cache is empty")
             return None
+        if start is None:
+            start = self.oldest
+        if end is None:
+            end = self.newest
         log.debug("get: start: %s end: %s", start, end)
         df = pd.concat([pd.read_parquet(f) for f in self.files_in_range(start, end)])
         out = pd.DataFrame(data=df.loc[(df.index >= start) & (df.index <= end)])

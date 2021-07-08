@@ -54,20 +54,33 @@ class FlatnessResults:
     def affected_links(self) -> List[str]:
         return [link for link, intervals in self.events.items() if len(intervals) > 0]
 
-    def to_json(self, filename: Optional[str] = None) -> Optional[str]:
+    def to_json(self, **kwargs) -> str:
+        """
+        Produce JSON rendering of flatness analysis results.
+        :param  kwargs dictionary passed to JSON formatter (json_dumps)
+        :return: JSON text
+        """
         r = {
             link: [(i.start.isoformat(), i.end.isoformat()) for i in intervals]
             for link, intervals in self.events.items()
             if len(intervals) > 0
         }
-        if filename:
-            with Path(filename).open("w") as f:
-                json.dump(r, f, indent=2)
-                return None
-        else:
-            return json.dumps(r, indent=2)
+        return json.dumps(r, **kwargs)
+
+    def to_json_file(self, filename: str, **kwargs) -> None:
+        """
+        Save results of flatness analysis to JSON file
+        :param filename: name of the output file
+        :param  kwargs dictionary passed to JSON formatter (json_dumps)
+        """
+        with Path(filename).open("w") as f:
+            f.write(self.to_json(**kwargs))
 
     def to_text(self, out=sys.stdout) -> None:
+        """
+        Produce human consumable rendering of flatness analysis results to an output channel
+        :param out: file handle (default stdout)
+        """
         for k, v in self.stats.items():
             print(f"{k:20}: {v}", file=out)
         print(file=out)
@@ -77,6 +90,39 @@ class FlatnessResults:
             print(link, file=out)
             for i in intervals:
                 print(f"\t[{i.start}, {i.end}]", file=out)
+
+
+def freq_to_seconds(freq: str) -> float:
+    """
+    Converts pandas frequency string to seconds
+    :param freq: str
+    :return: period in seconds
+    """
+    if not freq[0].isdigit():
+        freq = "1" + freq
+    return pd.Timedelta(freq).total_seconds()
+
+
+def compute_bandwidth(
+        df: pd.DataFrame,
+        link_col: Optional[str] = "link",
+        data_col: Optional[str] = "bytes_out",
+        bps_col: Optional[str] = "bps_out",
+) -> None:
+    """
+    Adds column bps_out containing bandwidth usage via each link (in bits/s) to the input DataFrame
+    The function requires that the input DataFrame is indexed by time in equidistant intervals. If this is not the case
+    the input DataFrame is resampled using the longest period seen in the index.
+    :param link_col: Name of column containing link names
+    :param data_col: Name of column containing bytes out
+    :param bps_col: Name of column for bandwidth
+    :return: None (modifies input DataFrame in place)
+    """
+    freq = df.index.unique().inferred_freq
+    if freq is None:
+        raise RuntimeError("Input DataFrame is not indexed by time or timestamps are not equidistant")
+    factor = 8 / freq_to_seconds(freq)  # converting also bytes to bits
+    df[bps_col] = df[data_col] * factor
 
 
 def set_link_utilization(
@@ -259,7 +305,7 @@ def flatness_analysis(
     Detect intervals of constant traffic in data passed in DataFrame based on provided criteria.
     :param devices: instance of kentik-api.utils.DeviceCache containing data for all devices references in the `link`
                     column of the "data" DataFrame
-    :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bps_out". The "link" column is
+    :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bytes_out". The "link" column is
                  expected to contain names of network links as <device_name>:<interface_name> and :"bps_out" contains
                  sum of outbound traffic rate (in bits per second) for the interval ending at the row timestamp
     :param flatness_limit: maximum range of network link utilization in percents to deem traffic constant ("flat")
@@ -269,8 +315,14 @@ def flatness_analysis(
     :return: FlatnessResults instance
     """
     log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
+    log.debug("Computing bandwidth via each link")
+    compute_bandwidth(data)
     log.debug("Computing link utilization")
     set_link_utilization(data, devices)
+    bad = data[data.utilization > 100].shape[0]
+    if bad > 0:
+        log.critical("%d data samples with link utilization > 100%%", bad)
+        data.loc[data.utilization > 100, "utilization"] = 100.0
     log.debug("Computing traffic statistics")
     stats = compute_stats(data, window=window)
     log.debug("Analyzing flatness")

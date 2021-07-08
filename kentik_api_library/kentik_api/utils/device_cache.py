@@ -36,7 +36,8 @@ class DeviceCache:
     def from_pickle(cls: Type[T], filename: str) -> T:
         file = Path(filename)
         log.debug(f"Reading device data from {file.resolve()}")
-        return pickle.load(file.open("rb"))
+        with file.open("rb") as f:
+            return pickle.load(f)
 
     def __init__(self, devices: List[Device], labels: Optional[List[str]] = None) -> None:
         self._devices_by_name: Dict[str, Device] = dict()

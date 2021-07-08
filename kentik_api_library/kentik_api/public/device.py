@@ -128,10 +128,17 @@ class DeviceInterface:
 
     @property
     def speed(self):
-        speed = max([float(x) for x in (self.snmp_speed, self.initial_snmp_speed) if x is not None])
-        if not speed:
+        """
+        Return effective speed of the interface in bit/s
+        :return: interface speed or NaN (if interface speed is not available)
+        """
+        if self.snmp_speed is None:
+            speed = self.initial_snmp_speed
+        else:
+            speed = self.snmp_speed
+        if speed is None:
             return float("NaN")
-        return float(speed * 10e6 * 8)
+        return float(speed) * 1e6  # SNMP speed is in Mbits/s, we want bits/s
 
 
 class Device:

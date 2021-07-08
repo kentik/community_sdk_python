@@ -81,7 +81,7 @@ The general approach is that every single KentikAPI resource is represented in t
 }
 ```
 Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in 
-`${KHOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
+`${KTAPI_HOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
 
 ### Support for caching of device data
 The `DeviceCache` class allows caching of device related data obtained from the Kentik API. It internally builds

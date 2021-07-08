@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials, DeviceCache
 from kentik_api.analytics import SQLQueryDefinition, flatness_analysis
+from kentik_api.analytics.flatness import freq_to_seconds
 
 
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +16,7 @@ query_data = {
     " AND i_start_time >= '{start}' AND i_start_time <= '{end}'"
     " GROUP BY i_start_time, i_device_name, i_output_interface_description ORDER BY f_sum_both_bytes DESC",
     "mapping": {
-        "bps_out": {"type": "int64", "source": "{f_sum_both_bytes}"},
+        "bytes_out": {"type": "int64", "source": "{f_sum_both_bytes}"},
         "link": {"source": "{i_device_name}:{i_output_interface_description}"},
         "ts": {"type": "time", "source": "{i_start_time}", "index": True},
     },
@@ -39,11 +40,10 @@ def main() -> None:
         print("Got no flow data")
         return
     try:
-        a, b = df.index.unique()[:2]
-        resolution = b - a
+        resolution = freq_to_seconds(df.index.unique().inferred_freq)
     except ValueError:
         resolution = "unknown"
-    print(f"Got {df.shape[0]} entries, time resolution {resolution}")
+    print(f"Got {df.shape[0]} entries, time resolution {resolution} seconds")
 
     time_window = timedelta(minutes=60)
     flatness_limit = 0.5

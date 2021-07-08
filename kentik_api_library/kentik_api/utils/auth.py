@@ -25,7 +25,7 @@ def load_credential_profile(filename: str) -> Optional[Dict]:
 def get_credentials(profile: str = "default") -> Tuple[str, str]:
     email = os.environ.get("KTAPI_AUTH_EMAIL")
     token = os.environ.get("KTAPI_AUTH_TOKEN")
-    home: str = os.environ.get("KHOME", os.environ.get("HOME", "."))
+    home: str = os.environ.get("KTAPI_HOME", os.environ.get("HOME", "."))
     if email is None or token is None:
         cfg = load_credential_profile(os.environ.get("KTAPI_CFG_FILE", os.path.join(home, ".kentik", profile)))
         if cfg is not None:
