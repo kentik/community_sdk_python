@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.public.plan import Plan
@@ -89,7 +89,7 @@ class SNMPv3Conf:
         return self
 
 
-class AllInterfaces:
+class DeviceInterface:
     def __init__(
         self,
         interface_description: str,
@@ -102,6 +102,9 @@ class AllInterfaces:
         self._device_id = device_id
         self._snmp_speed = snmp_speed
         self._initial_snmp_speed = initial_snmp_speed
+
+    def __repr__(self):
+        return f"{self.name} (owner: {self.device_id})"
 
     @property
     def interface_description(self) -> str:
@@ -118,6 +121,24 @@ class AllInterfaces:
     @property
     def initial_snmp_speed(self) -> Optional[float]:
         return self._initial_snmp_speed
+
+    @property
+    def name(self):
+        return self._interface_description
+
+    @property
+    def speed(self):
+        """
+        Return effective speed of the interface in bit/s
+        :return: interface speed or NaN (if interface speed is not available)
+        """
+        if self.snmp_speed is None:
+            speed = self.initial_snmp_speed
+        else:
+            speed = self.snmp_speed
+        if speed is None:
+            return float("NaN")
+        return float(speed) * 1e6  # SNMP speed is in Mbits/s, we want bits/s
 
 
 class Device:
@@ -158,7 +179,7 @@ class Device:
         plan: Optional[Plan] = None,
         site: Optional[Site] = None,
         labels: Optional[List[DeviceLabel]] = None,
-        all_interfaces: Optional[List[AllInterfaces]] = None,
+        interfaces: Optional[List[DeviceInterface]] = None,
     ) -> None:
         """Note: plan_id and site_id is being sent to API, plan and site gets returned"""
 
@@ -196,7 +217,13 @@ class Device:
         self._plan = plan
         self._site = site
         self._labels = labels
-        self._all_interfaces = all_interfaces
+        self._interfaces = interfaces
+        self._interfaces_by_name: Dict[str, DeviceInterface] = {}
+        if self._interfaces:
+            self._interfaces_by_name = {i.name: i for i in self._interfaces}
+
+    def __repr__(self):
+        return f"{self.device_name} (id: {self.id} type: {self.device_type.value})"
 
     @property
     def id(self) -> ID:
@@ -204,8 +231,11 @@ class Device:
         return self._id
 
     @property
-    def device_name(self) -> Optional[str]:
-        return self._device_name
+    def device_name(self) -> str:
+        if self._device_name:
+            return self._device_name
+        else:
+            return f"<id: {self.id}>"
 
     @property
     def device_type(self) -> Optional[DeviceType]:
@@ -261,8 +291,14 @@ class Device:
         return list(self._labels) if self._labels is not None else []
 
     @property
-    def all_interfaces(self) -> List[Any]:
-        return list(self._all_interfaces) if self._all_interfaces is not None else []
+    def interfaces(self) -> List[DeviceInterface]:
+        return list(self._interfaces) if self._interfaces is not None else []
+
+    def get_interface(self, name):
+        return self._interfaces_by_name.get(name)
+
+    def has_label(self, label: str):
+        return label in [lbl.name for lbl in self.labels]
 
     @classmethod
     def new_router(

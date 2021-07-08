@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from kentik_api.public.device import (
-    AllInterfaces,
+    DeviceInterface,
     AppliedLabels,
     AuthenticationProtocol,
     CDNAttribute,
@@ -132,7 +132,7 @@ PlanPayload = PlanGetResponse  # Plan payload is same as in Plans API
 
 
 @dataclass
-class AllInterfacesPayload:
+class DeviceInterfacePayload:
     """This datastructure represents JSON Device.AllInterfaces payload as it is transmitted from KentikAPI"""
 
     device_id: str
@@ -144,8 +144,8 @@ class AllInterfacesPayload:
     def from_dict(cls, dic: Dict[str, Any]):
         return from_dict(data_class=cls, data=dic)
 
-    def to_all_interfaces(self) -> AllInterfaces:
-        return AllInterfaces(
+    def to_device_interface(self) -> DeviceInterface:
+        return DeviceInterface(
             device_id=convert(self.device_id, ID),
             snmp_speed=convert(self.snmp_speed, int),
             interface_description=self.interface_description,
@@ -168,7 +168,7 @@ class DevicePayload:
     plan_id: Optional[int] = None
     site_id: Optional[int] = None
     labels: Optional[List[LabelPayload]] = None
-    all_interfaces: Optional[List[AllInterfacesPayload]] = None
+    all_interfaces: Optional[List[DeviceInterfacePayload]] = None
     cdn_attr: Optional[str] = None
     device_description: Optional[str] = None
     device_snmp_ip: Optional[str] = None
@@ -222,7 +222,7 @@ class DevicePayload:
             sending_ips=dic.get("sending_ips"),
             site=convert_or_none(dic.get("site"), SitePayload.from_dict),
             labels=convert_list_or_none(dic.get("labels"), LabelPayload.from_dict),
-            all_interfaces=convert_list_or_none(dic.get("all_interfaces"), AllInterfacesPayload.from_dict),
+            all_interfaces=convert_list_or_none(dic.get("all_interfaces"), DeviceInterfacePayload.from_dict),
             cdn_attr=dic.get("cdn_attr"),
             device_description=dic.get("device_description"),
             device_snmp_ip=dic.get("device_snmp_ip"),
@@ -299,7 +299,7 @@ class DevicePayload:
             bgp_peer_ip4=self.bgpPeerIP4,
             bgp_peer_ip6=self.bgpPeerIP6,
             labels=convert_list_or_none(self.labels, LabelPayload.to_device_label),
-            all_interfaces=convert_list_or_none(self.all_interfaces, AllInterfacesPayload.to_all_interfaces),
+            interfaces=convert_list_or_none(self.all_interfaces, DeviceInterfacePayload.to_device_interface),
             device_snmp_v3_conf=convert_or_none(self.device_snmp_v3_conf, SNMPv3ConfPayload.to_conf),
             cdn_attr=convert_or_none(self.cdn_attr, CDNAttribute),
         )

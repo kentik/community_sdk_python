@@ -35,6 +35,7 @@ class APIConnector:
         auth_token: str,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
+        proxy: Optional[str] = None,
     ) -> None:
         self._api_url = api_url
         self._logger = logging.getLogger(__name__)
@@ -42,6 +43,9 @@ class APIConnector:
         self._session.auth = KentikAuth(auth_email, auth_token)
         self._session.headers.update({"Content-Type": "application/json"})
         self._timeout = timeout
+        if proxy:
+            self._logger.debug("Using proxy: %s", proxy)
+            self._session.proxies = dict(http=proxy, https=proxy)
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
         try:
@@ -73,9 +77,9 @@ class APIConnector:
 
     def _log_http_roundtrip(self, response: Response) -> None:
         self._logger.debug(
-            f"HTTP roundtrip finished - "
-            f"request: {response.request.method} {response.request.url} {str(response.request.body)}, "
-            f"response: {response.status_code} {response.text}, "
+            f"HTTP request done: "
+            f"request: {response.request.method} {response.request.url}, "
+            f"response: {response.status_code} {len(response.text)} bytes, "
             f"elapsed: {response.elapsed}"
         )
 

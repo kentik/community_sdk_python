@@ -185,7 +185,7 @@ def test_create_device_router_success() -> None:
     assert created.plan.name is None
     assert created.plan.metadata is None
     assert len(created.labels) == 0
-    assert len(created.all_interfaces) == 0
+    assert len(created.interfaces) == 0
     assert created.device_flow_type == "auto"
     assert created.device_sample_rate == 1
     assert created.sending_ips is not None
@@ -347,7 +347,7 @@ def test_create_device_dns_success() -> None:
     assert created.plan.name is None
     assert created.plan.metadata is None
     assert len(created.labels) == 0
-    assert len(created.all_interfaces) == 0
+    assert len(created.interfaces) == 0
     assert created.device_flow_type == "auto"
     assert created.device_sample_rate == 1
     assert created.sending_ips == []
@@ -541,15 +541,15 @@ def test_get_device_router_success() -> None:
     assert device.labels[1].user_id == ID(136885)
     assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
-    assert len(device.all_interfaces) == 2
-    assert device.all_interfaces[0].interface_description == "testapi-interface-1"
-    assert device.all_interfaces[0].initial_snmp_speed == None
-    assert device.all_interfaces[0].device_id == ID(42)
-    assert device.all_interfaces[0].snmp_speed == 75
-    assert device.all_interfaces[1].interface_description == "testapi-interface-2"
-    assert device.all_interfaces[1].initial_snmp_speed == 7
-    assert device.all_interfaces[1].device_id == ID(42)
-    assert device.all_interfaces[1].snmp_speed == 7
+    assert len(device.interfaces) == 2
+    assert device.interfaces[0].interface_description == "testapi-interface-1"
+    assert device.interfaces[0].initial_snmp_speed is None
+    assert device.interfaces[0].device_id == ID(42)
+    assert device.interfaces[0].snmp_speed == 75
+    assert device.interfaces[1].interface_description == "testapi-interface-2"
+    assert device.interfaces[1].initial_snmp_speed == 7
+    assert device.interfaces[1].device_id == ID(42)
+    assert device.interfaces[1].snmp_speed == 7
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == 1001
     assert device.sending_ips is not None
@@ -680,19 +680,19 @@ def test_get_device_dns_success() -> None:
     assert device.plan.name == "Free Trial Plan"
     assert device.plan.metadata == {}
     assert len(device.labels) == 0
-    assert len(device.all_interfaces) == 0
+    assert len(device.interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == 1
     assert device.sending_ips is not None
     assert len(device.sending_ips) == 0
     assert device.device_snmp_ip is None
     assert device.device_snmp_community == ""
-    assert device.minimize_snmp == False
+    assert not device.minimize_snmp
     assert device.device_bgp_type == DeviceBGPType.none
     assert device.device_bgp_neighbor_ip is None
     assert device.device_bgp_neighbor_ip6 is None
     assert device.device_bgp_neighbor_asn is None
-    assert device.device_bgp_flowspec == False
+    assert not device.device_bgp_flowspec
     assert device.device_bgp_password is None
     assert device.use_bgp_device_id is None
     assert device.created_date == "2020-12-17T12:53:01.025Z"
@@ -820,6 +820,7 @@ def test_update_device_router_success() -> None:
             "sending_ips": ["128.0.0.10", "128.0.0.11"],
             "device_sample_rate": "10",
             "device_description": "updated description",
+            "device_name": "<id: 42>",
             "device_snmp_ip": "127.0.0.10",
             "plan_id": 11466,
             "site_id": 8483,
@@ -869,7 +870,7 @@ def test_update_device_router_success() -> None:
     assert updated.plan.name is None
     assert updated.plan.metadata is None
     assert len(updated.labels) == 0
-    assert len(updated.all_interfaces) == 0
+    assert len(updated.interfaces) == 0
     assert updated.device_flow_type == "auto"
     assert updated.device_sample_rate == 10
     assert updated.sending_ips is not None
@@ -1147,7 +1148,7 @@ def test_get_all_devices_success() -> None:
     assert device.labels[1].user_id is None
     assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
-    assert len(device.all_interfaces) == 0
+    assert len(device.interfaces) == 0
     assert device.device_flow_type == "auto"
     assert device.device_sample_rate == 1001
     assert device.sending_ips is not None
@@ -2254,7 +2255,7 @@ def check_device_dns_minimal(
     assert device.plan.name == "Free Trial Plan"
     assert device.plan.metadata == {}
     assert len(device.labels) == 0
-    assert len(device.all_interfaces) == 0
+    assert len(device.interfaces) == 0
     assert device.device_flow_type is None
     assert device.device_sample_rate == device_sample_rate
     assert device.sending_ips is None

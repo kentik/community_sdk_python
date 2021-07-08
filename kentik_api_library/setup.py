@@ -14,22 +14,15 @@ README = (HERE / "README.md").read_text()
 
 PACKAGES = [
     "kentik_api",
+    "kentik_api.analytics",
     "kentik_api.auth",
     "kentik_api.api_calls",
     "kentik_api.api_connection",
     "kentik_api.api_resources",
     "kentik_api.requests_payload",
     "kentik_api.public",
+    "kentik_api.utils",
 ]
-PACKAGE_DIR = {
-    "kentik_api": "kentik_api",
-    "kentik_api.auth": "kentik_api/auth",
-    "kentik_api.api_calls": "kentik_api/api_calls",
-    "kentik_api.api_connection": "kentik_api/api_connection",
-    "kentik_api.api_resources": "kentik_api/api_resources",
-    "kentik_api.requests_payload": "kentik_api/requests_payload",
-    "kentik_api.public": "kentik_api/public",
-}
 
 
 class PylintCmd(distutils.cmd.Command):
@@ -102,16 +95,21 @@ setup(
         "relative_to": __file__,
     },
     description="SDK library for Kentik API",
+    maintainer="Martin Machacek",
+    maintainer_email="martin.machacek@kentik.com",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     license="Apache-2.0",
     include_package_data=True,
-    install_requires=["requests>=2.25.0", "typing-extensions>=3.7.4.3", "dacite>=1.6.0"],
-    setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm"],
+    install_requires=["dacite>=1.6.0", "requests>=2.25.0", "typing-extensions>=3.7.4.3"],
+    setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm", "wheel"],
     tests_require=["httpretty", "pytest", "pylint"],
+    extras_require={
+        "analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"],
+    },
     packages=PACKAGES,
-    package_dir=PACKAGE_DIR,
+    package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},
     cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
