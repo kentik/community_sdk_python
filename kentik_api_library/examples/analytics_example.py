@@ -42,7 +42,7 @@ def main() -> None:
     try:
         resolution = freq_to_seconds(df.index.unique().inferred_freq)
     except ValueError:
-        resolution = "unknown"
+        resolution = float("NaN")
     print(f"Got {df.shape[0]} entries, time resolution {resolution} seconds")
 
     time_window = timedelta(minutes=60)

@@ -104,10 +104,10 @@ def freq_to_seconds(freq: str) -> float:
 
 
 def compute_bandwidth(
-        df: pd.DataFrame,
-        link_col: Optional[str] = "link",
-        data_col: Optional[str] = "bytes_out",
-        bps_col: Optional[str] = "bps_out",
+    df: pd.DataFrame,
+    link_col: Optional[str] = "link",
+    data_col: Optional[str] = "bytes_out",
+    bps_col: Optional[str] = "bps_out",
 ) -> None:
     """
     Adds column bps_out containing bandwidth usage via each link (in bits/s) to the input DataFrame
