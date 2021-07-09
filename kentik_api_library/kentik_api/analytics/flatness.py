@@ -92,6 +92,20 @@ class FlatnessResults:
                 print(f"\t[{i.start}, {i.end}]", file=out)
 
 
+def min_index_resolution(df: pd.DataFrame) -> timedelta:
+    """
+    Find the longest period between entries of DataFrame index. The input DataFrame must be be DatetimeIndex
+    :param df: input DataFrame
+    :return: maximum time difference between unique entries in the index
+    """
+    # sanity check
+    if df.index.inferred_type != 'datetime64':
+        raise RuntimeError("Input DataFrame is not indexed by time")
+    # ignore identical values
+    idx = df.sort_index().index.unique()
+    return max(idx[i] - idx[i - 1] for i in range(1, len(idx)))
+
+
 def freq_to_seconds(freq: str) -> float:
     """
     Converts pandas frequency string to seconds
@@ -103,24 +117,50 @@ def freq_to_seconds(freq: str) -> float:
     return pd.Timedelta(freq).total_seconds()
 
 
+def resample_volume_data(df: pd.DataFrame, resolution: str, link_col: str = "link") -> pd.DataFrame:
+    """
+    Resample input DataFrame to target resolution (which has to be lower than the input index resolution) while
+    preserving link column
+    :param df: input DataFrame assume to have DatetimeIndex and a least 2 columns with one of them being link_col
+    :param link_col: name of column to be preserved untouched by resampling
+    :param resolution: string describing target resolution (see pd.DataFrame.resample)
+    :return: resampled DataFrame
+    """
+    # sanity checks
+    if df.shape[1] < 2 or link_col not in df:
+        raise RuntimeError(f"Input DataFrame must have 2 columns with one of them named '{link_col}'")
+    if df.index.inferred_type != 'datetime64':
+        raise RuntimeError("Input DataFrame must have DatetimeIndex")
+    idx_name = df.index.name
+    log.debug("Resampling DataFrame to %s resolution", resolution)
+    return df.groupby(link_col).resample(resolution).sum().reset_index().set_index(idx_name).sort_index()
+
+
+def has_uniform_datetime_index(df: pd.DataFrame) -> bool:
+    """
+    Report whether the input DataFrame has uniform DatetimeIndex
+    :param df: input DataFrame
+    :return: True or False
+    """
+    return df.index.unique().inferred_freq is not None
+
+
 def compute_bandwidth(
     df: pd.DataFrame,
-    link_col: Optional[str] = "link",
     data_col: Optional[str] = "bytes_out",
     bps_col: Optional[str] = "bps_out",
 ) -> None:
     """
     Adds column bps_out containing bandwidth usage via each link (in bits/s) to the input DataFrame
-    The function requires that the input DataFrame is indexed by time in equidistant intervals. If this is not the case
-    the input DataFrame is resampled using the longest period seen in the index.
-    :param link_col: Name of column containing link names
+    The function requires that the input DataFrame is indexed by time in equidistant intervals.
+    :param df: input DataFrame
     :param data_col: Name of column containing bytes out
     :param bps_col: Name of column for bandwidth
     :return: None (modifies input DataFrame in place)
     """
     freq = df.index.unique().inferred_freq
     if freq is None:
-        raise RuntimeError("Input DataFrame is not indexed by time or timestamps are not equidistant")
+        raise RuntimeError("Input DataFrame is not indexed by time or the index is not uniform")
     factor = 8 / freq_to_seconds(freq)  # converting also bytes to bits
     df[bps_col] = df[data_col] * factor
 
@@ -266,7 +306,7 @@ def analyze_flatness(
         d = df.xs(link)
         for ts in suspects.xs(link)[suspects.xs(link)].index:
             log.debug("link: %s, ts: %s", link, ts)
-            s = d.loc[(ts - window) :].index[0]
+            s = d.loc[(ts - window):].index[0]
             if last is not None and last.end >= s:
                 agg_min = min(d.loc[last.end][min_column], d.loc[ts][min_column])
                 agg_max = max(d.loc[last.end][max_column], d.loc[ts][max_column])
@@ -316,6 +356,10 @@ def flatness_analysis(
     """
     log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
     log.debug("Computing bandwidth via each link")
+    if not has_uniform_datetime_index(data):
+        resolution = min_index_resolution(data).total_seconds()
+        log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling")
+        data = resample_volume_data(data, f"{resolution}S")
     compute_bandwidth(data)
     log.debug("Computing link utilization")
     set_link_utilization(data, devices)
