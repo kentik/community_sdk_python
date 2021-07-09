@@ -99,7 +99,7 @@ def min_index_resolution(df: pd.DataFrame) -> timedelta:
     :return: maximum time difference between unique entries in the index
     """
     # sanity check
-    if df.index.inferred_type != 'datetime64':
+    if df.index.inferred_type != "datetime64":
         raise RuntimeError("Input DataFrame is not indexed by time")
     # ignore identical values
     idx = df.sort_index().index.unique()
@@ -129,7 +129,7 @@ def resample_volume_data(df: pd.DataFrame, resolution: str, link_col: str = "lin
     # sanity checks
     if df.shape[1] < 2 or link_col not in df:
         raise RuntimeError(f"Input DataFrame must have 2 columns with one of them named '{link_col}'")
-    if df.index.inferred_type != 'datetime64':
+    if df.index.inferred_type != "datetime64":
         raise RuntimeError("Input DataFrame must have DatetimeIndex")
     idx_name = df.index.name
     log.debug("Resampling DataFrame to %s resolution", resolution)
@@ -306,7 +306,7 @@ def analyze_flatness(
         d = df.xs(link)
         for ts in suspects.xs(link)[suspects.xs(link)].index:
             log.debug("link: %s, ts: %s", link, ts)
-            s = d.loc[(ts - window):].index[0]
+            s = d.loc[(ts - window) :].index[0]
             if last is not None and last.end >= s:
                 agg_min = min(d.loc[last.end][min_column], d.loc[ts][min_column])
                 agg_max = max(d.loc[last.end][max_column], d.loc[ts][max_column])
