@@ -381,7 +381,6 @@ def flatness_analysis(
     bad = link_util[(link_util.utilization > 100) & (link_util.utilization != float("Inf"))].shape[0]
     if bad > 0:
         log.critical("%d data samples with link utilization > 100%%", bad)
-        data.loc[data.utilization > 100, "utilization"] = 100.0
     log.debug("Computing traffic statistics")
     stats = compute_stats(link_util, window=window)
     log.debug("Analyzing flatness")
