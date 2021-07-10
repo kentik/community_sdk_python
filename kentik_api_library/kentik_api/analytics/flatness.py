@@ -375,7 +375,7 @@ def flatness_analysis(
     link_bw = compute_link_bandwidth(data)
     log.debug("Computing link utilization")
     link_util = compute_link_utilization(link_bw, devices)
-    bad = link_util[link_util.speed == 0].shape[0]
+    bad = len(link_util.loc[link_util.speed == 0].link.unique())
     if bad > 0:
         log.info("%d links with unknown or zero speed ignored", bad)
     bad = link_util[(link_util.utilization > 100) & (link_util.utilization != float("Inf"))].shape[0]
