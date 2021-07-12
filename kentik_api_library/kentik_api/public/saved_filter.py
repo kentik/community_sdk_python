@@ -18,7 +18,7 @@ class FilterGroups:
         self,
         connector: str,
         filters: List[Filter],
-        not_: bool,
+        not_: bool = False,
         filterString: Optional[str] = None,
         id: Optional[ID] = None,
         metric: Optional[str] = None,

@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Type, TypeVar
 from enum import Enum
 
+from kentik_api.internal import mandatory_dataclass_attributes
 from kentik_api.public.types import ID
 from kentik_api.public.saved_filter import Filters
 
@@ -42,6 +43,7 @@ class DimensionType(Enum):
     RegionTopTalkers = "RegionTopTalkers"
     i_device_id = "i_device_id"
     i_device_site_name = "i_device_site_name"
+    i_output_interface_speed = 'i_output_interface_speed'
     src_route_prefix_len = "src_route_prefix_len"
     src_route_length = "src_route_length"
     src_bgp_community = "src_bgp_community"
@@ -142,34 +144,99 @@ class Aggregate:
     raw: Optional[bool] = None  # required for topxchart queries
 
 
+QueryType = TypeVar("QueryType", bound="Query")
+
+
 @dataclass
 class Query:
-    metric: MetricType
+    # mandatory attributes
     dimension: List[DimensionType]
-    filters_obj: Optional[Filters] = None
-    saved_filters: List[SavedFilter] = field(default_factory=list)
-    matrixBy: List[str] = field(default_factory=list)  # DimensionType or custom dimension
-    cidr: Optional[int] = None  # valid: number 0..32
-    cidr6: Optional[int] = None  # valid: number 0..128
-    pps_threshold: Optional[int] = None  # valid number > 0
-    topx: int = 8  # valid: number 1..40
-    depth: int = 100  # valid: number 25..250
-    fastData: FastDataType = FastDataType.auto
-    time_format: TimeFormat = TimeFormat.utc
-    hostname_lookup: bool = True
-    lookback_seconds: int = 3600  # value != 0 overrides "starting_time" and "ending_time"
-    starting_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
-    ending_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
-    all_selected: Optional[bool] = None  # overrides "device_name" if true (makes it ignored)
-    device_name: List[str] = field(default_factory=list)  #  alternative with "all_selected"
-    descriptor: str = ""  # only used when dimension is "Traffic"
+    metric: List[MetricType]
+    # attributes with defaults (sorted alphabetically)
+    aggregateFilters: Optional[dict] = None
+    aggregateFiltersDimensionLabel: Optional[dict] = None
+    aggregateFiltersEnabled: Optional[dict] = None
+    aggregateThresholds: Optional[Dict[str, int]] = None
+    aggregateTypes: Optional[List[str]] = None
     aggregates: List[Aggregate] = field(default_factory=list)  # if empty, will be auto-filled based on "metric" field
-    outsort: Optional[str] = None  # name of aggregate object, required when more than 1 objects on "aggregates" list
-    query_title: str = ""  # only used in QueryChart
-    viz_type: Optional[ChartViewType] = None  # only used in QueryChart, QueryURL
-    show_overlay: Optional[bool] = None  # only used in QueryChart, QueryURL
+    all_devices: Optional[bool] = None
+    all_selected: Optional[bool] = None  # overrides "device_name" if true (makes it ignored)
+    bracketOptions: Optional[str] = None
+    cidr6: Optional[int] = None  # valid: number 0..128
+    cidr: Optional[int] = None  # valid: number 0..32
+    customAsGroups: Optional[bool] = None
+    cutFn: Optional[dict] = None
+    cutFnRegex: Optional[dict] = None
+    cutFnSelector: Optional[dict] = None
+    depth: int = 100  # valid: number 25..250
+    descriptor: str = ""  # only used when dimension is "Traffic"
+    device_labels: Optional[dict] = None
+    device_name: List[str] = field(default_factory=list)  # alternative with "all_selected"
+    device_sites: Optional[dict] = None
+    device_types: Optional[dict] = None
+    ending_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
+    fastData: FastDataType = FastDataType.auto
+    filterDimensionName: Optional[dict] = None
+    filterDimensionOther: Optional[dict] = None
+    filterDimensionSort: Optional[dict] = None
+    filterDimensions: Optional[dict] = None
+    filterDimensionsEnabled: Optional[dict] = None
+    filters: Optional[Filters] = None
+    filters_obj: Optional[Filters] = None
+    forceMinsPolling: Optional[dict] = None
+    from_to_lookback: Optional[dict] = None
+    generatorColumns: Optional[dict] = None
+    generatorDimensions: Optional[dict] = None
+    generatorMode: Optional[dict] = None
+    generatorPanelMinHeight: Optional[dict] = None
+    generatorQueryTitle: Optional[dict] = None
+    generatorTopx: Optional[dict] = None
+    hideCidr: Optional[bool] = None
+    hostname_lookup: bool = True
+    isOverlay: Optional[dict] = None
+    lookback_seconds: Optional[int] = None  # value != 0 overrides "starting_time" and "ending_time"
+    matrixBy: List[str] = field(default_factory=list)  # DimensionType or custom dimension
+    mirror: Optional[dict] = None
+    mirrorUnits: Optional[dict] = None
+    outsort: str = ""  # name of aggregate object, required when more than 1 objects on "aggregates" list
     overlay_day: Optional[int] = None  # only used in QueryChart, QueryURL
+    overlay_timestamp_adjust: Optional[dict] = None
+    pps_threshold: Optional[int] = None  # valid number > 0
+    query_title: str = ""  # only used in QueryChart
+    saved_filters: List[SavedFilter] = field(default_factory=list)
+    secondaryOutsort: Optional[dict] = None
+    secondaryTopxMirrored: Optional[dict] = None
+    secondaryTopxSeparate: Optional[dict] = None
+    show_overlay: Optional[bool] = None  # only used in QueryChart, QueryURL
+    show_site_markers: Optional[dict] = None
+    show_total_overlay: Optional[dict] = None
+    starting_time: Optional[str] = None  # alternative with "lookback_seconds", format: YYYY-MM-DD HH:mm:00
+    sync_all_axes: Optional[dict] = None
     sync_axes: Optional[bool] = None  # only used in QueryChart, QueryURL
+    sync_extents: Optional[dict] = None
+    time_format: TimeFormat = TimeFormat.utc
+    topx: int = 125  # valid: number 1..40
+    update_frequency: Optional[dict] = None
+    use_log_axis: Optional[dict] = None
+    use_secondary_log_axis: Optional[dict] = None
+    viz_type: Optional[ChartViewType] = None  # only used in QueryChart, QueryURL
+
+    @classmethod
+    def from_dict(cls: Type[QueryType], data: Dict) -> QueryType:
+        """
+        Construct Query object based on data in a dictionary. The dictionary must provide values for all mandatory
+        Query attributes
+        :param data: dictionary
+        :return: instance of Query
+        """
+        # verify that values are provided for all mandatory fields
+        missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
+        if missing:
+            raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
+        return cls(**data)
+
+
+QueryArrayItemType = TypeVar("QueryArrayItemType", bound="QueryArrayItem")
 
 
 @dataclass
@@ -179,11 +246,50 @@ class QueryArrayItem:
     bucketIndex: Optional[int] = None
     isOverlay: Optional[bool] = None  # used in QueryChart, QueryURL
 
+    @classmethod
+    def from_dict(cls: Type[QueryArrayItemType], data: Dict) -> QueryArrayItemType:
+        """
+        Construct QueryArrayItem based on data in a dictionary. The dictionary must provide values for all mandatory
+        QueryArrayItem fields
+        :param data: dictionary
+        :return: instance of QueryArrayItem
+        """
+        # verify that values are provided for all mandatory fields
+        missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
+        if missing:
+            raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
+        # construct Query object
+        _d = dict()
+        _d.update(data)
+        _d["query"] = Query.from_dict(data["query"])
+        return cls(**_d)
+
+
+QueryObjectType = TypeVar("QueryObjectType", bound="QueryObject")
+
 
 @dataclass
 class QueryObject:
     queries: List[QueryArrayItem]
     imageType: Optional[ImageType] = None  # used in QueryChart
+    version: int = 4
+
+    @classmethod
+    def from_dict(cls: Type[QueryObjectType], data: Dict) -> QueryObjectType:
+        """
+        Construct QueryObject based on a dictionary. The dictionary must contain data for all mandatory query attributes
+        :param data: dictionary
+        :return: instance of QueryObject
+        """
+        # verify that all QueryObject data field without built-in default value are provided
+        missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
+        if missing:
+            raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
+        # construct List of QueryArrayItem objects
+        _d = dict()
+        _d.update(data)
+        _d["queries"] = [QueryArrayItem.from_dict(item_data) for item_data in data["queries"]]
+        return cls(**_d)
 
 
 @dataclass
