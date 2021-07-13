@@ -122,6 +122,8 @@ def sql_result_to_df(mapping: SQLResultMapping, sql_data: QuerySQLResult) -> Opt
             continue
         if m.data_type == "time":
             df[k] = to_datetime(df[k])
+        elif m.data_type == "unix_timestamp":
+            df[k] = to_datetime(df[k], unit="s", utc=True)
         else:
             df[k] = df[k].astype(m.data_type)
         if m.is_index:

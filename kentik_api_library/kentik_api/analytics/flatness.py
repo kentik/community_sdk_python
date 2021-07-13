@@ -92,6 +92,20 @@ class FlatnessResults:
                 print(f"\t[{i.start}, {i.end}]", file=out)
 
 
+def min_index_resolution(df: pd.DataFrame) -> timedelta:
+    """
+    Find the longest period between entries of DataFrame index. The input DataFrame must be be DatetimeIndex
+    :param df: input DataFrame
+    :return: maximum time difference between unique entries in the index
+    """
+    # sanity check
+    if df.index.inferred_type != "datetime64":
+        raise RuntimeError("Input DataFrame is not indexed by time")
+    # ignore identical values
+    idx = df.sort_index().index.unique()
+    return max(idx[i] - idx[i - 1] for i in range(1, len(idx)))
+
+
 def freq_to_seconds(freq: str) -> float:
     """
     Converts pandas frequency string to seconds
@@ -103,47 +117,83 @@ def freq_to_seconds(freq: str) -> float:
     return pd.Timedelta(freq).total_seconds()
 
 
-def compute_bandwidth(
+def resample_volume_data(df: pd.DataFrame, resolution: str, link_col: str = "link") -> pd.DataFrame:
+    """
+    Resample input DataFrame to target resolution (which has to be lower than the input index resolution) while
+    preserving link column
+    :param df: input DataFrame assume to have DatetimeIndex and a least 2 columns with one of them being link_col
+    :param link_col: name of column to be preserved untouched by resampling
+    :param resolution: string describing target resolution (see pd.DataFrame.resample)
+    :return: resampled DataFrame
+    """
+    # sanity checks
+    if df.shape[1] < 2 or link_col not in df:
+        raise RuntimeError(f"Input DataFrame must have 2 columns with one of them named '{link_col}'")
+    if df.index.inferred_type != "datetime64":
+        raise RuntimeError("Input DataFrame must have DatetimeIndex")
+    idx_name = df.index.name
+    log.debug("Resampling DataFrame to %s resolution", resolution)
+    return df.groupby(link_col).resample(resolution).sum().reset_index().set_index(idx_name).sort_index()
+
+
+def has_uniform_datetime_index(df: pd.DataFrame) -> bool:
+    """
+    Report whether the input DataFrame has uniform DatetimeIndex
+    :param df: input DataFrame
+    :return: True or False
+    """
+    return df.index.unique().inferred_freq is not None
+
+
+def compute_link_bandwidth(
     df: pd.DataFrame,
-    link_col: Optional[str] = "link",
     data_col: Optional[str] = "bytes_out",
     bps_col: Optional[str] = "bps_out",
-) -> None:
+    link_col: Optional[str] = "link",
+) -> pd.DataFrame:
     """
-    Adds column bps_out containing bandwidth usage via each link (in bits/s) to the input DataFrame
-    The function requires that the input DataFrame is indexed by time in equidistant intervals. If this is not the case
-    the input DataFrame is resampled using the longest period seen in the index.
-    :param link_col: Name of column containing link names
+    Return DataFrame with same index as input, 'link_col' copied from input and 'bps_out' column containing
+    bandwidth via each link (in bits/s) added. Link bandwidth is computed based in 'data_col' in the input DataFrame
+    and period between index timestamps.
+    The function requires that the input DataFrame is indexed by time in equidistant intervals.
+    :param df: input pandas.DataFrame, which is expected to contain:
+    - link_col column containing names of links  (link = device_name:interface_name)
+    - numeric 'data_col' column containing data volume via each link bytes
     :param data_col: Name of column containing bytes out
     :param bps_col: Name of column for bandwidth
-    :return: None (modifies input DataFrame in place)
+    :param link_col: Name of columns containing link names (to be copied to output data)
+    :return: pandas.DataFrame
     """
     freq = df.index.unique().inferred_freq
     if freq is None:
-        raise RuntimeError("Input DataFrame is not indexed by time or timestamps are not equidistant")
+        raise RuntimeError("Input DataFrame is not indexed by time or the index is not uniform")
     factor = 8 / freq_to_seconds(freq)  # converting also bytes to bits
-    df[bps_col] = df[data_col] * factor
+    out = df.drop(columns=[c for c in df.columns if c != link_col])
+    out[bps_col] = df[data_col] * factor
+    return out
 
 
-def set_link_utilization(
+def compute_link_utilization(
     df: pd.DataFrame,
     devices: DeviceCache,
     link_col: Optional[str] = "link",
     data_col: Optional[str] = "bps_out",
     util_col: Optional[str] = "utilization",
     speed_col: Optional[str] = "speed",
-) -> None:
+) -> pd.DataFrame:
     """
-    Adds column 'utilization' to a DataFrame based on interface speeds in 'devices' and the 'data' column
-    :param df: DataFrame to work on. It is expected to contain:
+    Returns DataFrame with same index as input, 'link_col' columns copied from input, 'speed_col' containing speed
+    for each link and 'util_col' containing link utilization added. Link utilization is computed based on interface
+    speeds in 'devices' and the 'data_col' column in the input DataFrame
+    :param df: input pandas.DataFrame, which is expected to contain:
     - link_col column containing names of links  (link = device_name:interface_name)
-    - numeric data_col column containing data rate in bps
+    - numeric data_col column containing data rate via each link bits/s
     :param devices: DeviceCache instance containing data for relevant devices
     :param link_col: Name of column containing link names
     :param data_col: Name of column containing data rate
     :param util_col: Name of column for utilization
     :param speed_col: Name of columns for interface speed (installed bandwidth)
-    :return: None (modifies input DataFrame in place)
+    :return: pandas.DataFrame
     """
     if log.level == logging.DEBUG:
         with io.StringIO() as f:
@@ -160,8 +210,10 @@ def set_link_utilization(
     if data_col not in df:
         raise RuntimeError(f"No {data_col} column in DataFrame")
     speeds = devices.get_link_speeds(df[link_col].unique())
-    df[speed_col] = [speeds[link] for link in df[link_col]]
-    df[util_col] = (df[data_col] / df[speed_col]) * 100
+    out = df.drop(columns=[c for c in df.columns if c != link_col])
+    out[speed_col] = [speeds[link] for link in df[link_col]]
+    out[util_col] = (df[data_col] / out[speed_col]) * 100
+    return out
 
 
 def compute_stats(
@@ -173,7 +225,7 @@ def compute_stats(
     closed: str = "right",
 ) -> pd.DataFrame:
     """
-    Compute mean, max and min over a DataFrame column using rolling window
+    Compute mean, max and min over a pandas.DataFrame column using rolling window
     :param df: pandas.DataFrame indexed by time with  2 columns:
         - pivot: str or panda.object
         - any numeric value (anything allowing to compute mean)
@@ -217,7 +269,7 @@ def analyze_flatness(
     Analyze flatness measure and means in the DataFrame to find intervals where utilization was 'flat' based
     on specified criteria
 
-    :param df: DataFrame containing flatness measure and mean of the observed variable
+    :param df: pandas.DataFrame containing flatness measure and mean of the observed variable
                The DataFrame must be indexed by link names and time
     :param flatness_limit: threshold for considering traffic flat (values less than the threshold are considered flat)
     :param window: time interval in which the rolling windows were computed
@@ -316,15 +368,21 @@ def flatness_analysis(
     """
     log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
     log.debug("Computing bandwidth via each link")
-    compute_bandwidth(data)
+    if not has_uniform_datetime_index(data):
+        resolution = min_index_resolution(data).total_seconds()
+        log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling")
+        data = resample_volume_data(data, f"{resolution}S")
+    link_bw = compute_link_bandwidth(data)
     log.debug("Computing link utilization")
-    set_link_utilization(data, devices)
-    bad = data[data.utilization > 100].shape[0]
+    link_util = compute_link_utilization(link_bw, devices)
+    bad = len(link_util.loc[link_util.speed == 0].link.unique())
+    if bad > 0:
+        log.info("%d links with unknown or zero speed ignored", bad)
+    bad = link_util[(link_util.utilization > 100) & (link_util.utilization != float("Inf"))].shape[0]
     if bad > 0:
         log.critical("%d data samples with link utilization > 100%%", bad)
-        data.loc[data.utilization > 100, "utilization"] = 100.0
     log.debug("Computing traffic statistics")
-    stats = compute_stats(data, window=window)
+    stats = compute_stats(link_util, window=window)
     log.debug("Analyzing flatness")
     return analyze_flatness(
         stats, flatness_limit=flatness_limit, window=window, min_valid=min_valid, max_valid=max_valid
