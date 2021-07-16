@@ -128,7 +128,7 @@ def test_query_data_success() -> None:
         dimension=[DimensionType.Traffic],
         cidr=32,
         cidr6=128,
-        metric=MetricType.bytes,
+        metric=[MetricType.bytes],
         topx=8,
         depth=75,
         fastData=FastDataType.auto,
@@ -153,7 +153,7 @@ def test_query_data_success() -> None:
     assert query0["dimension"][0] == "Traffic"
     assert query0["cidr"] == 32
     assert query0["cidr6"] == 128
-    assert query0["metric"] == "bytes"
+    assert query0["metric"] == ["bytes"]
     assert query0["topx"] == 8
     assert query0["depth"] == 75
     assert query0["fastData"] == "Auto"
@@ -204,7 +204,7 @@ def test_query_chart_success() -> None:
         dimension=[DimensionType.Traffic],
         cidr=32,
         cidr6=128,
-        metric=MetricType.bytes,
+        metric=[MetricType.bytes],
         topx=8,
         depth=75,
         fastData=FastDataType.auto,
@@ -215,7 +215,7 @@ def test_query_chart_success() -> None:
         hostname_lookup=False,
         device_name=["dev1", "dev2"],
         all_selected=False,
-        filters_obj=filters,
+        filters=filters,
         saved_filters=[],
         matrixBy=[DimensionType.src_geo_city.value, DimensionType.dst_geo_city.value],
         pps_threshold=1,
@@ -243,7 +243,7 @@ def test_query_chart_success() -> None:
     assert query0["dimension"][0] == "Traffic"
     assert query0["cidr"] == 32
     assert query0["cidr6"] == 128
-    assert query0["metric"] == "bytes"
+    assert query0["metric"] == ["bytes"]
     assert query0["topx"] == 8
     assert query0["depth"] == 75
     assert query0["fastData"] == "Auto"
@@ -254,13 +254,13 @@ def test_query_chart_success() -> None:
     assert query0["hostname_lookup"] == False
     assert query0["device_name"] == ["dev1", "dev2"]
     assert query0["all_selected"] == False
-    assert len(query0["filters_obj"]["filterGroups"]) == 1
-    assert query0["filters_obj"]["filterGroups"][0]["connector"] == "All"
-    assert query0["filters_obj"]["filterGroups"][0]["not"] == False
-    assert len(query0["filters_obj"]["filterGroups"][0]["filters"]) == 1
-    assert query0["filters_obj"]["filterGroups"][0]["filters"][0]["filterField"] == "dst_as"
-    assert query0["filters_obj"]["filterGroups"][0]["filters"][0]["operator"] == "="
-    assert query0["filters_obj"]["filterGroups"][0]["filters"][0]["filterValue"] == ""
+    assert len(query0["filters"]["filterGroups"]) == 1
+    assert query0["filters"]["filterGroups"][0]["connector"] == "All"
+    assert query0["filters"]["filterGroups"][0]["not"] == False
+    assert len(query0["filters"]["filterGroups"][0]["filters"]) == 1
+    assert query0["filters"]["filterGroups"][0]["filters"][0]["filterField"] == "dst_as"
+    assert query0["filters"]["filterGroups"][0]["filters"][0]["operator"] == "="
+    assert query0["filters"]["filterGroups"][0]["filters"][0]["filterValue"] == ""
     assert query0["saved_filters"] == []
     assert query0["matrixBy"] == ["src_geo_city", "dst_geo_city"]
     assert query0["pps_threshold"] == 1
@@ -297,7 +297,7 @@ def test_query_url_success() -> None:
         dimension=[DimensionType.Traffic],
         cidr=32,
         cidr6=128,
-        metric=MetricType.bytes,
+        metric=[MetricType.bytes],
         topx=8,
         depth=75,
         fastData=FastDataType.auto,
@@ -324,7 +324,7 @@ def test_query_url_success() -> None:
     assert query0["dimension"][0] == "Traffic"
     assert query0["cidr"] == 32
     assert query0["cidr6"] == 128
-    assert query0["metric"] == "bytes"
+    assert query0["metric"] == ["bytes"]
     assert query0["topx"] == 8
     assert query0["depth"] == 75
     assert query0["fastData"] == "Auto"

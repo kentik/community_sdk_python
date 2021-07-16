@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Type, TypeVar
 from enum import Enum
+import json
 
 from kentik_api.internal import mandatory_dataclass_attributes
-from kentik_api.public.types import ID
-from kentik_api.public.saved_filter import Filters
+from kentik_api.public.types import PermissiveEnumMeta
+from kentik_api.public.saved_filter import Filters, SavedFilter
 
 
 class ImageType(Enum):
@@ -14,7 +15,7 @@ class ImageType(Enum):
     pdf = "pdf"
 
 
-class DimensionType(Enum):
+class DimensionType(Enum, metaclass=PermissiveEnumMeta):
     AS_src = "AS_src"
     Geography_src = "Geography_src"
     InterfaceID_src = "InterfaceID_src"
@@ -43,7 +44,7 @@ class DimensionType(Enum):
     RegionTopTalkers = "RegionTopTalkers"
     i_device_id = "i_device_id"
     i_device_site_name = "i_device_site_name"
-    i_output_interface_speed = 'i_output_interface_speed'
+    i_output_interface_speed = "i_output_interface_speed"
     src_route_prefix_len = "src_route_prefix_len"
     src_route_length = "src_route_length"
     src_bgp_community = "src_bgp_community"
@@ -67,7 +68,7 @@ class DimensionType(Enum):
     tcp_flags = "tcp_flags"
 
 
-class ChartViewType(Enum):
+class ChartViewType(Enum, metaclass=PermissiveEnumMeta):
     stackedArea = "stackedArea"
     line = "line"
     stackedBar = "stackedBar"
@@ -78,7 +79,7 @@ class ChartViewType(Enum):
     matrix = "matrix"
 
 
-class MetricType(Enum):
+class MetricType(Enum, metaclass=PermissiveEnumMeta):
     bytes = "bytes"
     in_bytes = "in_bytes"
     out_bytes = "out_bytes"
@@ -99,6 +100,9 @@ class MetricType(Enum):
     fps = "fps"
     unique_src_ip = "unique_src_ip"
     unique_dst_ip = "unique_dst_ip"
+    unique_src_as = "unique_src_as"
+    unique_dst_as = "unique_dst_as"
+    unique_dst_nexthop_asn = "unique_dst_nexthop_asn"
 
 
 class FastDataType(Enum):
@@ -112,13 +116,7 @@ class TimeFormat(Enum):
     local = "Local"
 
 
-@dataclass
-class SavedFilter:
-    filter_id: ID
-    is_not: bool = False
-
-
-class AggregateFunctionType(Enum):
+class AggregateFunctionType(Enum, metaclass=PermissiveEnumMeta):
     sum = "sum"
     average = "average"
     percentile = "percentile"
@@ -134,14 +132,40 @@ class AggregateFunctionType(Enum):
     notEquals = "notEquals"
 
 
+AggregateType = TypeVar("AggregateType", bound="Aggregate")
+
+
 @dataclass
 class Aggregate:
     name: str
     column: str
     fn: AggregateFunctionType
+    value: Optional[str] = None
+    label: Optional[str] = None
+    origLabel: Optional[str] = None
+    unit: Optional[str] = None
+    group: Optional[str] = None
     sample_rate: int = 1
     rank: Optional[int] = None  # valid: number 5..99; only used when fn == percentile
     raw: Optional[bool] = None  # required for topxchart queries
+
+    @classmethod
+    def from_dict(cls: Type[AggregateType], data: Dict) -> AggregateType:
+        """
+        Construct Aggregate object based on data in a dictionary. The dictionary must provide values for all mandatory
+        Query attributes
+        :param data: dictionary
+        :return: instance of Aggregate
+        """
+        # verify that values are provided for all mandatory fields
+        missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
+        if missing:
+            raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
+        # construct Filters, Dimension, Metric and SavedFilter arrays
+        _d = dict()
+        _d.update(data)
+        _d["fn"] = AggregateFunctionType(data["fn"])
+        return cls(**_d)
 
 
 QueryType = TypeVar("QueryType", bound="Query")
@@ -182,7 +206,6 @@ class Query:
     filterDimensions: Optional[dict] = None
     filterDimensionsEnabled: Optional[dict] = None
     filters: Optional[Filters] = None
-    filters_obj: Optional[Filters] = None
     forceMinsPolling: Optional[dict] = None
     from_to_lookback: Optional[dict] = None
     generatorColumns: Optional[dict] = None
@@ -233,7 +256,19 @@ class Query:
         missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
         if missing:
             raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
-        return cls(**data)
+        _d = dict()
+        _d.update(data)
+        if "fastData" in data:
+            _d["fastData"] = FastDataType(data["fastData"])
+        if "filters" in data:
+            _d["filters"] = Filters.from_dict(data["filters"])
+        _d["dimension"] = [DimensionType(f) for f in data["dimension"]]
+        _d["metric"] = [MetricType(f) for f in data["metric"]]
+        if "aggregates" in data:
+            _d["aggregates"] = [Aggregate.from_dict(f) for f in data["aggregates"]]
+        if "saved_filters" in data:
+            _d["saved_filters"] = [SavedFilter.from_dict(f) for f in data["saved_filters"]]
+        return cls(**_d)
 
 
 QueryArrayItemType = TypeVar("QueryArrayItemType", bound="QueryArrayItem")
@@ -290,6 +325,11 @@ class QueryObject:
         _d.update(data)
         _d["queries"] = [QueryArrayItem.from_dict(item_data) for item_data in data["queries"]]
         return cls(**_d)
+
+    @classmethod
+    def from_json(cls: Type[QueryObjectType], file_name: str) -> QueryObjectType:
+        with open(file_name) as f:
+            return cls.from_dict(json.load(f))
 
 
 @dataclass
