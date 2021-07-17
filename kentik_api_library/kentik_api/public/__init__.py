@@ -20,6 +20,7 @@ from .query_object import (
     MetricType,
     Query,
     QueryArrayItem,
+    QueryDataResult,
     QueryObject,
     TimeFormat,
 )
