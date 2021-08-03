@@ -9,4 +9,4 @@ except ImportError:
 
 from .data_frame_cache import DFCache
 from .flatness import FlatnessResults, flatness_analysis
-from .mapped_query import SQLQueryDefinition
+from .mapped_query import SQLQueryDefinition, DataQueryDefinition
