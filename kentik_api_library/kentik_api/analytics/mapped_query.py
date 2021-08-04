@@ -14,8 +14,11 @@ from kentik_api.public import QuerySQL, QuerySQLResult, QueryObject, QueryDataRe
 MappedQueryFn = Callable[..., DataFrame]
 
 
+TIME_SERIES_PREFIX = "@TS"
 TIME_SERIES_FIELDS = ("timestamp", "value", "period")
-TIME_SERIES_REGEX = re.compile("__TS[.]([^.]+)[.]({})".format("|".join(TIME_SERIES_FIELDS)))
+TIME_SERIES_REGEX = re.compile(
+    "{prefix}[.]([^.]+)[.]({fields})".format(prefix=TIME_SERIES_PREFIX, fields="|".join(TIME_SERIES_FIELDS))
+)
 
 
 class MappingEntry:
@@ -168,7 +171,15 @@ def sql_result_to_df(mapping: SQLResultMapping, sql_data: QuerySQLResult) -> Opt
                 data[k].append(v)
         else:
             for k, m in mapping.items:
-                data[k].append(m.source.format(**row))
+                try:
+                    data[k].append(m.source.format(**row))
+                except KeyError as ex:
+                    logging.critical(
+                        "mapping for column '%s' ('%s') cannot be satisfied, fields '%s' not present in data",
+                        k,
+                        m.source,
+                        " ".join([str(x) for x in ex.args]),
+                    )
     df = DataFrame.from_dict(data)
     apply_data_types(df, mapping.items)
     logging.debug("df shape: (%d, %d)", df.shape[0], df.shape[1])
@@ -215,7 +226,7 @@ class DataResultMapping:
                 if m.is_time_series_key:
                     break
             else:
-                raise RuntimeError("'time_series' mapping must contain at least one '__TS' 'source'")
+                raise RuntimeError(f"'time_series' mapping must contain at least one '{TIME_SERIES_PREFIX}' source")
 
     def set_aggregates(self, key: str, value: MappingEntry) -> None:
         self._aggregates[key] = value
@@ -264,14 +275,19 @@ class DataQueryDefinition:
     def from_dict(cls, qd: dict):
         if "query" not in qd:
             raise RuntimeError(f"No query template in query definition: {qd}")
-        return cls(query=qd["query"], mapping=DataResultMapping.from_dict(qd.get("mapping")))
+        if "mappings" not in qd:
+            raise RuntimeError(f"No 'mapping' query definition: {qd}")
+        mappings = {k: DataResultMapping.from_dict(d) for k, d in qd["mappings"].items()}
+        if len(mappings) < 1:
+            raise RuntimeError(f"No valid 'mapping' query definition: {qd}")
+        return cls(query=qd["query"], mappings=mappings)
 
-    def __init__(self, query: Union[str, Dict], mapping: DataResultMapping) -> None:
+    def __init__(self, query: Union[str, Dict], mappings: Dict[str, DataResultMapping]) -> None:
         if type(query) == str:
             self.query = json.loads(query)
         else:
             self.query = query
-        self.mapping = mapping
+        self.mappings = mappings
 
     def expand_query(self, **kwargs) -> Dict:
         def _expand_dict(data: Dict, parent: str) -> Dict:
@@ -301,14 +317,12 @@ class DataQueryDefinition:
         """
         return QueryObject.from_dict(self.expand_query(**kwargs))
 
-    def get_data(self, api: KentikAPI, **kwargs) -> List[Tuple[Optional[DataFrame], Optional[DataFrame]]]:
+    def get_data(self, api: KentikAPI, **kwargs) -> Dict[str, Dict[str, DataFrame]]:
         result = api.query.data(self.query_object(**kwargs))
-        return data_result_to_df(self.mapping, result)
+        return data_result_to_df(self.mappings, result)
 
 
-def data_result_to_df(
-    mapping: DataResultMapping, data: QueryDataResult
-) -> List[Tuple[Optional[DataFrame], Optional[DataFrame]]]:
+def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataResult) -> Dict[str, Dict[str, DataFrame]]:
     """
     Map KDE API data query result to Pandas DataFrames. A Tuple of two DataFrames is created for each result returned.
     In each tuple the first entry contains DataFrame for aggregates mapping, if present in mapping data, otherwise None.
@@ -316,25 +330,52 @@ def data_result_to_df(
     """
     if len(data.results) < 1:
         logging.debug("No data in query result")
-        return [(None, None)]
-    if mapping.is_empty:
-        logging.error("Empty mapping")
-        raise RuntimeError("Mapping is required to transform data query results to DataFrames")
-    out = list()
+        return dict()
+    out: Dict[str, Dict[str, DataFrame]] = dict()
     for i, r in enumerate(data.results):
-        aggregates = None
-        time_series = None
+        mapping = mappings.get(r["bucket"], mappings.get("all"))
+        if not mapping:
+            logging.critical("No applicable mapping for result[%d] bucket: %s. Result ignored", i, r["bucket"])
+            continue
+        result_label = r["bucket"]
+        if result_label in out:
+            n = 0
+            while result_label in out:
+                n += 1
+                result_label = f"{result_label}_{n}"
+            logging.warning("Duplicate bucket name: %s (using: '%s')", r["bucket"], result_label)
+        out[result_label] = dict()
         if mapping.has_aggregates:
             out_data = dict()
             for c, m in mapping.aggregates:
-                out_data[c] = [m.source.format(bucket=r["bucket"], **e) for e in r["data"]]
-            aggregates = DataFrame.from_dict(out_data)
-            apply_data_types(aggregates, mapping.aggregates)
+                try:
+                    out_data[c] = [m.source.format(**e) for e in r["data"]]
+                except KeyError as ex:
+                    logging.critical(
+                        "result[%d]: label: %s: mapping for column '%s' ('%s') cannot be satisfied, "
+                        "fields '%s' not present in data ",
+                        i,
+                        result_label,
+                        c,
+                        m.source,
+                        " ".join([str(x) for x in ex.args]),
+                    )
+            df = DataFrame.from_dict(out_data)
+            apply_data_types(df, mapping.aggregates)
+            logging.debug("result[%d]: label: %s aggregates shape: (%d, %d)", i, result_label, df.shape[0], df.shape[1])
+            out[result_label]["aggregates"] = df
+        else:
+            logging.debug("result[%d]: label: %s no aggregates", i, result_label)
         if mapping.has_time_series:
             # check that all data entries in the result have `timeSeries` key
             missing = [e["key"] for e in r["data"] if "timeSeries" not in e or not e["timeSeries"]]
             if missing:
-                logging.warning("%d data entries do not contain time series and will be ignored", len(missing))
+                logging.critical(
+                    "result[%s]: label: %s: %d data entries do not contain time series and will be ignored",
+                    i,
+                    result_label,
+                    len(missing),
+                )
             if len(r["data"]) > 1:
                 # if there is more than one `data` entry, time_series mapping must contain at least one non-time series
                 # column to make rows unique
@@ -343,8 +384,8 @@ def data_result_to_df(
                         break
                 else:
                     raise RuntimeError(
-                        "More than 1 data item in result,"
-                        "'time_series' mapping must contain at least one non '__TS' 'source'"
+                        f"result[{i}]: label: {result_label}: More than 1 data item in result,"
+                        f"'time_series' mapping must contain at least one non-'{TIME_SERIES_PREFIX}' 'source'"
                     )
             out_data = {k: list() for k, _ in mapping.time_series}
             for e in r["data"]:
@@ -359,35 +400,46 @@ def data_result_to_df(
                 ]
                 if missing_ts:
                     raise RuntimeError(
-                        "No 'timeSeries' for variables(s) '{mts}' in entry '{e}'".format(
-                            mts=",".join([str(x) for x in missing_ts]), e=e
+                        "result[{i}]: label: {label}: No 'timeSeries' for variables(s) '{mts}' in entry '{e}'".format(
+                            i=i, label=result_label, mts=",".join([str(x) for x in missing_ts]), e=e
                         )
                     )
-                ts_len = max(
+                ts_len = set(
                     [
                         len(e["timeSeries"][m.time_series_name]["flow"])
                         for _, m in mapping.time_series
                         if m.is_time_series_key
                     ]
                 )
+                if len(ts_len) > 1:
+                    _s = " ".join([str(x) for x in ts_len])
+                    raise RuntimeWarning(f"result[{i}]: bucket: {r['bucket']}: lengths of 'timeSeries' differ ({_s})")
                 for k, m in mapping.time_series:
                     if m.is_time_series_key:
                         out_data[k].extend(
                             row[m.time_series_field_idx] for row in e["timeSeries"][m.time_series_name]["flow"]
                         )
                     else:
-                        val = m.source.format(bucket=r["bucket"], **e)
-                        out_data[k].extend([val] * ts_len)
-            time_series = DataFrame.from_dict(out_data)
-            apply_data_types(time_series, mapping.time_series)
-            #  FINISH MAPPING OF TIME SERIES DATA
-        if aggregates is not None:
-            logging.debug("result[%d]: aggregates shape: (%d, %d)", i, aggregates.shape[0], aggregates.shape[1])
+                        try:
+                            val = m.source.format(**e)
+                            out_data[k].extend([val] * max(ts_len))
+                        except KeyError as ex:
+                            logging.critical(
+                                "result[%d]: label: %s: mapping for column '%s' ('%s') cannot be satisfied, "
+                                "fields '%s' not present in data ",
+                                i,
+                                result_label,
+                                k,
+                                m.source,
+                                " ".join([str(x) for x in ex.args]),
+                            )
+                            out_data[k].extend([""] * max(ts_len))
+            df = DataFrame.from_dict(out_data)
+            apply_data_types(df, mapping.time_series)
+            logging.debug(
+                "result[%d]: label: %s time_series shape: (%d, %d)", i, result_label, df.shape[0], df.shape[1]
+            )
+            out[result_label]["time_series"] = df
         else:
-            logging.debug("result[%d]: no aggregates", i)
-        if time_series is not None:
-            logging.debug("result[%d]: time_series shape: (%d, %d)", i, time_series.shape[0], time_series.shape[1])
-        else:
-            logging.debug("result[%d]: no time_series", i)
-        out.append((aggregates, time_series))
+            logging.debug("result[%d]: label: %s no time_series", i, result_label)
     return out
