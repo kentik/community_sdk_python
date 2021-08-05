@@ -22,6 +22,23 @@ TIME_SERIES_REGEX = re.compile(
 
 
 class MappingEntry:
+    """
+    Class describing single mapping entry for construction of a DataFrame from KDE API 'sql' or 'topXdata' result.
+    Attributes:
+        'source': string containing 'str.format' formatting string for extacting specific result data field. Special
+                  directives, prefixed with @TS allow to extract data from 'topXdata' result 'timeSeries' blocks
+        'data_type': optional string containing desired data type for column values. Any numpy.dtype and Python
+                  type name is accepted. In addition to that, following special type strings are provided:
+                  'time': converts string to pandas.datetime object
+                  'unix_timestamp': converts integer Unix epoch timestamp to pandas.datetime object
+                  'unix_timestamp_millis': converts integer Unix epoch millisecond timestamp to pandas.datetime object
+                  '@fixup<python lambda>': allows to apply <python lambda> to every value in the columns. Example:
+                         '@fixup: lambda x: x.split(".")[0]' results in calling
+                          DataFrame.transform(lambda x: x.split(".")[0] for all values in the column
+
+        'is_index': boolean indicating whether columns should be used as index for resulting DataFrame
+    """
+
     def __init__(self, source: str, data_type: Optional[str] = None, is_index: bool = False):
         self.source = source
         self.data_type = data_type
@@ -48,14 +65,18 @@ class MappingEntry:
         return self.time_series_field is not None
 
 
-def apply_data_types(df: DataFrame, mapping: Generator[Tuple[str, MappingEntry], None, None]) -> None:
+def set_data_types_and_index(df: DataFrame, mapping: Generator[Tuple[str, MappingEntry], None, None]) -> None:
     """
-    Apply data types specified in the mapping to the DataFrame
+    Apply data types and indexing of DataFrame according to mapping
     :param df: DataFrame to operate on
     :param mapping: mapping dictionary
     :return: None (modified input DataFrame in place)
     """
+    index_columns = list()
     for k, m in mapping:
+        if k not in df:
+            logging.debug("mapping column %s not in DataFrames (columns: %s)", k, ",".join(df.columns))
+            continue
         if m.data_type is not None:
             if m.data_type == "time":
                 df[k] = to_datetime(df[k])
@@ -63,29 +84,44 @@ def apply_data_types(df: DataFrame, mapping: Generator[Tuple[str, MappingEntry],
                 df[k] = to_datetime(df[k], unit="s", utc=True)
             elif m.data_type == "unix_timestamp_millis":
                 df[k] = to_datetime(df[k] / 1000, unit="s", utc=True)
+            elif m.data_type.startswith("@fixup:"):
+                try:
+                    fn = eval(m.data_type.split("@fixup:")[1])
+                except SyntaxError:
+                    raise RuntimeError(f"Syntax error in '@fixup:' directive ({m.data_type}) for column {k}")
+                df[k] = df[k].transform(fn)
             else:
                 df[k] = df[k].astype(m.data_type)
         if m.is_index:
-            df.set_index(k, inplace=True)
-            df.sort_index(inplace=True)
+            index_columns.append(k)
+    if index_columns:
+        df.set_index(index_columns, inplace=True)
+        df.sort_index(inplace=True)
 
 
-SQLResultMappingType = TypeVar("SQLResultMappingType", bound="SQLResultMapping")
+ResultMappingType = TypeVar("ResultMappingType", bound="ResultMapping")
 
 
-class SQLResultMapping:
+class ResultMapping:
+    """
+    Collection of data mapping entries used for construction of DataFrames based on KDE API 'sql' or 'topXdata' query
+    results.
+
+    ResultMapping instance is basically dictionary on MappingEntries keyed by DataFrame column names.
+    """
+
     @classmethod
-    def from_dict(cls: Type[SQLResultMappingType], data: Optional[Dict] = None) -> SQLResultMappingType:
-        mapping = cls()
+    def from_dict(cls: Type[ResultMappingType], data: Optional[Dict] = None) -> ResultMappingType:
+        mapping: Dict[str, MappingEntry] = dict()
         if data is None:
-            return mapping
+            return cls()
         for c, d in data.items():
-            if mapping.has(c):
+            if c in mapping:
                 raise RuntimeError(f"Duplicate mapping for column '{c}' in query definition ({data})")
             if type(d) != dict or "source" not in d.keys():
                 raise RuntimeError(f"'source' is missing in query definition entry for column {c} ({data})")
             mapping[c] = MappingEntry(source=d["source"], data_type=d.get("type"), is_index=d.get("index", False))
-        return mapping
+        return cls(entries=mapping)
 
     def __init__(self, entries: Optional[Dict[str, MappingEntry]] = None) -> None:
         self._entries: Dict[str, MappingEntry] = dict()
@@ -95,11 +131,16 @@ class SQLResultMapping:
     def __getitem__(self, column):
         return self._entries.get(column)
 
-    def __setitem__(self, key: str, value: MappingEntry) -> None:
-        self._entries[key] = value
-
     def has(self, column) -> bool:
         return column in self._entries
+
+    @property
+    def has_aggregate_keys(self):
+        return any(e for e in self._entries.values() if not e.is_time_series_key)
+
+    @property
+    def has_time_series_keys(self):
+        return any(e for e in self._entries.values() if e.is_time_series_key)
 
     @property
     def items(self) -> Generator[Tuple[str, MappingEntry], None, None]:
@@ -108,7 +149,8 @@ class SQLResultMapping:
 
     @property
     def entries(self):
-        return self._entries
+        for e in self._entries.values():
+            yield e
 
     @property
     def is_empty(self) -> bool:
@@ -117,8 +159,16 @@ class SQLResultMapping:
 
 @dataclass
 class SQLQueryDefinition:
+    """
+    Class describing KDE API 'sql' query template and associated mapping allowing to transform result to
+    pandas DataFrame.
+
+    Query template is a string containing KDE SQL query with optional 'str.format'
+    style directives allowing to interpolate query attributes based on a dictionary of attributes provided at runtime.
+    """
+
     query: str
-    mapping: SQLResultMapping
+    mapping: ResultMapping
 
     @classmethod
     def from_file(cls, filename: str):
@@ -131,13 +181,22 @@ class SQLQueryDefinition:
     def from_dict(cls, qd: dict):
         if "query" not in qd:
             raise RuntimeError(f"No query template in query definition: {qd}")
-        return cls(query=qd["query"], mapping=SQLResultMapping.from_dict(qd.get("mapping")))
+        return cls(query=qd["query"], mapping=ResultMapping.from_dict(qd.get("mapping")))
 
     def to_sql(self, **kwargs) -> QuerySQL:
         """
         Produce SQL query object from template by expanding embedded str.format directives using data in kwargs
         """
-        return QuerySQL(self.query.format(**kwargs))
+        try:
+            q = self.query.format(**kwargs)
+        except KeyError as ex:
+            _s = ",".join(ex.args)
+            _p = ",".join(kwargs.keys())
+            raise RuntimeError(
+                f"No values provided for query template parameters '{_s}' (template: {self.query}, "
+                f"provided parameters: '{_p}'"
+            )
+        return QuerySQL(q)
 
     def get_data(self, api: KentikAPI, **kwargs) -> DataFrame:
         result = api.query.sql(self.to_sql(**kwargs))
@@ -155,7 +214,7 @@ class SQLQueryDefinition:
         return sql_mapped_query
 
 
-def sql_result_to_df(mapping: SQLResultMapping, sql_data: QuerySQLResult) -> Optional[DataFrame]:
+def sql_result_to_df(mapping: ResultMapping, sql_data: QuerySQLResult) -> Optional[DataFrame]:
     """
     Map KDE SQL query result to Pandas DataFrame
     If no mapping is provided in query definition, every column in response row is included as DataFrame columns
@@ -175,95 +234,31 @@ def sql_result_to_df(mapping: SQLResultMapping, sql_data: QuerySQLResult) -> Opt
                     data[k].append(m.source.format(**row))
                 except KeyError as ex:
                     logging.critical(
-                        "mapping for column '%s' ('%s') cannot be satisfied, fields '%s' not present in data",
+                        "mapping for column '%s' ('%s') cannot be satisfied, fields '%s' not present in data "
+                        "(available fields: %s)",
                         k,
                         m.source,
-                        " ".join([str(x) for x in ex.args]),
+                        ",".join([str(x) for x in ex.args]),
+                        ",".join(row.keys()),
                     )
     df = DataFrame.from_dict(data)
-    apply_data_types(df, mapping.items)
+    set_data_types_and_index(df, mapping.items)
     logging.debug("df shape: (%d, %d)", df.shape[0], df.shape[1])
     return df
 
 
-DataResultMappingType = TypeVar("DataResultMappingType", bound="DataResultMapping")
-
-
-class DataResultMapping:
-    @classmethod
-    def from_dict(cls: Type[DataResultMappingType], data: Optional[Dict] = None) -> DataResultMappingType:
-        if data is None:
-            raise RuntimeError("No data passed to DataResultMapping.from_dict")
-        mappings: Dict[str, Dict[str, MappingEntry]] = dict()
-        for m in ("aggregates", "time_series"):
-            mappings[m] = dict()
-            if m not in data:
-                logging.debug("No %s in mapping data %s", m, data)
-                continue
-            for c, d in data[m].items():
-                if c in mappings[m]:
-                    raise RuntimeError(f"Duplicate mapping for column '{c}' in '{m}' mapping data ({data})")
-                if type(d) != dict or "source" not in d.keys():
-                    raise RuntimeError(f"'source' is missing in '{m}' mapping entry for column '{c}' ({data})")
-                mappings[m][c] = MappingEntry(
-                    source=d["source"], data_type=d.get("type"), is_index=d.get("index", False)
-                )
-        return cls(**mappings)
-
-    def __init__(
-        self,
-        aggregates: Optional[Dict[str, MappingEntry]] = None,
-        time_series: Optional[Dict[str, MappingEntry]] = None,
-    ) -> None:
-        self._aggregates: Dict[str, MappingEntry] = dict()
-        self._time_series: Dict[str, MappingEntry] = dict()
-        if aggregates:
-            self._aggregates.update(aggregates)
-        if time_series:
-            self._time_series.update(time_series)
-            # sanity check that the mapping uses any fields from `timeSeries`
-            for _, m in self.time_series:
-                if m.is_time_series_key:
-                    break
-            else:
-                raise RuntimeError(f"'time_series' mapping must contain at least one '{TIME_SERIES_PREFIX}' source")
-
-    def set_aggregates(self, key: str, value: MappingEntry) -> None:
-        self._aggregates[key] = value
-
-    def set_time_series(self, key: str, value: MappingEntry) -> None:
-        self._time_series[key] = value
-
-    def has_aggregates_column(self, column) -> bool:
-        return column in self._aggregates
-
-    def has_time_series_column(self, column) -> bool:
-        return column in self._time_series
-
-    @property
-    def aggregates(self) -> Generator[Tuple[str, MappingEntry], None, None]:
-        for k, v in self._aggregates.items():
-            yield k, v
-
-    @property
-    def time_series(self) -> Generator[Tuple[str, MappingEntry], None, None]:
-        for k, v in self._time_series.items():
-            yield k, v
-
-    @property
-    def has_aggregates(self):
-        return len(self._aggregates) > 0
-
-    @property
-    def has_time_series(self):
-        return len(self._time_series) > 0
-
-    @property
-    def is_empty(self) -> bool:
-        return not self.has_aggregates and not self.has_time_series
-
-
 class DataQueryDefinition:
+    """
+    Class describing KDE API 'topXdata' data query template and associated set of mappings allowing to transform results
+    into pandas DataFrames.
+
+    Query template can be provided either as a JSON string of equivalent dictionary. It may contain 'str.format'
+    style directives allowing to interpolate query attributes based on a dictionary of attributes provided at runtime.
+
+    Set of mappings keyed by query/result 'bucket' attribute value allow to define construction of values for colums
+    of resulting DataFrame based on data in response.
+    """
+
     @classmethod
     def from_file(cls, filename: str):
         with open(filename, "r") as f:
@@ -277,12 +272,12 @@ class DataQueryDefinition:
             raise RuntimeError(f"No query template in query definition: {qd}")
         if "mappings" not in qd:
             raise RuntimeError(f"No 'mapping' query definition: {qd}")
-        mappings = {k: DataResultMapping.from_dict(d) for k, d in qd["mappings"].items()}
+        mappings = {k: ResultMapping.from_dict(d) for k, d in qd["mappings"].items()}
         if len(mappings) < 1:
             raise RuntimeError(f"No valid 'mapping' query definition: {qd}")
         return cls(query=qd["query"], mappings=mappings)
 
-    def __init__(self, query: Union[str, Dict], mappings: Dict[str, DataResultMapping]) -> None:
+    def __init__(self, query: Union[str, Dict], mappings: Dict[str, ResultMapping]) -> None:
         if type(query) == str:
             self.query = json.loads(query)
         else:
@@ -302,9 +297,15 @@ class DataQueryDefinition:
             elif type(data) == list:
                 return _expand_list(data, parent)
             elif type(data) == str:
-                logging.debug("key: %s expanding: '%s'", f"{parent}", data)
-                r = data.format(**kwargs)
-                logging.debug("got: '%s'", r)
+                try:
+                    r = data.format(**kwargs)
+                except KeyError as ex:
+                    _s = ",".join(ex.args)
+                    _p = ",".join(kwargs.keys())
+                    raise RuntimeError(
+                        f"No values provided for query template parameters '{_s}' (template: {self.query}, "
+                        f"provided parameters: '{_p}'"
+                    )
                 return r
             else:
                 return data
@@ -313,28 +314,41 @@ class DataQueryDefinition:
 
     def query_object(self, **kwargs) -> QueryObject:
         """
-        Produce SQL query object from template by expanding embedded str.format directives using data in kwargs
+        Produce data query object from template by expanding embedded str.format directives using data in kwargs
         """
         return QueryObject.from_dict(self.expand_query(**kwargs))
 
-    def get_data(self, api: KentikAPI, **kwargs) -> Dict[str, Dict[str, DataFrame]]:
+    def get_data(self, api: KentikAPI, **kwargs) -> Dict[str, DataFrame]:
         result = api.query.data(self.query_object(**kwargs))
         return data_result_to_df(self.mappings, result)
 
 
-def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataResult) -> Dict[str, Dict[str, DataFrame]]:
+def data_result_to_df(mappings: Dict[str, ResultMapping], data: QueryDataResult) -> Dict[str, DataFrame]:
     """
-    Map KDE API data query result to Pandas DataFrames. A Tuple of two DataFrames is created for each result returned.
-    In each tuple the first entry contains DataFrame for aggregates mapping, if present in mapping data, otherwise None.
-    The second entry contains DataFrame for time_series mapping, if present in the mapping data, otherwise None.
+    Map KDE API 'topXdata' query result to Pandas DataFrames based on result mappings.
+
+    Mapping sets (ResultMapping objects) are matched to result entries based on value of 'bucket' attribute. If no match
+    for is found in the 'mappings' dictionary, an entry with key 'all' is used, if present, otherwise error is logged
+    and result entry is ignored.
+
+    If ResultMapping for an result entry contains columns sourced from 'timeSeries' data (i.e. source specification
+    starting with '@TS'), number of rows in the resulting DataFrame is equal to number of result data entries times
+    lengths of 'timeSeries' data. Non 'timeSeries' data are replicated for each timestamp in the time series.
+
+    If no @TS sourced columns are present in the mapping, number of rows in the resulting DataFrame is equal to number
+    of result 'data' entries.
+
+    :param mappings: Dictionary keyed by result 'bucket' containing ResultMapping objects
+    :param data: QueryDataResult containing response data
+    :return: Dictionary keyed by result 'bucket' containing DataFrame for each results entry
     """
     if len(data.results) < 1:
         logging.debug("No data in query result")
         return dict()
-    out: Dict[str, Dict[str, DataFrame]] = dict()
+    out: Dict[str, DataFrame] = dict()
     for i, r in enumerate(data.results):
         mapping = mappings.get(r["bucket"], mappings.get("all"))
-        if not mapping:
+        if mapping is None or mapping.is_empty:
             logging.critical("No applicable mapping for result[%d] bucket: %s. Result ignored", i, r["bucket"])
             continue
         result_label = r["bucket"]
@@ -344,29 +358,8 @@ def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataRes
                 n += 1
                 result_label = f"{result_label}_{n}"
             logging.warning("Duplicate bucket name: %s (using: '%s')", r["bucket"], result_label)
-        out[result_label] = dict()
-        if mapping.has_aggregates:
-            out_data = dict()
-            for c, m in mapping.aggregates:
-                try:
-                    out_data[c] = [m.source.format(**e) for e in r["data"]]
-                except KeyError as ex:
-                    logging.critical(
-                        "result[%d]: label: %s: mapping for column '%s' ('%s') cannot be satisfied, "
-                        "fields '%s' not present in data ",
-                        i,
-                        result_label,
-                        c,
-                        m.source,
-                        " ".join([str(x) for x in ex.args]),
-                    )
-            df = DataFrame.from_dict(out_data)
-            apply_data_types(df, mapping.aggregates)
-            logging.debug("result[%d]: label: %s aggregates shape: (%d, %d)", i, result_label, df.shape[0], df.shape[1])
-            out[result_label]["aggregates"] = df
-        else:
-            logging.debug("result[%d]: label: %s no aggregates", i, result_label)
-        if mapping.has_time_series:
+        out_data: Dict[str, List[Any]] = dict()
+        if mapping.has_time_series_keys:
             # check that all data entries in the result have `timeSeries` key
             missing = [e["key"] for e in r["data"] if "timeSeries" not in e or not e["timeSeries"]]
             if missing:
@@ -376,18 +369,14 @@ def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataRes
                     result_label,
                     len(missing),
                 )
-            if len(r["data"]) > 1:
+            if len(r["data"]) > 1 and not mapping.has_aggregate_keys:
                 # if there is more than one `data` entry, time_series mapping must contain at least one non-time series
                 # column to make rows unique
-                for _, m in mapping.time_series:
-                    if not m.is_time_series_key:
-                        break
-                else:
-                    raise RuntimeError(
-                        f"result[{i}]: label: {result_label}: More than 1 data item in result,"
-                        f"'time_series' mapping must contain at least one non-'{TIME_SERIES_PREFIX}' 'source'"
-                    )
-            out_data = {k: list() for k, _ in mapping.time_series}
+                raise RuntimeError(
+                    f"result[{i}]: label: {result_label}: More than 1 data item in result,"
+                    f"'time_series' mapping must contain at least one non-'{TIME_SERIES_PREFIX}' 'source'"
+                )
+            out_data = {k: list() for k, _ in mapping.items}
             for e in r["data"]:
                 if e["key"] in missing:
                     logging.debug("no time series in entry: %s", e)
@@ -395,7 +384,7 @@ def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataRes
                 # check that all time_series names are present
                 missing_ts = [
                     n
-                    for n in [m.time_series_name for _, m in mapping.time_series if m.is_time_series_key]
+                    for n in [m.time_series_name for m in mapping.entries if m.is_time_series_key]
                     if n not in e["timeSeries"]
                 ]
                 if missing_ts:
@@ -405,16 +394,12 @@ def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataRes
                         )
                     )
                 ts_len = set(
-                    [
-                        len(e["timeSeries"][m.time_series_name]["flow"])
-                        for _, m in mapping.time_series
-                        if m.is_time_series_key
-                    ]
+                    len(e["timeSeries"][m.time_series_name]["flow"]) for m in mapping.entries if m.is_time_series_key
                 )
                 if len(ts_len) > 1:
                     _s = " ".join([str(x) for x in ts_len])
                     raise RuntimeWarning(f"result[{i}]: bucket: {r['bucket']}: lengths of 'timeSeries' differ ({_s})")
-                for k, m in mapping.time_series:
+                for k, m in mapping.items:
                     if m.is_time_series_key:
                         out_data[k].extend(
                             row[m.time_series_field_idx] for row in e["timeSeries"][m.time_series_name]["flow"]
@@ -426,20 +411,33 @@ def data_result_to_df(mappings: Dict[str, DataResultMapping], data: QueryDataRes
                         except KeyError as ex:
                             logging.critical(
                                 "result[%d]: label: %s: mapping for column '%s' ('%s') cannot be satisfied, "
-                                "fields '%s' not present in data ",
+                                "fields '%s' not present in data "
+                                "(available fields: %s)",
                                 i,
                                 result_label,
                                 k,
                                 m.source,
-                                " ".join([str(x) for x in ex.args]),
+                                ",".join([str(x) for x in ex.args]),
+                                ",".join(r["data"][0].keys()),
                             )
-                            out_data[k].extend([""] * max(ts_len))
-            df = DataFrame.from_dict(out_data)
-            apply_data_types(df, mapping.time_series)
-            logging.debug(
-                "result[%d]: label: %s time_series shape: (%d, %d)", i, result_label, df.shape[0], df.shape[1]
-            )
-            out[result_label]["time_series"] = df
+                            out_data[k].extend([None] * max(ts_len))
         else:
-            logging.debug("result[%d]: label: %s no time_series", i, result_label)
+            for c, m in mapping.items:
+                try:
+                    out_data[c] = [m.source.format(**e) for e in r["data"]]
+                except KeyError as ex:
+                    logging.critical(
+                        "result[%d]: label: %s: mapping for column '%s' ('%s') cannot be satisfied, "
+                        "fields '%s' not present in data "
+                        "(available fields: %s)",
+                        i,
+                        result_label,
+                        c,
+                        m.source,
+                        ",".join([str(x) for x in ex.args]),
+                        ",".join(r["data"][0].keys()),
+                    )
+        out[result_label] = DataFrame.from_dict(out_data)
+        set_data_types_and_index(out[result_label], mapping.items)
+        logging.debug("result[%d]: label: %s df shape: (%d, %d)", i, result_label, *out[result_label].shape)
     return out
