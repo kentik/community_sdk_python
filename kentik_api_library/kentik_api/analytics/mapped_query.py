@@ -25,7 +25,7 @@ class MappingEntry:
     """
     Class describing single mapping entry for construction of a DataFrame from KDE API 'sql' or 'topXdata' result.
     Attributes:
-        'source': string containing 'str.format' formatting string for extacting specific result data field. Special
+        'source': string containing 'str.format' formatting string for extracting specific result data field. Special
                   directives, prefixed with @TS allow to extract data from 'topXdata' result 'timeSeries' blocks
         'data_type': optional string containing desired data type for column values. Any numpy.dtype and Python
                   type name is accepted. In addition to that, following special type strings are provided:
@@ -389,8 +389,12 @@ def data_result_to_df(mappings: Dict[str, ResultMapping], data: QueryDataResult)
                 ]
                 if missing_ts:
                     raise RuntimeError(
-                        "result[{i}]: label: {label}: No 'timeSeries' for variables(s) '{mts}' in entry '{e}'".format(
-                            i=i, label=result_label, mts=",".join([str(x) for x in missing_ts]), e=e
+                        "result[{i}]: label: {label}: Entry has no time series for variables '{mts}' "
+                        "(available time series: '{ts_keys}')".format(
+                            i=i,
+                            label=result_label,
+                            mts=",".join([str(x) for x in missing_ts]),
+                            ts_keys=",".join(e["timeSeries"].keys()),
                         )
                     )
                 ts_len = set(
