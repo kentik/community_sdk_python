@@ -111,7 +111,8 @@ List of available examples:
 - [tags_example.py](./examples/tags_example.py) - create/update/get/delete/list Tags
 - [users_example.py](./examples/users_example.py) - create/update/get/delete/list Users
 - [error_handling_example.py](./examples/error_handling_example.py) - handling errors raised by the library
-- [analytics_example.py](./examples/analytics_example.py) - use of the `flatness_analysis` method and the`DeviceCache`
+- [analytics_example_sql.py](./examples/analytics_example_sql.py) - use of `SQLQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
+- [analytics_example_topx.py](./examples/analytics_example_sql.py) - use of `DataQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
   (see also [analytics readme](./kentik_api/analytics/README.md))
 
 ## Open-source libraries

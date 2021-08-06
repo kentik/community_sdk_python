@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime, timedelta, timezone
+
 from kentik_api import KentikAPI
-from kentik_api.utils import get_credentials, DeviceCache
 from kentik_api.analytics import SQLQueryDefinition, flatness_analysis
 from kentik_api.analytics.flatness import freq_to_seconds
-
+from kentik_api.utils import DeviceCache, get_credentials
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,8 +32,8 @@ def main() -> None:
         print("No devices available.")
         return
     print(f"Got {devices.count} devices")
-    print("Fetching flow data ...", end=" ")
-    end = datetime.now(timezone.utc)
+    print("Fetching flow data (using SQL query) ...", end=" ")
+    end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
     start = end - timedelta(hours=23, minutes=59)
     df = query.get_data(api, start=start, end=end)
     if df.shape[0] < 1:

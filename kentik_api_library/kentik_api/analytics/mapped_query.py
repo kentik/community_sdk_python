@@ -1,15 +1,26 @@
+import json
 import logging
+import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
-import re
 import yaml
-import json
 from pandas import DataFrame, to_datetime
 
 from kentik_api import KentikAPI
-from kentik_api.public import QuerySQL, QuerySQLResult, QueryObject, QueryDataResult
+from kentik_api.public import QueryDataResult, QueryObject, QuerySQL, QuerySQLResult
 
 MappedQueryFn = Callable[..., DataFrame]
 
@@ -321,6 +332,18 @@ class DataQueryDefinition:
     def get_data(self, api: KentikAPI, **kwargs) -> Dict[str, DataFrame]:
         result = api.query.data(self.query_object(**kwargs))
         return data_result_to_df(self.mappings, result)
+
+    def make_query_fn(self, api: KentikAPI, result_bucket: str) -> MappedQueryFn:
+        """
+        Create a function returning DataFrame based on the query definition. It allows to extract only 1 DataFrame
+        from all responses.
+        The main purpose is to pass the function to the DFCache.fetch method
+        """
+
+        def data_mapped_query(**kwargs) -> DataFrame:
+            return self.get_data(api, **kwargs).get(result_bucket)
+
+        return data_mapped_query
 
 
 def data_result_to_df(mappings: Dict[str, ResultMapping], data: QueryDataResult) -> Dict[str, DataFrame]:
