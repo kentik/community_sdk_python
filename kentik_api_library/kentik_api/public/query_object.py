@@ -156,7 +156,7 @@ class Aggregate:
         """
         Construct Aggregate object based on data in a dictionary. The dictionary must provide values for all mandatory
         Query attributes
-        :param data: dictionary
+        :param data: dictionary containing class attributes
         :return: instance of Aggregate
         """
         # verify that values are provided for all mandatory fields
