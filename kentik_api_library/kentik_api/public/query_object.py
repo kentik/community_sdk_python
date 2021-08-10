@@ -149,6 +149,7 @@ class Aggregate:
     rank: Optional[int] = None  # valid: number 5..99; only used when fn == percentile
     raw: Optional[bool] = None  # required for topxchart queries
     is_bytes: Optional[bool] = None
+    is_count: Optional[bool] = None
     fix: Optional[int] = None
 
     @classmethod
