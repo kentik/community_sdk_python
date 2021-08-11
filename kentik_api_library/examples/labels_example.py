@@ -8,6 +8,7 @@ import sys
 import logging
 from typing import Tuple
 from kentik_api import KentikAPI, DeviceLabel
+from kentik_api.public.types import ID
 
 
 logging.basicConfig(level=logging.INFO)
@@ -70,7 +71,7 @@ def run_get_with_devices() -> None:
     client = KentikAPI(email, token)
 
     print("### GET")
-    label_with_devices_id = 2752
+    label_with_devices_id = ID(2752)
     got = client.device_labels.get(label_with_devices_id)
     print(got.__dict__)
     print("devices:")

@@ -76,8 +76,8 @@ def run_crud_router() -> None:
         device_sample_rate=1,
         device_description="testapi router with full config",
         device_snmp_ip="127.0.0.1",
-        plan_id=11466,
-        site_id=8483,
+        plan_id=ID(11466),
+        site_id=ID(8483),
         minimize_snmp=False,
         device_snmp_v3_conf=snmp_v3_conf,
         device_bgp_flowspec=True,
@@ -158,8 +158,8 @@ def run_crud_dns() -> None:
         device_subtype=DeviceSubtype.aws_subnet,
         cdn_attr=CDNAttribute.yes,
         device_sample_rate=1,
-        plan_id=11466,
-        site_id=8483,
+        plan_id=ID(11466),
+        site_id=ID(8483),
         device_bgp_flowspec=True,
     )
 
