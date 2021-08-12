@@ -1,7 +1,7 @@
 from enum import EnumMeta
 
 # common id type across all resources
-ID = int
+ID = str
 
 
 class PermissiveEnumMeta(EnumMeta):

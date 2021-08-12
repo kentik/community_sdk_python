@@ -1218,7 +1218,7 @@ def test_apply_labels_success() -> None:
     devices_api = DevicesAPI(connector)
 
     # when
-    device_id = 42
+    device_id = ID(42)
     labels = [ID(3011), ID(3012)]
     apply_result = devices_api.apply_labels(device_id, labels)
 

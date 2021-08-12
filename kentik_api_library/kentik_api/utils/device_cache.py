@@ -6,6 +6,7 @@ from typing import Dict, Generator, List, Optional, Tuple, Type, TypeVar
 
 from kentik_api import KentikAPI
 from kentik_api.public import Device, DeviceInterface
+from kentik_api.public.types import ID
 
 log = logging.getLogger("device_cache")
 
@@ -41,7 +42,7 @@ class DeviceCache:
 
     def __init__(self, devices: List[Device], labels: Optional[List[str]] = None) -> None:
         self._devices_by_name: Dict[str, Device] = dict()
-        self._devices_by_id: Dict[int, Device] = dict()
+        self._devices_by_id: Dict[ID, Device] = dict()
         self.duplicate_names = 0
         self.labels = labels
 
@@ -91,7 +92,7 @@ class DeviceCache:
         for d in self._devices_by_name.values():
             yield d
 
-    def get_by_id(self, device_id: int) -> Optional[Device]:
+    def get_by_id(self, device_id: ID) -> Optional[Device]:
         return self._devices_by_id.get(device_id)
 
     @staticmethod
