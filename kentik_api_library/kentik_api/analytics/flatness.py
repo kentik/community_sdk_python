@@ -361,7 +361,7 @@ def flatness_analysis(
                  "bytes_out" columns (if present) is expected to contain total number of bytes transmitted via the link
                  "bps_out" column (if present) is expected to contain average outbound bandwith in bits/s for the link
                  For "bytes_out" and "bps_out" the value is for a time period ending at the timestamp.
-                 If the "bps_out" column is present it used as the source for the analysis (regardless of presence of
+                 If the "bps_out" column is present it is used as the source for the analysis (regardless of presence of
                  "bytes_out")
     :param flatness_limit: maximum range of network link utilization in percents to deem traffic constant ("flat")
     :param window: minimum time window over which link utilization must stay with flatness_limit
