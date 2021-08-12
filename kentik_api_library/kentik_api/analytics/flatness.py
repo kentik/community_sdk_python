@@ -11,7 +11,6 @@ import pandas as pd
 
 from kentik_api.utils import DeviceCache
 
-
 log = logging.getLogger("flatness_analysis")
 
 
@@ -357,9 +356,13 @@ def flatness_analysis(
     Detect intervals of constant traffic in data passed in DataFrame based on provided criteria.
     :param devices: instance of kentik-api.utils.DeviceCache containing data for all devices references in the `link`
                     column of the "data" DataFrame
-    :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bytes_out". The "link" column is
-                 expected to contain names of network links as <device_name>:<interface_name> and :"bps_out" contains
-                 sum of outbound traffic rate (in bits per second) for the interval ending at the row timestamp
+    :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bytes_out" or "bps_out.
+                 "link" column is expected to contain names of network links as <device_name>:<interface_name>
+                 "bytes_out" columns (if present) is expected to contain total number of bytes transmitted via the link
+                 "bps_out" column (if present) is expected to contain average outbound bandwith in bits/s for the link
+                 For "bytes_out" and "bps_out" the value is for a time period ending at the timestamp.
+                 If the "bps_out" column is present it used as the source for the analysis (regardless of presence of
+                 "bytes_out")
     :param flatness_limit: maximum range of network link utilization in percents to deem traffic constant ("flat")
     :param window: minimum time window over which link utilization must stay with flatness_limit
     :param min_valid: minimum link utilization in percents for the interval to be considered as "flat traffic"
@@ -367,12 +370,15 @@ def flatness_analysis(
     :return: FlatnessResults instance
     """
     log.debug("Got %d entries for %d links", data.shape[0], len(data["link"].unique()))
-    log.debug("Computing bandwidth via each link")
-    if not has_uniform_datetime_index(data):
-        resolution = min_index_resolution(data).total_seconds()
-        log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling")
-        data = resample_volume_data(data, f"{resolution}S")
-    link_bw = compute_link_bandwidth(data)
+    if "bps_out" not in data:
+        log.debug("Computing bandwidth via each link")
+        if not has_uniform_datetime_index(data):
+            resolution = min_index_resolution(data).total_seconds()
+            log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling")
+            data = resample_volume_data(data, f"{resolution}S")
+        link_bw = compute_link_bandwidth(data)
+    else:
+        link_bw = data
     log.debug("Computing link utilization")
     link_util = compute_link_utilization(link_bw, devices)
     bad = len(link_util.loc[link_util.speed == 0].link.unique())

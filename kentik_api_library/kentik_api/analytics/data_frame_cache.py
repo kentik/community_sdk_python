@@ -6,12 +6,38 @@ from typing import Generator, List, Optional, Tuple
 
 import pandas as pd
 
-from kentik_api import KentikAPI
 from kentik_api.utils.time_sequence import time_seq
 
 from .mapped_query import MappedQueryFn
 
 log = logging.getLogger("DFCache")
+
+
+def dedup_data_frame(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
+    """
+    Helper function for de-duplicating DataFrame on specified columns
+    :param df: input DataFrame (not modified)
+    :param columns: list of column names on which to deduplicate
+    :return: DataFrame
+    """
+    out = df.reset_index()
+    missing = [c for c in columns if c not in out]
+    if missing:
+        _m = ",".join(missing)
+        raise RuntimeError(
+            f"dedup_data_frame: columns '{_m}' not in input DataFrame " f"(available columns: '{out.columns}')"
+        )
+    out.set_index(columns, inplace=True)
+    out.sort_index(inplace=True)
+    duplicates = out.index.duplicated()
+    if duplicates.any():
+        out = out[~duplicates]
+    out.reset_index(inplace=True)
+    orig_index_names = [n for n in df.index.names if n is not None]
+    if orig_index_names:
+        out.set_index(orig_index_names, inplace=True)
+    out.sort_index(inplace=True)
+    return out
 
 
 class DFCache:
@@ -170,16 +196,9 @@ class DFCache:
         out = pd.DataFrame(data=df.loc[(df.index >= start) & (df.index <= end)])
         if dedup_columns:
             # Deduplicate the data based on specified columns
-            # Remember current index fields
-            orig_index_columns = out.index.names
-            out.reset_index(inplace=True)
-            missing = set(dedup_columns).difference(set(out.columns))
-            if missing:
-                log.warning("get: Cannot deduplicate. %s column(s) not in data", ",".join(missing))
-            else:
-                out.drop_duplicates(subset=dedup_columns, inplace=True)
-            out.set_index(orig_index_columns, inplace=True)
-        return out
+            return dedup_data_frame(out, dedup_columns)
+        else:
+            return out
 
     def store(self, df: pd.DataFrame) -> None:
         out = self.data_dir / self.filename_format.format(start=df.index[0].isoformat(), end=df.index[-1].isoformat())

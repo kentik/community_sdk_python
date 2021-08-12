@@ -148,20 +148,22 @@ class Aggregate:
     sample_rate: int = 1
     rank: Optional[int] = None  # valid: number 5..99; only used when fn == percentile
     raw: Optional[bool] = None  # required for topxchart queries
+    is_bytes: Optional[bool] = None
+    is_count: Optional[bool] = None
+    fix: Optional[int] = None
 
     @classmethod
     def from_dict(cls: Type[AggregateType], data: Dict) -> AggregateType:
         """
         Construct Aggregate object based on data in a dictionary. The dictionary must provide values for all mandatory
         Query attributes
-        :param data: dictionary
+        :param data: dictionary containing class attributes
         :return: instance of Aggregate
         """
         # verify that values are provided for all mandatory fields
         missing = [field_name for field_name in mandatory_dataclass_attributes(cls) if field_name not in data]
         if missing:
             raise RuntimeError(f"{cls.__name__}.from_dict: missing mandatory fields: {missing}")
-        # construct Filters, Dimension, Metric and SavedFilter arrays
         _d = dict()
         _d.update(data)
         _d["fn"] = AggregateFunctionType(data["fn"])
@@ -217,8 +219,11 @@ class Query:
     hideCidr: Optional[bool] = None
     hostname_lookup: bool = True
     isOverlay: Optional[dict] = None
-    lookback_seconds: Optional[int] = None  # value != 0 overrides "starting_time" and "ending_time"
+    # "lookback_seconds" MUST be present and set to 0 in order for "starting_time" and "ending_time" to be honored
+    # It defaults to 3600 seconds if absent and overrides "(starting|ending)_time"
+    lookback_seconds: Optional[int] = 0
     matrixBy: List[str] = field(default_factory=list)  # DimensionType or custom dimension
+    minsPolling: Optional[int] = None
     mirror: Optional[dict] = None
     mirrorUnits: Optional[dict] = None
     outsort: str = ""  # name of aggregate object, required when more than 1 objects on "aggregates" list
