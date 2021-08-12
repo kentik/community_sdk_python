@@ -26,8 +26,8 @@ Result mapping represented by `ResultMapping` class is (basically) a dictionary 
 with entries providing data for constructing values of the column from Kentik API query responses. Individual
 mapping entries are represented by the `MappingEntry` class. Mapping entries contain following attributes:
 - `source`: string containing `str.format`-style formatting string for extracting specific result data fields. Special
-          directives, prefixed with @TS allow extracting data from `topXdata` result `timeSeries` blocks (and hence are
-          applicable only the context of `DataMappedQuery`)
+          directives, prefixed with `@TS` allow extracting data from `topXdata` result `timeSeries` blocks (and hence are
+          applicable only in the context of `DataMappedQuery`)
 - `type`: optional string containing desired data type for column values. Any `numpy.dtype` and Python
           type name is accepted. In addition, following special type strings are provided:
           - `time`: converts string to pandas.datetime object
