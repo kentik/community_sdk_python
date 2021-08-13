@@ -117,10 +117,10 @@ jobs:
             python artifacts/tests/library/test_imports.py ${package}
             echo "Imported package: ${package}"
           done
-  #Publish package to PyPi job, run only on tag creation and for python 3.8
+  #Publish package to PyPi job, run only on main branch
   package-publish:
     runs-on: ubuntu-latest
-    if: contains(github.ref, '/tags/')
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: [ python-versions-setup, code-tests, build, package-tests ]
     strategy: 
       matrix: 
