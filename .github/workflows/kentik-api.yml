@@ -120,7 +120,7 @@ jobs:
   #Publish package to PyPi job, run only on main branch
   package-publish:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: contains(github.ref, '/tags/v')
     needs: [ python-versions-setup, code-tests, build, package-tests ]
     strategy: 
       matrix: 
