@@ -124,7 +124,7 @@ jobs:
     needs: [ python-versions-setup, code-tests, build, package-tests ]
     strategy: 
       matrix: 
-        python-version: [ '3.8', '3.9' ]
+        python-version: [ '3.8' ]
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v2
