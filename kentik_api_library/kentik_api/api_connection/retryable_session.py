@@ -6,12 +6,13 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 
+
 # mypy: ignore-errors
 class RetryableSession(Session):
     DEFAULT_RETRY_STRATEGY = Retry(
         total=3,
         backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504],
+        status_forcelist=[429, 502, 503, 504],
         allowed_methods=["DELETE", "HEAD", "GET", "PUT", "OPTIONS", "PATCH", "POST"],
     )
 
