@@ -102,7 +102,7 @@ setup(
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     license="Apache-2.0",
     include_package_data=True,
-    install_requires=["dacite>=1.6.0", "requests>=2.25.0", "typing-extensions>=3.7.4.3"],
+    install_requires=["dacite>=1.6.0", "requests>=2.25.0", "typing-extensions>=3.7.4.3", "requests[socks]==2.25.1"],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm", "wheel"],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={
