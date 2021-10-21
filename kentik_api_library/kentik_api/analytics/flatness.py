@@ -359,7 +359,7 @@ def flatness_analysis(
     :param data: DataFrame indexed by time ("ts" column) containing columns "link" and "bytes_out" or "bps_out.
                  "link" column is expected to contain names of network links as <device_name>:<interface_name>
                  "bytes_out" columns (if present) is expected to contain total number of bytes transmitted via the link
-                 "bps_out" column (if present) is expected to contain average outbound bandwith in bits/s for the link
+                 "bps_out" column (if present) is expected to contain average outbound bandwidth in bits/s for the link
                  For "bytes_out" and "bps_out" the value is for a time period ending at the timestamp.
                  If the "bps_out" column is present it is used as the source for the analysis (regardless of presence of
                  "bytes_out")
@@ -374,7 +374,7 @@ def flatness_analysis(
         log.debug("Computing bandwidth via each link")
         if not has_uniform_datetime_index(data):
             resolution = min_index_resolution(data).total_seconds()
-            log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling")
+            log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling", resolution)
             data = resample_volume_data(data, f"{resolution}S")
         link_bw = compute_link_bandwidth(data)
     else:
