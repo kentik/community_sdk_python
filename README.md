@@ -2,11 +2,11 @@
 
 ## Release process for kentik-api
 
-Release process for kentik-api library is based on github repo tags. Every tag with format v[0-9].[0-9].[0-9] will trigger automatic build of package and publish it in PyPi repository.
+The release process for the kentik-api library is based on GitHub repo tags. Every tag with format v[0-9].[0-9].[0-9] will trigger an automatic build of the package and publish it in the PyPi repository.
 
 To build and release package:
-1. Make sure that all code that you want to release is in main branch
-1. Create tag with format v[0-9].[0-9].[0-9] in github. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
+1. Make sure that all code that you want to release is in the main branch
+1. Create a tag with format v[0-9].[0-9].[0-9] in GitHub. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
 1. Go to [Github Actions](https://github.com/kentik/community_sdk_python/actions)
 
 
