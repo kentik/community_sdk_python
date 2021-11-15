@@ -1,3 +1,5 @@
+from typing import Optional, Tuple, Union
+
 from .api_connection.api_connector import APIConnector
 from .api_resources.alerting_api import AlertingAPI
 from .api_resources.batch_api import BatchAPI
@@ -12,8 +14,8 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
-from typing import Optional, Tuple, Union
 from .api_connection.retryable_session import Retry
+from .synthetics.synth_client import KentikSynthClient
 
 
 class KentikAPI:
@@ -46,6 +48,7 @@ class KentikAPI:
         self.devices = DevicesAPI(connector)
         self.batch = BatchAPI(connector)
         self.alerting = AlertingAPI(connector)
+        self.synthetics = KentikSynthClient((auth_email, auth_token))
 
 
 # pylint: enable=too-many-instance-attributes
