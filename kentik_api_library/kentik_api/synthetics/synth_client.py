@@ -10,6 +10,12 @@ from .synth_tests import SynTest, TestStatus
 log = logging.getLogger("synth_client")
 
 
+def deserialize(cls, object, deserialize_func) -> Any:
+    if isinstance(object, cls):
+        return object
+    return deserialize_func(object)
+
+
 class KentikSynthClient:
     def __init__(
         self,
@@ -51,14 +57,14 @@ class KentikSynthClient:
 
     @property
     def tests(self) -> List[SynTest]:
-        return [SynTest.test_from_dict(t) for t in self._transport.req("TestsList")]
+        return [deserialize(SynTest, t, SynTest.test_from_dict) for t in self._transport.req("TestsList")]
 
     def list_tests(self, presets: bool = False, raw: bool = False) -> Any:
         r = self._transport.req("TestsList", params=dict(presets=presets))
         if raw:
             return r
         else:
-            return [SynTest.test_from_dict(t) for t in r]
+            return [deserialize(SynTest, t, SynTest.test_from_dict) for t in r]
 
     def test(self, test: Union[str, SynTest]) -> SynTest:
         if isinstance(test, SynTest):

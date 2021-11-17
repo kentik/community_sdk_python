@@ -17,6 +17,9 @@ from .api_resources.users_api import UsersAPI
 from .api_connection.retryable_session import Retry
 from .synthetics.synth_client import KentikSynthClient
 
+from .synthetics.api_transport_http import SynthHTTPTransport
+from .synthetics.api_transport_grpc import SynthGRPCTransport
+
 
 class KentikAPI:
     """Root object for operating KentikAPI"""
@@ -24,11 +27,15 @@ class KentikAPI:
     API_URL_EU = "https://api.kentik.eu/api/v5"
     API_URL_US = "https://api.kentik.com/api/v5"
 
+    API_URL_SYNTHETICS_HTTP = "https://synthetics.api.kentik.com"
+    API_URL_SYNTHETICS_GRPC = "synthetics.api.kentik.com:443"
+
     def __init__(
         self,
         auth_email: str,
         auth_token: str,
         api_url: str = API_URL_US,
+        synthetics_url: str = API_URL_SYNTHETICS_GRPC,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
@@ -48,7 +55,14 @@ class KentikAPI:
         self.devices = DevicesAPI(connector)
         self.batch = BatchAPI(connector)
         self.alerting = AlertingAPI(connector)
-        self.synthetics = KentikSynthClient((auth_email, auth_token))
+
+        self.synthetics = KentikSynthClient(
+            credentials=(auth_email, auth_token), url=self.API_URL_SYNTHETICS_GRPC, transport=SynthGRPCTransport
+        )
+
+        # self.synthetics = KentikSynthClient(
+        #     credentials=(auth_email, auth_token), url=self.API_URL_SYNTHETICS_HTTP, transport=SynthHTTPTransport
+        # )
 
 
 # pylint: enable=too-many-instance-attributes
