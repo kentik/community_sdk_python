@@ -165,18 +165,18 @@ class SynTestSettings(_ConfigElement):
     count: int = 0
     expiry: int = Defaults.expiry
     limit: int = 0
-    protocol: Protocol = field(init=True, default=Protocol.none)
+    protocol: Protocol = field(init=False, default=Protocol.none)
     family: IPFamily = Defaults.family
-    rollupLevel: int = field(init=True, default=1)
+    rollupLevel: int = field(init=False, default=1)
     servers: List[str] = field(default_factory=list)
 
 
 @dataclass
 class SynTest(_ConfigElement):
     name: str
-    type: TestType = field(init=True, default=TestType.none)
+    type: TestType = field(init=False, default=TestType.none)
     status: TestStatus = field(default=TestStatus.active)
-    deviceId: str = field(init=True, default="0")
+    deviceId: str = field(init=False, default="0")
     _id: str = field(default="0", init=False)
     _cdate: str = field(default_factory=str, init=False)
     _edate: str = field(default_factory=str, init=False)
