@@ -1,0 +1,28 @@
+[build-system]
+
+requires = ["setuptools", "wheel", "setuptools_scm", "gitpython", "pytest-runner", "pylint-runner"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 120
+target-version = ['py39']
+check = true
+fast = true
+
+[tool.isort]
+profile = "black"
+known_local_folder = ["kentik_api", "examples", "tests"]
+line_length = 120
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = "(generated|build)/"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/integration", "tests/unit"]
+
+[tool.pylint]
+
+[[tool.mypy.overrides]]
+module = "/generated/*"
+ignore_errors = true

@@ -4,17 +4,13 @@ import importlib
 
 
 def test_import(library=""):
-
-    library_found = False
-
+    error = None
     try:
-        imported_library = importlib.import_module(library)
-    except ImportError:
-        pass
-    else:
-        library_found = True
+        _ = importlib.import_module(library)
+    except ImportError as err:
+        error = err
 
-    assert library_found, "Can't import '" + library + "'"
+    assert error is None, f'Can\'t import "{library}": {error}'
 
 
 if __name__ == "__main__":
