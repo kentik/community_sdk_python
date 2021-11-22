@@ -3,33 +3,19 @@
 Examples of using the alerting API
 """
 
-import os
-import sys
 import logging
 from datetime import datetime
 
-from typing import Tuple
-
 from kentik_api import KentikAPI, ManualMitigation, AlertFilter
-
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def run_crud():
     """Runs example CRUD API calls and prints responses"""
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     start_time = datetime(2020, 10, 15, 22, 15, 0)

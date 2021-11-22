@@ -1,25 +1,12 @@
 """Examples of handling errors raised in kentik_api library. Only a subset of possible errors is presented."""
 
-import os
-import sys
 import logging
-
-from typing import Tuple
 
 from kentik_api import KentikAPI, AuthError, NotFoundError, IncompleteObjectError, Device, RateLimitExceededError
 from kentik_api.public.types import ID
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def handle_errors() -> None:
@@ -32,7 +19,7 @@ def handle_errors() -> None:
         users = client.users.get_all()
 
     except AuthError:
-        email, token = get_auth_email_token()
+        email, token = get_credentials()
         client = KentikAPI(email, token)
 
     users = client.users.get_all()
