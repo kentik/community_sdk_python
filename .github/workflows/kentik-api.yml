@@ -41,11 +41,13 @@ jobs:
           architecture: x64
       - name: Install requirements
         working-directory: ./kentik_api_library
-        run: pip3 install -r requirements.txt
+        run: |
+          pip3 install -r requirements.txt
+          python3 setup.py grpc_stubs
       - name: Black
         uses: rickstaa/action-black@v1
         with:
-          black_args: "./kentik_api_library --check --fast --line-length 120 --exclude grpc"
+          black_args: "./kentik_api_library --check --fast --line-length 120 --exclude .eggs|generated"
       - name: PyTest
         working-directory: ./kentik_api_library
         run: python3 setup.py pytest
@@ -73,6 +75,7 @@ jobs:
         working-directory: ./kentik_api_library
         run: |
           pip3 install -r requirements.txt
+          python3 setup.py grpc_stubs
           python3 setup.py build sdist bdist_wheel
       - name: Archive code
         uses: actions/upload-artifact@v2

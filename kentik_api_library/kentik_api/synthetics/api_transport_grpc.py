@@ -2,11 +2,12 @@ import logging
 from typing import Any, Optional, Tuple, List
 from datetime import datetime, timezone
 
+import grpc.experimental as _
+
 from .api_transport import KentikAPIRequestError, KentikAPITransport
 
-import grpc.experimental as _
-from kentik_api.grpc.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
-from kentik_api.grpc.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+from generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
+from generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ListTestsRequest,
     Test as pbTest,
     TestStatus as pbTestStatus,
@@ -80,8 +81,8 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.status = STATUS[v.status]
     out.deviceId = v.device_id
     out._id = v.id
-    out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc).isoformat()
-    out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc).isoformat()
+    out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc)
+    out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc)
 
     settings = SynTestSettings()
     pupulate_settings_from_pb(v.settings, settings)

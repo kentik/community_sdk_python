@@ -1,3 +1,8 @@
+import sys
+import pathlib
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent.joinpath("generated")))
+
 from .api_transport import KentikAPIRequestError
 from .synth_client import KentikSynthClient
 from .synth_tests import (

@@ -57,7 +57,7 @@ class KentikAPI:
         self.alerting = AlertingAPI(connector)
 
         self.synthetics = KentikSynthClient(
-            credentials=(auth_email, auth_token), url=self.API_URL_SYNTHETICS_GRPC, transport=SynthGRPCTransport
+            credentials=(auth_email, auth_token), url=synthetics_url, transport=SynthGRPCTransport
         )
 
         # self.synthetics = KentikSynthClient(
