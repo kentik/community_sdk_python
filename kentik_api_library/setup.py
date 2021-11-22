@@ -39,7 +39,7 @@ def run_cmd(cmd, reporter) -> None:
 class Pylint(Command):
     """Custom command to run Pylint"""
 
-    description = "run Pylint on kentik_api, tests and examples directories; read configuratin from pyproject.toml"
+    description = "run Pylint on kentik_api, tests and examples directories; read configuration from pyproject.toml"
     user_options = []
 
     def initialize_options(self):
@@ -60,7 +60,7 @@ class Pylint(Command):
 class Mypy(Command):
     """Custom command to run Mypy"""
 
-    description = "run Mypy on kentik_api, tests and examples directories; read configuratin from pyproject.toml"
+    description = "run Mypy on kentik_api, tests and examples directories; read configuration from pyproject.toml"
     user_options = [("packages=", None, "Packages to check with mypy")]
 
     def initialize_options(self):
@@ -83,7 +83,7 @@ class Mypy(Command):
 class Black(Command):
     """Custom command to run black"""
 
-    description = "run black on all relevant code; read configuratin from pyproject.toml"
+    description = "run black on all relevant code; read configuration from pyproject.toml"
     user_options = []
 
     def initialize_options(self) -> None:
@@ -98,10 +98,10 @@ class Black(Command):
         run_cmd(cmd, self.announce)
 
 
-class PytestCmd(Command):
+class Pytest(Command):
     """Custom command to run pytest"""
 
-    description = "run pytest on all relevant code; read configuratin from pyproject.toml"
+    description = "run pytest on all relevant code; read configuration from pyproject.toml"
     user_options = []
 
     def initialize_options(self) -> None:
@@ -132,7 +132,7 @@ setup(
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
     packages=PACKAGES,
     package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},
-    cmdclass={"pylint": Pylint, "mypy": Mypy, "black": Black, "pytest": PytestCmd},
+    cmdclass={"pylint": Pylint, "mypy": Mypy, "black": Black, "pytest": Pytest},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
     ],
