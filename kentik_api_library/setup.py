@@ -84,17 +84,24 @@ class Black(Command):
     """Custom command to run black"""
 
     description = "run black on all relevant code; read configuration from pyproject.toml"
-    user_options = []
+    user_options = [("dirs=", None, "Directories to check with black"), ("check", None, "Run in check mode")]
 
     def initialize_options(self) -> None:
-        pass
+        self.dirs = ["."]
+        self.check = False
 
     def finalize_options(self):
-        pass
+        """Post-process options."""
+        for d in self.dirs:
+            assert os.path.exists(d), "Path {} does not exist.".format(d)
 
     def run(self):
         """Run command"""
-        cmd = ["black", "."]
+        cmd = ["black"]
+        if self.check:
+            cmd.append("--check")
+        for d in self.dirs:
+            cmd.append(d)
         run_cmd(cmd, self.announce)
 
 

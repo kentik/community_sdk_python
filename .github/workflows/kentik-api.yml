@@ -49,7 +49,7 @@ jobs:
           python -m pip install --upgrade -r requirements-dev.txt
       - name: Black
         working-directory: ./kentik_api_library
-        run: python3 setup.py black
+        run: python3 setup.py black --check
       - name: Mypy
         working-directory: ./kentik_api_library
         run: python3 setup.py mypy
