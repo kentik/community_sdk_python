@@ -50,7 +50,7 @@ class Pylint(Command):
 
     def run(self):
         """Run command."""
-        cmd = ["pylint", "--exit-zero"]
+        cmd = ["pylint"]
         paths = ["kentik_api", "tests", "examples"]
         for path in paths:
             cmd.append(path)

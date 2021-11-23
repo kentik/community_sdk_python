@@ -15,16 +15,14 @@ known_local_folder = ["kentik_api", "examples", "tests"]
 ignore_missing_imports = true
 exclude = "(generated|build)/"
 
-[[tool.mypy.overrides]]
-module = "/generated/*"
-ignore_errors = true
-
 [tool.pytest.ini_options]
 testpaths = ["tests/integration", "tests/unit"]
 
+[tool.pylint.master]
+fail-under=8.5
+
 [tool.pylint.message_control]
 max-line-length = 120
-ignore = "examples"
 disable = [
     "missing-module-docstring",
     "missing-class-docstring",
