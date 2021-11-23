@@ -1,13 +1,13 @@
 import json
 import logging
 import os
-from functools import cache
+from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
 log = logging.getLogger("auth")
 
 
-@cache
+@lru_cache
 def load_credential_profile(profile: str) -> Dict:
     home: str = os.environ.get("KTAPI_HOME", os.environ.get("HOME", "."))
     filename = os.environ.get("KTAPI_CFG_FILE", os.path.join(home, ".kentik", profile))
