@@ -1,5 +1,5 @@
-from kentik_api.api_calls.api_call_decorators import get, post, payload_type
 from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call_decorators import get, payload_type, post
 
 
 @post

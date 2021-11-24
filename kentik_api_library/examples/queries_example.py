@@ -3,27 +3,28 @@
 Examples of using the typed Query API
 """
 
+import logging
 import os
 import sys
-import logging
 from io import BytesIO
-from PIL import Image  # type: ignore
 from typing import Tuple
+
+from PIL import Image  # type: ignore
+
 from kentik_api import (
-    KentikAPI,
-    QuerySQL,
-    QueryObject,
-    QueryArrayItem,
-    Query,
     Aggregate,
     AggregateFunctionType,
-    FastDataType,
-    MetricType,
-    DimensionType,
-    ImageType,
     ChartViewType,
+    DimensionType,
+    FastDataType,
+    ImageType,
+    KentikAPI,
+    MetricType,
+    Query,
+    QueryArrayItem,
+    QueryObject,
+    QuerySQL,
 )
-
 
 logging.basicConfig(level=logging.INFO)
 

@@ -1,8 +1,8 @@
-from typing import List, Dict
 from dataclasses import dataclass, field
+from typing import Dict, List
 
+from kentik_api.public.defaults import DEFAULT_DATE, DEFAULT_ID
 from kentik_api.public.types import ID
-from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 # pylint: disable=too-many-instance-attributes
 

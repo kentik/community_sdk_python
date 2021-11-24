@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
-from kentik_api.public.saved_filter import SavedFilter, Filters, FilterGroups, Filter
 from kentik_api.api_resources.saved_filters_api import SavedFiltersAPI
+from kentik_api.public.saved_filter import Filter, FilterGroups, Filters, SavedFilter
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

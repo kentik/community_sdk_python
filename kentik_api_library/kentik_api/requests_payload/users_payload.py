@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
 from kentik_api.public.types import ID
 from kentik_api.public.user import User
+from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
 
 # pylint: disable=too-many-instance-attributes
 

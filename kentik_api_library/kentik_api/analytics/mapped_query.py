@@ -3,18 +3,7 @@ import logging
 import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Type, TypeVar, Union
 
 import yaml
 from pandas import DataFrame, to_datetime

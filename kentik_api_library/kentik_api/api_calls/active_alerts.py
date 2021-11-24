@@ -1,6 +1,6 @@
 # Local application imports
-from kentik_api.api_calls.api_call_decorators import get, payload_type
 from kentik_api.api_calls.api_call import APICall
+from kentik_api.api_calls.api_call_decorators import get, payload_type
 
 
 @get

@@ -3,13 +3,14 @@
 Examples of using the typed custom dimensions API
 """
 
-import os
-import sys
 import logging
+import os
 import random
 import string
+import sys
 from typing import Tuple
-from kentik_api import KentikAPI, CustomDimension, Populator
+
+from kentik_api import CustomDimension, KentikAPI, Populator
 
 logging.basicConfig(level=logging.INFO)
 

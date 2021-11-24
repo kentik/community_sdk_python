@@ -1,22 +1,22 @@
 from http import HTTPStatus
 
-from kentik_api.api_resources.query_api import QueryAPI
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.saved_filter import Filters, FilterGroups, Filter
+from kentik_api.api_resources.query_api import QueryAPI
 from kentik_api.public.query_object import (
-    QueryObject,
-    QueryArrayItem,
-    Query,
-    ImageType,
     Aggregate,
     AggregateFunctionType,
-    FastDataType,
-    MetricType,
-    DimensionType,
     ChartViewType,
+    DimensionType,
+    FastDataType,
+    ImageType,
+    MetricType,
+    Query,
+    QueryArrayItem,
+    QueryObject,
     TimeFormat,
 )
 from kentik_api.public.query_sql import QuerySQL
+from kentik_api.public.saved_filter import Filter, FilterGroups, Filters
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

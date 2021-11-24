@@ -1,11 +1,11 @@
-from typing import Optional, Any, List, Dict
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
-from kentik_api.requests_payload.validation import validate_fields
-from kentik_api.public.types import ID
-from kentik_api.public.tag import Tag
 from kentik_api.public.errors import IncompleteObjectError
+from kentik_api.public.tag import Tag
+from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
+from kentik_api.requests_payload.validation import validate_fields
 
 # pylint: disable=too-many-instance-attributes
 

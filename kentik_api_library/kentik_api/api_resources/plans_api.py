@@ -1,7 +1,7 @@
 from typing import List
 
-from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.api_calls import plans
+from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.plan import Plan
 from kentik_api.requests_payload import plans_payload
 

@@ -3,11 +3,12 @@
 Example of using the saved filters API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
-from kentik_api import KentikAPI, SavedFilter, Filters, FilterGroups, Filter
+
+from kentik_api import Filter, FilterGroups, Filters, KentikAPI, SavedFilter
 
 logging.basicConfig(level=logging.INFO)
 

@@ -3,12 +3,12 @@
 Examples of using the typed sites API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
-from kentik_api import KentikAPI, Site
 
+from kentik_api import KentikAPI, Site
 
 logging.basicConfig(level=logging.INFO)
 

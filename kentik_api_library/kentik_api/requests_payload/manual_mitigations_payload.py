@@ -1,12 +1,11 @@
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert
 from kentik_api.public.errors import DataFormatError
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
-
+from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert, ManualMitigation
+from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
 
 CreateRequest = ManualMitigation
 

@@ -11,8 +11,8 @@ from kentik_api.public.device import (
     DeviceType,
     Interface,
     PrivacyProtocol,
-    SNMPv3Conf,
     SecondaryIP,
+    SNMPv3Conf,
     VRFAttributes,
 )
 from kentik_api.public.types import ID

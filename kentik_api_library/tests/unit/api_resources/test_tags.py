@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from kentik_api.api_resources.tags_api import TagsAPI
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
+from kentik_api.api_resources.tags_api import TagsAPI
 from kentik_api.public.tag import Tag
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

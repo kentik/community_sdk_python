@@ -1,6 +1,6 @@
 # pylint: skip-file
-import sys
 import importlib
+import sys
 
 
 def test_import(library=""):

@@ -3,10 +3,11 @@
 Example of using the plans API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
+
 from kentik_api import KentikAPI, Plan
 
 logging.basicConfig(level=logging.INFO)

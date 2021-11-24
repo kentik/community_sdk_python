@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
-from kentik_api.public.device_label import DeviceLabel
 from kentik_api.api_resources.device_labels_api import DeviceLabelsAPI
+from kentik_api.public.device_label import DeviceLabel
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

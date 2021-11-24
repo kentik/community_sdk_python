@@ -3,13 +3,13 @@
 Examples of using the typed labels API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
-from kentik_api import KentikAPI, DeviceLabel
-from kentik_api.public.types import ID
 
+from kentik_api import DeviceLabel, KentikAPI
+from kentik_api.public.types import ID
 
 logging.basicConfig(level=logging.INFO)
 

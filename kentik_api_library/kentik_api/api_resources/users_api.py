@@ -3,8 +3,8 @@ from typing import List
 
 from kentik_api.api_calls import users
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.public.user import User
 from kentik_api.public.types import ID
+from kentik_api.public.user import User
 from kentik_api.requests_payload import users_payload
 
 

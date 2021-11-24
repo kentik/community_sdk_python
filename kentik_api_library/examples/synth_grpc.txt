@@ -1,0 +1,268 @@
+0.
+ name : bigmesh
+ status
+   _value_ : TEST_STATUS_PAUSED
+   _name_ : paused
+ _cdate : 2021-06-30T09:38:40.973000+00:00
+ _edate : 2021-07-12T11:18:50.899000+00:00
+ settings
+   agentIds : ['804', '1199', '1102', '813', '826', '2141', '1103', '667', '1222', '1096', '1115', '621', '576', '1119', '1101', '818', '572', '1221', '634', '825']
+   tasks : ['ping', 'traceroute']
+   healthSettings
+     latencyCritical : 0.0
+     latencyWarning : 0.0
+     latencyCriticalStddev : 0.0
+     latencyWarningStddev : 0.0
+     packetLossCritical : 0.0
+     packetLossWarning : 0.0
+     jitterCritical : 0.0
+     jitterWarning : 0.0
+     jitterCriticalStddev : 0.0
+     jitterWarningStddev : 0.0
+     httpLatencyCritical : 0.0
+     httpLatencyWarning : 0.0
+     httpLatencyCriticalStddev : 0.0
+     httpLatencyWarningStddev : 0.0
+     httpValidCodes : []
+     dnsValidCodes : []
+   monitoringSettings
+     activationGracePeriod : 2
+     activationTimeUnit : m
+     activationTimeWindow : 5
+     activationTimes : 3
+     notificationChannels : []
+   port : 443
+   period : 0
+   count : 0
+   expiry : 0
+   limit : 0
+   protocol
+     _value_ : icmp
+     _name_ : icmp
+   family
+     _value_ : IP_FAMILY_DUAL
+     _name_ : dual
+   rollupLevel : 1
+   servers : []
+   ping
+     _name : ping
+     expiry : 3000.0
+     period : 60.0
+     count : 5.0
+   trace
+     _name : traceroute
+     expiry : 22500.0
+     period : 60.0
+     count : 3.0
+     protocol
+       _value_ : udp
+       _name_ : udp
+     port : 33434.0
+     limit : 30.0
+ type
+   _value_ : application_mesh
+   _name_ : mesh
+ deviceId : 75702
+ _id : 4416
+
+1.
+ name : 60_agents_mesh
+ status
+   _value_ : TEST_STATUS_PAUSED
+   _name_ : paused
+ _cdate : 2021-07-29T08:08:29.269000+00:00
+ _edate : 2021-08-24T14:25:43.938000+00:00
+ settings
+   agentIds : ['631', '604', '849', '2644', '808', '1201', '1138', '1222', '570', '569', '583', '801', '593', '1209', '581', '824', '1210', '626', '591', '805', '1094', '2663', '724', '2589', '1126', '2593', '629', '731', '1549', '2590', '671', '588', '737', '1219', '840', '1220', '856', '677', '676', '627', '759', '732', '1214', '2660', '575', '2662', '1101', '2659', '2655', '827', '816', '571', '725', '611', '1119', '621', '2652', '675', '726', '634']
+   tasks : ['ping', 'traceroute']
+   healthSettings
+     latencyCritical : 0.0
+     latencyWarning : 0.0
+     latencyCriticalStddev : 0.0
+     latencyWarningStddev : 0.0
+     packetLossCritical : 0.0
+     packetLossWarning : 0.0
+     jitterCritical : 0.0
+     jitterWarning : 0.0
+     jitterCriticalStddev : 0.0
+     jitterWarningStddev : 0.0
+     httpLatencyCritical : 0.0
+     httpLatencyWarning : 0.0
+     httpLatencyCriticalStddev : 0.0
+     httpLatencyWarningStddev : 0.0
+     httpValidCodes : []
+     dnsValidCodes : []
+   monitoringSettings
+     activationGracePeriod : 2
+     activationTimeUnit : m
+     activationTimeWindow : 5
+     activationTimes : 3
+     notificationChannels : []
+   port : 443
+   period : 0
+   count : 0
+   expiry : 0
+   limit : 0
+   protocol
+     _value_ : icmp
+     _name_ : icmp
+   family
+     _value_ : IP_FAMILY_DUAL
+     _name_ : dual
+   rollupLevel : 1
+   servers : []
+   ping
+     _name : ping
+     expiry : 3000.0
+     period : 60.0
+     count : 5.0
+   trace
+     _name : traceroute
+     expiry : 22500.0
+     period : 60.0
+     count : 3.0
+     protocol
+       _value_ : udp
+       _name_ : udp
+     port : 33434.0
+     limit : 30.0
+ type
+   _value_ : application_mesh
+   _name_ : mesh
+ deviceId : 75702
+ _id : 4650
+
+2.
+ name : mesh_5x5
+ status
+   _value_ : TEST_STATUS_PAUSED
+   _name_ : paused
+ _cdate : 2021-04-26T12:28:13.405000+00:00
+ _edate : 2021-11-12T17:18:05.855000+00:00
+ settings
+   agentIds : ['634', '733', '813', '628', '2659']
+   tasks : ['ping', 'traceroute']
+   healthSettings
+     latencyCritical : 0.0
+     latencyWarning : 0.0
+     latencyCriticalStddev : 3.0
+     latencyWarningStddev : 1.5
+     packetLossCritical : 0.0
+     packetLossWarning : 0.0
+     jitterCritical : 0.0
+     jitterWarning : 0.0
+     jitterCriticalStddev : 3.0
+     jitterWarningStddev : 1.5
+     httpLatencyCritical : 0.0
+     httpLatencyWarning : 0.0
+     httpLatencyCriticalStddev : 3.0
+     httpLatencyWarningStddev : 1.5
+     httpValidCodes : []
+     dnsValidCodes : []
+   monitoringSettings
+     activationGracePeriod : 2
+     activationTimeUnit : m
+     activationTimeWindow : 5
+     activationTimes : 3
+     notificationChannels : []
+   port : 443
+   period : 0
+   count : 0
+   expiry : 0
+   limit : 0
+   protocol
+     _value_ : icmp
+     _name_ : icmp
+   family
+     _value_ : IP_FAMILY_DUAL
+     _name_ : dual
+   rollupLevel : 1
+   servers : []
+   ping
+     _name : ping
+     expiry : 3000.0
+     period : 60.0
+     count : 5.0
+   trace
+     _name : traceroute
+     expiry : 22500.0
+     period : 60.0
+     count : 3.0
+     protocol
+       _value_ : udp
+       _name_ : udp
+     port : 33434.0
+     limit : 30.0
+ type
+   _value_ : application_mesh
+   _name_ : mesh
+ deviceId : 75702
+ _id : 3541
+
+3.
+ name : Mesh_6x6
+ status
+   _value_ : TEST_STATUS_PAUSED
+   _name_ : paused
+ _cdate : 2021-10-18T07:43:39.662000+00:00
+ _edate : 2021-10-22T09:27:00.344000+00:00
+ settings
+   agentIds : ['623', '1549', '737', '616', '650', '754']
+   tasks : ['ping', 'traceroute']
+   healthSettings
+     latencyCritical : 0.0
+     latencyWarning : 0.0
+     latencyCriticalStddev : 3.0
+     latencyWarningStddev : 1.5
+     packetLossCritical : 50.0
+     packetLossWarning : 0.0
+     jitterCritical : 0.0
+     jitterWarning : 0.0
+     jitterCriticalStddev : 3.0
+     jitterWarningStddev : 1.5
+     httpLatencyCritical : 0.0
+     httpLatencyWarning : 0.0
+     httpLatencyCriticalStddev : 3.0
+     httpLatencyWarningStddev : 1.5
+     httpValidCodes : []
+     dnsValidCodes : []
+   monitoringSettings
+     activationGracePeriod : 2
+     activationTimeUnit : m
+     activationTimeWindow : 5
+     activationTimes : 3
+     notificationChannels : []
+   port : 443
+   period : 0
+   count : 0
+   expiry : 0
+   limit : 0
+   protocol
+     _value_ : icmp
+     _name_ : icmp
+   family
+     _value_ : IP_FAMILY_DUAL
+     _name_ : dual
+   rollupLevel : 1
+   servers : []
+   ping
+     _name : ping
+     expiry : 3000.0
+     period : 60.0
+     count : 5.0
+   trace
+     _name : traceroute
+     expiry : 22500.0
+     period : 60.0
+     count : 3.0
+     protocol
+       _value_ : udp
+       _name_ : udp
+     port : 33434.0
+     limit : 30.0
+ type
+   _value_ : application_mesh
+   _name_ : mesh
+ deviceId : 75702
+ _id : 6232
+

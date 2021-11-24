@@ -3,11 +3,12 @@
 Examples of using the typed custom applications API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
-from kentik_api import KentikAPI, CustomApplication
+
+from kentik_api import CustomApplication, KentikAPI
 
 logging.basicConfig(level=logging.INFO)
 

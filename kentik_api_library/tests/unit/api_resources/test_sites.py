@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
-from kentik_api.public.types import ID
-from kentik_api.public.site import Site
 from kentik_api.api_resources.sites_api import SitesAPI
+from kentik_api.public.site import Site
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

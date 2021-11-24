@@ -1,8 +1,8 @@
 from kentik_api.api_calls import query_methods
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.requests_payload.queries_payload import QueryDataResponse, QueryChartResponse, QueryURLResponse
+from kentik_api.public.query_object import QueryChartResult, QueryDataResult, QueryObject, QueryURLResult
 from kentik_api.public.query_sql import QuerySQL, QuerySQLResult
-from kentik_api.public.query_object import QueryObject, QueryDataResult, QueryChartResult, QueryURLResult
+from kentik_api.requests_payload.queries_payload import QueryChartResponse, QueryDataResponse, QueryURLResponse
 
 
 class QueryAPI(BaseAPI):

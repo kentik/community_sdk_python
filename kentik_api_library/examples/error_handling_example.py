@@ -1,12 +1,11 @@
 """Examples of handling errors raised in kentik_api library. Only a subset of possible errors is presented."""
 
+import logging
 import os
 import sys
-import logging
-
 from typing import Tuple
 
-from kentik_api import KentikAPI, AuthError, NotFoundError, IncompleteObjectError, Device, RateLimitExceededError
+from kentik_api import AuthError, Device, IncompleteObjectError, KentikAPI, NotFoundError, RateLimitExceededError
 from kentik_api.public.types import ID
 
 logging.basicConfig(level=logging.INFO)

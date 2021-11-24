@@ -2,11 +2,12 @@
 Example of using the batch API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
-from kentik_api import KentikAPI, Criterion, Upsert, Deletion, BatchOperationPart
+
+from kentik_api import BatchOperationPart, Criterion, Deletion, KentikAPI, Upsert
 
 logging.basicConfig(level=logging.INFO)
 

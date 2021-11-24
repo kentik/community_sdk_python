@@ -1,11 +1,12 @@
 # Standard library imports
-from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+from kentik_api.public.device_label import DeviceItem, DeviceLabel
+from kentik_api.public.types import ID
 
 # Local imports
-from kentik_api.requests_payload.conversions import convert, convert_or_none, from_dict, dict_from_json, list_from_json
-from kentik_api.public.types import ID
-from kentik_api.public.device_label import DeviceLabel, DeviceItem
+from kentik_api.requests_payload.conversions import convert, convert_or_none, dict_from_json, from_dict, list_from_json
 
 
 @dataclass()

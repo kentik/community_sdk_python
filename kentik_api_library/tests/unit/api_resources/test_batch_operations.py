@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.api_resources.batch_api import BatchAPI
-from kentik_api.public.batch_operation import BatchOperationPart, Upsert, Criterion, Deletion
+from kentik_api.public.batch_operation import BatchOperationPart, Criterion, Deletion, Upsert
 from tests.unit.stub_api_connector import StubAPIConnector
 
 

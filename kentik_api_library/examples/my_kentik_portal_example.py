@@ -3,10 +3,11 @@
 Example of using the My Kentik Portal API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
+
 from kentik_api import KentikAPI, Tenant, TenantUser
 
 logging.basicConfig(level=logging.INFO)

@@ -3,23 +3,22 @@
 Examples of using the typed devices API
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Tuple
 
-from kentik_api.public.types import ID
 from kentik_api import (
-    KentikAPI,
-    Device,
-    SNMPv3Conf,
     AuthenticationProtocol,
-    PrivacyProtocol,
-    DeviceSubtype,
     CDNAttribute,
+    Device,
+    DeviceSubtype,
     Interface,
+    KentikAPI,
+    PrivacyProtocol,
+    SNMPv3Conf,
 )
-
+from kentik_api.public.types import ID
 
 logging.basicConfig(level=logging.INFO)
 

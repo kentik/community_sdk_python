@@ -3,15 +3,13 @@
 Examples of using the alerting API
 """
 
+import logging
 import os
 import sys
-import logging
 from datetime import datetime
-
 from typing import Tuple
 
-from kentik_api import KentikAPI, ManualMitigation, AlertFilter
-
+from kentik_api import AlertFilter, KentikAPI, ManualMitigation
 
 logging.basicConfig(level=logging.INFO)
 
