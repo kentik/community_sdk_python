@@ -9,7 +9,6 @@ target-version = ['py39']
 [tool.isort]
 line_length = 120
 profile = "black"
-known_local_folder = ["kentik_api", "examples", "tests"]
 
 [tool.mypy]
 ignore_missing_imports = true
