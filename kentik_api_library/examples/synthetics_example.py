@@ -7,7 +7,7 @@ from typing import Any
 
 from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials
-from generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
 
 
 logging.basicConfig(level=logging.INFO)

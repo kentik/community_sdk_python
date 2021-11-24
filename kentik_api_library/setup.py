@@ -5,9 +5,9 @@ import pathlib
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import List
 
 from setuptools import setup
-from setuptools.command.install import install
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -15,38 +15,23 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-PACKAGES = [
-    "generated",
-    "kentik_api",
-    "kentik_api.analytics",
-    "kentik_api.auth",
-    "kentik_api.api_calls",
-    "kentik_api.api_connection",
-    "kentik_api.api_resources",
-    "kentik_api.requests_payload",
-    "kentik_api.public",
-    "kentik_api.utils",
-]
 
-
-def rm_all(directory, remove_dir=False):
+def rm_all(path: Path, remove_dir=False):
     """Remove all content in a directory"""
-    for p in directory.iterdir():
+    for p in path.iterdir():
         if p.is_dir():
             rm_all(p, remove_dir=True)
         else:
             p.unlink()
     if remove_dir:
-        directory.rmdir()
+        path.rmdir()
 
 
 class PylintCmd(distutils.cmd.Command):
     """Custom command to run Pylint"""
 
     description = "run Pylint on src, tests and examples dir"
-    user_options = [
-        ("pylint-rcfile=", None, "path to Pylint config file"),
-    ]
+    user_options = [("pylint-rcfile=", None, "path to Pylint config file")]
 
     def initialize_options(self):
         """Set default values for options."""
@@ -116,13 +101,14 @@ class FetchGRPCCode(distutils.cmd.Command):
     def initialize_options(self):
         self.repo = "https://github.com/kentik/api-schema-public.git"
         self.src_path = "gen/python"
-        self.dst_path = HERE.joinpath("generated").as_posix()
+        self.dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
 
     def finalize_options(self):
         pass
 
-    # noinspection Mypy
     def run(self):
+        print("Fetching gRPC generated code")
+
         import git
 
         # create destination directory, if it does not exist
@@ -136,11 +122,13 @@ class FetchGRPCCode(distutils.cmd.Command):
             Path(tmp).joinpath(self.src_path).rename(dst)
 
 
-class Install(install):
-    def run(self):
-        print("### begin install")
-        install.run(self)
-        print("### end install")
+def list_packages(root: str) -> List[str]:
+    all_paths = [x[0] for x in os.walk(root)]
+    src_paths = [p for p in all_paths if "__" not in p]  # skip __pycache__ and similar
+    packages = [".".join(p.split(os.path.sep)) for p in src_paths]
+    print("Discovered packages:")
+    print(*packages, sep="\n")
+    return packages
 
 
 setup(
@@ -167,13 +155,8 @@ setup(
     ],
     setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm", "wheel", "gitpython"],
     tests_require=["httpretty", "pytest", "pylint"],
-    extras_require={
-        "analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"],
-    },
-    packages=PACKAGES,
-    package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},
-    cmdclass={"install": Install, "pylint": PylintCmd, "mypy": MypyCmd, "grpc_stubs": FetchGRPCCode},
-    classifiers=[
-        "License :: OSI Approved :: Apache Software License",
-    ],
+    extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
+    packages=list_packages("kentik_api"),
+    cmdclass={"pylint": PylintCmd, "mypy": MypyCmd, "grpc_stubs": FetchGRPCCode},
+    classifiers=["License :: OSI Approved :: Apache Software License"],
 )

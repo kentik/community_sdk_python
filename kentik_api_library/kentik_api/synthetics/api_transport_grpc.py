@@ -6,8 +6,8 @@ import grpc.experimental as _
 
 from .api_transport import KentikAPIRequestError, KentikAPITransport
 
-from generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
-from generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ListTestsRequest,
     Test as pbTest,
     TestStatus as pbTestStatus,
