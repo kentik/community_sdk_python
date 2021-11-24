@@ -80,56 +80,6 @@ class Mypy(Command):
         run_cmd(cmd, self.announce)
 
 
-class Black(Command):
-    """Custom command to run black"""
-
-    description = "run black on all relevant code; read configuration from pyproject.toml"
-    user_options = [("dirs=", None, "Directories to check with black"), ("check", None, "Run in check mode")]
-
-    def initialize_options(self) -> None:
-        self.dirs = ["."]
-        self.check = False
-
-    def finalize_options(self):
-        """Post-process options."""
-        for d in self.dirs:
-            assert os.path.exists(d), "Path {} does not exist.".format(d)
-
-    def run(self):
-        """Run command"""
-        cmd = ["black"]
-        if self.check:
-            cmd.append("--check")
-        for d in self.dirs:
-            cmd.append(d)
-        run_cmd(cmd, self.announce)
-
-
-class ISort(Command):
-    """Custom command to run isort"""
-
-    description = "run isort on all relevant code; read configuration from pyproject.toml"
-    user_options = [("dirs=", None, "Directories to check with isort"), ("check", None, "Run in check mode")]
-
-    def initialize_options(self) -> None:
-        self.dirs = ["kentik_api", "tests", "examples"]
-        self.check = False
-
-    def finalize_options(self):
-        """Post-process options."""
-        for d in self.dirs:
-            assert os.path.exists(d), "Path {} does not exist.".format(d)
-
-    def run(self):
-        """Run command"""
-        cmd = ["isort"]
-        if self.check:
-            cmd.append("--check")
-        for d in self.dirs:
-            cmd.append(d)
-        run_cmd(cmd, self.announce)
-
-
 class Pytest(Command):
     """Custom command to run pytest"""
 
@@ -145,6 +95,45 @@ class Pytest(Command):
     def run(self):
         """Run command"""
         cmd = ["pytest"]
+        run_cmd(cmd, self.announce)
+
+
+class Format(Command):
+    """Custom command to run black + isort"""
+
+    description = "run black and isort on all relevant code; read configuration from pyproject.toml"
+    user_options = [("dirs=", None, "Directories to check"), ("check", None, "Run in check mode")]
+
+    def initialize_options(self) -> None:
+        self.dirs = ["kentik_api", "tests", "examples"]
+        self.check = False
+
+    def finalize_options(self):
+        """Post-process options."""
+        for d in self.dirs:
+            assert os.path.exists(d), "Path {} does not exist.".format(d)
+
+    def run(self):
+        """Run command"""
+        self._black()
+        self._isort()
+
+    def _black(self) -> None:
+        print("Tool: black")
+        cmd = ["black"]
+        if self.check:
+            cmd.append("--check")
+        for d in self.dirs:
+            cmd.append(d)
+        run_cmd(cmd, self.announce)
+
+    def _isort(self) -> None:
+        print("Tool: isort")
+        cmd = ["isort"]
+        if self.check:
+            cmd.append("--check")
+        for d in self.dirs:
+            cmd.append(d)
         run_cmd(cmd, self.announce)
 
 
@@ -164,7 +153,7 @@ setup(
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
     packages=PACKAGES,
     package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},
-    cmdclass={"pylint": Pylint, "mypy": Mypy, "black": Black, "pytest": Pytest, "isort": ISort},
+    cmdclass={"mypy": Mypy, "pylint": Pylint, "pytest": Pytest, "format": Format},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
     ],
