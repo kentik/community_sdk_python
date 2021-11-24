@@ -4,23 +4,11 @@ Examples of using the typed custom applications API
 """
 
 import logging
-import os
-import sys
-from typing import Tuple
 
 from kentik_api import CustomApplication, KentikAPI
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def run_crud():
@@ -37,7 +25,7 @@ def run_crud():
     True
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     print("### CREATE")
@@ -70,7 +58,7 @@ def run_crud():
 
 
 def run_list():
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
     apps = client.custom_applications.get_all()
     for a in apps:

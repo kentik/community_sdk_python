@@ -4,10 +4,7 @@ Examples of using the typed Query API
 """
 
 import logging
-import os
-import sys
 from io import BytesIO
-from typing import Tuple
 
 from PIL import Image  # type: ignore
 
@@ -25,18 +22,9 @@ from kentik_api import (
     QueryObject,
     QuerySQL,
 )
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def run_query_data() -> None:
@@ -44,7 +32,7 @@ def run_query_data() -> None:
     Expected response is subsequent result items
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
@@ -82,7 +70,7 @@ def run_query_chart() -> None:
     Expected response is image type and base64 encoded image data
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
@@ -125,7 +113,7 @@ def run_query_url() -> None:
     Expected response is url to Data Explorer page with query params filled as specified in query
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     query = Query(
@@ -159,7 +147,7 @@ def run_query_sql() -> None:
     Expected response is rows containing SQL query result
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     # Return kpps and kBps over the last hour,

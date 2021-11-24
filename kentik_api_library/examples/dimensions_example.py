@@ -4,25 +4,13 @@ Examples of using the typed custom dimensions API
 """
 
 import logging
-import os
 import random
 import string
-import sys
-from typing import Tuple
 
 from kentik_api import CustomDimension, KentikAPI, Populator
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def rand_uid() -> str:
@@ -55,7 +43,7 @@ def run_crud() -> None:
     True
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     print("### CREATE DIMENSION")
@@ -125,7 +113,7 @@ def run_crud() -> None:
 
 
 def run_list() -> None:
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
     dimensions = client.custom_dimensions.get_all()
     for d in dimensions:
