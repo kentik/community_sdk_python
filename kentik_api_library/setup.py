@@ -2,6 +2,7 @@ import distutils.cmd
 import distutils.log
 import os
 import pathlib
+import shutil
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,17 +15,6 @@ HERE = pathlib.Path(__file__).parent
 
 # The text of the README file
 README = (HERE / "README.md").read_text()
-
-
-def rm_all(path: Path, remove_dir=False):
-    """Remove all content in a directory"""
-    for p in path.iterdir():
-        if p.is_dir():
-            rm_all(p, remove_dir=True)
-        else:
-            p.unlink()
-    if remove_dir:
-        path.rmdir()
 
 
 class PylintCmd(distutils.cmd.Command):
@@ -111,11 +101,11 @@ class FetchGRPCCode(distutils.cmd.Command):
 
         import git
 
+        # cleanup destination directory
+        shutil.rmtree(self.dst_path, ignore_errors=True)  # ignore "No such file or directory"
         # create destination directory, if it does not exist
         dst = Path(self.dst_path)
-        dst.mkdir(parents=True, exist_ok=True)
-        # cleanup destination directory
-        rm_all(dst)
+        dst.mkdir(parents=True)
         # checkout source repo and copy stubs
         with TemporaryDirectory() as tmp:
             git.Repo.clone_from(self.repo, tmp)
@@ -123,10 +113,11 @@ class FetchGRPCCode(distutils.cmd.Command):
 
 
 def list_packages(root: str) -> List[str]:
+    print("Listing packages")
+
     all_paths = [x[0] for x in os.walk(root)]
     src_paths = [p for p in all_paths if "__" not in p]  # skip __pycache__ and similar
     packages = [".".join(p.split(os.path.sep)) for p in src_paths]
-    print("Discovered packages:")
     print(*packages, sep="\n")
     return packages
 
