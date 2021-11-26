@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional, Tuple, List
+from typing import Any, Optional, Tuple, List, Dict
 from datetime import datetime, timezone
 
 import grpc.experimental as _
@@ -9,7 +9,10 @@ from .api_transport import KentikAPIRequestError, KentikAPITransport
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ListTestsRequest,
+    CreateTestRequest,
     Test as pbTest,
+    IpTest as pbIpTest,
+    HostnameTest as pbHostnameTest,
     TestStatus as pbTestStatus,
     TestSettings as pbTestSettings,
     IPFamily as pbIPFamily,
@@ -34,6 +37,27 @@ from kentik_api.synthetics.synth_tests import (
 )
 
 log = logging.getLogger("api_transport_grpc")
+
+PB_STATUS_TO_STATUS = {
+    pbTestStatus.TEST_STATUS_UNSPECIFIED: TestStatus.none,
+    pbTestStatus.TEST_STATUS_ACTIVE: TestStatus.active,
+    pbTestStatus.TEST_STATUS_PAUSED: TestStatus.paused,
+    pbTestStatus.TEST_STATUS_DELETED: TestStatus.deleted,
+}
+
+PB_FAMILY_TO_FAMILY = {
+    pbIPFamily.IP_FAMILY_UNSPECIFIED: IPFamily.unspecified,
+    pbIPFamily.IP_FAMILY_V4: IPFamily.v4,
+    pbIPFamily.IP_FAMILY_V6: IPFamily.v6,
+    pbIPFamily.IP_FAMILY_DUAL: IPFamily.dual,
+}
+
+
+def reverse_map(map: Dict, value: Any) -> Any:
+    for key, val in map.items():
+        if val == value:
+            return key
+    raise RuntimeError(f"Value '{value}' not found in map")
 
 
 class SynthGRPCTransport(KentikAPITransport):
@@ -65,28 +89,40 @@ class SynthGRPCTransport(KentikAPITransport):
                 else:
                     log.warning('Skipping test "%s" of unsupported type "%s"', pbt.name, pbt.type)
             return results
-        raise NotImplementedError
+
+        elif op == "TestCreate":
+            test = test_to_pb(kwargs["test"])
+            result = self._client.CreateTest(CreateTestRequest(test=test), metadata=self._credentials, target=self._url)
+            out = SynTest("[empty]")
+            populate_test_from_pb(result.test, out)
+            return out
+
+        else:
+            raise NotImplementedError(op)
 
 
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
-    STATUS = {
-        pbTestStatus.TEST_STATUS_UNSPECIFIED: TestStatus.none,
-        pbTestStatus.TEST_STATUS_ACTIVE: TestStatus.active,
-        pbTestStatus.TEST_STATUS_PAUSED: TestStatus.paused,
-        pbTestStatus.TEST_STATUS_DELETED: TestStatus.deleted,
-    }
-
     out.name = v.name
     out.type = TestType(v.type)
-    out.status = STATUS[v.status]
+    out.status = PB_STATUS_TO_STATUS[v.status]
     out.deviceId = v.device_id
     out._id = v.id
-    out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc)
-    out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc)
+    out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc).isoformat()
+    out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc).isoformat()
 
     settings = SynTestSettings()
     pupulate_settings_from_pb(v.settings, settings)
     out.settings = settings
+
+
+def test_to_pb(v: SynTest) -> pbTest:
+    out = pbTest()
+    out.name = v.name
+    out.device_id = v.deviceId
+    out.type = v.type.value
+    out.status = reverse_map(PB_STATUS_TO_STATUS, v.status)
+    out.settings.CopyFrom(settings_to_pb(v.settings))
+    return out
 
 
 def pupulate_ping_trace_test_from_pb(v: pbTest, out: PingTraceTest) -> None:
@@ -100,12 +136,6 @@ def populate_mesh_test_from_pb(v: pbTest, out: MeshTest) -> None:
 
 
 def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
-    FAMILY = {
-        pbIPFamily.IP_FAMILY_UNSPECIFIED: IPFamily.unspecified,
-        pbIPFamily.IP_FAMILY_V4: IPFamily.v4,
-        pbIPFamily.IP_FAMILY_V6: IPFamily.v6,
-        pbIPFamily.IP_FAMILY_DUAL: IPFamily.dual,
-    }
     out.agentIds = v.agent_ids
     out.tasks = v.tasks
     out.healthSettings = health_settings_from_pb(v.health_settings)
@@ -116,9 +146,39 @@ def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
     out.expiry = v.expiry
     out.limit = v.limit
     out.protocol = Protocol(v.protocol)
-    out.family = FAMILY[v.family]
+    out.family = PB_FAMILY_TO_FAMILY[v.family]
     out.rollupLevel = v.rollup_level
     out.servers = v.servers
+
+
+def settings_to_pb(v: SynTestSettings) -> pbTestSettings:
+    out = pbTestSettings()
+
+    # TODO: add missing fields to SynTestSettings
+    out.ping.period = 60
+    out.ping.count = 5
+    out.ping.expiry = 3000
+    out.trace.period = 60
+    out.trace.count = 3
+    out.trace.protocol = "udp"
+    out.trace.port = 33434
+    out.trace.expiry = 22500
+    out.trace.limit = 30
+
+    out.agent_ids.extend(v.agentIds)
+    out.tasks.extend(v.tasks)
+    out.health_settings.CopyFrom(health_settings_to_pb(v.healthSettings))
+    out.monitoring_settings.CopyFrom(monitoring_settings_to_pb(v.monitoringSettings))
+    out.port = v.port
+    out.period = v.period
+    out.count = v.count
+    out.expiry = v.expiry
+    out.limit = v.limit
+    out.protocol = v.protocol.value
+    out.family = reverse_map(PB_FAMILY_TO_FAMILY, v.family)
+    out.rollup_level = v.rollupLevel
+    out.servers.extend(v.servers)
+    return out
 
 
 def populate_ping_test_settings_from_pb(v: pbTestSettings, out: PingTraceTestSettings):
@@ -154,6 +214,27 @@ def health_settings_from_pb(v: pbHealthSettings) -> HealthSettings:
     )
 
 
+def health_settings_to_pb(v: HealthSettings) -> pbHealthSettings:
+    out = pbHealthSettings()
+    out.latency_critical = v.latencyCritical
+    out.latency_warning = v.latencyWarning
+    out.latency_critical_stddev = v.latencyCriticalStddev
+    out.latency_warning_stddev = v.latencyWarningStddev
+    out.packet_loss_critical = v.packetLossCritical
+    out.packet_loss_warning = v.packetLossWarning
+    out.jitter_critical = v.jitterCritical
+    out.jitter_warning = v.jitterWarning
+    out.jitter_critical_stddev = v.jitterCriticalStddev
+    out.jitter_warning_stddev = v.jitterWarningStddev
+    out.http_latency_critical = v.httpLatencyCritical
+    out.http_latency_warning = v.httpLatencyWarning
+    out.http_latency_critical_stddev = v.httpLatencyCriticalStddev
+    out.http_latency_warning_stddev = v.httpLatencyWarningStddev
+    out.http_valid_codes.extend(v.httpValidCodes)
+    out.dns_valid_codes.extend(v.dnsValidCodes)
+    return out
+
+
 def monitoring_settings_from_pb(v: pbMonitoringSettings) -> MonitoringSettings:
     return MonitoringSettings(
         activationGracePeriod=v.activation_grace_period,
@@ -162,3 +243,13 @@ def monitoring_settings_from_pb(v: pbMonitoringSettings) -> MonitoringSettings:
         activationTimes=v.activation_times,
         notificationChannels=v.notification_channels,
     )
+
+
+def monitoring_settings_to_pb(v: MonitoringSettings) -> pbMonitoringSettings:
+    out = pbMonitoringSettings()
+    out.activation_grace_period = v.activationGracePeriod
+    out.activation_time_unit = v.activationTimeUnit
+    out.activation_time_window = v.activationTimeWindow
+    out.activation_times = v.activationTimes
+    out.notification_channels.extend(v.notificationChannels)
+    return out

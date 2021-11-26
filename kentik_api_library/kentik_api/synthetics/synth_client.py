@@ -77,7 +77,10 @@ class KentikSynthClient:
         return self._transport.req("TestGet", id=test_id)
 
     def create_test(self, test: SynTest) -> SynTest:
-        return SynTest.test_from_dict(self._transport.req("TestCreate", body=test.to_dict()))
+        if isinstance(self._transport, SynthHTTPTransport):
+            return SynTest.test_from_dict(self._transport.req("TestCreate", body=test.to_dict()))
+        else:
+            return self._transport.req("TestCreate", test=test)
 
     def patch_test(self, test: SynTest, modified: str) -> SynTest:
         if test.id == 0:
