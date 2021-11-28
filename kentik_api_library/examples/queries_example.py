@@ -5,20 +5,22 @@ Examples of using the typed Query API
 
 import logging
 from io import BytesIO
+
 from PIL import Image  # type: ignore
+
 from kentik_api import (
-    KentikAPI,
-    QuerySQL,
-    QueryObject,
-    QueryArrayItem,
-    Query,
     Aggregate,
     AggregateFunctionType,
-    FastDataType,
-    MetricType,
-    DimensionType,
-    ImageType,
     ChartViewType,
+    DimensionType,
+    FastDataType,
+    ImageType,
+    KentikAPI,
+    MetricType,
+    Query,
+    QueryArrayItem,
+    QueryObject,
+    QuerySQL,
 )
 from kentik_api.utils import get_credentials
 

@@ -4,6 +4,7 @@ Example of using the My Kentik Portal API
 """
 
 import logging
+
 from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials
 

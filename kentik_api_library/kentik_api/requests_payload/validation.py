@@ -1,4 +1,5 @@
-from typing import Iterable, Mapping, Any
+from typing import Any, Iterable, Mapping
+
 from kentik_api.public.errors import DeserializationError
 
 

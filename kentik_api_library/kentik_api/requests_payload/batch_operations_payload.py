@@ -1,6 +1,7 @@
-from typing import Optional, List
 from dataclasses import dataclass
-from kentik_api.requests_payload.conversions import from_dict, dict_from_json
+from typing import List, Optional
+
+from kentik_api.requests_payload.conversions import dict_from_json, from_dict
 
 
 @dataclass()

@@ -1,9 +1,9 @@
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
 from kentik_api.api_calls import alerts
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.public.manual_mitigation import ManualMitigation, Alarm, HistoricalAlert, AlertFilter
+from kentik_api.public.manual_mitigation import Alarm, AlertFilter, HistoricalAlert, ManualMitigation
 from kentik_api.requests_payload import manual_mitigations_payload
 from kentik_api.requests_payload.conversions import convert, convert_or_none, enum_to_str
 

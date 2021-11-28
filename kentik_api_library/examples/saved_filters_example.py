@@ -4,7 +4,8 @@ Example of using the saved filters API
 """
 
 import logging
-from kentik_api import KentikAPI, SavedFilter, Filters, FilterGroups, Filter
+
+from kentik_api import Filter, FilterGroups, Filters, KentikAPI, SavedFilter
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

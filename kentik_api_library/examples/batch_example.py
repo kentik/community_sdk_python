@@ -3,7 +3,8 @@ Example of using the batch API
 """
 
 import logging
-from kentik_api import KentikAPI, Criterion, Upsert, Deletion, BatchOperationPart
+
+from kentik_api import BatchOperationPart, Criterion, Deletion, KentikAPI, Upsert
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

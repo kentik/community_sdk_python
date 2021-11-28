@@ -2,8 +2,8 @@ from typing import List
 
 from kentik_api.api_calls import device_labels
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.public.types import ID
 from kentik_api.public.device_label import DeviceLabel
+from kentik_api.public.types import ID
 from kentik_api.requests_payload import labels_payload
 
 

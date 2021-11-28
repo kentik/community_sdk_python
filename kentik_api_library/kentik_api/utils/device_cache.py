@@ -60,7 +60,7 @@ class DeviceCache:
             else:
                 self._devices_by_name[device.device_name] = device
             if device.id in self._devices_by_id:
-                log.critical("Duplicate device id: %%d", device.id)
+                log.critical("Duplicate device id: %d", device.id)
             else:
                 self._devices_by_id[device.id] = device
         log.debug("Got %d devices (%d duplicate names)", len(self._devices_by_name), self.duplicate_names)

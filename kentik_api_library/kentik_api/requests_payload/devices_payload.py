@@ -2,12 +2,12 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from kentik_api.public.device import (
-    DeviceInterface,
     AppliedLabels,
     AuthenticationProtocol,
     CDNAttribute,
     Device,
     DeviceBGPType,
+    DeviceInterface,
     DeviceSubtype,
     DeviceType,
     PrivacyProtocol,
@@ -29,7 +29,6 @@ from kentik_api.requests_payload.conversions import (
 )
 from kentik_api.requests_payload.plans_payload import GetResponse as PlanGetResponse
 from kentik_api.requests_payload.validation import validate_fields
-
 
 # pylint: disable=too-many-instance-attributes
 

@@ -6,7 +6,8 @@ Examples of using the typed custom dimensions API
 import logging
 import random
 import string
-from kentik_api import KentikAPI, CustomDimension, Populator
+
+from kentik_api import CustomDimension, KentikAPI, Populator
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

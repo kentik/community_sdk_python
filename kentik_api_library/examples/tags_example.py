@@ -4,6 +4,7 @@ Examples of using the typed tags API
 """
 
 import logging
+
 from kentik_api import KentikAPI, Tag
 from kentik_api.utils import get_credentials
 

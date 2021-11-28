@@ -1,5 +1,4 @@
-from kentik_api.api_calls.api_call import APICall
-from kentik_api.api_calls.api_call import APICallMethods
+from kentik_api.api_calls.api_call import APICall, APICallMethods
 from kentik_api.api_calls.devices import *
 
 DUMMY_API_URL = "/device"

@@ -6,7 +6,7 @@ Examples of using the alerting API
 import logging
 from datetime import datetime
 
-from kentik_api import KentikAPI, ManualMitigation, AlertFilter
+from kentik_api import AlertFilter, KentikAPI, ManualMitigation
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

@@ -1,8 +1,9 @@
 import logging
+from typing import Optional
+
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from typing import Optional
 
 log = logging.getLogger(__name__)
 

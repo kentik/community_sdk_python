@@ -4,6 +4,7 @@ Example of using the users API
 """
 
 import logging
+
 from kentik_api import KentikAPI, User
 from kentik_api.utils import get_credentials
 

@@ -1,8 +1,8 @@
-from typing import List, Optional
 from dataclasses import dataclass, field
+from typing import List, Optional
 
+from kentik_api.public.defaults import DEFAULT_DATE, DEFAULT_ID
 from kentik_api.public.types import ID
-from kentik_api.public.defaults import DEFAULT_ID, DEFAULT_DATE
 
 
 @dataclass(frozen=True)

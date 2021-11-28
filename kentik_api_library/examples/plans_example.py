@@ -4,6 +4,7 @@ Example of using the plans API
 """
 
 import logging
+
 from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials
 

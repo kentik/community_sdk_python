@@ -4,7 +4,8 @@ Examples of using the typed custom applications API
 """
 
 import logging
-from kentik_api import KentikAPI, CustomApplication
+
+from kentik_api import CustomApplication, KentikAPI
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

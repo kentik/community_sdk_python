@@ -1,4 +1,7 @@
+from typing import Optional, Tuple, Union
+
 from .api_connection.api_connector import APIConnector
+from .api_connection.retryable_session import Retry
 from .api_resources.alerting_api import AlertingAPI
 from .api_resources.batch_api import BatchAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
@@ -12,8 +15,6 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
-from typing import Optional, Tuple, Union
-from .api_connection.retryable_session import Retry
 
 
 class KentikAPI:

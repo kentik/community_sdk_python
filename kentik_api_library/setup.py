@@ -1,5 +1,5 @@
-import distutils.cmd
-import distutils.log
+from distutils.cmd import Command
+from distutils import log
 import os
 import pathlib
 import subprocess
@@ -19,50 +19,48 @@ PACKAGES = [
     "kentik_api.api_calls",
     "kentik_api.api_connection",
     "kentik_api.api_resources",
-    "kentik_api.requests_payload",
+    "kentik_api.internal",
     "kentik_api.public",
+    "kentik_api.requests_payload",
     "kentik_api.utils",
 ]
 
 
-class PylintCmd(distutils.cmd.Command):
+def run_cmd(cmd, reporter) -> None:
+    """Run arbitrary command as subprocess"""
+    reporter("Run command: {}".format(str(cmd)), level=log.DEBUG)
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as ex:
+        reporter(str(ex), level=log.ERROR)
+        exit(1)
+
+
+class Pylint(Command):
     """Custom command to run Pylint"""
 
-    description = "run Pylint on src, tests and examples dir"
-    user_options = [
-        ("pylint-rcfile=", None, "path to Pylint config file"),
-    ]
+    description = "run Pylint on kentik_api, tests and examples directories; read configuration from pyproject.toml"
+    user_options = []
 
     def initialize_options(self):
-        """Set default values for options."""
-        self.pylint_rcfile = ""
+        pass
 
     def finalize_options(self):
-        """Post-process options."""
-        if self.pylint_rcfile:
-            assert os.path.exists(self.pylint_rcfile), "Pylint config file {} does not exist.".format(
-                self.pylint_rcfile
-            )
+        pass
 
     def run(self):
         """Run command."""
         cmd = ["pylint"]
-        paths = ["./kentik_api", "./tests", "./examples"]
-        if self.pylint_rcfile:
-            cmd.append("--rcfile={}".format(self.pylint_rcfile))
+        paths = ["kentik_api", "tests", "examples"]
         for path in paths:
             cmd.append(path)
-        self.announce("Running command: %s" % str(cmd), level=distutils.log.INFO)
-        try:
-            subprocess.check_call(cmd)
-        except subprocess.CalledProcessError:
-            pass
+        run_cmd(cmd, self.announce)
 
 
-class MypyCmd(distutils.cmd.Command):
+class Mypy(Command):
     """Custom command to run Mypy"""
 
-    description = "run Mypy on kentik_api directory"
+    description = "run Mypy on kentik_api, tests and examples directories; read configuration from pyproject.toml"
     user_options = [("packages=", None, "Packages to check with mypy")]
 
     def initialize_options(self):
@@ -79,21 +77,68 @@ class MypyCmd(distutils.cmd.Command):
         cmd = ["mypy"]
         for package in self.packages:
             cmd.append(package)
-        self.announce("Run command: {}".format(str(cmd)), level=distutils.log.INFO)
-        try:
-            subprocess.check_call(cmd)
-        except subprocess.CalledProcessError:
-            self.announce(
-                "Command: {} returned error. Check if tests are not failing.".format(str(cmd)), level=distutils.log.INFO
-            )
+        run_cmd(cmd, self.announce)
+
+
+class Pytest(Command):
+    """Custom command to run pytest"""
+
+    description = "run pytest on all relevant code; read configuration from pyproject.toml"
+    user_options = []
+
+    def initialize_options(self) -> None:
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        """Run command"""
+        cmd = ["pytest"]
+        run_cmd(cmd, self.announce)
+
+
+class Format(Command):
+    """Custom command to run black + isort"""
+
+    description = "run black and isort on all relevant code; read configuration from pyproject.toml"
+    user_options = [("dirs=", None, "Directories to check"), ("check", None, "Run in check mode")]
+
+    def initialize_options(self) -> None:
+        self.dirs = ["kentik_api", "tests", "examples"]
+        self.check = False
+
+    def finalize_options(self):
+        """Post-process options."""
+        for d in self.dirs:
+            assert os.path.exists(d), "Path {} does not exist.".format(d)
+
+    def run(self):
+        """Run command"""
+        self._black()
+        self._isort()
+
+    def _black(self) -> None:
+        print("Tool: black")
+        cmd = ["black"]
+        if self.check:
+            cmd.append("--check")
+        for d in self.dirs:
+            cmd.append(d)
+        run_cmd(cmd, self.announce)
+
+    def _isort(self) -> None:
+        print("Tool: isort")
+        cmd = ["isort"]
+        if self.check:
+            cmd.append("--check")
+        for d in self.dirs:
+            cmd.append(d)
+        run_cmd(cmd, self.announce)
 
 
 setup(
     name="kentik-api",
-    use_scm_version={
-        "root": "..",
-        "relative_to": __file__,
-    },
     description="SDK library for Kentik API",
     maintainer="Martin Machacek",
     maintainer_email="martin.machacek@kentik.com",
@@ -102,15 +147,13 @@ setup(
     url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
     license="Apache-2.0",
     include_package_data=True,
+    python_requires=">=3.8, <4",
     install_requires=["dacite>=1.6.0", "requests[socks]>=2.25.0", "typing-extensions>=3.7.4.3", "urllib3>=1.26.0"],
-    setup_requires=["pytest-runner", "pylint-runner", "setuptools_scm", "wheel"],
     tests_require=["httpretty", "pytest", "pylint"],
-    extras_require={
-        "analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"],
-    },
+    extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
     packages=PACKAGES,
     package_dir={pkg: os.path.join(*pkg.split(".")) for pkg in PACKAGES},
-    cmdclass={"pylint": PylintCmd, "mypy": MypyCmd},
+    cmdclass={"mypy": Mypy, "pylint": Pylint, "pytest": Pytest, "format": Format},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
     ],

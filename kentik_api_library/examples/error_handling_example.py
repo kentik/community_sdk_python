@@ -2,7 +2,7 @@
 
 import logging
 
-from kentik_api import KentikAPI, AuthError, NotFoundError, IncompleteObjectError, Device, RateLimitExceededError
+from kentik_api import AuthError, Device, IncompleteObjectError, KentikAPI, NotFoundError, RateLimitExceededError
 from kentik_api.public.types import ID
 from kentik_api.utils import get_credentials
 

@@ -5,17 +5,17 @@ Examples of using the typed devices API
 
 import logging
 
-from kentik_api.public.types import ID
 from kentik_api import (
-    KentikAPI,
-    Device,
-    SNMPv3Conf,
     AuthenticationProtocol,
-    PrivacyProtocol,
-    DeviceSubtype,
     CDNAttribute,
+    Device,
+    DeviceSubtype,
     Interface,
+    KentikAPI,
+    PrivacyProtocol,
+    SNMPv3Conf,
 )
+from kentik_api.public.types import ID
 from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)

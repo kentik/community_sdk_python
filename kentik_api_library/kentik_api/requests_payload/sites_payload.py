@@ -1,9 +1,9 @@
-from typing import Optional, Any, List, Dict
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from kentik_api.requests_payload.conversions import dict_from_json, list_from_json, from_dict, convert
-from kentik_api.public.types import ID
 from kentik_api.public.site import Site
+from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
 
 
 @dataclass()

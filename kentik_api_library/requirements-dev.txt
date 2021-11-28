@@ -1,0 +1,11 @@
+black>=21.11b1
+isort>=5.8.0
+mypy-extensions>=0.4.3
+mypy>=0.902
+Pillow>=8.4.0
+pylint>=2.8.3
+pytest-pylint>=0.18.0
+pytest>=6.2.4
+PyYAML>=6.0
+types-PyYAML>=5.4.1
+types-requests>=2.26.0

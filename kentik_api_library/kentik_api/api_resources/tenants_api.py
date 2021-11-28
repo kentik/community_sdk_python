@@ -3,7 +3,7 @@ from typing import List
 
 from kentik_api.api_calls import my_kentik_portal
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.public.tenant import TenantUser, Tenant
+from kentik_api.public.tenant import Tenant, TenantUser
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import tenants_payload
 

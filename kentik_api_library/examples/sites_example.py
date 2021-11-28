@@ -4,6 +4,7 @@ Examples of using the typed sites API
 """
 
 import logging
+
 from kentik_api import KentikAPI, Site
 from kentik_api.utils import get_credentials
 
