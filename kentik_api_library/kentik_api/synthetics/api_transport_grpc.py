@@ -3,13 +3,14 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 import grpc.experimental as _
+from google.protobuf.field_mask_pb2 import FieldMask
 
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import CreateTestRequest, DeleteTestRequest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IpTest as pbIpTest
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, PatchTestRequest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Test as pbTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     TestMonitoringSettings as pbMonitoringSettings,
@@ -91,7 +92,18 @@ class SynthGRPCTransport(KentikAPITransport):
 
         elif op == "TestCreate":
             test = test_to_pb(kwargs["test"])
+            test._id = ""  # TestCreate doesn't accept id
             result = self._client.CreateTest(CreateTestRequest(test=test), metadata=self._credentials, target=self._url)
+            out = SynTest("[empty]")
+            populate_test_from_pb(result.test, out)
+            return out
+
+        elif op == "TestPatch":
+            test = test_to_pb(kwargs["test"])
+            mask = FieldMask(paths=[kwargs["mask"]])
+            result = self._client.PatchTest(
+                PatchTestRequest(test=test, mask=mask), metadata=self._credentials, target=self._url
+            )
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
@@ -123,6 +135,7 @@ def test_to_pb(v: SynTest) -> pbTest:
     out = pbTest()
     out.name = v.name
     out.device_id = v.deviceId
+    out.id = v.id
     out.type = v.type.value
     out.status = reverse_map(PB_STATUS_TO_STATUS, v.status)
     out.settings.CopyFrom(settings_to_pb(v.settings))

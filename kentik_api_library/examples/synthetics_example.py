@@ -14,7 +14,7 @@ from kentik_api.utils import get_credentials
 logging.basicConfig(level=logging.INFO)
 
 
-def pretty_print(v: Any, level: int) -> None:
+def pretty_print(v: Any, level: int = 1) -> None:
     INDENT = " " * level * 2
 
     for field_name, field in v.__dict__.items():
@@ -34,7 +34,7 @@ def list_tests() -> None:
     items = client.synthetics.tests
     for test in items:
         print(test.id)
-        pretty_print(test, 1)
+        pretty_print(test)
         print()
 
 
@@ -86,7 +86,12 @@ def crud_test() -> None:
     test.type = TestType.mesh
     test.deviceId = "75702"
     created_test = client.synthetics.create_test(test)
-    pretty_print(created_test, 1)
+    pretty_print(created_test)
+
+    print("### UPDATE")
+    created_test.settings.port = 640
+    updated_test = client.synthetics.patch_test(created_test, "test.settings.port")
+    pretty_print(updated_test)
 
     print("### DELETE")
     client.synthetics.delete_test(created_test.id)
@@ -99,7 +104,7 @@ def crud_test() -> None:
 #     agents = client.synthetics.agents
 #     for agent in agents:
 #         print(agent.id)
-#         pretty_print(agent, 1)
+#         pretty_print(agent)
 #         print()
 
 

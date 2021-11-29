@@ -85,9 +85,12 @@ class KentikSynthClient:
     def patch_test(self, test: SynTest, modified: str) -> SynTest:
         if test.id == 0:
             raise RuntimeError(f"test '{test.name}' has not been created yet (id=0). Cannot patch")
-        body = test.to_dict()
-        body["mask"] = modified
-        return SynTest.test_from_dict(self._transport.req("TestPatch", id=test.id, body=body))
+        if isinstance(self._transport, SynthHTTPTransport):
+            body = test.to_dict()
+            body["mask"] = modified
+            return SynTest.test_from_dict(self._transport.req("TestPatch", id=test.id, body=body))
+        else:
+            return self._transport.req("TestPatch", test=test, mask=modified)
 
     def delete_test(self, test: Union[str, SynTest]) -> None:
         if isinstance(test, SynTest):
