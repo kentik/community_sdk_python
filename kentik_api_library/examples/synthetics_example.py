@@ -88,6 +88,10 @@ def crud_test() -> None:
     created_test = client.synthetics.create_test(test)
     pretty_print(created_test)
 
+    print("### GET")
+    received_test = client.synthetics.test(created_test.id)
+    pretty_print(received_test)
+
     print("### UPDATE")
     created_test.settings.port = 640
     updated_test = client.synthetics.patch_test(created_test, "test.settings.port")

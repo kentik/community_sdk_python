@@ -5,7 +5,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
 
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import CreateTestRequest, DeleteTestRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    CreateTestRequest,
+    DeleteTestRequest,
+    GetTestRequest,
+)
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
@@ -79,38 +83,46 @@ class SynthGRPCTransport(KentikAPITransport):
             pbTests = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
             for pbt in pbTests:
                 if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
-                    test = SynTest("[empty]")
-                    populate_test_from_pb(pbt, test)
-                    results.append(test)
+                    pb_test = SynTest("[empty]")
+                    populate_test_from_pb(pbt, pb_test)
+                    results.append(pb_test)
                 if pbt.type == TestType.mesh.value:
-                    test = MeshTest("[empty]")
-                    populate_mesh_test_from_pb(pbt, test)
-                    results.append(test)
+                    pb_test = MeshTest("[empty]")
+                    populate_mesh_test_from_pb(pbt, pb_test)
+                    results.append(pb_test)
                 else:
                     log.warning('Skipping test "%s" of unsupported type "%s"', pbt.name, pbt.type)
             return results
 
         elif op == "TestCreate":
-            test = test_to_pb(kwargs["test"])
+            test: SynTest = kwargs["test"]
             test._id = ""  # TestCreate doesn't accept id
-            result = self._client.CreateTest(CreateTestRequest(test=test), metadata=self._credentials, target=self._url)
+            pb_test = test_to_pb(test)
+            result = self._client.CreateTest(
+                CreateTestRequest(test=pb_test), metadata=self._credentials, target=self._url
+            )
+            out = SynTest("[empty]")
+            populate_test_from_pb(result.test, out)
+            return out
+
+        elif op == "TestGet":
+            result = self._client.GetTest(GetTestRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
 
         elif op == "TestPatch":
-            test = test_to_pb(kwargs["test"])
+            pb_test = test_to_pb(kwargs["test"])
             mask = FieldMask(paths=[kwargs["mask"]])
             result = self._client.PatchTest(
-                PatchTestRequest(test=test, mask=mask), metadata=self._credentials, target=self._url
+                PatchTestRequest(test=pb_test, mask=mask), metadata=self._credentials, target=self._url
             )
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
 
         elif op == "TestDelete":
-            id = kwargs["id"]
-            self._client.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
+            self._client.DeleteTest(DeleteTestRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
             return None
 
         else:

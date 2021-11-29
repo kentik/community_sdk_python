@@ -71,7 +71,10 @@ class KentikSynthClient:
             test_id = test.id
         else:
             test_id = test
-        return SynTest.test_from_dict(self._transport.req("TestGet", id=test_id))
+        if isinstance(self._transport, SynthHTTPTransport):
+            return SynTest.test_from_dict(self._transport.req("TestGet", id=test_id))
+        else:
+            return self._transport.req("TestGet", id=test_id)
 
     def test_raw(self, test_id: str) -> Any:
         return self._transport.req("TestGet", id=test_id)
