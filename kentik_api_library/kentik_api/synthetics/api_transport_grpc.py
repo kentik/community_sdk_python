@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import grpc.experimental as _
 
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import CreateTestRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import CreateTestRequest, DeleteTestRequest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
@@ -95,6 +95,11 @@ class SynthGRPCTransport(KentikAPITransport):
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
+
+        elif op == "TestDelete":
+            id = kwargs["id"]
+            self._client.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
+            return None
 
         else:
             raise NotImplementedError(op)

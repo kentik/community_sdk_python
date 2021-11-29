@@ -85,8 +85,11 @@ def crud_test() -> None:
     test = SynTest(name="python-synthclient-test", status=TestStatus.active, settings=settings)
     test.type = TestType.mesh
     test.deviceId = "75702"
-    result = client.synthetics.create_test(test)
-    pretty_print(result, 1)
+    created_test = client.synthetics.create_test(test)
+    pretty_print(created_test, 1)
+
+    print("### DELETE")
+    client.synthetics.delete_test(created_test.id)
 
 
 # def run_list_agents() -> None:
