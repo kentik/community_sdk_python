@@ -14,7 +14,11 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import H
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IpTest as pbIpTest
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, PatchTestRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    ListTestsRequest,
+    PatchTestRequest,
+    SetTestStatusRequest,
+)
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Test as pbTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     TestMonitoringSettings as pbMonitoringSettings,
@@ -123,6 +127,14 @@ class SynthGRPCTransport(KentikAPITransport):
 
         elif op == "TestDelete":
             self._client.DeleteTest(DeleteTestRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
+            return None
+
+        elif op == "TestStatusUpdate":
+            status: TestStatus = kwargs["status"]
+            pb_status = reverse_map(PB_STATUS_TO_STATUS, status)
+            self._client.SetTestStatus(
+                SetTestStatusRequest(id=kwargs["id"], status=pb_status), metadata=self._credentials, target=self._url
+            )
             return None
 
         else:

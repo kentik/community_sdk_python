@@ -71,6 +71,8 @@ class KentikSynthClient:
             test_id = test.id
         else:
             test_id = test
+
+        # NOTE: "isinstance" calls related to transport will eventually go away
         if isinstance(self._transport, SynthHTTPTransport):
             return SynTest.test_from_dict(self._transport.req("TestGet", id=test_id))
         else:
@@ -105,7 +107,10 @@ class KentikSynthClient:
             test.undeploy()
 
     def set_test_status(self, test_id: str, status: TestStatus) -> dict:
-        return self._transport.req("TestStatusUpdate", id=test_id, body=dict(id=test_id, status=status.value))
+        if isinstance(self._transport, SynthHTTPTransport):
+            return self._transport.req("TestStatusUpdate", id=test_id, body=dict(id=test_id, status=status.value))
+        else:
+            return self._transport.req("TestStatusUpdate", id=test_id, status=status)
 
     def health(
         self,

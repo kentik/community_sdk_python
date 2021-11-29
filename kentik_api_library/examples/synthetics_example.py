@@ -88,6 +88,9 @@ def crud_test() -> None:
     created_test = client.synthetics.create_test(test)
     pretty_print(created_test)
 
+    print("### SET STATUS")
+    client.synthetics.set_test_status(created_test.id, TestStatus.paused)
+
     print("### GET")
     received_test = client.synthetics.test(created_test.id)
     pretty_print(received_test)
