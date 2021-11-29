@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from urllib.parse import urlparse
 
+from .agent import Agent
 from .api_transport import KentikAPITransport
 from .api_transport_http import SynthHTTPTransport
 from .synth_tests import SynTest, TestStatus
@@ -43,10 +44,10 @@ class KentikSynthClient:
             self._transport = SynthHTTPTransport(credentials, url=self._url, proxy=proxy)
 
     @property
-    def agents(self) -> List[Any]:
+    def agents(self) -> List[Agent]:
         return self._transport.req("AgentsList")
 
-    def agent(self, agent_id: str) -> Dict:
+    def agent(self, agent_id: str) -> Agent:
         return self._transport.req("AgentGet", id=agent_id)
 
     def patch_agent(self, agent_id: str, data: dict, modified: str) -> None:

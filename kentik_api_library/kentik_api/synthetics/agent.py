@@ -31,16 +31,16 @@ class Agent:
     ip: str  # "139.162.75.56"
     lat: float  # 35.689506
     long: float  # 139.6917
-    lastAuthed: str  # "2021-11-29T10:  #09:  #34.742Z"
+    last_authored: str  # "2021-11-29T10:  #09:  #34.742Z"
     family: IPFamily  # "IP_FAMILY_DUAL"
     asn: int  # 63949
-    siteId: ID  # "0"
+    site_id: ID  # "0"
     version: str  # "0.0.17"
     challenge: str  # ""
     city: str  # "Tokyo"
     region: str  # ""
     country: str  # "JP"
-    testIds: List[ID]  # []
-    localIp: str  # ""
-    cloudVpc: str  # ""
-    agentImpl: AgentImplementType  # "IMPLEMENT_TYPE_RUST"
+    test_ids: List[ID]  # []
+    local_ip: str  # ""
+    cloud_vpc: str  # ""
+    agent_impl: AgentImplementType  # "IMPLEMENT_TYPE_RUST"

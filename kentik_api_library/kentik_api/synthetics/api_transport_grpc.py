@@ -10,6 +10,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import A
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     CreateTestRequest,
     DeleteTestRequest,
+    GetAgentRequest,
     GetTestRequest,
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
@@ -72,7 +73,7 @@ PB_AGENT_STATUS_TO_STATUS = {
     pbAgentStatus.AGENT_STATUS_DELETED: AgentStatus.deleted,
 }
 
-PB_AGENT_IMPL = {
+PB_AGENT_IMPL_TO_IMPL = {
     pbAgentImpl.IMPLEMENT_TYPE_UNSPECIFIED: AgentImplementType.unspecified,
     pbAgentImpl.IMPLEMENT_TYPE_RUST: AgentImplementType.rust,
     pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.node,
@@ -158,6 +159,12 @@ class SynthGRPCTransport(KentikAPITransport):
         elif op == "AgentsList":
             pbAgents = self._client.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
             return [pb_to_agent(agent) for agent in pbAgents]
+
+        elif op == "AgentGet":
+            pbAgent = self._client.GetAgent(
+                GetAgentRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url
+            ).agent
+            return pb_to_agent(pbAgent)
 
         else:
             raise NotImplementedError(op)
@@ -329,17 +336,19 @@ def pb_to_agent(v: pbAgent) -> Agent:
         ip=v.ip,
         lat=v.lat,
         long=v.long,
-        lastAuthed=datetime.fromtimestamp(v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc).isoformat(),
+        last_authored=datetime.fromtimestamp(
+            v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc
+        ).isoformat(),
         family=PB_FAMILY_TO_FAMILY[v.family],
         asn=v.asn,
-        siteId=v.site_id,
+        site_id=v.site_id,
         version=v.version,
         challenge=v.challenge,
         city=v.city,
         region=v.region,
         country=v.country,
-        testIds=v.test_ids,
-        localIp=v.local_ip,
-        cloudVpc=v.cloud_vpc,
-        agentImpl=PB_AGENT_IMPL[v.agent_impl],
+        test_ids=v.test_ids,
+        local_ip=v.local_ip,
+        cloud_vpc=v.cloud_vpc,
+        agent_impl=PB_AGENT_IMPL_TO_IMPL[v.agent_impl],
     )

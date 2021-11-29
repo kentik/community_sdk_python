@@ -28,6 +28,7 @@ def pretty_print(v: Any, level: int = 1) -> None:
 
 
 def list_tests() -> None:
+    print("### TESTS LIST")
     email, token = get_credentials()
     client = KentikAPI(email, token)
 
@@ -81,30 +82,31 @@ def crud_test() -> None:
     email, token = get_credentials()
     client = KentikAPI(email, token)
 
-    print("### CREATE")
+    print("### TEST CREATE")
     test = SynTest(name="python-synthclient-test", status=TestStatus.active, settings=settings)
     test.type = TestType.mesh
     test.deviceId = "75702"
     created_test = client.synthetics.create_test(test)
     pretty_print(created_test)
 
-    print("### SET STATUS")
+    print("### TEST SET STATUS")
     client.synthetics.set_test_status(created_test.id, TestStatus.paused)
 
-    print("### GET")
+    print("### TEST GET")
     received_test = client.synthetics.test(created_test.id)
     pretty_print(received_test)
 
-    print("### UPDATE")
+    print("### TEST UPDATE")
     created_test.settings.port = 640
     updated_test = client.synthetics.patch_test(created_test, "test.settings.port")
     pretty_print(updated_test)
 
-    print("### DELETE")
+    print("### TEST DELETE")
     client.synthetics.delete_test(created_test.id)
 
 
 def list_agents() -> None:
+    print("### AGENTS LIST")
     email, token = get_credentials()
     client = KentikAPI(email, token)
 
@@ -115,7 +117,17 @@ def list_agents() -> None:
         print()
 
 
+def crud_agent() -> None:
+    email, token = get_credentials()
+    client = KentikAPI(email, token)
+
+    print("### AGENT GET")
+    received_agent = client.synthetics.agent("574")
+    pretty_print(received_agent)
+
+
 if __name__ == "__main__":
     list_tests()
     crud_test()
     list_agents()
+    crud_agent()
