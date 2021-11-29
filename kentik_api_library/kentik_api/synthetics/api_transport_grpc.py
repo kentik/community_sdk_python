@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
 
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Agent as pbAgent
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentStatus as pbAgentStatus
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     CreateTestRequest,
     DeleteTestRequest,
@@ -12,9 +14,11 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ImplementType as pbAgentImpl
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IpTest as pbIpTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    ListAgentsRequest,
     ListTestsRequest,
     PatchTestRequest,
     SetTestStatusRequest,
@@ -42,11 +46,12 @@ from kentik_api.synthetics.synth_tests import (
     TraceTask,
 )
 
+from .agent import Agent, AgentImplementType, AgentStatus
 from .api_transport import KentikAPIRequestError, KentikAPITransport
 
 log = logging.getLogger("api_transport_grpc")
 
-PB_STATUS_TO_STATUS = {
+PB_TEST_STATUS_TO_STATUS = {
     pbTestStatus.TEST_STATUS_UNSPECIFIED: TestStatus.none,
     pbTestStatus.TEST_STATUS_ACTIVE: TestStatus.active,
     pbTestStatus.TEST_STATUS_PAUSED: TestStatus.paused,
@@ -58,6 +63,19 @@ PB_FAMILY_TO_FAMILY = {
     pbIPFamily.IP_FAMILY_V4: IPFamily.v4,
     pbIPFamily.IP_FAMILY_V6: IPFamily.v6,
     pbIPFamily.IP_FAMILY_DUAL: IPFamily.dual,
+}
+
+PB_AGENT_STATUS_TO_STATUS = {
+    pbAgentStatus.AGENT_STATUS_UNSPECIFIED: AgentStatus.unspecified,
+    pbAgentStatus.AGENT_STATUS_OK: AgentStatus.ok,
+    pbAgentStatus.AGENT_STATUS_WAIT: AgentStatus.wait,
+    pbAgentStatus.AGENT_STATUS_DELETED: AgentStatus.deleted,
+}
+
+PB_AGENT_IMPL = {
+    pbAgentImpl.IMPLEMENT_TYPE_UNSPECIFIED: AgentImplementType.unspecified,
+    pbAgentImpl.IMPLEMENT_TYPE_RUST: AgentImplementType.rust,
+    pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.node,
 }
 
 
@@ -84,8 +102,8 @@ class SynthGRPCTransport(KentikAPITransport):
         # to be refactored
         if op == "TestsList":
             results: List[SynTest] = []
-            pbTests = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
-            for pbt in pbTests:
+            pbAgents = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
+            for pbt in pbAgents:
                 if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
                     pb_test = SynTest("[empty]")
                     populate_test_from_pb(pbt, pb_test)
@@ -131,11 +149,15 @@ class SynthGRPCTransport(KentikAPITransport):
 
         elif op == "TestStatusUpdate":
             status: TestStatus = kwargs["status"]
-            pb_status = reverse_map(PB_STATUS_TO_STATUS, status)
+            pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
             self._client.SetTestStatus(
                 SetTestStatusRequest(id=kwargs["id"], status=pb_status), metadata=self._credentials, target=self._url
             )
             return None
+
+        elif op == "AgentsList":
+            pbAgents = self._client.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
+            return [pb_to_agent(agent) for agent in pbAgents]
 
         else:
             raise NotImplementedError(op)
@@ -144,7 +166,7 @@ class SynthGRPCTransport(KentikAPITransport):
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.name = v.name
     out.type = TestType(v.type)
-    out.status = PB_STATUS_TO_STATUS[v.status]
+    out.status = PB_TEST_STATUS_TO_STATUS[v.status]
     out.deviceId = v.device_id
     out._id = v.id
     out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc).isoformat()
@@ -161,7 +183,7 @@ def test_to_pb(v: SynTest) -> pbTest:
     out.device_id = v.deviceId
     out.id = v.id
     out.type = v.type.value
-    out.status = reverse_map(PB_STATUS_TO_STATUS, v.status)
+    out.status = reverse_map(PB_TEST_STATUS_TO_STATUS, v.status)
     out.settings.CopyFrom(settings_to_pb(v.settings))
     return out
 
@@ -294,3 +316,30 @@ def monitoring_settings_to_pb(v: MonitoringSettings) -> pbMonitoringSettings:
     out.activation_times = v.activationTimes
     out.notification_channels.extend(v.notificationChannels)
     return out
+
+
+def pb_to_agent(v: pbAgent) -> Agent:
+    return Agent(
+        id=v.id,
+        name=v.name,
+        status=PB_AGENT_STATUS_TO_STATUS[v.status],
+        alias=v.alias,
+        type=v.type,
+        os=v.os,
+        ip=v.ip,
+        lat=v.lat,
+        long=v.long,
+        lastAuthed=datetime.fromtimestamp(v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc).isoformat(),
+        family=PB_FAMILY_TO_FAMILY[v.family],
+        asn=v.asn,
+        siteId=v.site_id,
+        version=v.version,
+        challenge=v.challenge,
+        city=v.city,
+        region=v.region,
+        country=v.country,
+        testIds=v.test_ids,
+        localIp=v.local_ip,
+        cloudVpc=v.cloud_vpc,
+        agentImpl=PB_AGENT_IMPL[v.agent_impl],
+    )

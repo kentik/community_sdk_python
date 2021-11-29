@@ -43,7 +43,7 @@ class KentikSynthClient:
             self._transport = SynthHTTPTransport(credentials, url=self._url, proxy=proxy)
 
     @property
-    def agents(self) -> List[Dict]:
+    def agents(self) -> List[Any]:
         return self._transport.req("AgentsList")
 
     def agent(self, agent_id: str) -> Dict:

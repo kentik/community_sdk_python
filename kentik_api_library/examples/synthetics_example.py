@@ -104,17 +104,18 @@ def crud_test() -> None:
     client.synthetics.delete_test(created_test.id)
 
 
-# def run_list_agents() -> None:
-#     email, token = get_credentials()
-#     client = KentikAPI(email, token)
+def list_agents() -> None:
+    email, token = get_credentials()
+    client = KentikAPI(email, token)
 
-#     agents = client.synthetics.agents
-#     for agent in agents:
-#         print(agent.id)
-#         pretty_print(agent)
-#         print()
+    agents = client.synthetics.agents
+    for agent in agents:
+        print(agent.id)
+        pretty_print(agent)
+        print()
 
 
 if __name__ == "__main__":
-    # list_tests()
+    list_tests()
     crud_test()
+    list_agents()
