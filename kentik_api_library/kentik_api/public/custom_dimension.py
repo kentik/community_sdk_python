@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from kentik_api.public.types import ID, PermissiveEnumMeta
 
-
 # pylint: disable=too-many-instance-attributes
 
 

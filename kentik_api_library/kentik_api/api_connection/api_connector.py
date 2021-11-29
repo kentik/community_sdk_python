@@ -1,10 +1,10 @@
 # Standard library imports
 import logging
 from http import HTTPStatus
-from typing import Union, Tuple, Optional, Dict, Any
+from typing import Any, Dict, Optional, Tuple, Union
 
 # Third party imports
-from requests import Timeout, RequestException, Response
+from requests import RequestException, Response, Timeout
 
 # Local application imports
 from kentik_api.api_calls.api_call import APICall, APICallMethods
@@ -19,7 +19,8 @@ from kentik_api.public.errors import (
     TimedOutError,
     UnavailabilityError,
 )
-from .retryable_session import prepare_kentik_api_http_session, Retry
+
+from .retryable_session import Retry, prepare_kentik_api_http_session
 
 PROTOCOL_HTTP = "HTTP"
 

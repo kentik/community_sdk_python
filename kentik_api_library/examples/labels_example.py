@@ -3,25 +3,13 @@
 Examples of using the typed labels API
 """
 
-import os
-import sys
 import logging
-from typing import Tuple
-from kentik_api import KentikAPI, DeviceLabel
-from kentik_api.public.types import ID
 
+from kentik_api import DeviceLabel, KentikAPI
+from kentik_api.public.types import ID
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
-
-
-def get_auth_email_token() -> Tuple[str, str]:
-    try:
-        email = os.environ["KTAPI_AUTH_EMAIL"]
-        token = os.environ["KTAPI_AUTH_TOKEN"]
-        return email, token
-    except KeyError:
-        print("You have to specify KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN first")
-        sys.exit(1)
 
 
 def run_crud() -> None:
@@ -41,7 +29,7 @@ def run_crud() -> None:
     DeleteResponse(success=True)
     """
 
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     print("### CREATE")
@@ -67,7 +55,7 @@ def run_crud() -> None:
 
 
 def run_get_with_devices() -> None:
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
 
     print("### GET")
@@ -81,7 +69,7 @@ def run_get_with_devices() -> None:
 
 
 def run_list() -> None:
-    email, token = get_auth_email_token()
+    email, token = get_credentials()
     client = KentikAPI(email, token)
     labels = client.device_labels.get_all()
     for l in labels:

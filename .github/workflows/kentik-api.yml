@@ -39,24 +39,27 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - name: Install requirements
+      - name: Install dependencies
         working-directory: ./kentik_api_library
         run: |
-          pip3 install -r requirements.txt
+          set -xe
+          python3 -VV
+          python3 -m site
+          python3 -m pip install --upgrade -r requirements.txt
+          python3 -m pip install --upgrade -r requirements-dev.txt
           python3 setup.py grpc_stubs
-      - name: Black
-        uses: rickstaa/action-black@v1
-        with:
-          black_args: "./kentik_api_library --check --fast --line-length 120 --exclude .eggs|generated"
-      - name: PyTest
+      - name: Code formatting
         working-directory: ./kentik_api_library
-        run: python3 setup.py pytest
-      - name: PyLint
-        working-directory: ./kentik_api_library
-        run: python3 setup.py pylint
+        run: python3 setup.py format --check
       - name: Mypy
         working-directory: ./kentik_api_library
         run: python3 setup.py mypy
+      - name: PyLint
+        working-directory: ./kentik_api_library
+        run: python3 setup.py pylint
+      - name: PyTest
+        working-directory: ./kentik_api_library
+        run: python3 setup.py pytest
 
   build:
     needs: python-versions-setup

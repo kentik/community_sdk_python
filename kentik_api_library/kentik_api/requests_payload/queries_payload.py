@@ -1,9 +1,9 @@
-from typing import List, Dict, Tuple
-from dataclasses import dataclass
 from base64 import b64decode
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
-from kentik_api.public.query_object import QueryDataResult, QueryChartResult, ImageType, QueryURLResult
-from kentik_api.requests_payload.conversions import from_dict, dict_from_json
+from kentik_api.public.query_object import ImageType, QueryChartResult, QueryDataResult, QueryURLResult
+from kentik_api.requests_payload.conversions import dict_from_json, from_dict
 
 
 @dataclass

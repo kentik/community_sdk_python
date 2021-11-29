@@ -6,14 +6,10 @@ import logging
 from typing import Any
 
 from kentik_api import KentikAPI
-from kentik_api.utils import get_credentials
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
-
-from kentik_api.synthetics.synth_tests import SynTest, SynTestSettings, HealthSettings, MonitoringSettings
-from kentik_api.synthetics.types import Protocol, TestStatus, TestType
-
-from kentik_api.synthetics.types import IPFamily
-
+from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
+from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
+from kentik_api.utils import get_credentials
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,7 +38,7 @@ def list_tests() -> None:
         print()
 
 
-def crud() -> None:
+def crud_test() -> None:
     health = HealthSettings(
         latencyCritical=90,
         latencyWarning=60,
@@ -93,18 +89,17 @@ def crud() -> None:
     pretty_print(result, 1)
 
 
-def run_list_agents() -> None:
-    email, token = get_credentials()
-    client = KentikAPI(email, token)
+# def run_list_agents() -> None:
+#     email, token = get_credentials()
+#     client = KentikAPI(email, token)
 
-    agents = client.synthetics.agents
-    for agent in agents:
-        print(agent.id)
-        pretty_print(agent, 1)
-        print()
+#     agents = client.synthetics.agents
+#     for agent in agents:
+#         print(agent.id)
+#         pretty_print(agent, 1)
+#         print()
 
 
 if __name__ == "__main__":
     # list_tests()
-    crud()
-    # run_list_agents()
+    crud_test()

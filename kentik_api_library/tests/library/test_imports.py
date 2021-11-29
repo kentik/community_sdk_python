@@ -1,20 +1,15 @@
-# pylint: skip-file
-import sys
 import importlib
+import sys
 
 
-def test_import(library=""):
-
-    library_found = False
+def test_import(library: str) -> None:
     error = None
     try:
-        imported_library = importlib.import_module(library)
+        _ = importlib.import_module(library)
     except ImportError as err:
         error = err
-    else:
-        library_found = True
 
-    assert library_found, "Can't import '" + library + "': " + str(error)
+    assert error is None, f"Can't import '{library}': {error}"
 
 
 if __name__ == "__main__":

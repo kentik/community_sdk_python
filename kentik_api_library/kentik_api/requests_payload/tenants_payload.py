@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional, Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from kentik_api.requests_payload.conversions import convert, from_dict, dict_from_json, list_from_json
-from kentik_api.public.types import ID
 from kentik_api.public.tenant import Tenant, TenantUser
+from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
 
 
 def tenant_user_from_dict(dic: Dict[str, Any]) -> TenantUser:

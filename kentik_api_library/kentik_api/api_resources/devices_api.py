@@ -1,11 +1,12 @@
-from typing import List
 from http import HTTPStatus
-from kentik_api.api_resources.base_api import BaseAPI
+from typing import List
+
 from kentik_api.api_calls import devices
-from kentik_api.public.types import ID
-from kentik_api.public.device import Device, AppliedLabels, Interface
-from kentik_api.requests_payload import devices_payload, interfaces_payload
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
+from kentik_api.api_resources.base_api import BaseAPI
+from kentik_api.public.device import AppliedLabels, Device, Interface
+from kentik_api.public.types import ID
+from kentik_api.requests_payload import devices_payload, interfaces_payload
 
 
 class InterfacesAPI(BaseAPI):

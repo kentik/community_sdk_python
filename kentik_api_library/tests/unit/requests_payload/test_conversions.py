@@ -1,18 +1,19 @@
-from enum import Enum
-from typing import Optional, Any, Dict
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, Optional
+
 import pytest
 
+from kentik_api.public.errors import DataFormatError, DeserializationError
 from kentik_api.requests_payload.conversions import (
-    from_dict,
-    dict_from_json,
-    list_from_json,
     convert,
-    convert_or_none,
     convert_list_or_none,
+    convert_or_none,
+    dict_from_json,
     enum_to_str,
+    from_dict,
+    list_from_json,
 )
-from kentik_api.public.errors import DeserializationError, DataFormatError
 
 
 @dataclass

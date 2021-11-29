@@ -1,10 +1,10 @@
-from typing import List
 from http import HTTPStatus
+from typing import List
 
 from kentik_api.api_calls import custom_applications
 from kentik_api.api_resources.base_api import BaseAPI
-from kentik_api.public.types import ID
 from kentik_api.public.custom_application import CustomApplication
+from kentik_api.public.types import ID
 from kentik_api.requests_payload import custom_applications_payload
 
 

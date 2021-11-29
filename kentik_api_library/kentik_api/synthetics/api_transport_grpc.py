@@ -1,40 +1,39 @@
 import logging
-from typing import Any, Optional, Tuple, List, Dict
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Tuple
 
 import grpc.experimental as _
 
-from .api_transport import KentikAPIRequestError, KentikAPITransport
-
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import CreateTestRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IpTest as pbIpTest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Test as pbTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
-    ListTestsRequest,
-    CreateTestRequest,
-    Test as pbTest,
-    IpTest as pbIpTest,
-    HostnameTest as pbHostnameTest,
-    TestStatus as pbTestStatus,
-    TestSettings as pbTestSettings,
-    IPFamily as pbIPFamily,
-    HealthSettings as pbHealthSettings,
     TestMonitoringSettings as pbMonitoringSettings,
 )
-
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestSettings as pbTestSettings
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestStatus as pbTestStatus
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
 from kentik_api.synthetics.synth_tests import (
-    MeshTest,
-    PingTask,
-    SynTest,
-    PingTraceTest,
-    TestType,
-    SynTestSettings,
-    TestStatus,
     HealthSettings,
+    IPFamily,
+    MeshTest,
     MonitoringSettings,
+    PingTask,
+    PingTraceTest,
     PingTraceTestSettings,
     Protocol,
-    IPFamily,
+    SynTest,
+    SynTestSettings,
+    TestStatus,
+    TestType,
     TraceTask,
 )
+
+from .api_transport import KentikAPIRequestError, KentikAPITransport
 
 log = logging.getLogger("api_transport_grpc")
 

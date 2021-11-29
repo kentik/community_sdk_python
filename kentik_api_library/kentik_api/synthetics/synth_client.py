@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from urllib.parse import urlparse
 
 from .api_transport import KentikAPITransport
@@ -20,7 +20,7 @@ class KentikSynthClient:
     def __init__(
         self,
         credentials: Tuple[str, str],
-        transport: Optional[KentikAPITransport] = None,
+        transport: Optional[Type[KentikAPITransport]] = None,
         url: Optional[str] = None,
         proxy: Optional[str] = None,
     ):

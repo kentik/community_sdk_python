@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_connection.api_call_response import APICallResponse

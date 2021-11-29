@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Type, TypeVar
-from enum import Enum
 import json
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, List, Optional, Type, TypeVar
 
 from kentik_api.internal import mandatory_dataclass_attributes
-from kentik_api.public.types import PermissiveEnumMeta
 from kentik_api.public.saved_filter import Filters, SavedFilter
+from kentik_api.public.types import PermissiveEnumMeta
 
 
 class ImageType(Enum):

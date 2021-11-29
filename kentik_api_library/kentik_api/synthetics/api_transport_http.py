@@ -1,7 +1,8 @@
 import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from kentik_api.api_connection.retryable_session import prepare_kentik_api_http_session
+
 from .api_transport import KentikAPIRequestError, KentikAPITransport
 
 log = logging.getLogger("api_transport_http")
@@ -35,7 +36,7 @@ class SynthHTTPTransport(KentikAPITransport):
         # noinspection PyProtectedMember,PyArgumentList
         self._session = prepare_kentik_api_http_session(*credentials, None, proxy)
         self._url = url
-        self._methods = dict(
+        self._methods: Dict[str, Callable] = dict(
             get=self._session.get,
             put=self._session.put,
             post=self._session.post,

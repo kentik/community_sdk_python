@@ -1,17 +1,18 @@
-from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
-from kentik_api.public.types import ID
+from typing import Any, Dict, List, Optional
+
 from kentik_api.public.device import Interface, SecondaryIP, TopNextHopASN, VRFAttributes
 from kentik_api.public.errors import IncompleteObjectError
-from kentik_api.requests_payload.validation import validate_fields
+from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import (
-    from_dict,
-    dict_from_json,
-    list_from_json,
     convert,
-    convert_or_none,
     convert_list_or_none,
+    convert_or_none,
+    dict_from_json,
+    from_dict,
+    list_from_json,
 )
+from kentik_api.requests_payload.validation import validate_fields
 
 
 @dataclass

@@ -1,10 +1,10 @@
 from unittest.mock import create_autospec
+
 import pytest
 
 from kentik_api.public.errors import IntermittentError
-from kentik_api.throttling.cmd import Cmd
 from kentik_api.throttling.active_wait_retry import active_wait_retry
-
+from kentik_api.throttling.cmd import Cmd
 
 FAIL = IntermittentError("fail, try again")
 SUCCESS = "expected_cmd_call_result"

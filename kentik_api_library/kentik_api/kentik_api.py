@@ -1,6 +1,7 @@
 from typing import Optional, Tuple, Union
 
 from .api_connection.api_connector import APIConnector
+from .api_connection.retryable_session import Retry
 from .api_resources.alerting_api import AlertingAPI
 from .api_resources.batch_api import BatchAPI
 from .api_resources.custom_applications_api import CustomApplicationsAPI
@@ -14,11 +15,9 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
-from .api_connection.retryable_session import Retry
-from .synthetics.synth_client import KentikSynthClient
-
-from .synthetics.api_transport_http import SynthHTTPTransport
 from .synthetics.api_transport_grpc import SynthGRPCTransport
+from .synthetics.api_transport_http import SynthHTTPTransport
+from .synthetics.synth_client import KentikSynthClient
 
 
 class KentikAPI:
@@ -35,7 +34,7 @@ class KentikAPI:
         auth_email: str,
         auth_token: str,
         api_url: str = API_URL_US,
-        synthetics_url: str = API_URL_SYNTHETICS_GRPC,
+        synthetics_api_url: str = API_URL_SYNTHETICS_GRPC,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
@@ -57,7 +56,7 @@ class KentikAPI:
         self.alerting = AlertingAPI(connector)
 
         self.synthetics = KentikSynthClient(
-            credentials=(auth_email, auth_token), url=synthetics_url, transport=SynthGRPCTransport
+            credentials=(auth_email, auth_token), url=synthetics_api_url, transport=SynthGRPCTransport
         )
 
         # self.synthetics = KentikSynthClient(
