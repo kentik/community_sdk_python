@@ -3,6 +3,8 @@ from enum import EnumMeta
 # common id type across all resources
 ID = str
 
+IP = str
+
 
 class PermissiveEnumMeta(EnumMeta):
     """

@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from urllib.parse import urlparse
 
+from kentik_api.public.types import ID, IP
+
 from .agent import Agent
 from .api_transport import KentikAPITransport
 from .api_transport_http import SynthHTTPTransport
@@ -47,14 +49,14 @@ class KentikSynthClient:
     def agents(self) -> List[Agent]:
         return self._transport.req("AgentsList")
 
-    def agent(self, agent_id: str) -> Agent:
+    def agent(self, agent_id: ID) -> Agent:
         return self._transport.req("AgentGet", id=agent_id)
 
     def patch_agent(self, agent: Agent, modified: str) -> Agent:
         # return self._transport.req("AgentPatch", id=agent_id, body=dict(agent=data, mask=modified))
         return self._transport.req("AgentPatch", agent=agent, mask=modified)
 
-    def delete_agent(self, agent_id: str) -> None:
+    def delete_agent(self, agent_id: ID) -> None:
         self._transport.req("AgentDelete", id=agent_id)
 
     @property
@@ -68,7 +70,7 @@ class KentikSynthClient:
         else:
             return [deserialize(SynTest, t, SynTest.test_from_dict) for t in r]
 
-    def test(self, test: Union[str, SynTest]) -> SynTest:
+    def test(self, test: Union[ID, SynTest]) -> SynTest:
         if isinstance(test, SynTest):
             test_id = test.id
         else:
@@ -80,7 +82,7 @@ class KentikSynthClient:
         else:
             return self._transport.req("TestGet", id=test_id)
 
-    def test_raw(self, test_id: str) -> Any:
+    def test_raw(self, test_id: ID) -> Any:
         return self._transport.req("TestGet", id=test_id)
 
     def create_test(self, test: SynTest) -> SynTest:
@@ -90,7 +92,7 @@ class KentikSynthClient:
             return self._transport.req("TestCreate", test=test)
 
     def patch_test(self, test: SynTest, modified: str) -> SynTest:
-        if test.id == 0:
+        if test.id == ID("0"):
             raise RuntimeError(f"test '{test.name}' has not been created yet (id=0). Cannot patch")
         if isinstance(self._transport, SynthHTTPTransport):
             body = test.to_dict()
@@ -99,7 +101,7 @@ class KentikSynthClient:
         else:
             return self._transport.req("TestPatch", test=test, mask=modified)
 
-    def delete_test(self, test: Union[str, SynTest]) -> None:
+    def delete_test(self, test: Union[ID, SynTest]) -> None:
         if isinstance(test, SynTest):
             test_id = test.id
         else:
@@ -108,7 +110,7 @@ class KentikSynthClient:
         if isinstance(test, SynTest):
             test.undeploy()
 
-    def set_test_status(self, test_id: str, status: TestStatus) -> dict:
+    def set_test_status(self, test_id: ID, status: TestStatus) -> dict:
         if isinstance(self._transport, SynthHTTPTransport):
             return self._transport.req("TestStatusUpdate", id=test_id, body=dict(id=test_id, status=status.value))
         else:
@@ -116,12 +118,12 @@ class KentikSynthClient:
 
     def health(
         self,
-        test_ids: List[str],
+        test_ids: List[ID],
         start: datetime,
         end: datetime,
         augment: bool = False,
-        agent_ids: Optional[List[str]] = None,
-        task_ids: Optional[List[str]] = None,
+        agent_ids: Optional[List[ID]] = None,
+        task_ids: Optional[List[ID]] = None,
     ) -> List[Dict]:
         return self._transport.req(
             "GetHealthForTests",

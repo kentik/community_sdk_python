@@ -7,6 +7,7 @@ from typing import Any
 
 from kentik_api import KentikAPI
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
+from kentik_api.public.types import ID
 from kentik_api.synthetics.agent import AgentImplementType, AgentStatus
 from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
@@ -86,7 +87,7 @@ def crud_test() -> None:
     print("### TEST CREATE")
     test = SynTest(name="python-synthclient-test", status=TestStatus.active, settings=settings)
     test.type = TestType.mesh
-    test.deviceId = "75702"
+    test.deviceId = ID("75702")
     created_test = client.synthetics.create_test(test)
     pretty_print(created_test)
 
@@ -123,7 +124,7 @@ def crud_agent() -> None:
     client = KentikAPI(email, token)
 
     print("### AGENT GET")
-    received_agent = client.synthetics.agent("1717")
+    received_agent = client.synthetics.agent(ID("1717"))
     pretty_print(received_agent)
 
     # print("### AGENT PATCH")
@@ -132,7 +133,7 @@ def crud_agent() -> None:
     # pretty_print(patched_agent)
 
     # print("### AGENT DELETE")
-    # client.synthetics.delete_agent("1717")
+    # client.synthetics.delete_agent(ID("1717"))
 
 
 if __name__ == "__main__":

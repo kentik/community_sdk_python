@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-from kentik_api.public.types import ID
+from kentik_api.public.types import ID, IP
 
 from .synth_tests import IPFamily
 
@@ -22,25 +22,25 @@ class AgentImplementType(Enum):
 
 @dataclass
 class Agent:
-    id: ID = ID("")
+    id: ID = ID()
     name: str = ""
     status: AgentStatus = AgentStatus.unspecified
     alias: str = ""
     type: str = ""  # "global"
     os: str = ""
-    ip: str = ""
+    ip: IP = IP()
     lat: float = 0.0
     long: float = 0.0
     last_authed: str = ""
     family: IPFamily = IPFamily.unspecified
     asn: int = 0
-    site_id: ID = ID("0")
+    site_id: ID = ID()
     version: str = ""
     challenge: str = ""
     city: str = ""
     region: str = ""
     country: str = ""
     test_ids: List[ID] = field(default_factory=list)
-    local_ip: str = ""
+    local_ip: IP = IP()
     cloud_vpc: str = ""
     agent_impl: AgentImplementType = AgentImplementType.unspecified

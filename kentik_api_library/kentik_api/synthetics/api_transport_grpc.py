@@ -33,6 +33,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestSettings as pbTestSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestStatus as pbTestStatus
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
+from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests import (
     HealthSettings,
     IPFamily,
@@ -121,7 +122,7 @@ class SynthGRPCTransport(KentikAPITransport):
 
         elif op == "TestCreate":
             test: SynTest = kwargs["test"]
-            test._id = ""  # TestCreate doesn't accept id
+            test._id = ID("")  # TestCreate doesn't accept id
             pb_test = test_to_pb(test)
             result = self._client.CreateTest(
                 CreateTestRequest(test=pb_test), metadata=self._credentials, target=self._url
@@ -131,7 +132,8 @@ class SynthGRPCTransport(KentikAPITransport):
             return out
 
         elif op == "TestGet":
-            result = self._client.GetTest(GetTestRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
+            id = str(kwargs["id"])
+            result = self._client.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
@@ -147,14 +149,16 @@ class SynthGRPCTransport(KentikAPITransport):
             return out
 
         elif op == "TestDelete":
-            self._client.DeleteTest(DeleteTestRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
+            id = str(kwargs["id"])
+            self._client.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
             return None
 
         elif op == "TestStatusUpdate":
+            id = str(kwargs["id"])
             status: TestStatus = kwargs["status"]
             pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
             self._client.SetTestStatus(
-                SetTestStatusRequest(id=kwargs["id"], status=pb_status), metadata=self._credentials, target=self._url
+                SetTestStatusRequest(id=id, status=pb_status), metadata=self._credentials, target=self._url
             )
             return None
 
@@ -163,9 +167,8 @@ class SynthGRPCTransport(KentikAPITransport):
             return [pb_to_agent(agent) for agent in pbAgents]
 
         elif op == "AgentGet":
-            result = self._client.GetAgent(
-                GetAgentRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url
-            ).agent
+            id = str(kwargs["id"])
+            result = self._client.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
             return pb_to_agent(result)
 
         elif op == "AgentPatch":
@@ -178,7 +181,8 @@ class SynthGRPCTransport(KentikAPITransport):
             return pb_to_agent(result.agent)
 
         elif op == "AgentDelete":
-            self._client.DeleteAgent(DeleteAgentRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
+            id = str(kwargs["id"])
+            self._client.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
             return None
 
         else:
@@ -189,8 +193,8 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.name = v.name
     out.type = TestType(v.type)
     out.status = PB_TEST_STATUS_TO_STATUS[v.status]
-    out.deviceId = v.device_id
-    out._id = v.id
+    out.deviceId = ID(v.device_id)
+    out._id = ID(v.id)
     out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc).isoformat()
     out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc).isoformat()
 
@@ -202,8 +206,8 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
 def test_to_pb(v: SynTest) -> pbTest:
     out = pbTest()
     out.name = v.name
-    out.device_id = v.deviceId
-    out.id = v.id
+    out.device_id = str(v.deviceId)
+    out.id = str(v.id)
     out.type = v.type.value
     out.status = reverse_map(PB_TEST_STATUS_TO_STATUS, v.status)
     out.settings.CopyFrom(settings_to_pb(v.settings))
@@ -221,7 +225,7 @@ def populate_mesh_test_from_pb(v: pbTest, out: MeshTest) -> None:
 
 
 def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
-    out.agentIds = v.agent_ids
+    out.agentIds = [ID(id) for id in v.agent_ids]
     out.tasks = v.tasks
     out.healthSettings = health_settings_from_pb(v.health_settings)
     out.monitoringSettings = monitoring_settings_from_pb(v.monitoring_settings)
@@ -250,7 +254,7 @@ def settings_to_pb(v: SynTestSettings) -> pbTestSettings:
     out.trace.expiry = 22500
     out.trace.limit = 30
 
-    out.agent_ids.extend(v.agentIds)
+    out.agent_ids.extend([str(id) for id in v.agentIds])
     out.tasks.extend(v.tasks)
     out.health_settings.CopyFrom(health_settings_to_pb(v.healthSettings))
     out.monitoring_settings.CopyFrom(monitoring_settings_to_pb(v.monitoringSettings))
@@ -342,26 +346,26 @@ def monitoring_settings_to_pb(v: MonitoringSettings) -> pbMonitoringSettings:
 
 def pb_to_agent(v: pbAgent) -> Agent:
     return Agent(
-        id=v.id,
+        id=ID(v.id),
         name=v.name,
         status=PB_AGENT_STATUS_TO_STATUS[v.status],
         alias=v.alias,
         type=v.type,
         os=v.os,
-        ip=v.ip,
+        ip=IP(v.ip),
         lat=v.lat,
         long=v.long,
         last_authed=datetime.fromtimestamp(v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc).isoformat(),
         family=PB_FAMILY_TO_FAMILY[v.family],
         asn=v.asn,
-        site_id=v.site_id,
+        site_id=ID(v.site_id),
         version=v.version,
         challenge=v.challenge,
         city=v.city,
         region=v.region,
         country=v.country,
-        test_ids=v.test_ids,
-        local_ip=v.local_ip,
+        test_ids=[ID(id) for id in v.test_ids],
+        local_ip=IP(v.local_ip),
         cloud_vpc=v.cloud_vpc,
         agent_impl=PB_AGENT_IMPL_TO_IMPL[v.agent_impl],
     )
@@ -369,25 +373,25 @@ def pb_to_agent(v: pbAgent) -> Agent:
 
 def agent_to_pb(v: Agent) -> pbAgent:
     return pbAgent(
-        id=v.id,
+        id=str(v.id),
         name=v.name,
         status=reverse_map(PB_AGENT_STATUS_TO_STATUS, v.status),
         alias=v.alias,
         type=v.type,
         os=v.os,
-        ip=v.ip,
+        ip=str(v.ip),
         lat=v.lat,
         long=v.long,
         family=reverse_map(PB_FAMILY_TO_FAMILY, v.family),
         asn=v.asn,
-        site_id=v.site_id,
+        site_id=str(v.site_id),
         version=v.version,
         challenge=v.challenge,
         city=v.city,
         region=v.region,
         country=v.country,
-        test_ids=v.test_ids,
-        local_ip=v.local_ip,
+        test_ids=[str(id) for id in v.test_ids],
+        local_ip=str(v.local_ip),
         cloud_vpc=v.cloud_vpc,
         agent_impl=reverse_map(PB_AGENT_IMPL_TO_IMPL, v.agent_impl),
     )

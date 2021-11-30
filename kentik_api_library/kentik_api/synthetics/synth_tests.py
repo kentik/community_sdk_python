@@ -3,6 +3,8 @@ from dataclasses import dataclass, field, fields
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar
 
+from kentik_api.public.types import ID, IP
+
 from .types import *
 
 log = logging.getLogger("synth_tests")
@@ -156,7 +158,7 @@ class MonitoringSettings(_ConfigElement):
 
 @dataclass
 class SynTestSettings(_ConfigElement):
-    agentIds: List[str] = field(default_factory=list)
+    agentIds: List[ID] = field(default_factory=list)
     tasks: List[str] = field(default_factory=DefaultTasks)
     healthSettings: HealthSettings = field(default_factory=HealthSettings)
     monitoringSettings: MonitoringSettings = field(default_factory=MonitoringSettings)
@@ -176,19 +178,19 @@ class SynTest(_ConfigElement):
     name: str
     type: TestType = field(init=False, default=TestType.none)
     status: TestStatus = field(default=TestStatus.active)
-    deviceId: str = field(init=False, default="0")
-    _id: str = field(default="0", init=False)
+    deviceId: ID = field(init=False, default=ID("0"))
+    _id: ID = field(default=ID("0"), init=False)
     _cdate: str = field(default_factory=str, init=False)
     _edate: str = field(default_factory=str, init=False)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
 
     @property
-    def id(self) -> str:
+    def id(self) -> ID:
         return self._id
 
     @property
     def deployed(self) -> bool:
-        return self.id != "0"
+        return self.id != ID("0")
 
     @property
     def cdate(self) -> Optional[datetime]:
@@ -219,7 +221,7 @@ class SynTest(_ConfigElement):
         )
 
     def undeploy(self):
-        self._id = "0"
+        self._id = ID("0")
 
     def to_dict(self) -> dict:
         return {"test": super(SynTest, self).to_dict()}
@@ -309,7 +311,7 @@ class HostnameTest(PingTraceTest):
     settings: HostnameTestSettings = field(default_factory=HostnameTestSettings)
 
     @classmethod
-    def create(cls: Type[HostnameTestType], name: str, target: str, agent_ids: List[str]) -> HostnameTestType:
+    def create(cls: Type[HostnameTestType], name: str, target: IP, agent_ids: List[ID]) -> HostnameTestType:
         return cls(name=name, settings=HostnameTestSettings(agentIds=agent_ids, hostname=dict(target=target)))
 
 
@@ -327,7 +329,7 @@ class IPTest(PingTraceTest):
     settings: IPTestSettings = field(default_factory=IPTestSettings)
 
     @classmethod
-    def create(cls: Type[IPTestType], name: str, targets: List[str], agent_ids: List[str]) -> IPTestType:
+    def create(cls: Type[IPTestType], name: str, targets: List[IP], agent_ids: List[ID]) -> IPTestType:
         return cls(name=name, settings=IPTestSettings(agentIds=agent_ids, ip=dict(targets=targets)))
 
 
@@ -339,7 +341,7 @@ class MeshTest(PingTraceTest):
     type: TestType = field(init=False, default=TestType.mesh)
 
     @classmethod
-    def create(cls: Type[MeshTestType], name: str, agent_ids: List[str]) -> MeshTestType:
+    def create(cls: Type[MeshTestType], name: str, agent_ids: List[ID]) -> MeshTestType:
         return cls(name=name, settings=PingTraceTestSettings(agentIds=agent_ids))
 
 
@@ -358,7 +360,7 @@ class NetworkGridTest(PingTraceTest):
 
     @classmethod
     def create(
-        cls: Type[NetworkGridTestType], name: str, targets: List[str], agent_ids: List[str]
+        cls: Type[NetworkGridTestType], name: str, targets: List[IP], agent_ids: List[ID]
     ) -> NetworkGridTestType:
         return cls(name=name, settings=GridTestSettings(agentIds=agent_ids, networkGrid=dict(targets=targets)))
 
@@ -382,7 +384,7 @@ class FlowTest(PingTraceTest):
         cls: Type[FlowTestType],
         name: str,
         target: str,
-        agent_ids: List[str],
+        agent_ids: List[ID],
         type: FlowTestSubType,
         direction: DirectionType,
         inet_direction: DirectionType,
@@ -422,8 +424,8 @@ class DNSGridTest(SynTest):
     def create(
         cls: Type[DNSGridTestType],
         name: str,
-        targets: List[str],
-        agent_ids: List[str],
+        targets: List[IP],
+        agent_ids: List[ID],
         servers: List[str],
         record_type: DNSRecordType = DNSRecordType.A,
     ) -> DNSGridTestType:
@@ -460,8 +462,8 @@ class DNSTest(SynTest):
     def create(
         cls: Type[DNSTestType],
         name: str,
-        target: str,
-        agent_ids: List[str],
+        target: IP,
+        agent_ids: List[ID],
         servers: List[str],
         record_type: DNSRecordType = DNSRecordType.A,
     ) -> DNSTestType:
@@ -497,8 +499,8 @@ class UrlTest(SynTest):
     def create(
         cls: Type[UrlTestType],
         name: str,
-        target: str,
-        agent_ids: List[str],
+        target: IP,
+        agent_ids: List[ID],
         method: str = "GET",
         headers: Optional[Dict[str, str]] = None,
         body: str = "",
@@ -540,8 +542,8 @@ class PageLoadTest(PingTraceTest):
     def create(
         cls: Type[PageLoadTestType],
         name: str,
-        target: str,
-        agent_ids: List[str],
+        target: IP,
+        agent_ids: List[ID],
         method: str = "GET",
         headers: Optional[Dict[str, str]] = None,
         body: str = "",
@@ -572,5 +574,5 @@ class AgentTest(PingTraceTest):
     settings: AgentTestSettings = field(default=AgentTestSettings(agentIds=[]))
 
     @classmethod
-    def create(cls: Type[AgentTestType], name: str, target: str, agent_ids: List[str]) -> AgentTestType:
+    def create(cls: Type[AgentTestType], name: str, target: IP, agent_ids: List[ID]) -> AgentTestType:
         return cls(name=name, settings=AgentTestSettings(agentIds=agent_ids, agent=dict(target=target)))

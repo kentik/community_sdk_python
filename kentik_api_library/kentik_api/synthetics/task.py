@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List, Optional
 
-from kentik_api.public.types import ID
+from kentik_api.public.types import ID, IP
 
 from .types import IPFamily
 
@@ -16,7 +16,7 @@ class TaskState(Enum):
 
 @dataclass
 class PingTask:
-    target: str = ""  # ip address
+    target: IP = IP()
     period: int = 60  # seconds
     expiry: int = 3000
     count: int = 5
@@ -24,7 +24,7 @@ class PingTask:
 
 @dataclass
 class TraceTask:
-    target: str = ""  # ip address
+    target: IP = IP()
     period: int = 60  # in seconds
     expiry: int = 3000
     limit: int = 5
@@ -32,14 +32,14 @@ class TraceTask:
 
 @dataclass
 class HTTPTask:
-    target: str  # ip address
+    target: IP
     period: int
     expiry: int
 
 
 @dataclass
 class KnockTask:
-    target: str  # ip address
+    target: IP
     period: int
     expiry: int
     count: int
@@ -48,7 +48,7 @@ class KnockTask:
 
 @dataclass
 class DNSTask:
-    target: str  # ip address
+    target: IP
     period: int
     expiry: int
     count: int
@@ -58,7 +58,7 @@ class DNSTask:
 
 
 class ShakeTask:
-    target: str  # ip address
+    target: IP
     port: int
     period: int
     expiry: int
@@ -66,9 +66,9 @@ class ShakeTask:
 
 @dataclass
 class Task:
-    id: ID = ID("0")
-    test_id: ID = ID("0")
-    device_id: ID = ID("0")
+    id: ID = ID()
+    test_id: ID = ID()
+    device_id: ID = ID()
     state: TaskState = TaskState.unspecified
     status: str = ""
     family: IPFamily = IPFamily.unspecified
