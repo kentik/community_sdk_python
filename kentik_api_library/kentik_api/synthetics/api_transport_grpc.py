@@ -21,6 +21,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import I
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ListAgentsRequest,
     ListTestsRequest,
+    PatchAgentRequest,
     PatchTestRequest,
     SetTestStatusRequest,
 )
@@ -161,10 +162,22 @@ class SynthGRPCTransport(KentikAPITransport):
             return [pb_to_agent(agent) for agent in pbAgents]
 
         elif op == "AgentGet":
-            pbAgent = self._client.GetAgent(
+            result = self._client.GetAgent(
                 GetAgentRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url
             ).agent
-            return pb_to_agent(pbAgent)
+            return pb_to_agent(result)
+
+        # TODO: figure out why PATCH returns error for any mask:
+        # "Error received from peer ipv4:208.76.14.181:443","file":"src/core/lib/surface/call.cc","file_line":1063,
+        # "grpc_message":"internal error (name:TypeError type:object) (errxid c6jyzszp64h05y7px8w0)","grpc_status":13}
+        elif op == "AgentPatch":
+            pb_agent = agent_to_pb(kwargs["agent"])
+            pb_agent.name = ""  # AgentPatch doesn't accept name
+            mask = FieldMask(paths=[kwargs["mask"]])
+            result = self._client.PatchAgent(
+                PatchAgentRequest(agent=pb_agent, mask=mask), metadata=self._credentials, target=self._url
+            )
+            return pb_to_agent(result.agent)
 
         else:
             raise NotImplementedError(op)
@@ -336,9 +349,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
         ip=v.ip,
         lat=v.lat,
         long=v.long,
-        last_authored=datetime.fromtimestamp(
-            v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc
-        ).isoformat(),
+        last_authed=datetime.fromtimestamp(v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc).isoformat(),
         family=PB_FAMILY_TO_FAMILY[v.family],
         asn=v.asn,
         site_id=v.site_id,
@@ -351,4 +362,30 @@ def pb_to_agent(v: pbAgent) -> Agent:
         local_ip=v.local_ip,
         cloud_vpc=v.cloud_vpc,
         agent_impl=PB_AGENT_IMPL_TO_IMPL[v.agent_impl],
+    )
+
+
+def agent_to_pb(v: Agent) -> pbAgent:
+    return pbAgent(
+        id=v.id,
+        name=v.name,
+        status=reverse_map(PB_AGENT_STATUS_TO_STATUS, v.status),
+        alias=v.alias,
+        type=v.type,
+        os=v.os,
+        ip=v.ip,
+        lat=v.lat,
+        long=v.long,
+        family=reverse_map(PB_FAMILY_TO_FAMILY, v.family),
+        asn=v.asn,
+        site_id=v.site_id,
+        version=v.version,
+        challenge=v.challenge,
+        city=v.city,
+        region=v.region,
+        country=v.country,
+        test_ids=v.test_ids,
+        local_ip=v.local_ip,
+        cloud_vpc=v.cloud_vpc,
+        agent_impl=reverse_map(PB_AGENT_IMPL_TO_IMPL, v.agent_impl),
     )

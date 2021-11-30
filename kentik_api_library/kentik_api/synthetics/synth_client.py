@@ -50,8 +50,9 @@ class KentikSynthClient:
     def agent(self, agent_id: str) -> Agent:
         return self._transport.req("AgentGet", id=agent_id)
 
-    def patch_agent(self, agent_id: str, data: dict, modified: str) -> None:
-        return self._transport.req("AgentPatch", id=agent_id, body=dict(agent=data, mask=modified))
+    def patch_agent(self, agent: Agent, modified: str) -> Agent:
+        # return self._transport.req("AgentPatch", id=agent_id, body=dict(agent=data, mask=modified))
+        return self._transport.req("AgentPatch", agent=agent, mask=modified)
 
     def delete_agent(self, agent_id: str) -> Dict:
         return self._transport.req("AgentDelete", id=agent_id)

@@ -7,6 +7,7 @@ from typing import Any
 
 from kentik_api import KentikAPI
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
+from kentik_api.synthetics.agent import AgentImplementType, AgentStatus
 from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
 from kentik_api.utils import get_credentials
@@ -96,10 +97,10 @@ def crud_test() -> None:
     received_test = client.synthetics.test(created_test.id)
     pretty_print(received_test)
 
-    print("### TEST UPDATE")
+    print("### TEST PATCH")
     created_test.settings.port = 640
-    updated_test = client.synthetics.patch_test(created_test, "test.settings.port")
-    pretty_print(updated_test)
+    patched_test = client.synthetics.patch_test(created_test, "test.settings.port")
+    pretty_print(patched_test)
 
     print("### TEST DELETE")
     client.synthetics.delete_test(created_test.id)
@@ -124,6 +125,11 @@ def crud_agent() -> None:
     print("### AGENT GET")
     received_agent = client.synthetics.agent("574")
     pretty_print(received_agent)
+
+    # print("### AGENT PATCH")
+    # received_agent.alias = received_agent.alias + "."
+    # patched_agent = client.synthetics.patch_agent(received_agent, "agent.alias")
+    # pretty_print(patched_agent)
 
 
 if __name__ == "__main__":
