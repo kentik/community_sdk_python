@@ -22,6 +22,10 @@ testpaths = ["tests/integration", "tests/unit"]
 [tool.pylint.master]
 fail-under=8.5
 variable-rgx="[a-z_][a-z0-9_]{0,30}$"
+argument-rgx="[a-z_][a-z0-9_]{0,30}$"
+attr-rgx="[a-z_][a-z0-9_]{0,30}$"
+attribute-rgx="[a-z_][a-z0-9_]{0,30}$"
+class-attribute-rgx="([A-Za-z_][A-Za-z0-9_]{0,30}|(__.*__))$"
 
 [tool.pylint.message_control]
 max-line-length = 120
