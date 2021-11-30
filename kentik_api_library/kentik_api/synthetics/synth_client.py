@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from urllib.parse import urlparse
 
-from kentik_api.public.types import ID, IP
+from kentik_api.public.types import ID
 
 from .agent import Agent
 from .api_transport import KentikAPITransport
@@ -13,10 +13,10 @@ from .synth_tests import SynTest, TestStatus
 log = logging.getLogger("synth_client")
 
 
-def deserialize(cls, object, deserialize_func) -> Any:
-    if isinstance(object, cls):
-        return object
-    return deserialize_func(object)
+def deserialize(cls, obj, deserialize_func) -> Any:
+    if isinstance(obj, cls):
+        return obj
+    return deserialize_func(obj)
 
 
 class KentikSynthClient:
@@ -67,8 +67,7 @@ class KentikSynthClient:
         r = self._transport.req("TestsList", params=dict(presets=presets))
         if raw:
             return r
-        else:
-            return [deserialize(SynTest, t, SynTest.test_from_dict) for t in r]
+        return [deserialize(SynTest, t, SynTest.test_from_dict) for t in r]
 
     def test(self, test: Union[ID, SynTest]) -> SynTest:
         if isinstance(test, SynTest):
@@ -79,8 +78,7 @@ class KentikSynthClient:
         # NOTE: "isinstance" calls related to transport will eventually go away
         if isinstance(self._transport, SynthHTTPTransport):
             return SynTest.test_from_dict(self._transport.req("TestGet", id=test_id))
-        else:
-            return self._transport.req("TestGet", id=test_id)
+        return self._transport.req("TestGet", id=test_id)
 
     def test_raw(self, test_id: ID) -> Any:
         return self._transport.req("TestGet", id=test_id)
@@ -88,8 +86,7 @@ class KentikSynthClient:
     def create_test(self, test: SynTest) -> SynTest:
         if isinstance(self._transport, SynthHTTPTransport):
             return SynTest.test_from_dict(self._transport.req("TestCreate", body=test.to_dict()))
-        else:
-            return self._transport.req("TestCreate", test=test)
+        return self._transport.req("TestCreate", test=test)
 
     def patch_test(self, test: SynTest, modified: str) -> SynTest:
         if test.id == ID("0"):
@@ -98,8 +95,7 @@ class KentikSynthClient:
             body = test.to_dict()
             body["mask"] = modified
             return SynTest.test_from_dict(self._transport.req("TestPatch", id=test.id, body=body))
-        else:
-            return self._transport.req("TestPatch", test=test, mask=modified)
+        return self._transport.req("TestPatch", test=test, mask=modified)
 
     def delete_test(self, test: Union[ID, SynTest]) -> None:
         if isinstance(test, SynTest):
@@ -113,8 +109,7 @@ class KentikSynthClient:
     def set_test_status(self, test_id: ID, status: TestStatus) -> dict:
         if isinstance(self._transport, SynthHTTPTransport):
             return self._transport.req("TestStatusUpdate", id=test_id, body=dict(id=test_id, status=status.value))
-        else:
-            return self._transport.req("TestStatusUpdate", id=test_id, status=status)
+        return self._transport.req("TestStatusUpdate", id=test_id, status=status)
 
     def health(
         self,

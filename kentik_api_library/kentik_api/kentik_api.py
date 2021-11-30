@@ -16,7 +16,6 @@ from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
 from .synthetics.api_transport_grpc import SynthGRPCTransport
-from .synthetics.api_transport_http import SynthHTTPTransport
 from .synthetics.synth_client import KentikSynthClient
 
 

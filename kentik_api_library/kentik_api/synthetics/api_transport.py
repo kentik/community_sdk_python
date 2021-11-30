@@ -5,6 +5,7 @@ from typing import Any, Optional, Tuple
 
 class KentikAPIRequestError(Exception):
     def __init__(self, response):
+        super().__init(response)
         self.response = response
 
     def __repr__(self):

@@ -6,9 +6,7 @@ import logging
 from typing import Any
 
 from kentik_api import KentikAPI
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListTestsRequest, ListTestsResponse, Test
 from kentik_api.public.types import ID
-from kentik_api.synthetics.agent import AgentImplementType, AgentStatus
 from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
 from kentik_api.utils import get_credentials

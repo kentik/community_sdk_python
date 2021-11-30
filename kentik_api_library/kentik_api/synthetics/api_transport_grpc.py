@@ -15,10 +15,8 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     GetTestRequest,
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HostnameTest as pbHostnameTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ImplementType as pbAgentImpl
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IpTest as pbIpTest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ListAgentsRequest,
     ListTestsRequest,
@@ -51,7 +49,7 @@ from kentik_api.synthetics.synth_tests import (
 )
 
 from .agent import Agent, AgentImplementType, AgentStatus
-from .api_transport import KentikAPIRequestError, KentikAPITransport
+from .api_transport import KentikAPITransport
 
 log = logging.getLogger("api_transport_grpc")
 
@@ -83,8 +81,8 @@ PB_AGENT_IMPL_TO_IMPL = {
 }
 
 
-def reverse_map(map: Dict, value: Any) -> Any:
-    for key, val in map.items():
+def reverse_map(src_map: Dict, value: Any) -> Any:
+    for key, val in src_map.items():
         if val == value:
             return key
     raise RuntimeError(f"Value '{value}' not found in map")
@@ -106,8 +104,8 @@ class SynthGRPCTransport(KentikAPITransport):
         # to be refactored
         if op == "TestsList":
             results: List[SynTest] = []
-            pbAgents = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
-            for pbt in pbAgents:
+            pb_agents = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
+            for pbt in pb_agents:
                 if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
                     pb_test = SynTest("[empty]")
                     populate_test_from_pb(pbt, pb_test)
@@ -120,7 +118,7 @@ class SynthGRPCTransport(KentikAPITransport):
                     log.warning('Skipping test "%s" of unsupported type "%s"', pbt.name, pbt.type)
             return results
 
-        elif op == "TestCreate":
+        if op == "TestCreate":
             test: SynTest = kwargs["test"]
             test._id = ID("")  # TestCreate doesn't accept id
             pb_test = test_to_pb(test)
@@ -131,14 +129,14 @@ class SynthGRPCTransport(KentikAPITransport):
             populate_test_from_pb(result.test, out)
             return out
 
-        elif op == "TestGet":
+        if op == "TestGet":
             id = str(kwargs["id"])
             result = self._client.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
 
-        elif op == "TestPatch":
+        if op == "TestPatch":
             pb_test = test_to_pb(kwargs["test"])
             mask = FieldMask(paths=[kwargs["mask"]])
             result = self._client.PatchTest(
@@ -148,12 +146,12 @@ class SynthGRPCTransport(KentikAPITransport):
             populate_test_from_pb(result.test, out)
             return out
 
-        elif op == "TestDelete":
+        if op == "TestDelete":
             id = str(kwargs["id"])
             self._client.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
             return None
 
-        elif op == "TestStatusUpdate":
+        if op == "TestStatusUpdate":
             id = str(kwargs["id"])
             status: TestStatus = kwargs["status"]
             pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
@@ -162,16 +160,18 @@ class SynthGRPCTransport(KentikAPITransport):
             )
             return None
 
-        elif op == "AgentsList":
-            pbAgents = self._client.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
-            return [pb_to_agent(agent) for agent in pbAgents]
+        if op == "AgentsList":
+            pb_agents = self._client.ListAgents(
+                ListAgentsRequest(), metadata=self._credentials, target=self._url
+            ).agents
+            return [pb_to_agent(agent) for agent in pb_agents]
 
-        elif op == "AgentGet":
+        if op == "AgentGet":
             id = str(kwargs["id"])
             result = self._client.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
             return pb_to_agent(result)
 
-        elif op == "AgentPatch":
+        if op == "AgentPatch":
             pb_agent = agent_to_pb(kwargs["agent"])
             pb_agent.name = ""  # AgentPatch doesn't accept name
             mask = FieldMask(paths=[kwargs["mask"]])
@@ -180,13 +180,12 @@ class SynthGRPCTransport(KentikAPITransport):
             )
             return pb_to_agent(result.agent)
 
-        elif op == "AgentDelete":
+        if op == "AgentDelete":
             id = str(kwargs["id"])
             self._client.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
             return None
 
-        else:
-            raise NotImplementedError(op)
+        raise NotImplementedError(op)
 
 
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
