@@ -123,16 +123,16 @@ def crud_agent() -> None:
     client = KentikAPI(email, token)
 
     print("### AGENT GET")
-    received_agent = client.synthetics.agent("574")
+    received_agent = client.synthetics.agent("1717")
     pretty_print(received_agent)
 
     # print("### AGENT PATCH")
-    # received_agent.alias = received_agent.alias + "."
+    # received_agent.alias = received_agent.alias + "!"
     # patched_agent = client.synthetics.patch_agent(received_agent, "agent.alias")
     # pretty_print(patched_agent)
 
     # print("### AGENT DELETE")
-    # client.synthetics.delete_agent("574")
+    # client.synthetics.delete_agent("1717")
 
 
 if __name__ == "__main__":

@@ -168,9 +168,6 @@ class SynthGRPCTransport(KentikAPITransport):
             ).agent
             return pb_to_agent(result)
 
-        # TODO: figure out why PATCH returns error for any mask:
-        # "Error received from peer ipv4:208.76.14.181:443","file":"src/core/lib/surface/call.cc","file_line":1063,
-        # "grpc_message":"internal error (name:TypeError type:object) (errxid c6jyzszp64h05y7px8w0)","grpc_status":13}
         elif op == "AgentPatch":
             pb_agent = agent_to_pb(kwargs["agent"])
             pb_agent.name = ""  # AgentPatch doesn't accept name
