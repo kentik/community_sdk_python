@@ -131,6 +131,9 @@ def crud_agent() -> None:
     # patched_agent = client.synthetics.patch_agent(received_agent, "agent.alias")
     # pretty_print(patched_agent)
 
+    # print("### AGENT DELETE")
+    # client.synthetics.delete_agent("574")
+
 
 if __name__ == "__main__":
     list_tests()

@@ -9,6 +9,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import A
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentStatus as pbAgentStatus
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     CreateTestRequest,
+    DeleteAgentRequest,
     DeleteTestRequest,
     GetAgentRequest,
     GetTestRequest,
@@ -178,6 +179,10 @@ class SynthGRPCTransport(KentikAPITransport):
                 PatchAgentRequest(agent=pb_agent, mask=mask), metadata=self._credentials, target=self._url
             )
             return pb_to_agent(result.agent)
+
+        elif op == "AgentDelete":
+            self._client.DeleteAgent(DeleteAgentRequest(id=kwargs["id"]), metadata=self._credentials, target=self._url)
+            return None
 
         else:
             raise NotImplementedError(op)
