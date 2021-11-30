@@ -68,16 +68,16 @@ PB_FAMILY_TO_FAMILY = {
 }
 
 PB_AGENT_STATUS_TO_STATUS = {
-    pbAgentStatus.AGENT_STATUS_UNSPECIFIED: AgentStatus.unspecified,
-    pbAgentStatus.AGENT_STATUS_OK: AgentStatus.ok,
-    pbAgentStatus.AGENT_STATUS_WAIT: AgentStatus.wait,
-    pbAgentStatus.AGENT_STATUS_DELETED: AgentStatus.deleted,
+    pbAgentStatus.AGENT_STATUS_UNSPECIFIED: AgentStatus.UNSPECIFIED,
+    pbAgentStatus.AGENT_STATUS_OK: AgentStatus.OK,
+    pbAgentStatus.AGENT_STATUS_WAIT: AgentStatus.WAIT,
+    pbAgentStatus.AGENT_STATUS_DELETED: AgentStatus.DELETED,
 }
 
 PB_AGENT_IMPL_TO_IMPL = {
-    pbAgentImpl.IMPLEMENT_TYPE_UNSPECIFIED: AgentImplementType.unspecified,
-    pbAgentImpl.IMPLEMENT_TYPE_RUST: AgentImplementType.rust,
-    pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.node,
+    pbAgentImpl.IMPLEMENT_TYPE_UNSPECIFIED: AgentImplementType.UNSPECIFIED,
+    pbAgentImpl.IMPLEMENT_TYPE_RUST: AgentImplementType.RUST,
+    pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.NODE,
 }
 
 
@@ -202,6 +202,8 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.settings = settings
 
 
+# disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
+# pylint: disable=no-member
 def test_to_pb(v: SynTest) -> pbTest:
     out = pbTest()
     out.name = v.name
@@ -239,6 +241,8 @@ def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
     out.servers = v.servers
 
 
+# disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
+# pylint: disable=no-member
 def settings_to_pb(v: SynTestSettings) -> pbTestSettings:
     out = pbTestSettings()
 
@@ -302,6 +306,8 @@ def health_settings_from_pb(v: pbHealthSettings) -> HealthSettings:
     )
 
 
+# disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
+# pylint: disable=no-member
 def health_settings_to_pb(v: HealthSettings) -> pbHealthSettings:
     out = pbHealthSettings()
     out.latency_critical = v.latencyCritical

@@ -8,10 +8,10 @@ from .types import IPFamily
 
 
 class TaskState(Enum):
-    unspecified = "TASK_STATE_UNSPECIFIED"
-    created = "TASK_STATE_CREATED"
-    updated = "TASK_STATE_UPDATED"
-    deleted = "TASK_STATE_DELETED"
+    UNSPECIFIED = "TASK_STATE_UNSPECIFIED"
+    CREATED = "TASK_STATE_CREATED"
+    UPDATED = "TASK_STATE_UPDATED"
+    DELETED = "TASK_STATE_DELETED"
 
 
 @dataclass
@@ -69,7 +69,7 @@ class Task:
     id: ID = ID()
     test_id: ID = ID()
     device_id: ID = ID()
-    state: TaskState = TaskState.unspecified
+    state: TaskState = TaskState.UNSPECIFIED
     status: str = ""
     family: IPFamily = IPFamily.unspecified
     ping: Optional[PingTask] = None

@@ -15,15 +15,15 @@ logging.basicConfig(level=logging.INFO)
 
 
 def pretty_print(v: Any, level: int = 1) -> None:
-    INDENT = " " * level * 2
+    indent = " " * level * 2
 
     for field_name, field in v.__dict__.items():
         if callable(field):
             continue
         if not hasattr(field, "__dict__"):
-            print(f"{INDENT}{field_name}: {field}")
+            print(f"{indent}{field_name}: {field}")
         else:
-            print(f"{INDENT}{field_name}")
+            print(f"{indent}{field_name}")
             pretty_print(field, level + 1)
 
 

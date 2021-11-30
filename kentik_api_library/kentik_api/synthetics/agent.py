@@ -8,23 +8,23 @@ from .synth_tests import IPFamily
 
 
 class AgentStatus(Enum):
-    unspecified = "AGENT_STATUS_UNSPECIFIED"
-    ok = "AGENT_STATUS_OK"
-    wait = "AGENT_STATUS_WAIT"
-    deleted = "AGENT_STATUS_DELETED"
+    UNSPECIFIED = "AGENT_STATUS_UNSPECIFIED"
+    OK = "AGENT_STATUS_OK"
+    WAIT = "AGENT_STATUS_WAIT"
+    DELETED = "AGENT_STATUS_DELETED"
 
 
 class AgentImplementType(Enum):
-    unspecified = "IMPLEMENT_TYPE_UNSPECIFIED"
-    rust = "IMPLEMENT_TYPE_RUST"
-    node = "IMPLEMENT_TYPE_NODE"
+    UNSPECIFIED = "IMPLEMENT_TYPE_UNSPECIFIED"
+    RUST = "IMPLEMENT_TYPE_RUST"
+    NODE = "IMPLEMENT_TYPE_NODE"
 
 
 @dataclass
 class Agent:
     id: ID = ID()
     name: str = ""
-    status: AgentStatus = AgentStatus.unspecified
+    status: AgentStatus = AgentStatus.UNSPECIFIED
     alias: str = ""
     type: str = ""  # "global"
     os: str = ""
@@ -43,4 +43,4 @@ class Agent:
     test_ids: List[ID] = field(default_factory=list)
     local_ip: IP = IP()
     cloud_vpc: str = ""
-    agent_impl: AgentImplementType = AgentImplementType.unspecified
+    agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
