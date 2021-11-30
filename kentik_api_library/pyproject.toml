@@ -21,6 +21,7 @@ testpaths = ["tests/integration", "tests/unit"]
 
 [tool.pylint.master]
 fail-under=8.5
+variable-rgx="[a-z_][a-z0-9_]{0,30}$"
 
 [tool.pylint.message_control]
 max-line-length = 120
