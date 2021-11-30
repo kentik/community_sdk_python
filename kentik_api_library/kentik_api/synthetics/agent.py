@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
@@ -22,25 +22,25 @@ class AgentImplementType(Enum):
 
 @dataclass
 class Agent:
-    id: ID  # "574"
-    name: str  # "Linode,US (63949)"
-    status: AgentStatus  # "AGENT_STATUS_OK"
-    alias: str  # "Tokyo, Japan"
-    type: str  # "global"
-    os: str  # ""
-    ip: str  # "139.162.75.56"
-    lat: float  # 35.689506
-    long: float  # 139.6917
-    last_authored: str  # "2021-11-29T10:  #09:  #34.742Z"
-    family: IPFamily  # "IP_FAMILY_DUAL"
-    asn: int  # 63949
-    site_id: ID  # "0"
-    version: str  # "0.0.17"
-    challenge: str  # ""
-    city: str  # "Tokyo"
-    region: str  # ""
-    country: str  # "JP"
-    test_ids: List[ID]  # []
-    local_ip: str  # ""
-    cloud_vpc: str  # ""
-    agent_impl: AgentImplementType  # "IMPLEMENT_TYPE_RUST"
+    id: ID = ID("")
+    name: str = ""
+    status: AgentStatus = AgentStatus.unspecified
+    alias: str = ""
+    type: str = ""  # "global"
+    os: str = ""
+    ip: str = ""
+    lat: float = 0.0
+    long: float = 0.0
+    last_authed: str = ""
+    family: IPFamily = IPFamily.unspecified
+    asn: int = 0
+    site_id: ID = ID("0")
+    version: str = ""
+    challenge: str = ""
+    city: str = ""
+    region: str = ""
+    country: str = ""
+    test_ids: List[ID] = field(default_factory=list)
+    local_ip: str = ""
+    cloud_vpc: str = ""
+    agent_impl: AgentImplementType = AgentImplementType.unspecified
