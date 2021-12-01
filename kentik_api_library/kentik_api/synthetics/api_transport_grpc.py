@@ -190,6 +190,7 @@ class SynthGRPCTransport(KentikAPITransport):
 
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.name = v.name
+    print("@@@@@@@@@@@@@", v.type)
     out.type = TestType(v.type)
     out.status = PB_TEST_STATUS_TO_STATUS[v.status]
     out.deviceId = ID(v.device_id)
