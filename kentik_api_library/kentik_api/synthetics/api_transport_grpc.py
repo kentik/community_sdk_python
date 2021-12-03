@@ -4,34 +4,66 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
+from google.protobuf.timestamp_pb2 import Timestamp
 
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Agent as pbAgent
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentHealth as pbAgentHealth
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentStatus as pbAgentStatus
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentTaskConfig as pbAgentTaskConfig
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     CreateTestRequest,
     DeleteAgentRequest,
     DeleteTestRequest,
+)
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import DNSTaskDefinition as pbDNSTaskDefinition
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     GetAgentRequest,
+    GetHealthForTestsRequest,
     GetTestRequest,
 )
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Health as pbHealth
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthMoment as pbHealthMoment
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthSettings as pbHealthSettings
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    HTTPTaskDefinition as pbHTTPTaskDefinition,
+)
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ImplementType as pbAgentImpl
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
-    ListAgentsRequest,
-    ListTestsRequest,
-    PatchAgentRequest,
-    PatchTestRequest,
-    SetTestStatusRequest,
+    KnockTaskDefinition as pbKnockTaskDefinition,
 )
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ListAgentsRequest, ListTestsRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import MeshColumn as pbMeshColumn
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import MeshMetric as pbMeshMetric
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import MeshMetrics as pbMeshMetrics
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import MeshResponse as pbMeshResponse
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import PatchAgentRequest, PatchTestRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    PingTaskDefinition as pbPingTaskDefinition,
+)
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import SetTestStatusRequest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    ShakeTaskDefinition as pbShakeTaskDefinition,
+)
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Task as pbTask
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TaskHealth as pbTaskHealth
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TaskState as pbTaskState
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Test as pbTest
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestHealth as pbTestHealth
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     TestMonitoringSettings as pbMonitoringSettings,
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestSettings as pbTestSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestStatus as pbTestStatus
-from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import SyntheticsAdminService
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    TraceTaskDefinition as pbTraceTaskDefinition,
+)
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc import (
+    SyntheticsAdminService,
+    SyntheticsDataService,
+)
 from kentik_api.public.types import ID, IP
+from kentik_api.requests_payload.conversions import convert_or_none
 from kentik_api.synthetics.synth_tests import (
     HealthSettings,
     IPFamily,
@@ -50,6 +82,28 @@ from kentik_api.synthetics.synth_tests import (
 
 from .agent import Agent, AgentImplementType, AgentStatus
 from .api_transport import KentikAPITransport
+from .health import (
+    AgentHealth,
+    AgentTaskConfig,
+    Health,
+    HealthMoment,
+    MeshColumn,
+    MeshMetric,
+    MeshMetrics,
+    MeshResponse,
+    OverallHealth,
+    TaskHealth,
+)
+from .task import (
+    DNSTaskDefinition,
+    HTTPTaskDefinition,
+    KnockTaskDefinition,
+    PingTaskDefinition,
+    ShakeTaskDefinition,
+    Task,
+    TaskState,
+    TraceTaskDefinition,
+)
 
 log = logging.getLogger("api_transport_grpc")
 
@@ -80,6 +134,13 @@ PB_AGENT_IMPL_TO_IMPL = {
     pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.NODE,
 }
 
+PB_TASK_STATE_TO_STATE = {
+    pbTaskState.TASK_STATE_UNSPECIFIED: TaskState.UNSPECIFIED,
+    pbTaskState.TASK_STATE_CREATED: TaskState.CREATED,
+    pbTaskState.TASK_STATE_UPDATED: TaskState.UPDATED,
+    pbTaskState.TASK_STATE_DELETED: TaskState.DELETED,
+}
+
 
 def reverse_map(src_map: Dict, value: Any) -> Any:
     for key, val in src_map.items():
@@ -94,7 +155,8 @@ class SynthGRPCTransport(KentikAPITransport):
     ) -> None:
         (email, token) = credentials
         self._url = url
-        self._client = SyntheticsAdminService()
+        self._admin = SyntheticsAdminService()
+        self._data = SyntheticsDataService()
         self._credentials = [
             ("x-ch-auth-email", email),
             ("x-ch-auth-api-token", token),
@@ -104,7 +166,7 @@ class SynthGRPCTransport(KentikAPITransport):
         # to be refactored
         if op == "TestsList":
             results: List[SynTest] = []
-            pb_agents = self._client.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
+            pb_agents = self._admin.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
             for pbt in pb_agents:
                 if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
                     pb_test = SynTest("[empty]")
@@ -122,7 +184,7 @@ class SynthGRPCTransport(KentikAPITransport):
             test: SynTest = kwargs["test"]
             test._id = ID("")  # TestCreate doesn't accept id
             pb_test = test_to_pb(test)
-            result = self._client.CreateTest(
+            result = self._admin.CreateTest(
                 CreateTestRequest(test=pb_test), metadata=self._credentials, target=self._url
             )
             out = SynTest("[empty]")
@@ -131,7 +193,7 @@ class SynthGRPCTransport(KentikAPITransport):
 
         if op == "TestGet":
             id = str(kwargs["id"])
-            result = self._client.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
+            result = self._admin.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
             out = SynTest("[empty]")
             populate_test_from_pb(result.test, out)
             return out
@@ -139,7 +201,7 @@ class SynthGRPCTransport(KentikAPITransport):
         if op == "TestPatch":
             pb_test = test_to_pb(kwargs["test"])
             mask = FieldMask(paths=[kwargs["mask"]])
-            result = self._client.PatchTest(
+            result = self._admin.PatchTest(
                 PatchTestRequest(test=pb_test, mask=mask), metadata=self._credentials, target=self._url
             )
             out = SynTest("[empty]")
@@ -148,49 +210,67 @@ class SynthGRPCTransport(KentikAPITransport):
 
         if op == "TestDelete":
             id = str(kwargs["id"])
-            self._client.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
+            self._admin.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
             return None
 
         if op == "TestStatusUpdate":
             id = str(kwargs["id"])
             status: TestStatus = kwargs["status"]
             pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
-            self._client.SetTestStatus(
+            self._admin.SetTestStatus(
                 SetTestStatusRequest(id=id, status=pb_status), metadata=self._credentials, target=self._url
             )
             return None
 
         if op == "AgentsList":
-            pb_agents = self._client.ListAgents(
-                ListAgentsRequest(), metadata=self._credentials, target=self._url
-            ).agents
+            pb_agents = self._admin.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
             return [pb_to_agent(agent) for agent in pb_agents]
 
         if op == "AgentGet":
             id = str(kwargs["id"])
-            result = self._client.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
+            result = self._admin.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
             return pb_to_agent(result)
 
         if op == "AgentPatch":
             pb_agent = agent_to_pb(kwargs["agent"])
             pb_agent.name = ""  # AgentPatch doesn't accept name
             mask = FieldMask(paths=[kwargs["mask"]])
-            result = self._client.PatchAgent(
+            result = self._admin.PatchAgent(
                 PatchAgentRequest(agent=pb_agent, mask=mask), metadata=self._credentials, target=self._url
             )
             return pb_to_agent(result.agent)
 
         if op == "AgentDelete":
             id = str(kwargs["id"])
-            self._client.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
+            self._admin.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
             return None
+
+        if op == "GetHealthForTests":
+            ids = [str(id) for id in kwargs["test_ids"]]
+            agents = [str(id) for id in kwargs["agent_ids"]]
+            tasks = [str(id) for id in kwargs["task_ids"]]
+            start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
+            end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
+            get_health_req = GetHealthForTestsRequest(
+                ids=ids,
+                start_time=start,
+                end_time=end,
+                agent_ids=agents,
+                task_ids=tasks,
+                augment=kwargs["augment"],
+            )
+            result = self._data.GetHealthForTests(
+                request=get_health_req,
+                metadata=self._credentials,
+                target=self._url,
+            )
+            return pb_to_health(result.health)
 
         raise NotImplementedError(op)
 
 
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.name = v.name
-    print("@@@@@@@@@@@@@", v.type)
     out.type = TestType(v.type)
     out.status = PB_TEST_STATUS_TO_STATUS[v.status]
     out.deviceId = ID(v.device_id)
@@ -400,4 +480,199 @@ def agent_to_pb(v: Agent) -> pbAgent:
         local_ip=str(v.local_ip),
         cloud_vpc=v.cloud_vpc,
         agent_impl=reverse_map(PB_AGENT_IMPL_TO_IMPL, v.agent_impl),
+    )
+
+
+def pb_to_health(v: List[pbTestHealth]) -> List[Health]:
+    return [pb_to_health_(health) for health in v]
+
+
+def pb_to_health_(v: pbTestHealth) -> Health:
+    return Health(
+        test_id=ID(v.test_id),
+        tasks=[pb_to_task_health(task) for task in v.tasks],
+        overall_health=pb_to_overall_health(v.overall_health),
+        health_ts=[pb_to_overall_health(health) for health in v.health_ts],
+        agent_task_config=[pb_to_agent_task_config(config) for config in v.agent_task_config],
+        mesh=[pb_to_mesh_response(item) for item in v.mesh],
+    )
+
+
+def pb_to_mesh_response(v: pbMeshResponse) -> MeshResponse:
+    return MeshResponse(
+        id=ID(v.id),
+        name=v.name,
+        local_ip=IP(v.local_ip),
+        ip=IP(v.ip),
+        alias=v.alias,
+        columns=[pb_to_column(column) for column in v.columns],
+    )
+
+
+def pb_to_column(v: pbMeshColumn) -> MeshColumn:
+    return MeshColumn(
+        id=ID(v.id),
+        name=v.name,
+        alias=v.alias,
+        target=IP(v.target),
+        metrics=pb_to_metrics(v.metrics),
+        health=[pb_to_metrics(metric) for metric in v.health],
+    )
+
+
+def pb_to_metrics(v: pbMeshMetrics) -> MeshMetrics:
+    return MeshMetrics(
+        time=v.time,
+        latency=pb_to_metric(v.latency),
+        packet_loss=pb_to_metric(v.packet_loss),
+        jitter=pb_to_metric(v.jitter),
+    )
+
+
+def pb_to_metric(v: pbMeshMetric) -> MeshMetric:
+    return MeshMetric(
+        name=v.name,
+        health=v.health,
+        value=v.value,
+    )
+
+
+def pb_to_agent_task_config(v: pbAgentTaskConfig) -> AgentTaskConfig:
+    return AgentTaskConfig(
+        id=ID(v.id),
+        targets=[IP(ip) for ip in v.targets],
+    )
+
+
+def pb_to_task_health(v: pbTaskHealth) -> TaskHealth:
+    return TaskHealth(
+        task=pb_to_task(v.task),
+        agents=[pb_to_agent_health(agent) for agent in v.agents],
+        overall_health=pb_to_overall_health(v.overall_health),
+    )
+
+
+def pb_to_agent_health(v: pbAgentHealth) -> AgentHealth:
+    return AgentHealth(
+        agent=pb_to_agent(v.agent),
+        health=[pb_to_health_moment(health) for health in v.health],
+        overall_health=pb_to_overall_health(v.overall_health),
+    )
+
+
+def pb_to_health_moment(v: pbHealthMoment) -> HealthMoment:
+    return HealthMoment(
+        time=v.time,
+        src_ip=IP(v.src_ip),
+        dst_ip=IP(v.dst_ip),
+        packet_loss=v.packet_loss,
+        avg_latency=v.avg_latency,
+        avg_weighted_latency=v.avg_weighted_latency,
+        rolling_avg_latency=v.rolling_avg_latency,
+        rolling_stddev_latency=v.rolling_stddev_latency,
+        rolling_avg_weighted_latency=v.rolling_avg_weighted_latency,
+        latency_health=v.latency_health,
+        packet_loss_health=v.packet_loss_health,
+        overall_health=pb_to_overall_health(v.overall_health),
+        avg_jitter=v.avg_jitter,
+        rolling_avg_jitter=v.rolling_avg_jitter,
+        rolling_std_jitter=v.rolling_std_jitter,
+        jitter_health=v.jitter_health,
+        data=v.data,
+        size=v.size,
+        status=v.status,
+        task_type=v.task_type,
+    )
+
+
+def pb_to_overall_health(v: pbHealth) -> OverallHealth:
+    return OverallHealth(
+        health=v.health,
+        time=v.time,
+    )
+
+
+def pb_to_task(v: pbTask) -> Task:
+    return Task(
+        id=ID(v.id),
+        test_id=ID(v.test_id),
+        device_id=ID(v.device_id),
+        state=PB_TASK_STATE_TO_STATE[v.state],
+        status=v.status,
+        family=PB_FAMILY_TO_FAMILY[v.family],
+        ping=pb_to_ping_task(v.ping),
+        traceroute=pb_to_trace_task(v.traceroute),
+        http=pb_to_http_task(v.http),
+        knock=pb_to_knock_task(v.knock),
+        dns=pb_to_dns_task(v.dns),
+        shake=pb_to_shake_task(v.shake),
+    )
+
+
+def pb_to_ping_task(v: pbPingTaskDefinition) -> Optional[PingTaskDefinition]:
+    if v == pbPingTaskDefinition():
+        return None
+    return PingTaskDefinition(
+        target=IP(v.target),
+        period=v.period,
+        expiry=v.expiry,
+        count=v.count,
+    )
+
+
+def pb_to_trace_task(v: pbTraceTaskDefinition) -> Optional[TraceTaskDefinition]:
+    if v == pbTraceTaskDefinition():
+        return None
+    return TraceTaskDefinition(
+        target=IP(v.target),
+        period=v.period,
+        expiry=v.expiry,
+        limit=v.limit,
+    )
+
+
+def pb_to_http_task(v: pbHTTPTaskDefinition) -> Optional[HTTPTaskDefinition]:
+    if v == pbHTTPTaskDefinition():
+        return None
+    return HTTPTaskDefinition(
+        target=IP(v.target),
+        period=v.period,
+        expiry=v.expiry,
+    )
+
+
+def pb_to_knock_task(v: pbKnockTaskDefinition) -> Optional[KnockTaskDefinition]:
+    if v == pbKnockTaskDefinition():
+        return None
+    return KnockTaskDefinition(
+        target=IP(v.target),
+        period=v.period,
+        expiry=v.expiry,
+        count=v.count,
+        port=v.port,
+    )
+
+
+def pb_to_dns_task(v: pbDNSTaskDefinition) -> Optional[DNSTaskDefinition]:
+    if v == pbDNSTaskDefinition():
+        return None
+    return DNSTaskDefinition(
+        target=IP(v.target),
+        period=v.period,
+        expiry=v.expiry,
+        count=v.count,
+        port=v.count,
+        type=v.type,
+        resolver=v.resolver,
+    )
+
+
+def pb_to_shake_task(v: pbShakeTaskDefinition) -> Optional[ShakeTaskDefinition]:
+    if v == pbShakeTaskDefinition():
+        return None
+    return ShakeTaskDefinition(
+        target=IP(v.target),
+        port=v.port,
+        period=v.period,
+        expiry=v.expiry,
     )

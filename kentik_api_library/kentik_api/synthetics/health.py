@@ -14,7 +14,7 @@ class OverallHealth:
 
 
 @dataclass
-class HealthItem:
+class HealthMoment:
     time: str = ""  # "2021-11-08T07:20:00Z"
     src_ip: IP = IP()  # ""
     dst_ip: IP = IP()  # "123.57.94.157"
@@ -31,28 +31,28 @@ class HealthItem:
     rolling_avg_jitter: int = 0  # 3751
     rolling_std_jitter: int = 0  # 418
     jitter_health: str = ""  # "healthy"
-    data: List = field(default_factory=list)  # "[]"
+    data: str = ""  # "[]"
     size: int = 0  # 0
     status: int = 0  # 0
     task_type: str = ""  # "ping"
 
 
 @dataclass
-class AgentItem:
+class AgentHealth:
     agent: Agent = Agent()
-    health: List[HealthItem] = field(default_factory=list)
+    health: List[HealthMoment] = field(default_factory=list)
     overall_health: OverallHealth = OverallHealth()
 
 
 @dataclass
-class TaskItem:
+class TaskHealth:
     task: Task = Task()
-    agents: List[AgentItem] = field(default_factory=list)
+    agents: List[AgentHealth] = field(default_factory=list)
     overall_health: OverallHealth = OverallHealth()
 
 
 @dataclass
-class AgentTaskConfigItem:
+class AgentTaskConfig:
     id: ID = ID()  # agent id
     targets: List[IP] = field(default_factory=list)
 
@@ -83,7 +83,7 @@ class MeshColumn:
 
 
 @dataclass
-class MeshItem:
+class MeshResponse:
     id: ID = ID()
     name: str = ""
     local_ip: IP = IP()
@@ -95,8 +95,8 @@ class MeshItem:
 @dataclass
 class Health:
     test_id: ID = ID()
-    tasks: List[TaskItem] = field(default_factory=list)
+    tasks: List[TaskHealth] = field(default_factory=list)
     overall_health: OverallHealth = OverallHealth()
     health_ts: List[OverallHealth] = field(default_factory=list)
-    agent_task_config: List[AgentTaskConfigItem] = field(default_factory=list)
-    mesh: List[MeshItem] = field(default_factory=list)
+    agent_task_config: List[AgentTaskConfig] = field(default_factory=list)
+    mesh: List[MeshResponse] = field(default_factory=list)

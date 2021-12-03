@@ -15,7 +15,7 @@ class TaskState(Enum):
 
 
 @dataclass
-class PingTask:
+class PingTaskDefinition:
     target: IP = IP()
     period: int = 60  # seconds
     expiry: int = 3000
@@ -23,7 +23,7 @@ class PingTask:
 
 
 @dataclass
-class TraceTask:
+class TraceTaskDefinition:
     target: IP = IP()
     period: int = 60  # in seconds
     expiry: int = 3000
@@ -31,14 +31,14 @@ class TraceTask:
 
 
 @dataclass
-class HTTPTask:
+class HTTPTaskDefinition:
     target: IP
     period: int
     expiry: int
 
 
 @dataclass
-class KnockTask:
+class KnockTaskDefinition:
     target: IP
     period: int
     expiry: int
@@ -47,7 +47,7 @@ class KnockTask:
 
 
 @dataclass
-class DNSTask:
+class DNSTaskDefinition:
     target: IP
     period: int
     expiry: int
@@ -57,7 +57,8 @@ class DNSTask:
     resolver: str
 
 
-class ShakeTask:
+@dataclass
+class ShakeTaskDefinition:
     target: IP
     port: int
     period: int
@@ -72,9 +73,9 @@ class Task:
     state: TaskState = TaskState.UNSPECIFIED
     status: str = ""
     family: IPFamily = IPFamily.unspecified
-    ping: Optional[PingTask] = None
-    traceroute: Optional[TraceTask] = None
-    http: Optional[HTTPTask] = None
-    knock: Optional[KnockTask] = None
-    dns: Optional[DNSTask] = None
-    shake: Optional[ShakeTask] = None
+    ping: Optional[PingTaskDefinition] = None
+    traceroute: Optional[TraceTaskDefinition] = None
+    http: Optional[HTTPTaskDefinition] = None
+    knock: Optional[KnockTaskDefinition] = None
+    dns: Optional[DNSTaskDefinition] = None
+    shake: Optional[ShakeTaskDefinition] = None

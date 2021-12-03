@@ -3,6 +3,7 @@ Examples of using the Synthetics API
 """
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
 from kentik_api import KentikAPI
@@ -20,11 +21,11 @@ def pretty_print(v: Any, level: int = 1) -> None:
     for field_name, field in v.__dict__.items():
         if callable(field):
             continue
-        if not hasattr(field, "__dict__"):
-            print(f"{indent}{field_name}: {field}")
-        else:
+        if hasattr(field, "__dict__"):
             print(f"{indent}{field_name}")
             pretty_print(field, level + 1)
+        else:
+            print(f"{indent}{field_name}: {field}")
 
 
 def list_tests() -> None:
@@ -88,21 +89,28 @@ def crud_test() -> None:
     test.deviceId = ID("75702")
     created_test = client.synthetics.create_test(test)
     pretty_print(created_test)
+    print()
 
     print("### TEST SET STATUS")
     client.synthetics.set_test_status(created_test.id, TestStatus.paused)
+    print("OK")
+    print()
 
     print("### TEST GET")
     received_test = client.synthetics.test(created_test.id)
     pretty_print(received_test)
+    print()
 
     print("### TEST PATCH")
     created_test.settings.port = 640
     patched_test = client.synthetics.patch_test(created_test, "test.settings.port")
     pretty_print(patched_test)
+    print()
 
     print("### TEST DELETE")
     client.synthetics.delete_test(created_test.id)
+    print("OK")
+    print()
 
 
 def list_agents() -> None:
@@ -134,8 +142,32 @@ def crud_agent() -> None:
     # client.synthetics.delete_agent(ID("1717"))
 
 
+def get_health() -> None:
+    email, token = get_credentials()
+    client = KentikAPI(email, token)
+
+    test_id = ID("3541")
+    start = datetime(2021, 11, 8, 7, 15, 3, 0, timezone.utc)
+    end = datetime(2021, 11, 8, 7, 20, 3, 0, timezone.utc)
+
+    print("### GET HEALTH FOR TESTS")
+    health_items = client.synthetics.health(
+        test_ids=[test_id],
+        start=start,
+        end=end,
+        augment=True,
+        agent_ids=None,
+        task_ids=None,
+    )
+    for health in health_items:
+        print(health.test_id)
+        pretty_print(health)
+    print()
+
+
 if __name__ == "__main__":
     list_tests()
     crud_test()
     list_agents()
     crud_agent()
+    get_health()

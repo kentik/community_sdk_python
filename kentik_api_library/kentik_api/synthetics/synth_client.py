@@ -119,17 +119,27 @@ class KentikSynthClient:
         augment: bool = False,
         agent_ids: Optional[List[ID]] = None,
         task_ids: Optional[List[ID]] = None,
-    ) -> List[Dict]:
+    ) -> List[Any]:
+        if isinstance(self._transport, SynthHTTPTransport):
+            return self._transport.req(
+                "GetHealthForTests",
+                body=dict(
+                    ids=test_ids,
+                    startTime=start.isoformat(),
+                    endTime=end.isoformat(),
+                    augment=augment,
+                    agentIds=agent_ids if agent_ids else [],
+                    taskIds=task_ids if task_ids else [],
+                ),
+            )
         return self._transport.req(
             "GetHealthForTests",
-            body=dict(
-                ids=test_ids,
-                startTime=start.isoformat(),
-                endTime=end.isoformat(),
-                augment=augment,
-                agentIds=agent_ids if agent_ids else [],
-                taskIds=task_ids if task_ids else [],
-            ),
+            test_ids=test_ids,
+            start_time=start,
+            end_time=end,
+            augment=augment,
+            agent_ids=agent_ids if agent_ids else [],
+            task_ids=task_ids if task_ids else [],
         )
 
     def results(
