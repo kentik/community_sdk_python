@@ -275,8 +275,8 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.status = PB_TEST_STATUS_TO_STATUS[v.status]
     out.deviceId = ID(v.device_id)
     out._id = ID(v.id)
-    out._cdate = datetime.fromtimestamp(v.cdate.seconds + v.cdate.nanos / 1e9, timezone.utc).isoformat()
-    out._edate = datetime.fromtimestamp(v.edate.seconds + v.edate.nanos / 1e9, timezone.utc).isoformat()
+    out._cdate = pb_to_datetime_iso(v.cdate)
+    out._edate = pb_to_datetime_iso(v.edate)
 
     settings = SynTestSettings()
     pupulate_settings_from_pb(v.settings, settings)
@@ -441,7 +441,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
         ip=IP(v.ip),
         lat=v.lat,
         long=v.long,
-        last_authed=datetime.fromtimestamp(v.last_authed.seconds + v.last_authed.nanos / 1e9, timezone.utc).isoformat(),
+        last_authed=pb_to_datetime_iso(v.last_authed),
         family=PB_FAMILY_TO_FAMILY[v.family],
         asn=v.asn,
         site_id=ID(v.site_id),
@@ -522,7 +522,7 @@ def pb_to_column(v: pbMeshColumn) -> MeshColumn:
 
 def pb_to_metrics(v: pbMeshMetrics) -> MeshMetrics:
     return MeshMetrics(
-        time=v.time,
+        time=pb_to_datetime_iso(v.time),
         latency=pb_to_metric(v.latency),
         packet_loss=pb_to_metric(v.packet_loss),
         jitter=pb_to_metric(v.jitter),
@@ -562,7 +562,7 @@ def pb_to_agent_health(v: pbAgentHealth) -> AgentHealth:
 
 def pb_to_health_moment(v: pbHealthMoment) -> HealthMoment:
     return HealthMoment(
-        time=v.time,
+        time=pb_to_datetime_iso(v.time),
         src_ip=IP(v.src_ip),
         dst_ip=IP(v.dst_ip),
         packet_loss=v.packet_loss,
@@ -588,7 +588,7 @@ def pb_to_health_moment(v: pbHealthMoment) -> HealthMoment:
 def pb_to_overall_health(v: pbHealth) -> OverallHealth:
     return OverallHealth(
         health=v.health,
-        time=v.time,
+        time=pb_to_datetime_iso(v.time),
     )
 
 
@@ -676,3 +676,7 @@ def pb_to_shake_task(v: pbShakeTaskDefinition) -> Optional[ShakeTaskDefinition]:
         period=v.period,
         expiry=v.expiry,
     )
+
+
+def pb_to_datetime_iso(v: Timestamp) -> str:
+    return datetime.fromtimestamp(v.seconds + v.nanos / 1e9, timezone.utc).isoformat()

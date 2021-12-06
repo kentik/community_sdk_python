@@ -18,14 +18,18 @@ logging.basicConfig(level=logging.INFO)
 def pretty_print(v: Any, level: int = 1) -> None:
     indent = " " * level * 2
 
-    for field_name, field in v.__dict__.items():
-        if callable(field):
-            continue
-        if hasattr(field, "__dict__"):
-            print(f"{indent}{field_name}")
+    if hasattr(v, "__dict__"):
+        for field_name, field in v.__dict__.items():
+            if callable(field):
+                continue
+            print(f"\n{indent}{field_name}: ", end="")
             pretty_print(field, level + 1)
-        else:
-            print(f"{indent}{field_name}: {field}")
+    elif isinstance(v, list) and len(v) > 0 and hasattr(v[0], "__dict__"):
+        for i, item in enumerate(v):
+            print(f"\n{indent}[{i}]", end="")
+            pretty_print(item, level + 1)
+    else:
+        print(f"{v}", end="")
 
 
 def list_tests() -> None:
@@ -35,7 +39,7 @@ def list_tests() -> None:
 
     items = client.synthetics.tests
     for test in items:
-        print(test.id)
+        pretty_print(test.id)
         pretty_print(test)
         print()
 
@@ -120,7 +124,7 @@ def list_agents() -> None:
 
     agents = client.synthetics.agents
     for agent in agents:
-        print(agent.id)
+        pretty_print(agent.id)
         pretty_print(agent)
         print()
 
@@ -160,7 +164,7 @@ def get_health() -> None:
         task_ids=None,
     )
     for health in health_items:
-        print(health.test_id)
+        pretty_print(health.test_id)
         pretty_print(health)
     print()
 
