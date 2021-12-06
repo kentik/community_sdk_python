@@ -165,15 +165,25 @@ class KentikSynthClient:
         end: datetime,
         agent_ids: Optional[List[str]] = None,
         ips: Optional[List[str]] = None,
-    ):
-        return self._transport.req(
-            "GetTraceForTest",
-            id=test_id,
-            body=dict(
+    ) -> Any:
+        if isinstance(self._transport, SynthHTTPTransport):
+            return self._transport.req(
+                "GetTraceForTest",
                 id=test_id,
-                startTime=start.isoformat(),
-                endTime=end.isoformat(),
-                agentIds=agent_ids if agent_ids else [],
-                targetIps=ips if ips else [],
-            ),
-        )
+                body=dict(
+                    id=test_id,
+                    startTime=start.isoformat(),
+                    endTime=end.isoformat(),
+                    agentIds=agent_ids if agent_ids else [],
+                    targetIps=ips if ips else [],
+                ),
+            )
+        else:
+            return self._transport.req(
+                "GetTraceForTest",
+                id=test_id,
+                start_time=start,
+                end_time=end,
+                agent_ids=agent_ids if agent_ids else [],
+                target_ips=ips if ips else [],
+            )

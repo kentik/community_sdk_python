@@ -6,20 +6,28 @@ import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ASN as pbASN
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Agent as pbAgent
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentHealth as pbAgentHealth
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentStatus as pbAgentStatus
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentTaskConfig as pbAgentTaskConfig
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import City as pbCity
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Country as pbCountry
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     CreateTestRequest,
     DeleteAgentRequest,
     DeleteTestRequest,
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import DNSTaskDefinition as pbDNSTaskDefinition
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Geo as pbGeo
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     GetAgentRequest,
     GetHealthForTestsRequest,
     GetTestRequest,
+    GetTraceForTestRequest,
+)
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
+    GetTraceForTestResponse as pbGetTraceForTestResponse,
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Health as pbHealth
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import HealthMoment as pbHealthMoment
@@ -27,8 +35,10 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import H
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     HTTPTaskDefinition as pbHTTPTaskDefinition,
 )
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IDByIP as pbIDByIP
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ImplementType as pbAgentImpl
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPFamily as pbIPFamily
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import IPInfo as pbIPInfo
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     KnockTaskDefinition as pbKnockTaskDefinition,
 )
@@ -41,10 +51,12 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import P
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     PingTaskDefinition as pbPingTaskDefinition,
 )
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Region as pbRegion
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import SetTestStatusRequest
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     ShakeTaskDefinition as pbShakeTaskDefinition,
 )
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Stats as pbStats
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Task as pbTask
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TaskHealth as pbTaskHealth
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TaskState as pbTaskState
@@ -55,6 +67,12 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
 )
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestSettings as pbTestSettings
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TestStatus as pbTestStatus
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Trace as pbTrace
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TraceHop as pbTraceHop
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TraceProbe as pbTraceProbe
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TracerouteInfo as pbTracerouteInfo
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TracerouteLookup as pbTracerouteLookup
+from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import TracerouteResult as pbTracerouteResult
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import (
     TraceTaskDefinition as pbTraceTaskDefinition,
 )
@@ -62,6 +80,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc imp
     SyntheticsAdminService,
     SyntheticsDataService,
 )
+from kentik_api.public import device
 from kentik_api.public.types import ID, IP
 from kentik_api.requests_payload.conversions import convert_or_none
 from kentik_api.synthetics.synth_tests import (
@@ -103,6 +122,24 @@ from .task import (
     Task,
     TaskState,
     TraceTaskDefinition,
+)
+from .trace import (
+    ASN,
+    DNS,
+    City,
+    Country,
+    Geo,
+    GetTraceForTestResponse,
+    IDbyIP,
+    IPInfo,
+    Region,
+    Stats,
+    Trace,
+    TraceHop,
+    TraceProbe,
+    TracerouteInfo,
+    TracerouteLookup,
+    TracerouteResult,
 )
 
 log = logging.getLogger("api_transport_grpc")
@@ -265,6 +302,26 @@ class SynthGRPCTransport(KentikAPITransport):
                 target=self._url,
             )
             return pb_to_health(result.health)
+
+        if op == "GetTraceForTest":
+            id = str(kwargs["id"])
+            agents = [str(id) for id in kwargs["agent_ids"]]
+            ips = [str(ip) for ip in kwargs["target_ips"]]
+            start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
+            end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
+            get_trace_req = GetTraceForTestRequest(
+                id=id,
+                start_time=start,
+                end_time=end,
+                agent_ids=agents,
+                target_ips=ips,
+            )
+            result = self._data.GetTraceForTest(
+                request=get_trace_req,
+                metadata=self._credentials,
+                target=self._url,
+            )
+            return pb_to_trace_response(result)
 
         raise NotImplementedError(op)
 
@@ -680,3 +737,125 @@ def pb_to_shake_task(v: pbShakeTaskDefinition) -> Optional[ShakeTaskDefinition]:
 
 def pb_to_datetime_iso(v: Timestamp) -> str:
     return datetime.fromtimestamp(v.seconds + v.nanos / 1e9, timezone.utc).isoformat()
+
+
+def pb_to_trace_response(v: pbGetTraceForTestResponse) -> GetTraceForTestResponse:
+    return GetTraceForTestResponse(
+        lookups=pb_to_lookups(v.lookups),
+        trace_routes=[pb_to_trace_routes(item) for item in v.trace_routes],
+        trace_routes_info=pb_to_trace_route_info(v.trace_routes_info),
+    )
+
+
+def pb_to_trace_routes(v: pbTracerouteResult) -> TracerouteResult:
+    return TracerouteResult(
+        time=pb_to_datetime_iso(v.time),
+        traces=[pb_to_trace(trace) for trace in v.traces],
+        hop_count=v.hop_count,
+        count=pb_to_stats(v.count),
+        distance=pb_to_stats(v.distance),
+    )
+
+
+def pb_to_trace(v: pbTrace) -> Trace:
+    return Trace(
+        agent_id=ID(v.agent_id),
+        agent_ip=IP(v.agent_ip),
+        target_ip=IP(v.target_ip),
+        hop_count=v.hop_count,
+        probes=[pb_to_probe(probe) for probe in v.probes],
+    )
+
+
+def pb_to_probe(v: pbTraceProbe) -> TraceProbe:
+    return TraceProbe(
+        as_path=v.as_path,
+        completed=v.completed,
+        hop_count=v.hop_count,
+        region_path=v.region_path,
+        site_path=v.site_path,
+        hops=[pb_to_trace_hop(hop) for hop in v.hops],
+    )
+
+
+def pb_to_trace_hop(v: pbTraceHop) -> TraceHop:
+    return TraceHop(
+        ttl=v.ttl,
+        ip=IP(v.ip),
+        timeout=v.timeout,
+        latency=v.latency,
+        min_expected_latency=v.min_expected_latency,
+        asn=v.asn,
+        site=v.site,
+        region=v.region,
+        target=v.target,
+        trace_end=v.trace_end,
+    )
+
+
+def pb_to_stats(v: pbStats) -> Stats:
+    return Stats(
+        average=v.average,
+        max=v.max,
+        total=v.total,
+    )
+
+
+def pb_to_trace_route_info(v: pbTracerouteInfo) -> TracerouteInfo:
+    return TracerouteInfo(
+        is_trace_routes_truncated=v.is_trace_routes_truncated,
+        max_asn_path_count=v.max_asn_path_count,
+        max_site_path_count=v.max_site_path_count,
+        max_region_path_count=v.max_region_path_count,
+    )
+
+
+def pb_to_lookups(v: pbTracerouteLookup) -> TracerouteLookup:
+    return TracerouteLookup(
+        agent_id_by_ip=[pb_to_id_by_ip(item) for item in v.agent_id_by_ip],
+        agents=[pb_to_agent(agent) for agent in v.agents],
+        asns=[pb_to_asn(asn) for asn in v.asns],
+        device_id_by_ip=[pb_to_id_by_ip(item) for item in v.device_id_by_ip],
+        site_id_by_ip=[pb_to_id_by_ip(item) for item in v.site_id_by_ip],
+        ips=[pb_to_ipinfo(item) for item in v.ips],
+    )
+
+
+def pb_to_asn(v: pbASN) -> ASN:
+    return ASN(id=ID(v.id), name=v.name)
+
+
+def pb_to_id_by_ip(v: pbIDByIP) -> IDbyIP:
+    return IDbyIP(id=ID(v.id), ip=IP(v.ip))
+
+
+def pb_to_ipinfo(v: pbIPInfo) -> IPInfo:
+    return IPInfo(
+        ip=IP(v.ip),
+        asn=pb_to_asn(v.asn),
+        geo=pb_to_geo(v.geo),
+        dns=DNS(v.dns.name),
+        device_id=ID(v.device_id),
+        site_id=ID(v.site_id),
+        egress=v.egress,
+    )
+
+
+def pb_to_geo(v: pbGeo) -> Geo:
+    return Geo(
+        country=pb_to_country(v.country),
+        city=pb_to_city(v.city),
+        region=pb_to_region(v.region),
+    )
+
+
+def pb_to_country(v: pbCountry) -> Country:
+    return Country(code=v.code, name=v.name)
+
+
+def pb_to_city(v: pbCity) -> City:
+    return City(id=ID(v.id), name=v.name, longitude=v.longitude, latitude=v.latitude)
+
+
+def pb_to_region(v: pbRegion) -> Region:
+    return Region(id=ID(v.id), name=v.name)

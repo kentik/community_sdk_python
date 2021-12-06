@@ -4,6 +4,7 @@ Examples of using the Synthetics API
 
 import logging
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any
 
 from kentik_api import KentikAPI
@@ -18,16 +19,20 @@ logging.basicConfig(level=logging.INFO)
 def pretty_print(v: Any, level: int = 1) -> None:
     indent = " " * level * 2
 
-    if hasattr(v, "__dict__"):
+    if isinstance(v, Enum):
+        print(f"{v.value}", end="")
+    elif isinstance(v, str):
+        print(f'"{v}"', end="")
+    elif isinstance(v, list) and len(v) > 0 and hasattr(v[0], "__dict__"):
+        for i, item in enumerate(v):
+            print(f"\n{indent}[{i}]", end="")
+            pretty_print(item, level + 1)
+    elif hasattr(v, "__dict__"):
         for field_name, field in v.__dict__.items():
             if callable(field):
                 continue
             print(f"\n{indent}{field_name}: ", end="")
             pretty_print(field, level + 1)
-    elif isinstance(v, list) and len(v) > 0 and hasattr(v[0], "__dict__"):
-        for i, item in enumerate(v):
-            print(f"\n{indent}[{i}]", end="")
-            pretty_print(item, level + 1)
     else:
         print(f"{v}", end="")
 
@@ -169,9 +174,30 @@ def get_health() -> None:
     print()
 
 
+def get_trace() -> None:
+    email, token = get_credentials()
+    client = KentikAPI(email, token)
+
+    test_id = ID("3541")
+    start = datetime(2021, 11, 8, 7, 15, 3, 0, timezone.utc)
+    end = datetime(2021, 11, 8, 7, 20, 3, 0, timezone.utc)
+
+    print("### GET TRACE FOR TESTS")
+    trace = client.synthetics.trace(
+        test_id=test_id,
+        start=start,
+        end=end,
+        agent_ids=None,
+        ips=None,
+    )
+    pretty_print(trace)
+    print()
+
+
 if __name__ == "__main__":
     list_tests()
     crud_test()
     list_agents()
     crud_agent()
     get_health()
+    get_trace()
