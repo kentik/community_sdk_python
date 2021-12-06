@@ -93,7 +93,7 @@ class MeshResponse:
 
 
 @dataclass
-class Health:
+class TestHealth:
     test_id: ID = ID()
     tasks: List[TaskHealth] = field(default_factory=list)
     overall_health: OverallHealth = OverallHealth()

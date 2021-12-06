@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
@@ -104,7 +104,6 @@ from .api_transport import KentikAPITransport
 from .health import (
     AgentHealth,
     AgentTaskConfig,
-    Health,
     HealthMoment,
     MeshColumn,
     MeshMetric,
@@ -112,6 +111,7 @@ from .health import (
     MeshResponse,
     OverallHealth,
     TaskHealth,
+    TestHealth,
 )
 from .task import (
     DNSTaskDefinition,
@@ -179,13 +179,6 @@ PB_TASK_STATE_TO_STATE = {
 }
 
 
-def reverse_map(src_map: Dict, value: Any) -> Any:
-    for key, val in src_map.items():
-        if val == value:
-            return key
-    raise RuntimeError(f"Value '{value}' not found in map")
-
-
 class SynthGRPCTransport(KentikAPITransport):
     def __init__(
         self, credentials: Tuple[str, str], url: str = "synthetics.api.kentik.com:443", proxy: Optional[str] = None
@@ -200,130 +193,140 @@ class SynthGRPCTransport(KentikAPITransport):
         ]
 
     def req(self, op: str, **kwargs) -> Any:
-        # to be refactored
-        if op == "TestsList":
-            results: List[SynTest] = []
-            pb_agents = self._admin.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
-            for pbt in pb_agents:
-                if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
-                    pb_test = SynTest("[empty]")
-                    populate_test_from_pb(pbt, pb_test)
-                    results.append(pb_test)
-                if pbt.type == TestType.mesh.value:
-                    pb_test = MeshTest("[empty]")
-                    populate_mesh_test_from_pb(pbt, pb_test)
-                    results.append(pb_test)
-                else:
-                    log.warning('Skipping test "%s" of unsupported type "%s"', pbt.name, pbt.type)
-            return results
+        OPS: Dict[str, Callable] = {
+            "TestsList": self.tests_list,
+            "TestCreate": self.test_create,
+            "TestGet": self.test_get,
+            "TestPatch": self.test_patch,
+            "TestDelete": self.test_delete,
+            "TestStatusUpdate": self.test_status_update,
+            "AgentsList": self.agent_list,
+            "AgentGet": self.agent_get,
+            "AgentPatch": self.agent_patch,
+            "AgentDelete": self.agent_delete,
+            "GetHealthForTests": self.get_health_for_tests,
+            "GetTraceForTest": self.get_trace_for_test,
+        }
 
-        if op == "TestCreate":
-            test: SynTest = kwargs["test"]
-            test._id = ID("")  # TestCreate doesn't accept id
-            pb_test = test_to_pb(test)
-            result = self._admin.CreateTest(
-                CreateTestRequest(test=pb_test), metadata=self._credentials, target=self._url
-            )
-            out = SynTest("[empty]")
-            populate_test_from_pb(result.test, out)
-            return out
+        try:
+            svc = OPS[op]
+        except KeyError:
+            raise RuntimeError(f"Invalid operation '{op}'")
 
-        if op == "TestGet":
-            id = str(kwargs["id"])
-            result = self._admin.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
-            out = SynTest("[empty]")
-            populate_test_from_pb(result.test, out)
-            return out
+        return svc(**kwargs)
 
-        if op == "TestPatch":
-            pb_test = test_to_pb(kwargs["test"])
-            mask = FieldMask(paths=[kwargs["mask"]])
-            result = self._admin.PatchTest(
-                PatchTestRequest(test=pb_test, mask=mask), metadata=self._credentials, target=self._url
-            )
-            out = SynTest("[empty]")
-            populate_test_from_pb(result.test, out)
-            return out
+    def tests_list(self, **kwargs) -> List[SynTest]:
+        tests: List[SynTest] = []
+        pb_tests = self._admin.ListTests(ListTestsRequest(), metadata=self._credentials, target=self._url).tests
+        for pbt in pb_tests:
+            if pbt.type in [TestType.none.value, TestType.bgp_monitor.value]:
+                pb_test = SynTest("[empty]")
+                populate_test_from_pb(pbt, pb_test)
+                tests.append(pb_test)
+            if pbt.type == TestType.mesh.value:
+                pb_test = MeshTest("[empty]")
+                populate_mesh_test_from_pb(pbt, pb_test)
+                tests.append(pb_test)
+            else:
+                log.warning('Skipping test "%s" of unsupported type "%s"', pbt.name, pbt.type)
+        return tests
 
-        if op == "TestDelete":
-            id = str(kwargs["id"])
-            self._admin.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
-            return None
+    def test_create(self, **kwargs) -> SynTest:
+        test: SynTest = kwargs["test"]
+        test._id = ID("")  # TestCreate doesn't accept id
+        pb_test = pb_from_test(test)
+        response = self._admin.CreateTest(CreateTestRequest(test=pb_test), metadata=self._credentials, target=self._url)
+        out = SynTest("[empty]")
+        populate_test_from_pb(response.test, out)
+        return out
 
-        if op == "TestStatusUpdate":
-            id = str(kwargs["id"])
-            status: TestStatus = kwargs["status"]
-            pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
-            self._admin.SetTestStatus(
-                SetTestStatusRequest(id=id, status=pb_status), metadata=self._credentials, target=self._url
-            )
-            return None
+    def test_get(self, **kwargs) -> SynTest:
+        id = str(kwargs["id"])
+        response = self._admin.GetTest(GetTestRequest(id=id), metadata=self._credentials, target=self._url)
+        out = SynTest("[empty]")
+        populate_test_from_pb(response.test, out)
+        return out
 
-        if op == "AgentsList":
-            pb_agents = self._admin.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
-            return [pb_to_agent(agent) for agent in pb_agents]
+    def test_patch(self, **kwargs) -> SynTest:
+        pb_test = pb_from_test(kwargs["test"])
+        mask = FieldMask(paths=[kwargs["mask"]])
+        patch_test_req = PatchTestRequest(test=pb_test, mask=mask)
+        response = self._admin.PatchTest(request=patch_test_req, metadata=self._credentials, target=self._url)
+        out = SynTest("[empty]")
+        populate_test_from_pb(response.test, out)
+        return out
 
-        if op == "AgentGet":
-            id = str(kwargs["id"])
-            result = self._admin.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
-            return pb_to_agent(result)
+    def test_delete(self, **kwargs) -> None:
+        id = str(kwargs["id"])
+        self._admin.DeleteTest(DeleteTestRequest(id=id), metadata=self._credentials, target=self._url)
 
-        if op == "AgentPatch":
-            pb_agent = agent_to_pb(kwargs["agent"])
-            pb_agent.name = ""  # AgentPatch doesn't accept name
-            mask = FieldMask(paths=[kwargs["mask"]])
-            result = self._admin.PatchAgent(
-                PatchAgentRequest(agent=pb_agent, mask=mask), metadata=self._credentials, target=self._url
-            )
-            return pb_to_agent(result.agent)
+    def test_status_update(self, **kwargs) -> None:
+        id = str(kwargs["id"])
+        status: TestStatus = kwargs["status"]
+        pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
+        set_status_req = SetTestStatusRequest(id=id, status=pb_status)
+        self._admin.SetTestStatus(request=set_status_req, metadata=self._credentials, target=self._url)
 
-        if op == "AgentDelete":
-            id = str(kwargs["id"])
-            self._admin.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
-            return None
+    def agent_list(self, **kwargs) -> List[Agent]:
+        pb_agents = self._admin.ListAgents(ListAgentsRequest(), metadata=self._credentials, target=self._url).agents
+        return [pb_to_agent(agent) for agent in pb_agents]
 
-        if op == "GetHealthForTests":
-            ids = [str(id) for id in kwargs["test_ids"]]
-            agents = [str(id) for id in kwargs["agent_ids"]]
-            tasks = [str(id) for id in kwargs["task_ids"]]
-            start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
-            end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
-            get_health_req = GetHealthForTestsRequest(
-                ids=ids,
-                start_time=start,
-                end_time=end,
-                agent_ids=agents,
-                task_ids=tasks,
-                augment=kwargs["augment"],
-            )
-            result = self._data.GetHealthForTests(
-                request=get_health_req,
-                metadata=self._credentials,
-                target=self._url,
-            )
-            return pb_to_health(result.health)
+    def agent_get(self, **kwargs) -> Agent:
+        id = str(kwargs["id"])
+        response = self._admin.GetAgent(GetAgentRequest(id=id), metadata=self._credentials, target=self._url).agent
+        return pb_to_agent(response)
 
-        if op == "GetTraceForTest":
-            id = str(kwargs["id"])
-            agents = [str(id) for id in kwargs["agent_ids"]]
-            ips = [str(ip) for ip in kwargs["target_ips"]]
-            start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
-            end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
-            get_trace_req = GetTraceForTestRequest(
-                id=id,
-                start_time=start,
-                end_time=end,
-                agent_ids=agents,
-                target_ips=ips,
-            )
-            result = self._data.GetTraceForTest(
-                request=get_trace_req,
-                metadata=self._credentials,
-                target=self._url,
-            )
-            return pb_to_trace_response(result)
+    def agent_patch(self, **kwargs) -> Agent:
+        pb_agent = pb_from_agent(kwargs["agent"])
+        pb_agent.name = ""  # AgentPatch doesn't accept name
+        mask = FieldMask(paths=[kwargs["mask"]])
+        patch_agent_req = PatchAgentRequest(agent=pb_agent, mask=mask)
+        response = self._admin.PatchAgent(request=patch_agent_req, metadata=self._credentials, target=self._url)
+        return pb_to_agent(response.agent)
 
-        raise NotImplementedError(op)
+    def agent_delete(self, **kwargs) -> None:
+        id = str(kwargs["id"])
+        self._admin.DeleteAgent(DeleteAgentRequest(id=id), metadata=self._credentials, target=self._url)
+
+    def get_health_for_tests(self, **kwargs) -> List[TestHealth]:
+        ids = [str(id) for id in kwargs["test_ids"]]
+        agents = [str(id) for id in kwargs["agent_ids"]]
+        tasks = [str(id) for id in kwargs["task_ids"]]
+        start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
+        end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
+        get_health_req = GetHealthForTestsRequest(
+            ids=ids,
+            start_time=start,
+            end_time=end,
+            agent_ids=agents,
+            task_ids=tasks,
+            augment=kwargs["augment"],
+        )
+        response = self._data.GetHealthForTests(request=get_health_req, metadata=self._credentials, target=self._url)
+        return pb_to_health_tests(response.health)
+
+    def get_trace_for_test(self, **kwargs) -> GetTraceForTestResponse:
+        id = str(kwargs["id"])
+        agents = [str(id) for id in kwargs["agent_ids"]]
+        ips = [str(ip) for ip in kwargs["target_ips"]]
+        start = Timestamp(seconds=int(kwargs["start_time"].timestamp()))
+        end = Timestamp(seconds=int(kwargs["end_time"].timestamp()))
+        get_trace_req = GetTraceForTestRequest(
+            id=id,
+            start_time=start,
+            end_time=end,
+            agent_ids=agents,
+            target_ips=ips,
+        )
+        response = self._data.GetTraceForTest(request=get_trace_req, metadata=self._credentials, target=self._url)
+        return pb_to_trace_response(response)
+
+
+def reverse_map(src_map: Dict[Any, Any], value: Any) -> Any:
+    for key, val in src_map.items():
+        if val == value:
+            return key
+    raise RuntimeError(f"Value '{value}' not found in map")
 
 
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
@@ -342,14 +345,14 @@ def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
 
 # disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
 # pylint: disable=no-member
-def test_to_pb(v: SynTest) -> pbTest:
+def pb_from_test(v: SynTest) -> pbTest:
     out = pbTest()
     out.name = v.name
     out.device_id = str(v.deviceId)
     out.id = str(v.id)
     out.type = v.type.value
     out.status = reverse_map(PB_TEST_STATUS_TO_STATUS, v.status)
-    out.settings.CopyFrom(settings_to_pb(v.settings))
+    out.settings.CopyFrom(pb_from_settings(v.settings))
     return out
 
 
@@ -366,8 +369,8 @@ def populate_mesh_test_from_pb(v: pbTest, out: MeshTest) -> None:
 def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
     out.agentIds = [ID(id) for id in v.agent_ids]
     out.tasks = v.tasks
-    out.healthSettings = health_settings_from_pb(v.health_settings)
-    out.monitoringSettings = monitoring_settings_from_pb(v.monitoring_settings)
+    out.healthSettings = pb_to_health_settings(v.health_settings)
+    out.monitoringSettings = pb_to_monitoring_settings(v.monitoring_settings)
     out.port = v.port
     out.period = v.period
     out.count = v.count
@@ -381,7 +384,7 @@ def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
 
 # disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
 # pylint: disable=no-member
-def settings_to_pb(v: SynTestSettings) -> pbTestSettings:
+def pb_from_settings(v: SynTestSettings) -> pbTestSettings:
     out = pbTestSettings()
 
     # TODO: add missing fields to SynTestSettings
@@ -397,8 +400,8 @@ def settings_to_pb(v: SynTestSettings) -> pbTestSettings:
 
     out.agent_ids.extend([str(id) for id in v.agentIds])
     out.tasks.extend(v.tasks)
-    out.health_settings.CopyFrom(health_settings_to_pb(v.healthSettings))
-    out.monitoring_settings.CopyFrom(monitoring_settings_to_pb(v.monitoringSettings))
+    out.health_settings.CopyFrom(pb_from_health_settings(v.healthSettings))
+    out.monitoring_settings.CopyFrom(pb_from_monitoring_settings(v.monitoringSettings))
     out.port = v.port
     out.period = v.period
     out.count = v.count
@@ -423,7 +426,7 @@ def populate_ping_test_settings_from_pb(v: pbTestSettings, out: PingTraceTestSet
     )
 
 
-def health_settings_from_pb(v: pbHealthSettings) -> HealthSettings:
+def pb_to_health_settings(v: pbHealthSettings) -> HealthSettings:
     return HealthSettings(
         latencyCritical=v.latency_critical,
         latencyWarning=v.latency_warning,
@@ -446,7 +449,7 @@ def health_settings_from_pb(v: pbHealthSettings) -> HealthSettings:
 
 # disable no-member linting as gRPC structures are wrongly recognized as to have missing attributes
 # pylint: disable=no-member
-def health_settings_to_pb(v: HealthSettings) -> pbHealthSettings:
+def pb_from_health_settings(v: HealthSettings) -> pbHealthSettings:
     out = pbHealthSettings()
     out.latency_critical = v.latencyCritical
     out.latency_warning = v.latencyWarning
@@ -467,7 +470,7 @@ def health_settings_to_pb(v: HealthSettings) -> pbHealthSettings:
     return out
 
 
-def monitoring_settings_from_pb(v: pbMonitoringSettings) -> MonitoringSettings:
+def pb_to_monitoring_settings(v: pbMonitoringSettings) -> MonitoringSettings:
     return MonitoringSettings(
         activationGracePeriod=v.activation_grace_period,
         activationTimeUnit=v.activation_time_unit,
@@ -477,7 +480,7 @@ def monitoring_settings_from_pb(v: pbMonitoringSettings) -> MonitoringSettings:
     )
 
 
-def monitoring_settings_to_pb(v: MonitoringSettings) -> pbMonitoringSettings:
+def pb_from_monitoring_settings(v: MonitoringSettings) -> pbMonitoringSettings:
     out = pbMonitoringSettings()
     out.activation_grace_period = v.activationGracePeriod
     out.activation_time_unit = v.activationTimeUnit
@@ -514,7 +517,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
     )
 
 
-def agent_to_pb(v: Agent) -> pbAgent:
+def pb_from_agent(v: Agent) -> pbAgent:
     return pbAgent(
         id=str(v.id),
         name=v.name,
@@ -540,12 +543,12 @@ def agent_to_pb(v: Agent) -> pbAgent:
     )
 
 
-def pb_to_health(v: List[pbTestHealth]) -> List[Health]:
-    return [pb_to_health_(health) for health in v]
+def pb_to_health_tests(v: List[pbTestHealth]) -> List[TestHealth]:
+    return [pb_to_health_test(health) for health in v]
 
 
-def pb_to_health_(v: pbTestHealth) -> Health:
-    return Health(
+def pb_to_health_test(v: pbTestHealth) -> TestHealth:
+    return TestHealth(
         test_id=ID(v.test_id),
         tasks=[pb_to_task_health(task) for task in v.tasks],
         overall_health=pb_to_overall_health(v.overall_health),
@@ -822,11 +825,17 @@ def pb_to_lookups(v: pbTracerouteLookup) -> TracerouteLookup:
 
 
 def pb_to_asn(v: pbASN) -> ASN:
-    return ASN(id=ID(v.id), name=v.name)
+    return ASN(
+        id=ID(v.id),
+        name=v.name,
+    )
 
 
 def pb_to_id_by_ip(v: pbIDByIP) -> IDbyIP:
-    return IDbyIP(id=ID(v.id), ip=IP(v.ip))
+    return IDbyIP(
+        id=ID(v.id),
+        ip=IP(v.ip),
+    )
 
 
 def pb_to_ipinfo(v: pbIPInfo) -> IPInfo:
@@ -850,12 +859,23 @@ def pb_to_geo(v: pbGeo) -> Geo:
 
 
 def pb_to_country(v: pbCountry) -> Country:
-    return Country(code=v.code, name=v.name)
+    return Country(
+        code=v.code,
+        name=v.name,
+    )
 
 
 def pb_to_city(v: pbCity) -> City:
-    return City(id=ID(v.id), name=v.name, longitude=v.longitude, latitude=v.latitude)
+    return City(
+        id=ID(v.id),
+        name=v.name,
+        longitude=v.longitude,
+        latitude=v.latitude,
+    )
 
 
 def pb_to_region(v: pbRegion) -> Region:
-    return Region(id=ID(v.id), name=v.name)
+    return Region(
+        id=ID(v.id),
+        name=v.name,
+    )
