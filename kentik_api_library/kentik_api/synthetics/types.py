@@ -1,18 +1,5 @@
-from enum import Enum
-from typing import Any, Type, TypeVar
-
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-
-SerializableEnumT = TypeVar("SerializableEnumT", bound="SerializableEnum")
-
-
-class SerializableEnum(Enum):
-    @classmethod
-    def from_pb(cls: Type[SerializableEnumT], value: Any) -> SerializableEnumT:
-        return cls(value)
-
-    def to_pb(self) -> Any:
-        return self.value
+from kentik_api.internal.grpc import SerializableEnum
 
 
 class TestType(SerializableEnum):

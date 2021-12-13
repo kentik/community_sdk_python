@@ -15,6 +15,8 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
+from .cloudexport.api_connector import APICloudExportConnector
+from .cloudexport.client import KentikCloudExportClient
 from .synthetics.api_connector import APISyntheticsConnector
 from .synthetics.synth_client import KentikSynthClient
 
@@ -58,8 +60,12 @@ class KentikAPI:
             ]
 
         api_v6_url = self.make_api_v6_url(api_host)
-        synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token, options=grpc_client_options)
+
+        synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token, grpc_client_options)
         self.synthetics = KentikSynthClient(synth_connector)
+
+        cloud_export_connector = APICloudExportConnector(api_v6_url, auth_email, auth_token, grpc_client_options)
+        self.cloud_export = KentikCloudExportClient(cloud_export_connector)
 
     @staticmethod
     def make_api_v5_url(api_host: str) -> str:

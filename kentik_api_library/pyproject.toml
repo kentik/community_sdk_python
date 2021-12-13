@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 root = ".."
-relative_to = "__file__"
 
 [tool.black]
 line-length = 120
