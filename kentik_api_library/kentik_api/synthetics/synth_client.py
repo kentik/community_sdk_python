@@ -1,12 +1,13 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, List, Optional, Tuple, Type, Union
 from urllib.parse import urlparse
 
 from kentik_api.public.types import ID
 
 from .agent import Agent
 from .api_transport import KentikAPITransport
+from .api_transport_grpc import SynthGRPCTransport
 from .api_transport_http import SynthHTTPTransport
 from .synth_tests import SynTest, TestStatus
 
@@ -23,7 +24,7 @@ class KentikSynthClient:
     def __init__(
         self,
         credentials: Tuple[str, str],
-        transport: Optional[Type[KentikAPITransport]] = None,
+        transport: Optional[Type[KentikAPITransport]] = SynthGRPCTransport,
         url: Optional[str] = None,
         proxy: Optional[str] = None,
     ):

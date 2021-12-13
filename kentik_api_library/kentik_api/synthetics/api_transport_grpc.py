@@ -80,6 +80,7 @@ from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2_grpc imp
     SyntheticsAdminService,
     SyntheticsDataService,
 )
+from kentik_api.internal.reverse_map import reverse_map
 from kentik_api.public import device
 from kentik_api.public.types import ID, IP
 from kentik_api.requests_payload.conversions import convert_or_none
@@ -144,34 +145,34 @@ from .trace import (
 
 log = logging.getLogger("api_transport_grpc")
 
-PB_TEST_STATUS_TO_STATUS = {
+PB_TO_TEST_STATUS = {
     pbTestStatus.TEST_STATUS_UNSPECIFIED: TestStatus.none,
     pbTestStatus.TEST_STATUS_ACTIVE: TestStatus.active,
     pbTestStatus.TEST_STATUS_PAUSED: TestStatus.paused,
     pbTestStatus.TEST_STATUS_DELETED: TestStatus.deleted,
 }
 
-PB_FAMILY_TO_FAMILY = {
+PB_TO_IP_FAMILY = {
     pbIPFamily.IP_FAMILY_UNSPECIFIED: IPFamily.unspecified,
     pbIPFamily.IP_FAMILY_V4: IPFamily.v4,
     pbIPFamily.IP_FAMILY_V6: IPFamily.v6,
     pbIPFamily.IP_FAMILY_DUAL: IPFamily.dual,
 }
 
-PB_AGENT_STATUS_TO_STATUS = {
+PB_TO_AGENT_STATUS = {
     pbAgentStatus.AGENT_STATUS_UNSPECIFIED: AgentStatus.UNSPECIFIED,
     pbAgentStatus.AGENT_STATUS_OK: AgentStatus.OK,
     pbAgentStatus.AGENT_STATUS_WAIT: AgentStatus.WAIT,
     pbAgentStatus.AGENT_STATUS_DELETED: AgentStatus.DELETED,
 }
 
-PB_AGENT_IMPL_TO_IMPL = {
+PB_TO_AGENT_IMPL_TYPE = {
     pbAgentImpl.IMPLEMENT_TYPE_UNSPECIFIED: AgentImplementType.UNSPECIFIED,
     pbAgentImpl.IMPLEMENT_TYPE_RUST: AgentImplementType.RUST,
     pbAgentImpl.IMPLEMENT_TYPE_NODE: AgentImplementType.NODE,
 }
 
-PB_TASK_STATE_TO_STATE = {
+PB_TO_TASK_STATE = {
     pbTaskState.TASK_STATE_UNSPECIFIED: TaskState.UNSPECIFIED,
     pbTaskState.TASK_STATE_CREATED: TaskState.CREATED,
     pbTaskState.TASK_STATE_UPDATED: TaskState.UPDATED,
@@ -263,7 +264,7 @@ class SynthGRPCTransport(KentikAPITransport):
     def test_status_update(self, **kwargs) -> None:
         id = str(kwargs["id"])
         status: TestStatus = kwargs["status"]
-        pb_status = reverse_map(PB_TEST_STATUS_TO_STATUS, status)
+        pb_status = reverse_map(PB_TO_TEST_STATUS, status)
         set_status_req = SetTestStatusRequest(id=id, status=pb_status)
         self._admin.SetTestStatus(request=set_status_req, metadata=self._credentials, target=self._url)
 
@@ -322,17 +323,10 @@ class SynthGRPCTransport(KentikAPITransport):
         return pb_to_trace_response(response)
 
 
-def reverse_map(src_map: Dict[Any, Any], value: Any) -> Any:
-    for key, val in src_map.items():
-        if val == value:
-            return key
-    raise RuntimeError(f"Value '{value}' not found in map")
-
-
 def populate_test_from_pb(v: pbTest, out: SynTest) -> None:
     out.name = v.name
     out.type = TestType(v.type)
-    out.status = PB_TEST_STATUS_TO_STATUS[v.status]
+    out.status = PB_TO_TEST_STATUS[v.status]
     out.deviceId = ID(v.device_id)
     out._id = ID(v.id)
     out._cdate = pb_to_datetime_iso(v.cdate)
@@ -351,7 +345,7 @@ def pb_from_test(v: SynTest) -> pbTest:
     out.device_id = str(v.deviceId)
     out.id = str(v.id)
     out.type = v.type.value
-    out.status = reverse_map(PB_TEST_STATUS_TO_STATUS, v.status)
+    out.status = reverse_map(PB_TO_TEST_STATUS, v.status)
     out.settings.CopyFrom(pb_from_settings(v.settings))
     return out
 
@@ -377,7 +371,7 @@ def pupulate_settings_from_pb(v: pbTestSettings, out: SynTestSettings) -> None:
     out.expiry = v.expiry
     out.limit = v.limit
     out.protocol = Protocol(v.protocol)
-    out.family = PB_FAMILY_TO_FAMILY[v.family]
+    out.family = PB_TO_IP_FAMILY[v.family]
     out.rollupLevel = v.rollup_level
     out.servers = v.servers
 
@@ -408,7 +402,7 @@ def pb_from_settings(v: SynTestSettings) -> pbTestSettings:
     out.expiry = v.expiry
     out.limit = v.limit
     out.protocol = v.protocol.value
-    out.family = reverse_map(PB_FAMILY_TO_FAMILY, v.family)
+    out.family = reverse_map(PB_TO_IP_FAMILY, v.family)
     out.rollup_level = v.rollupLevel
     out.servers.extend(v.servers)
     return out
@@ -494,7 +488,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
     return Agent(
         id=ID(v.id),
         name=v.name,
-        status=PB_AGENT_STATUS_TO_STATUS[v.status],
+        status=PB_TO_AGENT_STATUS[v.status],
         alias=v.alias,
         type=v.type,
         os=v.os,
@@ -502,7 +496,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
         lat=v.lat,
         long=v.long,
         last_authed=pb_to_datetime_iso(v.last_authed),
-        family=PB_FAMILY_TO_FAMILY[v.family],
+        family=PB_TO_IP_FAMILY[v.family],
         asn=v.asn,
         site_id=ID(v.site_id),
         version=v.version,
@@ -513,7 +507,7 @@ def pb_to_agent(v: pbAgent) -> Agent:
         test_ids=[ID(id) for id in v.test_ids],
         local_ip=IP(v.local_ip),
         cloud_vpc=v.cloud_vpc,
-        agent_impl=PB_AGENT_IMPL_TO_IMPL[v.agent_impl],
+        agent_impl=PB_TO_AGENT_IMPL_TYPE[v.agent_impl],
     )
 
 
@@ -521,14 +515,14 @@ def pb_from_agent(v: Agent) -> pbAgent:
     return pbAgent(
         id=str(v.id),
         name=v.name,
-        status=reverse_map(PB_AGENT_STATUS_TO_STATUS, v.status),
+        status=reverse_map(PB_TO_AGENT_STATUS, v.status),
         alias=v.alias,
         type=v.type,
         os=v.os,
         ip=str(v.ip),
         lat=v.lat,
         long=v.long,
-        family=reverse_map(PB_FAMILY_TO_FAMILY, v.family),
+        family=reverse_map(PB_TO_IP_FAMILY, v.family),
         asn=v.asn,
         site_id=str(v.site_id),
         version=v.version,
@@ -539,7 +533,7 @@ def pb_from_agent(v: Agent) -> pbAgent:
         test_ids=[str(id) for id in v.test_ids],
         local_ip=str(v.local_ip),
         cloud_vpc=v.cloud_vpc,
-        agent_impl=reverse_map(PB_AGENT_IMPL_TO_IMPL, v.agent_impl),
+        agent_impl=reverse_map(PB_TO_AGENT_IMPL_TYPE, v.agent_impl),
     )
 
 
@@ -657,9 +651,9 @@ def pb_to_task(v: pbTask) -> Task:
         id=ID(v.id),
         test_id=ID(v.test_id),
         device_id=ID(v.device_id),
-        state=PB_TASK_STATE_TO_STATE[v.state],
+        state=PB_TO_TASK_STATE[v.state],
         status=v.status,
-        family=PB_FAMILY_TO_FAMILY[v.family],
+        family=PB_TO_IP_FAMILY[v.family],
         ping=pb_to_ping_task(v.ping),
         traceroute=pb_to_trace_task(v.traceroute),
         http=pb_to_http_task(v.http),

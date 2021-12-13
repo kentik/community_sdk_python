@@ -15,7 +15,6 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
-from .synthetics.api_transport_grpc import SynthGRPCTransport
 from .synthetics.synth_client import KentikSynthClient
 
 
@@ -54,13 +53,7 @@ class KentikAPI:
         self.batch = BatchAPI(connector)
         self.alerting = AlertingAPI(connector)
 
-        self.synthetics = KentikSynthClient(
-            credentials=(auth_email, auth_token), url=synthetics_api_url, transport=SynthGRPCTransport
-        )
-
-        # self.synthetics = KentikSynthClient(
-        #     credentials=(auth_email, auth_token), url=self.API_URL_SYNTHETICS_HTTP, transport=SynthHTTPTransport
-        # )
+        self.synthetics = KentikSynthClient(credentials=(auth_email, auth_token), url=synthetics_api_url)
 
 
 # pylint: enable=too-many-instance-attributes

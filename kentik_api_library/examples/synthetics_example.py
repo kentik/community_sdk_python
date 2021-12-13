@@ -2,49 +2,16 @@
 Examples of using the Synthetics API
 """
 
-import logging
 from datetime import datetime, timezone
-from enum import Enum
-from typing import Any
 
-from kentik_api import KentikAPI
+from examples.utils import client, pretty_print
 from kentik_api.public.types import ID
 from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
-from kentik_api.utils import get_credentials
-
-logging.basicConfig(level=logging.INFO)
 
 
-def pretty_print(v: Any, level: int = 1) -> None:
-    indent = " " * level * 2
-
-    if isinstance(v, Enum):
-        print(f"{v.value}", end="")
-    elif isinstance(v, str):
-        print(f'"{v}"', end="")
-    elif isinstance(v, list) and len(v) > 0 and hasattr(v[0], "__dict__"):
-        for i, item in enumerate(v):
-            print(f"\n{indent}[{i}]", end="")
-            pretty_print(item, level + 1)
-    elif hasattr(v, "__dict__"):
-        for field_name, field in v.__dict__.items():
-            if callable(field):
-                continue
-            print(f"\n{indent}{field_name}: ", end="")
-            pretty_print(field, level + 1)
-    else:
-        print(f"{v}", end="")
-
-
-def client() -> KentikAPI:
-    email, token = get_credentials()
-    return KentikAPI(email, token)
-
-
-def list_tests() -> None:
+def tests_list() -> None:
     print("### TESTS LIST")
-
     items = client().synthetics.tests
     for test in items:
         pretty_print(test.id)
@@ -52,7 +19,7 @@ def list_tests() -> None:
         print()
 
 
-def crud_test() -> None:
+def test_crud() -> None:
     health = HealthSettings(
         latencyCritical=90,
         latencyWarning=60,
@@ -123,9 +90,8 @@ def crud_test() -> None:
     print()
 
 
-def list_agents() -> None:
+def agents_list() -> None:
     print("### AGENTS LIST")
-
     agents = client().synthetics.agents
     for agent in agents:
         pretty_print(agent.id)
@@ -133,10 +99,11 @@ def list_agents() -> None:
         print()
 
 
-def crud_agent() -> None:
+def agent_crud() -> None:
     print("### AGENT GET")
     received_agent = client().synthetics.agent(ID("1717"))
     pretty_print(received_agent)
+    print()
 
     # print("### AGENT PATCH")
     # received_agent.alias = received_agent.alias + "!"
@@ -185,9 +152,9 @@ def get_trace() -> None:
 
 
 if __name__ == "__main__":
-    list_tests()
-    crud_test()
-    list_agents()
-    crud_agent()
+    tests_list()
+    test_crud()
+    agents_list()
+    agent_crud()
     get_health()
     get_trace()
