@@ -15,6 +15,7 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
+from .cloudexport.client import CloudExportClient
 from .synthetics.synth_client import KentikSynthClient
 
 
@@ -26,6 +27,7 @@ class KentikAPI:
 
     API_URL_SYNTHETICS_HTTP = "https://synthetics.api.kentik.com"
     API_URL_SYNTHETICS_GRPC = "synthetics.api.kentik.com:443"
+    API_URL_CLOUD_EXPORT_GRPC = "cloudexport.api.kentik.com:443"
 
     def __init__(
         self,
@@ -33,6 +35,7 @@ class KentikAPI:
         auth_token: str,
         api_url: str = API_URL_US,
         synthetics_api_url: str = API_URL_SYNTHETICS_GRPC,
+        cloud_export_api_url: str = API_URL_CLOUD_EXPORT_GRPC,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
@@ -54,6 +57,9 @@ class KentikAPI:
         self.alerting = AlertingAPI(connector)
 
         self.synthetics = KentikSynthClient(credentials=(auth_email, auth_token), url=synthetics_api_url)
+        self.cloud_export = CloudExportClient(
+            auth_email=auth_email, auth_token=auth_token, api_url=cloud_export_api_url
+        )
 
 
 # pylint: enable=too-many-instance-attributes

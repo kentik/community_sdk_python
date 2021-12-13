@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 
 import httpretty
@@ -16,7 +15,6 @@ from kentik_api.public.errors import (
     RateLimitExceededError,
     UnavailabilityError,
 )
-from kentik_api.public.user import User
 
 AUTH_EMAIL_KEY: str = "X-CH-Auth-Email"
 AUTH_API_TOKEN_KEY: str = "X-CH-Auth-API-Token"
