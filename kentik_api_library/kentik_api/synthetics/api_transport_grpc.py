@@ -5,7 +5,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import grpc.experimental as _
 from google.protobuf.field_mask_pb2 import FieldMask
 from google.protobuf.timestamp_pb2 import Timestamp
+from grpc import RpcError
 
+from kentik_api.api_connection.grpc_errors import new_api_error
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import ASN as pbASN
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import Agent as pbAgent
 from kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 import AgentHealth as pbAgentHealth
@@ -214,7 +216,10 @@ class SynthGRPCTransport(KentikAPITransport):
         except KeyError:
             raise RuntimeError(f"Invalid operation '{op}'")
 
-        return svc(**kwargs)
+        try:
+            return svc(**kwargs)
+        except RpcError as error:
+            raise new_api_error(error) from error
 
     def tests_list(self, **kwargs) -> List[SynTest]:
         tests: List[SynTest] = []
