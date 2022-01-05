@@ -37,7 +37,7 @@ def get_alerts_history(
     end_time: str,
     filter_by: str,
     filter_val: str,
-    sort_order: Optional[str],
+    sort_order: str,
     show_mitigations: int,
     show_alarms: int,
     show_matches: int,
