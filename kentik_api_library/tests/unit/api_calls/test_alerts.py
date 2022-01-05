@@ -1,5 +1,5 @@
 from kentik_api.api_calls.alerts import *
-from kentik_api.api_calls.api_call import APICall, APICallMethods
+from kentik_api.api_calls.api_call import APICall
 
 DUMMY_API_URL = "/alerts"
 DUMMY_START_DATE = "2018-10-15T22:15:00"

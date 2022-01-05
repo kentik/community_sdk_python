@@ -79,6 +79,7 @@ class HistoricalAlert:
 
 
 class AlertFilter(Enum):
+    NONE = "None"
     OLD_STATE = "old_state"
     NEW_STATE = "new_state"
     ANY_STATE = "any_state"
@@ -88,3 +89,14 @@ class AlertFilter(Enum):
     ALERT_ID = "alert_id"
     ALERT_KEY = "alert_key"
     ALARM_ID = "alarm_id"
+
+
+class SortOrder(Enum):
+    NONE = "None"
+    ALERT_KEY = "alert_key"
+    SEVERITY = "severity"
+    MITIGATION_ID = "mitigation_id"
+    ALARM_ID = "alarm_id"
+    ALERT_ID = "alert_id"
+    ALERT_VALUE = "alert_value"
+    ALARM_STATE = "alarm_state"
