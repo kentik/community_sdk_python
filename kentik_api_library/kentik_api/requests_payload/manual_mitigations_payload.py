@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from kentik_api.public.errors import DataFormatError
 from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert, ManualMitigation
-from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
+from kentik_api.requests_payload.conversions import dict_from_json, from_dict, list_from_json
 
 CreateRequest = ManualMitigation
 
@@ -30,7 +30,7 @@ class _Alarm:
     alarm_state: str
     alert_id: int
     mitigation_id: Optional[int]
-    threshold_id: int
+    threshold_id: Optional[int]
     alert_key: str
     alert_dimension: str
     alert_metric: List[str]
@@ -38,7 +38,7 @@ class _Alarm:
     alert_value2nd: float
     alert_value3rd: float
     alert_match_count: int
-    alert_baseline: int
+    alert_baseline: float
     alert_severity: str
     baseline_used: int
     learning_mode: int
@@ -51,26 +51,26 @@ class _Alarm:
     mit_threshold_id: int
     args: str
     id: int
-    policy_id: int
+    policy_id: Optional[int]
     policy_name: str
     alert_key_lookup: str
 
     def to_alarm(self) -> Alarm:
-        dic = deepcopy(self.__dict__)
-        try:  # when alarm end is not specified, the alarm_end is set to "0000-00-00 00:00:00" then converted to None
-            dic["alarm_end"] = datetime.strptime(self.alarm_end, "%Y-%m-%d %H:%M:%S")
-        except ValueError as err:
-            if dic["alarm_end"] == "0000-00-00 00:00:00":
-                dic["alarm_end"] = None
-            else:
+        d = deepcopy(self.__dict__)
+        # when alarm end is not specified, the alarm_end is set to "0000-00-00 00:00:00" then converted to None
+        if d["alarm_end"] == "0000-00-00 00:00:00":
+            d["alarm_end"] = None
+        else:
+            try:
+                d["alarm_end"] = datetime.fromisoformat(self.alarm_end.replace("Z", "+00:00"))
+            except ValueError as err:
                 raise DataFormatError(str(err))
 
-        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000Z")
-        dic["alarm_start"] = convert(self.alarm_start, date_parse)
-        dic["learning_mode"] = self.learning_mode != 0
-        dic["debug_mode"] = self.debug_mode != 0
+        d["alarm_start"] = datetime.fromisoformat(self.alarm_start.replace("Z", "+00:00"))
+        d["learning_mode"] = self.learning_mode != 0
+        d["debug_mode"] = self.debug_mode != 0
 
-        return from_dict(data_class=Alarm, data=dic)
+        return from_dict(data_class=Alarm, data=d)
 
 
 class GetActiveAlertsResponse(List[_Alarm]):
@@ -79,7 +79,8 @@ class GetActiveAlertsResponse(List[_Alarm]):
         items = list_from_json(cls.__name__, json_string)
         obj = cls()
         for i in items:
-            obj.append(from_dict(data_class=_Alarm, data=i))
+            if "type" not in i:
+                obj.append(from_dict(data_class=_Alarm, data=i))
         return obj
 
     def to_alarms(self) -> List[Alarm]:
@@ -95,15 +96,15 @@ class _HistoricalAlert:
     alert_match_count: str
     alert_severity: str
     alert_id: int
-    threshold_id: int
+    threshold_id: Optional[int]
     alarm_id: int
     alert_key: str
     alert_dimension: str
     alert_metric: List[str]
     alert_value: float
-    alert_value2nd: int
-    alert_value3rd: int
-    alert_baseline: int
+    alert_value2nd: float
+    alert_value3rd: float
+    alert_baseline: float
     baseline_used: int
     learning_mode: int
     debug_mode: int
@@ -119,18 +120,15 @@ class _HistoricalAlert:
     alert_key_lookup: str
 
     def to_alert(self) -> HistoricalAlert:
-        dic = deepcopy(self.__dict__)
-        dic.pop("ctime")
-        dic["learning_mode"] = self.learning_mode != 0
-        dic["debug_mode"] = self.debug_mode != 0
+        d = deepcopy(self.__dict__)
+        d.pop("ctime")
+        d["learning_mode"] = self.learning_mode != 0
+        d["debug_mode"] = self.debug_mode != 0
 
-        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000Z")
-        dic["creation_time"] = convert(self.ctime, date_parse)
+        d["creation_time"] = datetime.fromisoformat(self.ctime.replace("Z", "+00:00"))
+        d["alarm_start_time"] = datetime.fromisoformat(self.alarm_start_time + "+00:00")
 
-        date_parse = lambda date: datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
-        dic["alarm_start_time"] = convert(self.alarm_start_time, date_parse)
-
-        return from_dict(data_class=HistoricalAlert, data=dic)
+        return from_dict(data_class=HistoricalAlert, data=d)
 
 
 class GetHistoricalAlertsResponse(List[_HistoricalAlert]):

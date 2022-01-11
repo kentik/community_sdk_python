@@ -20,7 +20,7 @@ class Alarm:
     alarm_state: str
     alert_id: int
     mitigation_id: Optional[int]
-    threshold_id: int
+    threshold_id: Optional[int]
     alert_key: str
     alert_dimension: str
     alert_metric: List[str]
@@ -28,7 +28,7 @@ class Alarm:
     alert_value2nd: float
     alert_value3rd: float
     alert_match_count: int
-    alert_baseline: int
+    alert_baseline: float
     alert_severity: str
     baseline_used: int
     learning_mode: bool
@@ -41,7 +41,7 @@ class Alarm:
     mit_threshold_id: int
     args: str
     id: int
-    policy_id: int
+    policy_id: Optional[int]
     policy_name: str
     alert_key_lookup: str
 
@@ -54,16 +54,16 @@ class HistoricalAlert:
     alert_match_count: str
     alert_severity: str
     alert_id: int
-    threshold_id: int
+    threshold_id: Optional[int]
     alarm_id: int
     alert_key: str
     alert_dimension: str
     alert_metric: List[str]
     alert_value: float
-    alert_value2nd: int
-    alert_value3rd: int
-    alert_baseline: int
-    baseline_used: int
+    alert_value2nd: float
+    alert_value3rd: float
+    alert_baseline: float
+    baseline_used: float
     learning_mode: bool
     debug_mode: bool
     creation_time: datetime
