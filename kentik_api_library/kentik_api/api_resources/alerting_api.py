@@ -1,11 +1,14 @@
+import logging
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from kentik_api.api_calls import alerts
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.manual_mitigation import Alarm, AlertFilter, HistoricalAlert, ManualMitigation, SortOrder
 from kentik_api.requests_payload import manual_mitigations_payload
-from kentik_api.requests_payload.conversions import convert, convert_or_none, enum_to_str
+from kentik_api.requests_payload.conversions import convert, enum_to_str
+
+logger = logging.getLogger(__name__)
 
 
 class AlertingAPI(BaseAPI):
@@ -29,7 +32,8 @@ class AlertingAPI(BaseAPI):
     ) -> List[Alarm]:
 
         if filter_by == AlertFilter.NONE and filter_val != "":
-            raise ValueError("For filter_by == None, filter_val should be empty")
+            logger.warning("For filter_by == None, filter_val should be empty. Setting filter_val to empty")
+            filter_val = ""
 
         date_to_str = lambda date: date.strftime("%Y-%m-%dT%H:%M:%S")
         start_time_str = convert(start_time, date_to_str)
@@ -62,7 +66,8 @@ class AlertingAPI(BaseAPI):
     ) -> List[HistoricalAlert]:
 
         if filter_by == AlertFilter.NONE and filter_val != "":
-            raise ValueError("For filter_by == None, filter_val should be empty")
+            logger.warning("For filter_by == None, filter_val should be empty. Setting filter_val to empty")
+            filter_val = ""
 
         date_to_str = lambda date: date.strftime("%Y-%m-%dT%H:%M:%S")
         start_time_str = convert(start_time, date_to_str)
