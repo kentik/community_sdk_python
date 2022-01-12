@@ -7,8 +7,6 @@ from kentik_api.public.errors import DataFormatError
 from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert, ManualMitigation
 from kentik_api.requests_payload.conversions import dict_from_json, from_dict, list_from_json
 
-CreateRequest = ManualMitigation
-
 
 class CreateResponse:
     def __init__(self, result: str) -> None:
@@ -79,8 +77,19 @@ class GetActiveAlertsResponse(List[_Alarm]):
         items = list_from_json(cls.__name__, json_string)
         obj = cls()
         for i in items:
-            if "type" not in i:
-                obj.append(from_dict(data_class=_Alarm, data=i))
+            # Workaround for manual mitigation entries which do not comply with general schema
+            if "type" in i and i["type"] == "manual":
+                if i["args"] is None:
+                    i["args"] = ""
+                if i["alert_metric"] == "":
+                    i["alert_metric"] = []
+                if i["alarm_end"] is None:
+                    i["alarm_end"] = "0000-00-00 00:00:00"
+                if i["mit_alert_id"] is None:
+                    i["mit_alert_id"] = 0
+                if i["mit_threshold_id"] is None:
+                    i["mit_threshold_id"] = 0
+            obj.append(from_dict(data_class=_Alarm, data=i))
         return obj
 
     def to_alarms(self) -> List[Alarm]:
