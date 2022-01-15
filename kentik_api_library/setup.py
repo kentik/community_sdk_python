@@ -148,6 +148,7 @@ setup(
     license="Apache-2.0",
     include_package_data=True,
     python_requires=">=3.8, <4",
+    setup_requires=["setuptools_scm"],
     install_requires=["dacite>=1.6.0", "requests[socks]>=2.25.0", "typing-extensions>=3.7.4.3", "urllib3>=1.26.0"],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
