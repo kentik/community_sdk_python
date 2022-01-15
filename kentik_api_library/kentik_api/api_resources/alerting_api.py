@@ -8,7 +8,6 @@ from kentik_api.public.manual_mitigation import Alarm, AlertFilter, HistoricalAl
 from kentik_api.requests_payload import manual_mitigations_payload
 from kentik_api.requests_payload.conversions import enum_to_str
 
-
 logger = logging.getLogger(__name__)
 
 
