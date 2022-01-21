@@ -25,7 +25,6 @@ def run_crud() -> None:
         full_name="Test User",
         user_email="test@user.example",
         role="Member",
-        user_password="test_password",
         email_service=True,
         email_product=True,
     )

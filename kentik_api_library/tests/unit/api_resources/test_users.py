@@ -23,7 +23,6 @@ def test_create_user_success() -> None:
                     "created_date":"2020-12-09T14:33:28.330Z",
                     "updated_date":"2020-12-09T14:33:28.369Z",
                     "company_id":"74333",
-                    "user_api_token":null,
                     "filters":{},
                     "saved_filters":[]
                 }
@@ -61,10 +60,8 @@ def test_create_user_success() -> None:
     assert created.email == "test@user.example"
     assert created.company_id == ID(74333)
     assert created.role == "Member"
-    assert created.password == ""
     assert created.email_service is True
     assert created.email_product is True
-    assert created.api_token == ""
 
 
 def test_get_user_success() -> None:
@@ -83,7 +80,6 @@ def test_get_user_success() -> None:
                         "created_date":"2020-12-09T14:48:42.187Z",
                         "updated_date":"2020-12-09T14:48:43.243Z",
                         "company_id":"74333",
-                        "user_api_token":"****************************a997",
                         "filters":{},
                         "saved_filters":[]
                     }
@@ -107,10 +103,8 @@ def test_get_user_success() -> None:
     assert user.email == "test@user.example"
     assert user.company_id == ID(74333)
     assert user.role == "Member"
-    assert user.password == ""
     assert user.email_service is True
     assert user.email_product is True
-    assert user.api_token == "****************************a997"
 
 
 def test_update_user_success() -> None:
@@ -129,7 +123,6 @@ def test_update_user_success() -> None:
                 "created_date":"2020-12-09T15:23:29.768Z",
                 "updated_date":"2020-12-09T15:23:31.108Z",
                 "company_id":"74333",
-                "user_api_token":null,
                 "filters":{},
                 "saved_filters":[]
                }
