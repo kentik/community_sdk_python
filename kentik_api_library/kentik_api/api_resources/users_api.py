@@ -27,7 +27,6 @@ class UsersAPI(BaseAPI):
             user_name=user.username,
             user_full_name=user.full_name,
             user_email=user.email,
-            user_password=user.password,
             role=user.role,
             email_service=user.email_service,
             email_product=user.email_product,

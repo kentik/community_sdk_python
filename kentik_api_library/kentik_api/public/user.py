@@ -15,12 +15,10 @@ class User:
     email: str
     email_service: bool
     email_product: bool
-    password: str = ""
     role: str = ""
 
     # read-only
     _company_id: ID = DEFAULT_ID
-    _api_token: str = ""
     _filters: Dict = field(default_factory=dict)
     _saved_filters: List = field(default_factory=list)
     _id: ID = DEFAULT_ID
@@ -36,7 +34,6 @@ class User:
         user_email: str,
         email_service: bool,
         email_product: bool,
-        user_password: str = "",
         role: str = "",
     ):
         return cls(
@@ -45,17 +42,12 @@ class User:
             email=user_email,
             email_service=email_service,
             email_product=email_product,
-            password=user_password,
             role=role,
         )
 
     @property
     def company_id(self) -> ID:
         return self._company_id
-
-    @property
-    def api_token(self) -> str:
-        return self._api_token
 
     @property
     def filters(self) -> Dict:
