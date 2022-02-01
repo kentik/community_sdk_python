@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Type, TypeVar
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.internal.dataclass import mandatory_dataclass_attributes
 from kentik_api.public.types import ID
 
@@ -164,12 +165,14 @@ class SavedFilter:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("SavedFilter", "_id is required")
         return self._id
 
     @property
     def company_id(self) -> ID:
-        assert self._company_id is not None
+        if self._company_id is None:
+            raise IncompleteObjectError("SavedFilter", "_company_id is required")
         return self._company_id
 
 

@@ -72,7 +72,8 @@ class Tag:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Tag", "_id is required")
         return self._id
 
     @property

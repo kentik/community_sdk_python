@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import List
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.api_calls import custom_dimensions
 from kentik_api.api_connection.api_connector_protocol import APIConnectorProtocol
 from kentik_api.api_resources.base_api import BaseAPI
@@ -14,9 +15,7 @@ class PopulatorsAPI(BaseAPI):
     """Exposes Kentik API operations related to populators (belong to custom dimensions)"""
 
     def create(self, populator: Populator) -> Populator:
-        assert populator.value is not None
-        assert populator.direction is not None
-        assert populator.dimension_id is not None
+        PopulatorsAPI.check_fields(populator)
         apicall = custom_dimensions.create_populator(populator.dimension_id)
         payload = populators_payload.CreateRequest(
             value=populator.value,
@@ -44,9 +43,7 @@ class PopulatorsAPI(BaseAPI):
         return populators_payload.CreateResponse.from_json(response.text).to_populator()
 
     def update(self, populator: Populator) -> Populator:
-        assert populator.value is not None
-        assert populator.direction is not None
-        assert populator.dimension_id is not None
+        PopulatorsAPI.check_fields(populator)
         apicall = custom_dimensions.update_populator(populator.dimension_id, populator.id)
         payload = populators_payload.UpdateRequest(
             value=populator.value,
@@ -78,6 +75,15 @@ class PopulatorsAPI(BaseAPI):
         response = self.send(apicall)
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
+    @staticmethod
+    def check_fields(populator: Populator):
+        if populator.value is None:
+            raise IncompleteObjectError("Populators", "value is required")
+        if populator.direction is None:
+            raise IncompleteObjectError("Populators", "direction is required")
+        if populator.dimension_id is None:
+            raise IncompleteObjectError("Populators", "dimension_id is required")
+
 
 class CustomDimensionsAPI(BaseAPI):
     """Exposes Kentik API operations related to custom dimensions"""
@@ -97,9 +103,12 @@ class CustomDimensionsAPI(BaseAPI):
         return custom_dimensions_payload.GetAllResponse.from_json(response.text).to_custom_dimensions()
 
     def create(self, custom_dimension: CustomDimension) -> CustomDimension:
-        assert custom_dimension.name is not None
-        assert custom_dimension.display_name is not None
-        assert custom_dimension.type is not None
+        if custom_dimension.name is None:
+            raise IncompleteObjectError("Custom Dimensions", "custom dimension name value is required")
+        if custom_dimension.display_name is None:
+            raise IncompleteObjectError("Custom Dimensions", "custom dimension display_name is required")
+        if custom_dimension.type is None:
+            raise IncompleteObjectError("Custom Dimensions", "custom dimension type is required")
         apicall = custom_dimensions.create_custom_dimension()
         payload = custom_dimensions_payload.CreateRequest(
             name=custom_dimension.name,
@@ -110,7 +119,8 @@ class CustomDimensionsAPI(BaseAPI):
         return custom_dimensions_payload.CreateResponse.from_json(response.text).to_custom_dimension()
 
     def update(self, custom_dimension: CustomDimension) -> CustomDimension:
-        assert custom_dimension.display_name is not None
+        if custom_dimension.display_name is None:
+            raise IncompleteObjectError("Custom Dimensions", "custom dimensions display_name value is required")
         apicall = custom_dimensions.update_custom_dimension(custom_dimension.id)
         payload = custom_dimensions_payload.UpdateRequest(
             display_name=custom_dimension.display_name,

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.device_label import DeviceLabel
 from kentik_api.public.plan import Plan
 from kentik_api.public.site import Site
@@ -227,7 +228,8 @@ class Device:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Device", "_id is required")
         return self._id
 
     @property
@@ -283,7 +285,8 @@ class Device:
 
     @property
     def plan(self) -> Plan:
-        assert self._plan is not None
+        if self._plan is None:
+            raise IncompleteObjectError("Device", "_plan is required")
         return self._plan
 
     @property
@@ -438,7 +441,8 @@ class VRFAttributes:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("VRFAttributes", "_id is required")
         return self._id
 
     @property
@@ -515,7 +519,8 @@ class Interface:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Interface", "_id is required")
         return self._id
 
     @property
@@ -524,7 +529,8 @@ class Interface:
 
     @property
     def device_id(self) -> ID:
-        assert self._device_id is not None
+        if self._device_id is None:
+            raise IncompleteObjectError("Interface", "_device_id is required")
         return self._device_id
 
     @property
