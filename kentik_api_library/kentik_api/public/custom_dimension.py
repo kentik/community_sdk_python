@@ -146,7 +146,7 @@ class CustomDimension:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("Custom Dimension", "_id is required")
+            raise IncompleteObjectError("CustomDimension", "_id is required")
         return self._id
 
     @property

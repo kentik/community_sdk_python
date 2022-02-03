@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from typing import List
 
-from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.api_calls import custom_applications
 from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.custom_application import CustomApplication
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import custom_applications_payload
 
@@ -19,7 +19,7 @@ class CustomApplicationsAPI(BaseAPI):
 
     def create(self, custom_application: CustomApplication) -> CustomApplication:
         if custom_application.name is None:
-            raise IncompleteObjectError("Custom Aplication", "custom aplication name is required")
+            raise IncompleteObjectError("Create CustomApplication", "name is required")
         apicall = custom_applications.create_custom_application()
         payload = custom_applications_payload.CreateRequest(
             name=custom_application.name,

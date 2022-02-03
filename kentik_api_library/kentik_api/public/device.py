@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.device_label import DeviceLabel
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.plan import Plan
 from kentik_api.public.site import Site
 from kentik_api.public.types import ID, PermissiveEnumMeta

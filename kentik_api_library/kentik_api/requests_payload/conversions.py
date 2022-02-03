@@ -1,9 +1,10 @@
 import json
 from enum import Enum
 from typing import Any, Dict, Iterable, List, Optional, Type, TypeVar
-from kentik_api.public.errors import DataFormatError, DeserializationError
 
 import dacite
+
+from kentik_api.public.errors import DataFormatError, DeserializationError
 
 
 def as_dict(obj: Any) -> Dict[str, Any]:
