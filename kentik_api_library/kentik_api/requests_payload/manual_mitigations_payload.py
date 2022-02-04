@@ -5,7 +5,8 @@ from typing import List, Optional
 
 from kentik_api.public.errors import DataFormatError
 from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert, ManualMitigation
-from kentik_api.requests_payload.conversions import dict_from_json, from_dict, list_from_json
+from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import convert, convert_or_none, dict_from_json, from_dict, list_from_json
 
 
 class CreateResponse:
@@ -67,6 +68,15 @@ class _Alarm:
         d["alarm_start"] = datetime.fromisoformat(self.alarm_start.replace("Z", "+00:00"))
         d["learning_mode"] = self.learning_mode != 0
         d["debug_mode"] = self.debug_mode != 0
+
+        d["alarm_id"] = convert(d["alarm_id"], ID)
+        d["alert_id"] = convert(d["alert_id"], ID)
+        d["mitigation_id"] = convert_or_none(d["mitigation_id"], ID)
+        d["threshold_id"] = convert_or_none(d["threshold_id"], ID)
+        d["mit_alert_id"] = convert(d["mit_alert_id"], ID)
+        d["mit_threshold_id"] = convert(d["mit_threshold_id"], ID)
+        d["id"] = convert(d["id"], ID)
+        d["policy_id"] = convert_or_none(d["policy_id"], ID)
 
         return from_dict(data_class=Alarm, data=d)
 
@@ -136,6 +146,14 @@ class _HistoricalAlert:
 
         d["creation_time"] = datetime.fromisoformat(self.ctime.replace("Z", "+00:00"))
         d["alarm_start_time"] = datetime.fromisoformat(self.alarm_start_time + "+00:00")
+
+        d["alert_id"] = convert(d["alert_id"], ID)
+        d["threshold_id"] = convert_or_none(d["threshold_id"], ID)
+        d["alarm_id"] = convert(d["alarm_id"], ID)
+        d["mitigation_id"] = convert_or_none(d["mitigation_id"], ID)
+        d["mit_method_id"] = convert(d["mit_method_id"], ID)
+        d["id"] = convert(d["id"], ID)
+        d["policy_id"] = convert(d["policy_id"], ID)
 
         return from_dict(data_class=HistoricalAlert, data=d)
 

@@ -4,6 +4,7 @@ from http import HTTPStatus
 from kentik_api.api_calls.api_call import APICallMethods
 from kentik_api.api_resources.alerting_api import AlertingAPI
 from kentik_api.public.manual_mitigation import AlertFilter, ManualMitigation, SortOrder
+from kentik_api.public.types import ID
 from tests.unit.stub_api_connector import StubAPIConnector
 
 get_active_filter_response_payload = """
@@ -131,7 +132,7 @@ def test_get_active_alerts_with_filter() -> None:
     assert connector.last_payload is None
 
     assert len(alarms) == 1
-    assert alarms[0].alarm_id == 82867908
+    assert alarms[0].alarm_id == ID(82867908)
     assert alarms[0].alarm_start == datetime(2021, 1, 19, 13, 50, 0, 0, tzinfo=timezone.utc)
     assert alarms[0].alarm_end is None
 
@@ -156,7 +157,7 @@ def test_get_active_alerts_without_filter() -> None:
     assert connector.last_payload is None
 
     assert len(alarms) == 1
-    assert alarms[0].alarm_id == 82867908
+    assert alarms[0].alarm_id == ID(82867908)
     assert alarms[0].alarm_start == datetime(2021, 1, 19, 13, 50, 0, 0, tzinfo=timezone.utc)
     assert alarms[0].alarm_end is None
 
@@ -184,7 +185,7 @@ def test_get_alerts_history_with_sort_and_filter() -> None:
     assert connector.last_payload is None
 
     assert len(alerts) == 1
-    assert alerts[0].alarm_id == 82867908
+    assert alerts[0].alarm_id == ID(82867908)
     assert alerts[0].alarm_start_time == datetime(2021, 1, 19, 13, 50, 0, 0, tzinfo=timezone.utc)
 
 
@@ -208,5 +209,5 @@ def test_get_alerts_history_without_sort_and_filter() -> None:
     assert connector.last_payload is None
 
     assert len(alerts) == 1
-    assert alerts[0].alarm_id == 82867908
+    assert alerts[0].alarm_id == ID(82867908)
     assert alerts[0].alarm_start_time == datetime(2021, 1, 19, 13, 50, 0, 0, tzinfo=timezone.utc)
