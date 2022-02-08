@@ -76,7 +76,7 @@ class PopulatorsAPI(BaseAPI):
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
     @staticmethod
-    def check_fields(populator: Populator, method: string):
+    def check_fields(populator: Populator, method: str):
         class_op = f"{method} Populator"
         if populator.value is None:
             raise IncompleteObjectError(class_op, "value is required")

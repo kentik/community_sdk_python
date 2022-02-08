@@ -46,7 +46,7 @@ class SavedFiltersAPI(BaseAPI):
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
     @staticmethod
-    def check_fields(saved_filter: SavedFilter, method: String):
+    def check_fields(saved_filter: SavedFilter, method: str):
         class_op = f"{method} SavedFilters"
         if saved_filter.filter_name is None:
             raise IncompleteObjectError(class_op, "filter must have name")

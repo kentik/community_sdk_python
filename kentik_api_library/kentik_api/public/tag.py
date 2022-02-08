@@ -1,5 +1,6 @@
 from typing import Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 
 # pylint: disable=too-many-instance-attributes
