@@ -1,5 +1,6 @@
 from typing import Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 
 # pylint: disable=too-many-instance-attributes
@@ -72,7 +73,8 @@ class Tag:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Tag", "_id is required")
         return self._id
 
     @property
