@@ -3,6 +3,7 @@ from typing import List
 
 from kentik_api.api_calls import sites
 from kentik_api.api_resources.base_api import BaseAPI
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.site import Site
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import sites_payload
@@ -22,7 +23,8 @@ class SitesAPI(BaseAPI):
         return sites_payload.GetResponse.from_json(response.text).to_site()
 
     def create(self, site: Site) -> Site:
-        assert site.site_name is not None
+        if site.site_name is None:
+            raise IncompleteObjectError("Create Sites", "site_name has to be provided")
         apicall = sites.create_site()
         payload = sites_payload.CreateRequest(site.site_name, site.latitude, site.longitude)
         response = self.send(apicall, payload)

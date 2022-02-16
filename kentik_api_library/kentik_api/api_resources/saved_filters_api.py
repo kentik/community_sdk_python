@@ -3,6 +3,7 @@ from typing import List
 
 from kentik_api.api_calls import saved_filters
 from kentik_api.api_resources.base_api import BaseAPI
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.saved_filter import SavedFilter
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import saved_filters_payload
@@ -22,7 +23,7 @@ class SavedFiltersAPI(BaseAPI):
         return saved_filters_payload.GetResponse.from_json(response.text).to_saved_filter()
 
     def create(self, saved_filter: SavedFilter) -> SavedFilter:
-        SavedFiltersAPI.check_fields(saved_filter)
+        SavedFiltersAPI.check_fields(saved_filter, "Create")
 
         api_call = saved_filters.create_saved_filter()
         payload = saved_filters_payload.CreateRequest(saved_filter)
@@ -30,8 +31,9 @@ class SavedFiltersAPI(BaseAPI):
         return saved_filters_payload.CreateResponse.from_json(response.text).to_saved_filter()
 
     def update(self, saved_filter: SavedFilter) -> SavedFilter:
-        assert saved_filter.id is not None, "SavedFilter ID has to be provided"
-        SavedFiltersAPI.check_fields(saved_filter)
+        if saved_filter.id is None:
+            raise IncompleteObjectError("Update savedFilter", "ID has to be provided")
+        SavedFiltersAPI.check_fields(saved_filter, "Update")
 
         api_call = saved_filters.update_saved_filter(saved_filter.id)
         payload = saved_filters_payload.UpdateRequest(saved_filter)
@@ -44,9 +46,14 @@ class SavedFiltersAPI(BaseAPI):
         return response.http_status_code == HTTPStatus.NO_CONTENT
 
     @staticmethod
-    def check_fields(saved_filter: SavedFilter):
-        assert saved_filter.filter_name is not None, "Filter must have name"
+    def check_fields(saved_filter: SavedFilter, method: str):
+        class_op = f"{method} SavedFilters"
+        if saved_filter.filter_name is None:
+            raise IncompleteObjectError(class_op, "filter must have name")
         if saved_filter.filters is not None:
-            assert saved_filter.filters.connector is not None
-            assert all(i.connector is not None for i in saved_filter.filters.filterGroups)
-            assert all(i.not_ is not None for i in saved_filter.filters.filterGroups)
+            if saved_filter.filters.connector is None:
+                raise IncompleteObjectError(class_op, "connector is required")
+            if not all(i.connector is not None for i in saved_filter.filters.filterGroups):
+                raise IncompleteObjectError(class_op, "filterGroups connector is required")
+            if not all(i.not_ is not None for i in saved_filter.filters.filterGroups):
+                raise IncompleteObjectError(class_op, "not_ is required")

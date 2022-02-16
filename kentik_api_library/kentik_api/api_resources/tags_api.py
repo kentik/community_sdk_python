@@ -3,6 +3,7 @@ from typing import List
 
 from kentik_api.api_calls import tags
 from kentik_api.api_resources.base_api import BaseAPI
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.tag import Tag
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import tags_payload
@@ -22,7 +23,8 @@ class TagsAPI(BaseAPI):
         return tags_payload.GetResponse.from_json(response.text).to_tag()
 
     def create(self, tag: Tag) -> Tag:
-        assert tag.flow_tag is not None
+        if tag.flow_tag is None:
+            raise IncompleteObjectError("Create Tags", "flow_tag has to be provided")
         apicall = tags.create_tag()
         payload = tags_payload.CreateRequest.from_tag(tag)
         response = self.send(apicall, payload)

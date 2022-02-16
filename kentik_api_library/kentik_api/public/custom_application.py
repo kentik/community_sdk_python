@@ -1,5 +1,6 @@
 from typing import Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 
 # pylint: disable=too-many-instance-attributes
@@ -40,7 +41,8 @@ class CustomApplication:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Custom Application", "_id is required")
         return self._id
 
     @property

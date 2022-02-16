@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List, Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID, PermissiveEnumMeta
 
 # pylint: disable=too-many-instance-attributes
@@ -81,7 +82,8 @@ class Populator:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("Populator", "_id is required")
         return self._id
 
     @property
@@ -90,7 +92,8 @@ class Populator:
 
     @property
     def dimension_id(self) -> ID:
-        assert self._dimension_id is not None
+        if self._dimension_id is None:
+            raise IncompleteObjectError("Populator", "_dimension_id is required")
         return self._dimension_id
 
     @property
@@ -142,7 +145,8 @@ class CustomDimension:
 
     @property
     def id(self) -> ID:
-        assert self._id is not None
+        if self._id is None:
+            raise IncompleteObjectError("CustomDimension", "_id is required")
         return self._id
 
     @property
