@@ -1,9 +1,27 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.site import Site
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
+
+
+@dataclass
+class SitePayload:
+    """This datastructure represents JSON CustomApplication payload as it is transmitted to and from KentikAPI"""
+
+    site_name: Optional[str]  # eg. "apitest-site-1"
+    lat: Optional[float]  # eg. 50.102
+    lon: Optional[float]  # eg. 18.209
+
+    @classmethod
+    def from_site(cls, site: Site):
+        return cls(
+            site_name=site.site_name,
+            lat=site.latitude,
+            lon=site.longitude,
+        )
 
 
 @dataclass()
@@ -51,17 +69,6 @@ class GetAllResponse:
         return [item.to_site() for item in self.sites]
 
 
-class CreateRequest:
-    @dataclass
-    class _Site:
-        site_name: str  # eg. "apitest-site-1"
-        lat: Optional[float]  # eg. 50.102
-        lon: Optional[float]  # eg. 18.209
-
-    def __init__(self, site_name: str, lat: Optional[float], lon: Optional[float]) -> None:
-        self.site = CreateRequest._Site(site_name, lat, lon)  # sites api payload is embedded under "site" key
-
-
 @dataclass()
 class CreateResponse:
     @dataclass
@@ -89,17 +96,6 @@ class CreateResponse:
         )
 
 
-class UpdateRequest:
-    @dataclass
-    class _Site:
-        site_name: Optional[str]  # eg. "apitest-site-1"
-        lat: Optional[float]  # eg. 50.102
-        lon: Optional[float]  # eg. 18.201
-
-    def __init__(self, site_name: Optional[str], lat: Optional[float], lon: Optional[float]) -> None:
-        self.site = UpdateRequest._Site(site_name, lat, lon)  # sites api payload is embedded under "site" key
-
-
 @dataclass()
 class UpdateResponse:
     @dataclass
@@ -125,6 +121,32 @@ class UpdateResponse:
             convert(self.site.id, ID),
             convert(self.site.company_id, ID),
         )
+
+
+@dataclass
+class CreateRequest:
+
+    site: SitePayload
+
+    @classmethod
+    def from_site(cls, site: Site):
+        CreateRequest.validate(site)
+        return cls(site=SitePayload.from_site(site))
+
+    @staticmethod
+    def validate(site: Site):
+        if site.site_name is None:
+            raise IncompleteObjectError("Create Sites", "site_name has to be provided")
+
+
+@dataclass
+class UpdateRequest:
+
+    site: SitePayload
+
+    @classmethod
+    def from_site(cls, site: Site):
+        return cls(site=SitePayload.from_site(site))
 
 
 @dataclass()

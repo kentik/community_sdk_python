@@ -2,10 +2,62 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from kentik_api.public.custom_dimension import Populator
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict
 
 # pylint: disable=too-many-instance-attributes
+
+
+@dataclass
+class PopulatorPayload:
+    """This datastructure represents JSON Populator payload as it is transmitted to and from KentikAPI"""
+
+    value: Optional[str]
+    direction: Optional[str]
+    device_name: Optional[str]
+    interface_name: Optional[str]
+    addr: Optional[str]
+    port: Optional[str]
+    tcp_flags: Optional[str]
+    protocol: Optional[str]
+    asn: Optional[str]
+    nexthop_asn: Optional[str]
+    nexthop: Optional[str]
+    bgp_aspath: Optional[str]
+    bgp_community: Optional[str]
+    device_type: Optional[str]
+    site: Optional[str]
+    lasthop_as_name: Optional[str]
+    nexthop_as_name: Optional[str]
+    mac: Optional[str]
+    country: Optional[str]
+    vlans: Optional[str]
+
+    @classmethod
+    def from_populator(cls, populator: Populator):
+        return cls(
+            value=populator.value,
+            direction=convert(populator.direction, Populator.Direction),
+            device_name=populator.device_name,
+            interface_name=populator.interface_name,
+            addr=populator.addr,
+            port=populator.port,
+            tcp_flags=populator.tcp_flags,
+            protocol=populator.protocol,
+            asn=populator.asn,
+            nexthop_asn=populator.nexthop_asn,
+            nexthop=populator.nexthop,
+            bgp_aspath=populator.bgp_aspath,
+            bgp_community=populator.bgp_community,
+            device_type=populator.device_type,
+            site=populator.site,
+            lasthop_as_name=populator.lasthop_as_name,
+            nexthop_as_name=populator.nexthop_as_name,
+            mac=populator.mac,
+            country=populator.country,
+            vlans=populator.vlans,
+        )
 
 
 @dataclass
@@ -97,36 +149,15 @@ class GetResponse(_Populator):
         return from_dict(data_class=cls, data=dic)
 
 
+@dataclass
 class CreateRequest:
-    # pylint: disable=too-many-instance-attributes
-    @dataclass
-    class _Populator:
-        # dimension_id: int # this id goes as url param
-        value: str
-        direction: str
-        device_name: Optional[str]
-        interface_name: Optional[str]
-        addr: Optional[str]
-        port: Optional[str]
-        tcp_flags: Optional[str]
-        protocol: Optional[str]
-        asn: Optional[str]
-        nexthop_asn: Optional[str]
-        nexthop: Optional[str]
-        bgp_aspath: Optional[str]
-        bgp_community: Optional[str]
-        device_type: Optional[str]
-        site: Optional[str]
-        lasthop_as_name: Optional[str]
-        nexthop_as_name: Optional[str]
-        mac: Optional[str]
-        country: Optional[str]
-        vlans: Optional[str]
 
-    # pylint: enable=too-many-instance-attributes
+    populator: PopulatorPayload
 
-    def __init__(self, **kwargs) -> None:
-        self.populator = from_dict(data_class=CreateRequest._Populator, data=kwargs)
+    @classmethod
+    def from_populator(cls, populator: Populator):
+        check_fields(populator, "Create")
+        return cls(populator=PopulatorPayload.from_populator(populator))
 
 
 CreateResponse = GetResponse
@@ -134,39 +165,26 @@ CreateResponse = GetResponse
 
 @dataclass
 class UpdateRequest:
-    # pylint: disable=too-many-instance-attributes
-    @dataclass
-    class _Populator:
-        # id: int # this id goes as url param
-        # dimension_id: int # this id goes as url param
-        value: str
-        direction: str
-        device_name: Optional[str]
-        interface_name: Optional[str]
-        addr: Optional[str]
-        port: Optional[str]
-        tcp_flags: Optional[str]
-        protocol: Optional[str]
-        asn: Optional[str]
-        nexthop_asn: Optional[str]
-        nexthop: Optional[str]
-        bgp_aspath: Optional[str]
-        bgp_community: Optional[str]
-        device_type: Optional[str]
-        site: Optional[str]
-        lasthop_as_name: Optional[str]
-        nexthop_as_name: Optional[str]
-        mac: Optional[str]
-        country: Optional[str]
-        vlans: Optional[str]
 
-    # pylint: enable=too-many-instance-attributes
+    populator: PopulatorPayload
 
-    def __init__(self, **kwargs) -> None:
-        self.populator = from_dict(data_class=UpdateRequest._Populator, data=kwargs)
+    @classmethod
+    def from_populator(cls, populator: Populator):
+        check_fields(populator, "Update")
+        return cls(populator=PopulatorPayload.from_populator(populator))
 
 
 UpdateResponse = GetResponse
+
+
+def check_fields(populator: Populator, method: str):
+    class_op = f"{method} Populator"
+    if populator.value is None:
+        raise IncompleteObjectError(class_op, "value is required")
+    if populator.direction is None:
+        raise IncompleteObjectError(class_op, "direction is required")
+    if populator.dimension_id is None:
+        raise IncompleteObjectError(class_op, "dimension_id is required")
 
 
 # @dataclass()

@@ -2,11 +2,49 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.saved_filter import Filter, FilterGroups, Filters, SavedFilter
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, convert_or_none, dict_from_json, from_dict, list_from_json
 
 # pylint: disable=too-many-instance-attributes
+
+
+@dataclass
+class SavedFilterPayload:
+
+    filter_description: Optional[str] = None
+    filter_name: Optional[str] = None
+    filters: Optional[Filters] = None
+
+    @staticmethod
+    def get_filter_groups(filter_groups: List[FilterGroups]) -> List[Dict[str, Any]]:
+        return [
+            {
+                "connector": i.connector,
+                "filters": [
+                    {"filterField": j.filterField, "filterValue": j.filterValue, "operator": j.operator}
+                    for j in i.filters
+                ],
+                "not": i.not_,
+            }
+            for i in filter_groups
+        ]
+
+    @classmethod
+    def from_saved_filter(cls, saved_filter: SavedFilter):
+        filters = None
+        if saved_filter.filters:
+            filters_dict = {
+                "connector": saved_filter.filters.connector,
+                "filterGroups": SavedFilterPayload.get_filter_groups(saved_filter.filters.filterGroups),
+            }
+            filters = Filters.from_dict(filters_dict)
+        return cls(
+            filter_name=saved_filter.filter_name,
+            filter_description=saved_filter.filter_description,
+            filters=filters,
+        )
 
 
 @dataclass()
@@ -75,38 +113,45 @@ class GetAllResponse(List[GetResponse]):
         return [ftr.to_saved_filter() for ftr in self]
 
 
+@dataclass
 class CreateRequest:
-    def __init__(
-        self,
-        saved_filter: SavedFilter,
-    ) -> None:
-        self.filter_name = saved_filter.filter_name
-        self.filter_description = saved_filter.filter_description
-        self.filters = (
-            {
-                "connector": saved_filter.filters.connector,
-                "filterGroups": CreateRequest.get_filter_groups(saved_filter.filters.filterGroups),
-            }
-            if saved_filter.filters is not None
-            else None
-        )
 
-    @staticmethod
-    def get_filter_groups(filter_groups: List[FilterGroups]) -> List[Dict[str, Any]]:
-        return [
-            {
-                "connector": i.connector,
-                "filters": [
-                    {"filterField": j.filterField, "filterValue": j.filterValue, "operator": j.operator}
-                    for j in i.filters
-                ],
-                "not": i.not_,
-            }
-            for i in filter_groups
-        ]
+    saved_filter: SavedFilterPayload
+
+    @classmethod
+    def from_custom_application(cls, saved_filter: SavedFilter):
+        check_fields(saved_filter, "Create")
+        return SavedFilterPayload.from_saved_filter(saved_filter)
 
 
 CreateResponse = GetResponse
 
-UpdateRequest = CreateRequest
+
+@dataclass
+class UpdateRequest:
+
+    saved_filter: SavedFilterPayload
+
+    @classmethod
+    def from_custom_application(cls, saved_filter: SavedFilter):
+        check_fields(saved_filter, "Update")
+        return SavedFilterPayload.from_saved_filter(saved_filter)
+
+
 UpdateResponse = GetResponse
+
+
+def check_fields(saved_filter: SavedFilter, method: str):
+    class_op = f"{method} SavedFilters"
+    if method == "Update":
+        if saved_filter.id is None:
+            raise IncompleteObjectError(class_op, "ID has to be provided")
+    if saved_filter.filter_name is None:
+        raise IncompleteObjectError(class_op, "filter must have name")
+    if saved_filter.filters is not None:
+        if saved_filter.filters.connector is None:
+            raise IncompleteObjectError(class_op, "connector is required")
+        if not all(i.connector is not None for i in saved_filter.filters.filterGroups):
+            raise IncompleteObjectError(class_op, "filterGroups connector is required")
+        if not all(i.not_ is not None for i in saved_filter.filters.filterGroups):
+            raise IncompleteObjectError(class_op, "not_ is required")
