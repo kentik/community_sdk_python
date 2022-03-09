@@ -11,7 +11,7 @@ from kentik_api.requests_payload.conversions import convert, convert_or_none, di
 
 @dataclass
 class CustomApplicationPayload:
-    """This datastructure represents JSON CustomApplication payload as it is transmitted to and from KentikAPI"""
+    """This data structure represents JSON CustomApplication payload as it is transmitted to and from Kentik API"""
 
     name: Optional[str] = None
     description: Optional[str] = None

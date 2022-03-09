@@ -10,7 +10,7 @@ from kentik_api.requests_payload.populators_payload import PopulatorArray
 
 @dataclass
 class CustomDimensionPayload:
-    """This datastructure represents JSON CustomDimension payload as it is transmitted to and from KentikAPI"""
+    """This data structure represents JSON CustomDimension payload as it is transmitted to and from Kentik API"""
 
     name: Optional[str] = None
     display_name: Optional[str] = None

@@ -11,7 +11,7 @@ from kentik_api.requests_payload.conversions import convert, dict_from_json, fro
 
 @dataclass
 class PopulatorPayload:
-    """This datastructure represents JSON Populator payload as it is transmitted to and from KentikAPI"""
+    """This data structure represents JSON Populator payload as it is transmitted to and from Kentik API"""
 
     value: Optional[str]
     direction: Optional[str]

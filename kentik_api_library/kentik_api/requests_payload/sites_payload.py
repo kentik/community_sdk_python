@@ -9,7 +9,7 @@ from kentik_api.requests_payload.conversions import convert, dict_from_json, fro
 
 @dataclass
 class SitePayload:
-    """This datastructure represents JSON CustomApplication payload as it is transmitted to and from KentikAPI"""
+    """This data structure represents JSON SitePayload payload as it is transmitted to and from Kentik API"""
 
     site_name: Optional[str]  # eg. "apitest-site-1"
     lat: Optional[float]  # eg. 50.102
