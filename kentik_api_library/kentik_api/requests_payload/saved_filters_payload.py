@@ -120,7 +120,7 @@ class CreateRequest:
 
     @classmethod
     def from_custom_application(cls, saved_filter: SavedFilter):
-        check_fields(saved_filter, "Create")
+        validate(saved_filter, "Create")
         return SavedFilterPayload.from_saved_filter(saved_filter)
 
 
@@ -134,14 +134,14 @@ class UpdateRequest:
 
     @classmethod
     def from_custom_application(cls, saved_filter: SavedFilter):
-        check_fields(saved_filter, "Update")
+        validate(saved_filter, "Update")
         return SavedFilterPayload.from_saved_filter(saved_filter)
 
 
 UpdateResponse = GetResponse
 
 
-def check_fields(saved_filter: SavedFilter, method: str):
+def validate(saved_filter: SavedFilter, method: str):
     class_op = f"{method} SavedFilters"
     if method == "Update":
         if saved_filter.id is None:

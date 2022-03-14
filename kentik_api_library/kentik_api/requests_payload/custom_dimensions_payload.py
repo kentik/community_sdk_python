@@ -76,7 +76,7 @@ class CreateRequest:
 
     @classmethod
     def from_custom_dimension(cls, custom_dimension: CustomDimension):
-        check_fields(custom_dimension, "Create")
+        validate(custom_dimension, "Create")
         return CustomDimensionPayload.from_custom_dimension(custom_dimension)
 
 
@@ -90,14 +90,14 @@ class UpdateRequest:
 
     @classmethod
     def from_custom_dimension(cls, custom_dimension: CustomDimension):
-        check_fields(custom_dimension, "Update")
+        validate(custom_dimension, "Update")
         return CustomDimensionPayload.from_custom_dimension(custom_dimension)
 
 
 UpdateResponse = GetResponse
 
 
-def check_fields(custom_dimension: CustomDimension, method: str):
+def validate(custom_dimension: CustomDimension, method: str):
     class_op = f"{method} CustomDimensions"
     if method == "Create":
         if custom_dimension.name is None:

@@ -61,7 +61,7 @@ class PopulatorPayload:
 
 
 @dataclass
-class _Populator:
+class PopulatorGetPayload:
     id: int
     dimension_id: int
     company_id: str
@@ -128,7 +128,7 @@ class _Populator:
 # pylint: enable=too-many-instance-attributes
 
 
-class PopulatorArray(List[_Populator]):
+class PopulatorArray(List[PopulatorGetPayload]):
     @classmethod
     def from_list(cls, items: List[Dict[str, Any]]):
         populators = cls()
@@ -141,7 +141,7 @@ class PopulatorArray(List[_Populator]):
         return [p.to_populator() for p in self]
 
 
-class GetResponse(_Populator):
+class GetResponse(PopulatorGetPayload):
     @classmethod
     def from_json(cls, json_string: str):
         # payload is embeded under "populator" key
@@ -156,7 +156,7 @@ class CreateRequest:
 
     @classmethod
     def from_populator(cls, populator: Populator):
-        check_fields(populator, "Create")
+        validate(populator, "Create")
         return cls(populator=PopulatorPayload.from_populator(populator))
 
 
@@ -170,14 +170,14 @@ class UpdateRequest:
 
     @classmethod
     def from_populator(cls, populator: Populator):
-        check_fields(populator, "Update")
+        validate(populator, "Update")
         return cls(populator=PopulatorPayload.from_populator(populator))
 
 
 UpdateResponse = GetResponse
 
 
-def check_fields(populator: Populator, method: str):
+def validate(populator: Populator, method: str):
     class_op = f"{method} Populator"
     if populator.value is None:
         raise IncompleteObjectError(class_op, "value is required")
