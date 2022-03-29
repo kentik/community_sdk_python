@@ -22,15 +22,14 @@ class SitesAPI(BaseAPI):
         return sites_payload.GetResponse.from_json(response.text).to_site()
 
     def create(self, site: Site) -> Site:
-        assert site.site_name is not None
         apicall = sites.create_site()
-        payload = sites_payload.CreateRequest(site.site_name, site.latitude, site.longitude)
+        payload = sites_payload.CreateRequest.from_site(site)
         response = self.send(apicall, payload)
         return sites_payload.CreateResponse.from_json(response.text).to_site()
 
     def update(self, site: Site) -> Site:
         apicall = sites.update_site(site.id)
-        payload = sites_payload.UpdateRequest(site.site_name, site.latitude, site.longitude)
+        payload = sites_payload.UpdateRequest.from_site(site)
         response = self.send(apicall, payload)
         return sites_payload.UpdateResponse.from_json(response.text).to_site()
 

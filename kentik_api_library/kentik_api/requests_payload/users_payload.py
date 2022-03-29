@@ -21,7 +21,6 @@ class _User:
     created_date: str
     updated_date: str
     company_id: str
-    user_api_token: Optional[str]
     filters: Dict
     saved_filters: List
 
@@ -38,7 +37,6 @@ class _User:
             _created_date=self.created_date,
             _updated_date=self.updated_date,
             _company_id=convert(self.company_id, ID),
-            _api_token=self.user_api_token if self.user_api_token is not None else "",
             _filters=dict(self.filters),
             _saved_filters=list(self.saved_filters),
         )
@@ -87,7 +85,6 @@ class CreateRequest:
         user_name: Optional[str]
         user_full_name: Optional[str]
         user_email: str
-        user_password: Optional[str]
         role: str
         email_service: bool
         email_product: bool
@@ -100,13 +97,10 @@ class CreateRequest:
         role: str,
         email_service: bool,
         email_product: bool,
-        user_password: Optional[str] = None,
         user_name: Optional[str] = None,
         user_full_name: Optional[str] = None,
     ) -> None:
-        self.user = CreateRequest._CreateData(
-            user_name, user_full_name, user_email, user_password, role, email_service, email_product
-        )
+        self.user = CreateRequest._CreateData(user_name, user_full_name, user_email, role, email_service, email_product)
 
     # pylint: enable=too-many-arguments
 

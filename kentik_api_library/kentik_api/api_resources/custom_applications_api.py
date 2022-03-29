@@ -17,29 +17,14 @@ class CustomApplicationsAPI(BaseAPI):
         return custom_applications_payload.GetAllResponse.from_json(response.text).to_custom_applications()
 
     def create(self, custom_application: CustomApplication) -> CustomApplication:
-        assert custom_application.name is not None
         apicall = custom_applications.create_custom_application()
-        payload = custom_applications_payload.CreateRequest(
-            name=custom_application.name,
-            description=custom_application.description,
-            ip_range=custom_application.ip_range,
-            protocol=custom_application.protocol,
-            port=custom_application.port,
-            asn=custom_application.asn,
-        )
+        payload = custom_applications_payload.CreateRequest.from_custom_application(custom_application)
         response = self.send(apicall, payload)
         return custom_applications_payload.CreateResponse.from_json(response.text).to_custom_application()
 
     def update(self, custom_application: CustomApplication) -> CustomApplication:
         apicall = custom_applications.update_custom_application(custom_application.id)
-        payload = custom_applications_payload.UpdateRequest(
-            name=custom_application.name,
-            description=custom_application.description,
-            ip_range=custom_application.ip_range,
-            protocol=custom_application.protocol,
-            port=custom_application.port,
-            asn=custom_application.asn,
-        )
+        payload = custom_applications_payload.UpdateRequest.from_custom_application(custom_application)
         response = self.send(apicall, payload)
         return custom_applications_payload.UpdateResponse.from_json(response.text).to_custom_application()
 

@@ -1,10 +1,28 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import List, Optional
 
 from kentik_api.public.custom_dimension import CustomDimension
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, dict_from_json, from_dict, list_from_json
 from kentik_api.requests_payload.populators_payload import PopulatorArray
+
+
+@dataclass
+class CustomDimensionPayload:
+    """This data structure represents JSON CustomDimension payload as it is transmitted to and from Kentik API"""
+
+    name: Optional[str] = None
+    display_name: Optional[str] = None
+    type: Optional[str] = None
+
+    @classmethod
+    def from_custom_dimension(cls, custom_dimension: CustomDimension):
+        return cls(
+            name=custom_dimension.name,
+            display_name=custom_dimension.display_name,
+            type=custom_dimension.type,
+        )
 
 
 @dataclass
@@ -53,9 +71,13 @@ class GetAllResponse(List[GetResponse]):
 
 @dataclass
 class CreateRequest:
-    name: str
-    display_name: str
-    type: str
+
+    custom_dimension: CustomDimensionPayload
+
+    @classmethod
+    def from_custom_dimension(cls, custom_dimension: CustomDimension):
+        validate(custom_dimension, "Create")
+        return CustomDimensionPayload.from_custom_dimension(custom_dimension)
 
 
 CreateResponse = GetResponse
@@ -63,10 +85,27 @@ CreateResponse = GetResponse
 
 @dataclass
 class UpdateRequest:
-    display_name: str
+
+    custom_dimension: CustomDimensionPayload
+
+    @classmethod
+    def from_custom_dimension(cls, custom_dimension: CustomDimension):
+        validate(custom_dimension, "Update")
+        return CustomDimensionPayload.from_custom_dimension(custom_dimension)
 
 
 UpdateResponse = GetResponse
+
+
+def validate(custom_dimension: CustomDimension, method: str):
+    class_op = f"{method} CustomDimensions"
+    if method == "Create":
+        if custom_dimension.name is None:
+            raise IncompleteObjectError(class_op, "name is required")
+        if custom_dimension.type is None:
+            raise IncompleteObjectError(class_op, "type is required")
+    if custom_dimension.display_name is None:
+        raise IncompleteObjectError(class_op, "display_name is required")
 
 
 # @dataclass()

@@ -7,69 +7,20 @@ from kentik_api.api_resources.base_api import BaseAPI
 from kentik_api.public.custom_dimension import CustomDimension, Populator
 from kentik_api.public.types import ID
 from kentik_api.requests_payload import custom_dimensions_payload, populators_payload
-from kentik_api.requests_payload.conversions import convert, permissive_enum_to_str
 
 
 class PopulatorsAPI(BaseAPI):
     """Exposes Kentik API operations related to populators (belong to custom dimensions)"""
 
     def create(self, populator: Populator) -> Populator:
-        assert populator.value is not None
-        assert populator.direction is not None
-        assert populator.dimension_id is not None
         apicall = custom_dimensions.create_populator(populator.dimension_id)
-        payload = populators_payload.CreateRequest(
-            value=populator.value,
-            direction=populator.direction.value,
-            device_name=populator.device_name,
-            interface_name=populator.interface_name,
-            addr=populator.addr,
-            port=populator.port,
-            tcp_flags=populator.tcp_flags,
-            protocol=populator.protocol,
-            asn=populator.asn,
-            nexthop_asn=populator.nexthop_asn,
-            nexthop=populator.nexthop,
-            bgp_aspath=populator.bgp_aspath,
-            bgp_community=populator.bgp_community,
-            device_type=populator.device_type,
-            site=populator.site,
-            lasthop_as_name=populator.lasthop_as_name,
-            nexthop_as_name=populator.nexthop_as_name,
-            mac=populator.mac,
-            country=populator.country,
-            vlans=populator.vlans,
-        )
+        payload = populators_payload.CreateRequest.from_populator(populator)
         response = self.send(apicall, payload)
         return populators_payload.CreateResponse.from_json(response.text).to_populator()
 
     def update(self, populator: Populator) -> Populator:
-        assert populator.value is not None
-        assert populator.direction is not None
-        assert populator.dimension_id is not None
         apicall = custom_dimensions.update_populator(populator.dimension_id, populator.id)
-        payload = populators_payload.UpdateRequest(
-            value=populator.value,
-            direction=convert(populator.direction, permissive_enum_to_str),
-            device_name=populator.device_name,
-            interface_name=populator.interface_name,
-            addr=populator.addr,
-            port=populator.port,
-            tcp_flags=populator.tcp_flags,
-            protocol=populator.protocol,
-            asn=populator.asn,
-            nexthop_asn=populator.nexthop_asn,
-            nexthop=populator.nexthop,
-            bgp_aspath=populator.bgp_aspath,
-            bgp_community=populator.bgp_community,
-            device_type=populator.device_type,
-            site=populator.site,
-            lasthop_as_name=populator.lasthop_as_name,
-            nexthop_as_name=populator.nexthop_as_name,
-            mac=populator.mac,
-            country=populator.country,
-            vlans=populator.vlans,
-        )
+        payload = populators_payload.UpdateRequest.from_populator(populator)
         response = self.send(apicall, payload)
         return populators_payload.UpdateResponse.from_json(response.text).to_populator()
 
@@ -97,24 +48,14 @@ class CustomDimensionsAPI(BaseAPI):
         return custom_dimensions_payload.GetAllResponse.from_json(response.text).to_custom_dimensions()
 
     def create(self, custom_dimension: CustomDimension) -> CustomDimension:
-        assert custom_dimension.name is not None
-        assert custom_dimension.display_name is not None
-        assert custom_dimension.type is not None
         apicall = custom_dimensions.create_custom_dimension()
-        payload = custom_dimensions_payload.CreateRequest(
-            name=custom_dimension.name,
-            display_name=custom_dimension.display_name,
-            type=custom_dimension.type,
-        )
+        payload = custom_dimensions_payload.CreateRequest.from_custom_dimension(custom_dimension)
         response = self.send(apicall, payload)
         return custom_dimensions_payload.CreateResponse.from_json(response.text).to_custom_dimension()
 
     def update(self, custom_dimension: CustomDimension) -> CustomDimension:
-        assert custom_dimension.display_name is not None
         apicall = custom_dimensions.update_custom_dimension(custom_dimension.id)
-        payload = custom_dimensions_payload.UpdateRequest(
-            display_name=custom_dimension.display_name,
-        )
+        payload = custom_dimensions_payload.UpdateRequest.from_custom_dimension(custom_dimension)
         response = self.send(apicall, payload)
         return custom_dimensions_payload.UpdateResponse.from_json(response.text).to_custom_dimension()
 

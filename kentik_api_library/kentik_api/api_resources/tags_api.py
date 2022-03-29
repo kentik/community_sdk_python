@@ -22,7 +22,6 @@ class TagsAPI(BaseAPI):
         return tags_payload.GetResponse.from_json(response.text).to_tag()
 
     def create(self, tag: Tag) -> Tag:
-        assert tag.flow_tag is not None
         apicall = tags.create_tag()
         payload = tags_payload.CreateRequest.from_tag(tag)
         response = self.send(apicall, payload)

@@ -10,7 +10,8 @@ from kentik_api.public.errors import DataFormatError, DeserializationError
 def as_dict(obj: Any) -> Dict[str, Any]:
     """Convert obj to dict, removing all keys with None values"""
 
-    assert hasattr(obj, "__dict__") or isinstance(obj, dict), f"Input should be either class or dict , got: {type(obj)}"
+    if not (hasattr(obj, "__dict__") or isinstance(obj, dict)):
+        raise DataFormatError("Object as dict", f"Input should be either class or dict , got: {type(obj)}")
 
     if hasattr(obj, "__dict__"):
         obj = obj.__dict__

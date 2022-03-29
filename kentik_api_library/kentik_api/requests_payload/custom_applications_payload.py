@@ -2,10 +2,34 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from kentik_api.public.custom_application import CustomApplication
+from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, convert_or_none, dict_from_json, from_dict, list_from_json
 
 # pylint: disable=too-many-instance-attributes
+
+
+@dataclass
+class CustomApplicationPayload:
+    """This data structure represents JSON CustomApplication payload as it is transmitted to and from Kentik API"""
+
+    name: Optional[str] = None
+    description: Optional[str] = None
+    ip_range: Optional[str] = None
+    protocol: Optional[str] = None
+    port: Optional[str] = None
+    asn: Optional[str] = None
+
+    @classmethod
+    def from_custom_application(cls, custom_application: CustomApplication):
+        return cls(
+            name=custom_application.name,
+            description=custom_application.description,
+            ip_range=custom_application.ip_range,
+            protocol=custom_application.protocol,
+            port=custom_application.port,
+            asn=custom_application.asn,
+        )
 
 
 @dataclass
@@ -62,12 +86,18 @@ class GetAllResponse(List[GetResponse]):
 
 @dataclass
 class CreateRequest:
-    name: str
-    description: Optional[str] = None
-    ip_range: Optional[str] = None
-    protocol: Optional[str] = None
-    port: Optional[str] = None
-    asn: Optional[str] = None
+
+    custom_application: CustomApplicationPayload
+
+    @classmethod
+    def from_custom_application(cls, custom_application: CustomApplication):
+        CreateRequest.validate(custom_application)
+        return CustomApplicationPayload.from_custom_application(custom_application)
+
+    @staticmethod
+    def validate(custom_application: CustomApplication) -> None:
+        if custom_application.name is None:
+            raise IncompleteObjectError("Create Custom Application", "name is required")
 
 
 CreateResponse = GetResponse
@@ -75,12 +105,12 @@ CreateResponse = GetResponse
 
 @dataclass
 class UpdateRequest:
-    name: Optional[str] = None
-    description: Optional[str] = None
-    ip_range: Optional[str] = None
-    protocol: Optional[str] = None
-    port: Optional[str] = None
-    asn: Optional[str] = None
+
+    custom_application: CustomApplicationPayload
+
+    @classmethod
+    def from_custom_application(cls, custom_application: CustomApplication):
+        return CustomApplicationPayload.from_custom_application(custom_application)
 
 
 UpdateResponse = GetResponse
