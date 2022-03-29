@@ -16,6 +16,67 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
+# Package list generated with: python setup.py packages
+PACKAGES = [
+    "kentik_api.",
+    "kentik_api.auth",
+    "kentik_api.throttling",
+    "kentik_api.analytics",
+    "kentik_api.api_calls",
+    "kentik_api.synthetics",
+    "kentik_api.api_connection",
+    "kentik_api.api_resources",
+    "kentik_api.internal",
+    "kentik_api.generated",
+    "kentik_api.generated.google",
+    "kentik_api.generated.google.api",
+    "kentik_api.generated.google.type",
+    "kentik_api.generated.grpc",
+    "kentik_api.generated.grpc.status",
+    "kentik_api.generated.grpc.binary_log",
+    "kentik_api.generated.grpc.binary_log.v1alpha",
+    "kentik_api.generated.grpc.lb",
+    "kentik_api.generated.grpc.lb.v1",
+    "kentik_api.generated.grpc.health",
+    "kentik_api.generated.grpc.health.v1",
+    "kentik_api.generated.grpc.reflection",
+    "kentik_api.generated.grpc.reflection.v1alpha",
+    "kentik_api.generated.grpc.http_over_grpc",
+    "kentik_api.generated.grpc.channelz",
+    "kentik_api.generated.grpc.core",
+    "kentik_api.generated.kentik",
+    "kentik_api.generated.kentik.cloud_maps",
+    "kentik_api.generated.kentik.cloud_maps.v202201alpha1",
+    "kentik_api.generated.kentik.cloud_gw",
+    "kentik_api.generated.kentik.cloud_gw.v202103alpha1",
+    "kentik_api.generated.kentik.mkp",
+    "kentik_api.generated.kentik.mkp.v202102alpha1",
+    "kentik_api.generated.kentik.cloud_export",
+    "kentik_api.generated.kentik.cloud_export.v202101beta1",
+    "kentik_api.generated.kentik.interface",
+    "kentik_api.generated.kentik.interface.v202108alpha1",
+    "kentik_api.generated.kentik.user",
+    "kentik_api.generated.kentik.user.v202106alpha1",
+    "kentik_api.generated.kentik.synthetics",
+    "kentik_api.generated.kentik.synthetics.v202101beta1",
+    "kentik_api.generated.kentik.synthetics.backend",
+    "kentik_api.generated.kentik.synthetics.backend.v1",
+    "kentik_api.generated.kentik.site",
+    "kentik_api.generated.kentik.site.v202106alpha1",
+    "kentik_api.generated.kentik.network_class",
+    "kentik_api.generated.kentik.network_class.v202109alpha1",
+    "kentik_api.generated.kentik.notify",
+    "kentik_api.generated.kentik.notify.backend",
+    "kentik_api.generated.kentik.notify.backend.v0",
+    "kentik_api.generated.kentik.core",
+    "kentik_api.generated.kentik.core.v202012alpha1",
+    "kentik_api.generated.protoc_gen_openapiv2",
+    "kentik_api.generated.protoc_gen_openapiv2.options",
+    "kentik_api.requests_payload",
+    "kentik_api.utils",
+    "kentik_api.public",
+]
+
 
 def run_cmd(cmd, reporter) -> None:
     """Run arbitrary command as subprocess"""
@@ -162,14 +223,24 @@ class FetchGRPCCode(Command):
             Path(tmp).joinpath(self.src_path).rename(dst)
 
 
-def list_packages(root: str) -> List[str]:
-    print("Listing packages")
+class PrintPackages(Command):
+    """Command helps to recreate package list"""
 
-    all_paths = [x[0] for x in os.walk(root)]
-    src_paths = [p for p in all_paths if "__" not in p]  # skip __pycache__ and similar
-    packages = [".".join(p.split(os.path.sep)) for p in src_paths]
-    print(*packages, sep="\n")
-    return packages
+    user_options = []
+
+    def initialize_options(self) -> None:
+        pass
+
+    def finalize_options(self) -> None:
+        pass
+
+    def run(self):
+        ROOT = "kentik_api/"
+
+        all_paths = [x[0] for x in os.walk(ROOT)]
+        src_paths = [p for p in all_paths if "__" not in p]  # skip __pycache__ and similar
+        packages = [".".join(p.split(os.path.sep)) for p in src_paths]
+        print(*packages, sep="\n")
 
 
 setup(
@@ -193,7 +264,14 @@ setup(
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
-    packages=list_packages("kentik_api/"),
-    cmdclass={"mypy": Mypy, "pylint": Pylint, "pytest": Pytest, "format": Format, "grpc_stubs": FetchGRPCCode},
+    packages=PACKAGES,
+    cmdclass={
+        "mypy": Mypy,
+        "pylint": Pylint,
+        "pytest": Pytest,
+        "format": Format,
+        "grpc_stubs": FetchGRPCCode,
+        "packages": PrintPackages,
+    },
     classifiers=["License :: OSI Approved :: Apache Software License"],
 )
