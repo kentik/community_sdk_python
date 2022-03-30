@@ -2,22 +2,28 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
+import kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 
 from .synth_tests import IPFamily
 
 
 class AgentStatus(Enum):
-    UNSPECIFIED = "AGENT_STATUS_UNSPECIFIED"
-    OK = "AGENT_STATUS_OK"
-    WAIT = "AGENT_STATUS_WAIT"
-    DELETED = "AGENT_STATUS_DELETED"
+    UNSPECIFIED = pb.AgentStatus.AGENT_STATUS_UNSPECIFIED
+    OK = pb.AgentStatus.AGENT_STATUS_OK
+    WAIT = pb.AgentStatus.AGENT_STATUS_WAIT
+    DELETED = pb.AgentStatus.AGENT_STATUS_DELETED
 
 
 class AgentImplementType(Enum):
-    UNSPECIFIED = "IMPLEMENT_TYPE_UNSPECIFIED"
-    RUST = "IMPLEMENT_TYPE_RUST"
-    NODE = "IMPLEMENT_TYPE_NODE"
+    UNSPECIFIED = pb.ImplementType.IMPLEMENT_TYPE_UNSPECIFIED
+    RUST = pb.ImplementType.IMPLEMENT_TYPE_RUST
+    NODE = pb.ImplementType.IMPLEMENT_TYPE_NODE
+
+
+class AgentType(Enum):
+    PRIVATE = "private"
+    GLOBAL = "global"
 
 
 @dataclass
@@ -26,7 +32,7 @@ class Agent:
     name: str = ""
     status: AgentStatus = AgentStatus.UNSPECIFIED
     alias: str = ""
-    type: str = ""  # "global"
+    type: AgentType = AgentType.GLOBAL
     os: str = ""
     ip: IP = IP()
     lat: float = 0.0

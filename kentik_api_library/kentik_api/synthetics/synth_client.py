@@ -62,7 +62,7 @@ class KentikSynthClient:
 
     @property
     def tests(self) -> List[SynTest]:
-        return [deserialize(SynTest, t, SynTest.test_from_dict) for t in self._transport.req("TestsList")]
+        return self.list_tests()
 
     def list_tests(self, presets: bool = False, raw: bool = False) -> Any:
         r = self._transport.req("TestsList", params=dict(presets=presets))

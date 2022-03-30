@@ -2,16 +2,17 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+import kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 
 from .types import IPFamily
 
 
 class TaskState(Enum):
-    UNSPECIFIED = "TASK_STATE_UNSPECIFIED"
-    CREATED = "TASK_STATE_CREATED"
-    UPDATED = "TASK_STATE_UPDATED"
-    DELETED = "TASK_STATE_DELETED"
+    UNSPECIFIED = pb.TaskState.TASK_STATE_UNSPECIFIED
+    CREATED = pb.TaskState.TASK_STATE_CREATED
+    UPDATED = pb.TaskState.TASK_STATE_UPDATED
+    DELETED = pb.TaskState.TASK_STATE_DELETED
 
 
 @dataclass

@@ -161,7 +161,6 @@ class SynTestSettings(_ConfigElement):
     agentIds: List[ID] = field(default_factory=list)
     tasks: List[str] = field(default_factory=DefaultTasks)
     healthSettings: HealthSettings = field(default_factory=HealthSettings)
-    monitoringSettings: MonitoringSettings = field(default_factory=MonitoringSettings)
     port: int = 0
     period: int = Defaults.period
     count: int = 0

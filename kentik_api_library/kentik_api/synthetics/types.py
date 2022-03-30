@@ -1,5 +1,7 @@
 from enum import Enum
 
+import kentik_api.generated.kentik.synthetics.v202101beta1.synthetics_pb2 as pb
+
 
 class SerializableEnum(Enum):
     @classmethod
@@ -26,17 +28,17 @@ class TestType(SerializableEnum):
 
 
 class TestStatus(SerializableEnum):
-    none = "<invalid>"
-    active = "TEST_STATUS_ACTIVE"
-    paused = "TEST_STATUS_PAUSED"
-    deleted = "TEST_STATUS_DELETED"
+    none = pb.TestStatus.TEST_STATUS_UNSPECIFIED
+    active = pb.TestStatus.TEST_STATUS_ACTIVE
+    paused = pb.TestStatus.TEST_STATUS_PAUSED
+    deleted = pb.TestStatus.TEST_STATUS_DELETED
 
 
 class IPFamily(SerializableEnum):
-    unspecified = "IP_FAMILY_UNSPECIFIED"
-    dual = "IP_FAMILY_DUAL"
-    v4 = "IP_FAMILY_V4"
-    v6 = "IP_FAMILY_V6"
+    unspecified = pb.IPFamily.IP_FAMILY_UNSPECIFIED
+    dual = pb.IPFamily.IP_FAMILY_DUAL
+    v4 = pb.IPFamily.IP_FAMILY_V4
+    v6 = pb.IPFamily.IP_FAMILY_V6
 
 
 class Protocol(SerializableEnum):

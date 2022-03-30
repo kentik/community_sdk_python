@@ -5,16 +5,16 @@ from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials
 
 
-def is_data_structure(v: Any) -> bool:
+def is_class(v: Any) -> bool:
     return hasattr(v, "__dict__") and not isinstance(v, Enum)
 
 
 def is_non_empty_data_structure_list(v: Any) -> bool:
-    return isinstance(v, list) and len(v) > 0 and is_data_structure(v[0])
+    return isinstance(v, list) and len(v) > 0 and is_class(v[0])
 
 
 def new_line_if_needed(v: Any) -> str:
-    return "\n" if is_data_structure(v) or is_non_empty_data_structure_list(v) else ""
+    return "\n" if is_class(v) or is_non_empty_data_structure_list(v) else ""
 
 
 def pretty_print(v: Any, indent_level: int = 1) -> None:
@@ -26,7 +26,7 @@ def pretty_print(v: Any, indent_level: int = 1) -> None:
         print(f"{v.value}")
     elif isinstance(v, str):
         print(f'"{v}"')
-    elif is_data_structure(v):
+    elif is_class(v):
         for name, value in v.__dict__.items():
             if callable(value):
                 continue

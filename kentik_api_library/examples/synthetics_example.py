@@ -4,9 +4,11 @@ Examples of using the Synthetics API
 
 from datetime import datetime, timezone
 
-from examples.utils import client, pretty_print
+from utils import client, pretty_print
+
 from kentik_api.public.types import ID
-from kentik_api.synthetics.synth_tests import HealthSettings, MonitoringSettings, SynTest, SynTestSettings
+from kentik_api.synthetics.agent import AgentStatus
+from kentik_api.synthetics.synth_tests import HealthSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
 
 
@@ -38,18 +40,10 @@ def test_crud() -> None:
         httpValidCodes=[200, 201],
         dnsValidCodes=[5, 6, 7],
     )
-    monitoring = MonitoringSettings(
-        activationGracePeriod="2",
-        activationTimeUnit="m",
-        activationTimeWindow="5",
-        activationTimes="3",
-        notificationChannels=[],
-    )
     settings = SynTestSettings(
         agentIds=["616", "650", "754"],
         tasks=["ping", "traceroute"],
         healthSettings=health,
-        monitoringSettings=monitoring,
         port=443,
         period=60,
         count=3,
@@ -105,8 +99,10 @@ def agent_crud() -> None:
     pretty_print(received_agent)
     print()
 
+    # Note: it is only allowed to modify/delete Agent if Agent type is "private"
+
     # print("### AGENT PATCH")
-    # received_agent.alias = received_agent.alias + "!"
+    # received_agent.status = AgentStatus.OK
     # patched_agent = client().synthetics.patch_agent(received_agent, "agent.alias")
     # pretty_print(patched_agent)
 
@@ -115,7 +111,7 @@ def agent_crud() -> None:
 
 
 def get_health() -> None:
-    test_id = ID("3541")
+    test_id = ID("6232")
     start = datetime(2021, 11, 8, 7, 15, 3, 0, timezone.utc)
     end = datetime(2021, 11, 8, 7, 20, 3, 0, timezone.utc)
 
@@ -135,7 +131,7 @@ def get_health() -> None:
 
 
 def get_trace() -> None:
-    test_id = ID("3541")
+    test_id = ID("6232")
     start = datetime(2021, 11, 8, 7, 15, 3, 0, timezone.utc)
     end = datetime(2021, 11, 8, 7, 20, 3, 0, timezone.utc)
 

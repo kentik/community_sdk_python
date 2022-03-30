@@ -1,9 +1,16 @@
 from enum import EnumMeta
+from ipaddress import ip_address
 
 # common id type across all resources
 ID = str
 
-IP = str
+
+class IP:
+    def __init__(self, addr: str = "") -> None:
+        self._addr = str(ip_address(addr)) if addr else ""
+
+    def __str__(self) -> str:
+        return self._addr
 
 
 class PermissiveEnumMeta(EnumMeta):
