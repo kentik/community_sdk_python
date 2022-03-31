@@ -1,4 +1,3 @@
-from .api_transport import KentikAPIRequestError
 from .synth_client import KentikSynthClient
 from .synth_tests import (
     AgentTest,

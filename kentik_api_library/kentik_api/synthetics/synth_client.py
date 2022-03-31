@@ -6,44 +6,15 @@ from urllib.parse import urlparse
 from kentik_api.public.types import ID
 
 from .agent import Agent
-from .api_transport import KentikAPITransport
 from .api_transport_grpc import SynthGRPCTransport
 from .synth_tests import SynTest, TestStatus
 
 log = logging.getLogger("synth_client")
 
 
-def deserialize(cls, obj, deserialize_func) -> Any:
-    if isinstance(obj, cls):
-        return obj
-    return deserialize_func(obj)
-
-
 class KentikSynthClient:
-    def __init__(
-        self,
-        credentials: Tuple[str, str],
-        transport: Optional[Type[KentikAPITransport]] = SynthGRPCTransport,
-        url: Optional[str] = None,
-        proxy: Optional[str] = None,
-    ):
-        if url:
-            u = urlparse(url)
-            dns_path = u.netloc.split(".")
-            if dns_path[0] == "api":
-                dns_path.insert(0, "synthetics")
-                log.debug("Setting url to: %s (input: %s)", u._replace(netloc=".".join(dns_path)).geturl(), url)
-                self._url = u._replace(netloc=".".join(dns_path)).geturl()
-            else:
-                self._url = url
-        else:
-            self._url = "https://synthetics.api.kentik.com"
-        if transport:
-            # noinspection Mypy
-            # noinspection PyCallingNonCallable
-            self._transport = transport(credentials, url=self._url, proxy=proxy)  # type: ignore
-        else:
-            self._transport = SynthGRPCTransport(credentials, url=self._url, proxy=proxy)
+    def __init__(self, credentials: Tuple[str, str], url: str = "https://synthetics.api.kentik.com"):
+        self._transport = SynthGRPCTransport(credentials=credentials, url=url)
 
     @property
     def agents(self) -> List[Agent]:
@@ -53,7 +24,6 @@ class KentikSynthClient:
         return self._transport.req("AgentGet", id=agent_id)
 
     def patch_agent(self, agent: Agent, modified: str) -> Agent:
-        # return self._transport.req("AgentPatch", id=agent_id, body=dict(agent=data, mask=modified))
         return self._transport.req("AgentPatch", agent=agent, mask=modified)
 
     def delete_agent(self, agent_id: ID) -> None:
@@ -61,13 +31,7 @@ class KentikSynthClient:
 
     @property
     def tests(self) -> List[SynTest]:
-        return self.list_tests()
-
-    def list_tests(self, presets: bool = False, raw: bool = False) -> Any:
-        r = self._transport.req("TestsList", params=dict(presets=presets))
-        if raw:
-            return r
-        return [deserialize(SynTest, t, SynTest.test_from_dict) for t in r]
+        return self._transport.req("TestsList")
 
     def test(self, test: Union[ID, SynTest]) -> SynTest:
         if isinstance(test, SynTest):
@@ -75,9 +39,6 @@ class KentikSynthClient:
         else:
             test_id = test
 
-        return self._transport.req("TestGet", id=test_id)
-
-    def test_raw(self, test_id: ID) -> Any:
         return self._transport.req("TestGet", id=test_id)
 
     def create_test(self, test: SynTest) -> SynTest:

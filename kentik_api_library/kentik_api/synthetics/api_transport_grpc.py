@@ -45,7 +45,6 @@ from kentik_api.synthetics.synth_tests import (
 )
 
 from .agent import Agent, AgentImplementType, AgentStatus, AgentType
-from .api_transport import KentikAPITransport
 from .health import (
     AgentHealth,
     AgentTaskConfig,
@@ -90,10 +89,8 @@ from .trace import (
 log = logging.getLogger("api_transport_grpc")
 
 
-class SynthGRPCTransport(KentikAPITransport):
-    def __init__(
-        self, credentials: Tuple[str, str], url: str = "synthetics.api.kentik.com:443", proxy: Optional[str] = None
-    ) -> None:
+class SynthGRPCTransport:
+    def __init__(self, credentials: Tuple[str, str], url: str) -> None:
         (email, token) = credentials
         self._url = url
         self._admin = SyntheticsAdminService()
