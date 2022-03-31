@@ -8,7 +8,6 @@ from kentik_api.public.types import ID
 from .agent import Agent
 from .api_transport import KentikAPITransport
 from .api_transport_grpc import SynthGRPCTransport
-from .api_transport_http import SynthHTTPTransport
 from .synth_tests import SynTest, TestStatus
 
 log = logging.getLogger("synth_client")
@@ -44,7 +43,7 @@ class KentikSynthClient:
             # noinspection PyCallingNonCallable
             self._transport = transport(credentials, url=self._url, proxy=proxy)  # type: ignore
         else:
-            self._transport = SynthHTTPTransport(credentials, url=self._url, proxy=proxy)
+            self._transport = SynthGRPCTransport(credentials, url=self._url, proxy=proxy)
 
     @property
     def agents(self) -> List[Agent]:
@@ -76,26 +75,17 @@ class KentikSynthClient:
         else:
             test_id = test
 
-        # NOTE: "isinstance" calls related to transport will eventually go away
-        if isinstance(self._transport, SynthHTTPTransport):
-            return SynTest.test_from_dict(self._transport.req("TestGet", id=test_id))
         return self._transport.req("TestGet", id=test_id)
 
     def test_raw(self, test_id: ID) -> Any:
         return self._transport.req("TestGet", id=test_id)
 
     def create_test(self, test: SynTest) -> SynTest:
-        if isinstance(self._transport, SynthHTTPTransport):
-            return SynTest.test_from_dict(self._transport.req("TestCreate", body=test.to_dict()))
         return self._transport.req("TestCreate", test=test)
 
     def patch_test(self, test: SynTest, modified: str) -> SynTest:
         if test.id == ID("0"):
             raise RuntimeError(f"test '{test.name}' has not been created yet (id=0). Cannot patch")
-        if isinstance(self._transport, SynthHTTPTransport):
-            body = test.to_dict()
-            body["mask"] = modified
-            return SynTest.test_from_dict(self._transport.req("TestPatch", id=test.id, body=body))
         return self._transport.req("TestPatch", test=test, mask=modified)
 
     def delete_test(self, test: Union[ID, SynTest]) -> None:
@@ -108,8 +98,6 @@ class KentikSynthClient:
             test.undeploy()
 
     def set_test_status(self, test_id: ID, status: TestStatus) -> dict:
-        if isinstance(self._transport, SynthHTTPTransport):
-            return self._transport.req("TestStatusUpdate", id=test_id, body=dict(id=test_id, status=status.value))
         return self._transport.req("TestStatusUpdate", id=test_id, status=status)
 
     def health(
@@ -121,18 +109,6 @@ class KentikSynthClient:
         agent_ids: Optional[List[ID]] = None,
         task_ids: Optional[List[ID]] = None,
     ) -> List[Any]:
-        if isinstance(self._transport, SynthHTTPTransport):
-            return self._transport.req(
-                "GetHealthForTests",
-                body=dict(
-                    ids=test_ids,
-                    startTime=start.isoformat(),
-                    endTime=end.isoformat(),
-                    augment=augment,
-                    agentIds=agent_ids if agent_ids else [],
-                    taskIds=task_ids if task_ids else [],
-                ),
-            )
         return self._transport.req(
             "GetHealthForTests",
             test_ids=test_ids,
@@ -167,24 +143,11 @@ class KentikSynthClient:
         agent_ids: Optional[List[str]] = None,
         ips: Optional[List[str]] = None,
     ) -> Any:
-        if isinstance(self._transport, SynthHTTPTransport):
-            return self._transport.req(
-                "GetTraceForTest",
-                id=test_id,
-                body=dict(
-                    id=test_id,
-                    startTime=start.isoformat(),
-                    endTime=end.isoformat(),
-                    agentIds=agent_ids if agent_ids else [],
-                    targetIps=ips if ips else [],
-                ),
-            )
-        else:
-            return self._transport.req(
-                "GetTraceForTest",
-                id=test_id,
-                start_time=start,
-                end_time=end,
-                agent_ids=agent_ids if agent_ids else [],
-                target_ips=ips if ips else [],
-            )
+        return self._transport.req(
+            "GetTraceForTest",
+            id=test_id,
+            start_time=start,
+            end_time=end,
+            agent_ids=agent_ids if agent_ids else [],
+            target_ips=ips if ips else [],
+        )
