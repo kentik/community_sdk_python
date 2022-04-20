@@ -15,6 +15,8 @@ from .api_resources.sites_api import SitesAPI
 from .api_resources.tags_api import TagsAPI
 from .api_resources.tenants_api import MyKentikPortalAPI
 from .api_resources.users_api import UsersAPI
+from .synthetics.api_connector import APISyntheticsConnector
+from .synthetics.synth_client import KentikSynthClient
 
 
 class KentikAPI:
@@ -23,17 +25,19 @@ class KentikAPI:
     API_URL_EU = "https://api.kentik.eu/api/v5"
     API_URL_US = "https://api.kentik.com/api/v5"
 
+    API_URL_GRPC = "grpc.api.kentik.com"
+
     def __init__(
         self,
         auth_email: str,
         auth_token: str,
         api_url: str = API_URL_US,
+        api_url_grpc: str = API_URL_GRPC,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
     ) -> None:
         connector = APIConnector(api_url, auth_email, auth_token, timeout, retry_strategy, proxy)
-
         self.device_labels = DeviceLabelsAPI(connector)
         self.sites = SitesAPI(connector)
         self.users = UsersAPI(connector)
@@ -47,6 +51,9 @@ class KentikAPI:
         self.devices = DevicesAPI(connector)
         self.batch = BatchAPI(connector)
         self.alerting = AlertingAPI(connector)
+
+        synth_connector = APISyntheticsConnector(api_url_grpc, auth_email, auth_token)
+        self.synthetics = KentikSynthClient(synth_connector)
 
 
 # pylint: enable=too-many-instance-attributes

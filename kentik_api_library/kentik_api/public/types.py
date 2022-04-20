@@ -1,7 +1,25 @@
+from dataclasses import dataclass
 from enum import EnumMeta
+from ipaddress import ip_address
 
 # common id type across all resources
 ID = str
+
+
+@dataclass
+class IP:
+    """IP v4 or v6 with format validation; empty address is allowed"""
+
+    addr: str = ""
+
+    def __init__(self, addr: str = "") -> None:
+        self.addr = str(ip_address(addr)) if addr else ""
+
+    def __str__(self) -> str:
+        return self.addr
+
+    def __repr__(self) -> str:
+        return self.addr
 
 
 class PermissiveEnumMeta(EnumMeta):

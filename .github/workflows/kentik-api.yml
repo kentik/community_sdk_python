@@ -43,10 +43,11 @@ jobs:
         working-directory: ./kentik_api_library
         run: |
           set -xe
-          python -VV
-          python -m site
-          python -m pip install --upgrade -r requirements.txt
-          python -m pip install --upgrade -r requirements-dev.txt
+          python3 -VV
+          python3 -m site
+          python3 -m pip install --upgrade -r requirements.txt
+          python3 -m pip install --upgrade -r requirements-dev.txt
+          python3 setup.py grpc_stubs
       - name: Code formatting
         working-directory: ./kentik_api_library
         run: python3 setup.py format --check
@@ -77,6 +78,7 @@ jobs:
         working-directory: ./kentik_api_library
         run: |
           pip3 install -r requirements.txt
+          python3 setup.py grpc_stubs # fetching grpc stubs must go before building
           python3 setup.py build sdist bdist_wheel
       - name: Archive code
         uses: actions/upload-artifact@v2

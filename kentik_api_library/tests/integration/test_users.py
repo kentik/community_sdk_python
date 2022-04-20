@@ -3,8 +3,9 @@ from http import HTTPStatus
 
 import httpretty
 import pytest
+from requests.packages.urllib3.util.retry import Retry
 
-from kentik_api import KentikAPI, Retry
+from kentik_api import KentikAPI
 from kentik_api.public.errors import (
     AuthError,
     BadRequestError,

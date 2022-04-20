@@ -9,7 +9,6 @@ from requests import RequestException, Response, Timeout
 # Local application imports
 from kentik_api.api_calls.api_call import APICall, APICallMethods
 from kentik_api.api_connection.api_call_response import APICallResponse
-from kentik_api.auth.auth import KentikAuth
 from kentik_api.public.errors import (
     AuthError,
     BadRequestError,
@@ -21,7 +20,7 @@ from kentik_api.public.errors import (
     UnavailabilityError,
 )
 
-from .retryable_session import Retry, RetryableSession
+from .retryable_session import Retry, prepare_kentik_api_http_session
 
 PROTOCOL_HTTP = "HTTP"
 
@@ -40,13 +39,10 @@ class APIConnector:
     ) -> None:
         self._api_url = api_url
         self._logger = logging.getLogger(__name__)
-        self._session = RetryableSession(retry_strategy=retry_strategy)
-        self._session.auth = KentikAuth(auth_email, auth_token)
-        self._session.headers.update({"Content-Type": "application/json"})
+        self._session = prepare_kentik_api_http_session(auth_email, auth_token, retry_strategy, proxy)
         self._timeout = timeout
         if proxy:
             self._logger.debug("Using proxy: %s", proxy)
-            self._session.proxies = dict(http=proxy, https=proxy)
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
         try:

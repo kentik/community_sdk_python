@@ -1,0 +1,127 @@
+from datetime import datetime
+from typing import Any, List, Optional
+
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.public.errors import KentikAPIError
+from kentik_api.public.types import ID, IP
+from kentik_api.synthetics.agent import Agent, AgentOwnershipType
+from kentik_api.synthetics.api_connector_protocol import APISyntheticsConnectorProtocol
+from kentik_api.synthetics.synth_tests import *
+from kentik_api.synthetics.synth_tests import SynTest, TestResults, TraceResponse
+from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime
+from kentik_api.synthetics.synth_tests.traces import TraceResponse
+from kentik_api.synthetics.types import TestStatus, TestType
+
+
+class KentikSynthClient:
+    def __init__(self, connector: APISyntheticsConnectorProtocol):
+        self._connector = connector
+
+    def get_all_agents(self) -> List[Agent]:
+        pb_agents = self._connector.get_all_agents()
+        return [Agent.from_pb(agent) for agent in pb_agents]
+
+    def get_agent(self, id: ID) -> Agent:
+        pb_agent = self._connector.get_agent(str(id))
+        return Agent.from_pb(pb_agent)
+
+    def update_agent(self, agent: Agent) -> Agent:
+        if agent.type != AgentOwnershipType.PRIVATE:
+            raise KentikAPIError("Only agents of type 'private' can be modified")
+        pb_input_agent = agent.to_pb()
+        pb_output_agent = self._connector.update_agent(pb_input_agent)
+        return Agent.from_pb(pb_output_agent)
+
+    def delete_agent(self, id: ID) -> None:
+        self._connector.delete_agent(str(id))
+
+    def get_all_tests(self) -> List[SynTest]:
+        pb_tests = self._connector.get_all_tests()
+        return [make_synth_test(pb_test) for pb_test in pb_tests]
+
+    def get_test(self, id: ID) -> SynTest:
+        pb_test = self._connector.get_test(str(id))
+        return make_synth_test(pb_test)
+
+    def create_test(self, test: SynTest) -> SynTest:
+        pb_input_test = pb.Test()
+        test.to_pb(pb_input_test)
+        pb_output_test = self._connector.create_test(pb_input_test)
+        return make_synth_test(pb_output_test)
+
+    def update_test(self, test: SynTest) -> SynTest:
+        pb_input_test = pb.Test()
+        test.to_pb(pb_input_test)
+        pb_output_test = self._connector.update_test(pb_input_test)
+        return make_synth_test(pb_output_test)
+
+    def delete_test(self, id: ID) -> None:
+        self._connector.delete_test(str(id))
+
+    def set_test_status(self, id: ID, status: TestStatus) -> None:
+        self._connector.test_status_update(str(id), status.value)
+
+    def results_for_tests(
+        self,
+        test_ids: List[ID],
+        start: datetime,
+        end: datetime,
+        agent_ids: Optional[List[ID]] = None,
+        task_ids: Optional[List[ID]] = None,
+    ) -> List[TestResults]:
+        ids = [str(id) for id in test_ids]
+        agents = [str(id) for id in agent_ids] if agent_ids else []
+        tasks = [str(id) for id in task_ids] if task_ids else []
+        response = self._connector.results_for_tests(
+            test_ids=ids,
+            start=pb_from_datetime(start),
+            end=pb_from_datetime(end),
+            agent_ids=agents,
+            task_ids=tasks,
+        )
+        return [TestResults.from_pb(tr) for tr in response.results]
+
+    def trace_for_test(
+        self,
+        test_id: ID,
+        start: datetime,
+        end: datetime,
+        agent_ids: Optional[List[ID]] = None,
+        target_ips: Optional[List[IP]] = None,
+    ) -> TraceResponse:
+        agents = [str(id) for id in agent_ids] if agent_ids else []
+        targets = [str(ip) for ip in target_ips] if target_ips else []
+        response = self._connector.trace_for_test(
+            test_id=str(test_id),
+            start=pb_from_datetime(start),
+            end=pb_from_datetime(end),
+            agent_ids=agents,
+            target_ips=targets,
+        )
+        return TraceResponse.from_pb(response)
+
+
+def make_synth_test(pb_object: pb.Test) -> SynTest:
+    def _cls_from_type(test_type: TestType) -> Any:
+        return {
+            # TestType.bgp_monitor: SynTest,
+            TestType.IP: IPTest,
+            TestType.AGENT: AgentTest,
+            TestType.HOSTNAME: HostnameTest,
+            TestType.URL: UrlTest,
+            TestType.DNS: DNSTest,
+            TestType.DNS_GRID: DNSGridTest,
+            TestType.NETWORK_MESH: NetworkMeshTest,
+            TestType.NETWORK_GRID: NetworkGridTest,
+            TestType.PAGE_LOAD: PageLoadTest,
+            TestType.FLOW: FlowTest,
+        }.get(test_type)
+
+    test_type = str(pb_object.type)
+    cls = _cls_from_type(TestType(test_type))
+    if cls is None:
+        raise KentikAPIError(f"Unsupported test type: {test_type}")
+
+    test = cls(pb_object.name)
+    test.fill_from_pb(pb_object)
+    return test
