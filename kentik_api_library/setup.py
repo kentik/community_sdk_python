@@ -24,6 +24,7 @@ PACKAGES = [
     "kentik_api.analytics",
     "kentik_api.api_calls",
     "kentik_api.synthetics",
+    "kentik_api.synthetics.synth_tests",
     "kentik_api.api_connection",
     "kentik_api.api_resources",
     "kentik_api.internal",
