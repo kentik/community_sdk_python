@@ -27,30 +27,30 @@ class StubAPISyntheticsConnector:
     def get_all_agents(self) -> List[pb.Agent]:
         return self._agents_response
 
-    def get_agent(self, id: str) -> pb.Agent:
+    def get_agent(self, agent_id: str) -> pb.Agent:
         return self._agents_response.pop(0)
 
     def update_agent(self, agent: pb.Agent) -> pb.Agent:
         self.last_payload = agent
         return agent
 
-    def delete_agent(self, id: str) -> None:
+    def delete_agent(self, agent_id: str) -> None:
         pass
 
     def get_all_tests(self) -> List[pb.Test]:
         return self._tests_response
 
-    def get_test(self, id: str) -> pb.Test:
+    def get_test(self, test_id: str) -> pb.Test:
         return self._tests_response.pop(0)
 
     def create_test(self, test: pb.Test) -> pb.Test:
         self.last_payload = test
         return test
 
-    def delete_test(self, id: str) -> None:
+    def delete_test(self, test_id: str) -> None:
         pass
 
-    def test_status_update(self, id: str, status: pb.TestStatus) -> None:
+    def test_status_update(self, test_id: str, status: pb.TestStatus) -> None:
         pass
 
     def update_test(self, test: pb.Test) -> pb.Test:

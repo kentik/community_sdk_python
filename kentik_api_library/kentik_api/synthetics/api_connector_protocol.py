@@ -10,19 +10,19 @@ class APISyntheticsConnectorProtocol(Protocol):
     def get_all_agents(self) -> List[pb.Agent]:
         pass
 
-    def get_agent(self, id: str) -> pb.Agent:
+    def get_agent(self, agent_id: str) -> pb.Agent:
         pass
 
     def update_agent(self, agent: pb.Agent) -> pb.Agent:
         pass
 
-    def delete_agent(self, id: str) -> None:
+    def delete_agent(self, agent_id: str) -> None:
         pass
 
     def get_all_tests(self) -> List[pb.Test]:
         pass
 
-    def get_test(self, id: str) -> pb.Test:
+    def get_test(self, test_id: str) -> pb.Test:
         pass
 
     def create_test(self, test: pb.Test) -> pb.Test:
@@ -31,10 +31,10 @@ class APISyntheticsConnectorProtocol(Protocol):
     def update_test(self, test: pb.Test) -> pb.Test:
         pass
 
-    def delete_test(self, id: str) -> None:
+    def delete_test(self, test_id: str) -> None:
         pass
 
-    def test_status_update(self, id: str, status: pb.TestStatus) -> None:
+    def test_status_update(self, test_id: str, status: pb.TestStatus) -> None:
         pass
 
     def results_for_tests(
