@@ -262,6 +262,7 @@ setup(
         "urllib3>=1.26.0",
         "protobuf>=3.19.1",
         "grpcio>=1.38.1",
+        "inflection>=0.5.1",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
