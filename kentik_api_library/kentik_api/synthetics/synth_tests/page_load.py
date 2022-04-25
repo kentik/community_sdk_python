@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Type, TypeVar
 
-from kentik_api.synthetics.types import *
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.synthetics.types import TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory
 from .protobuf_tools import pb_assign_map
@@ -15,19 +16,19 @@ class PageLoadTestSpecific:
     ignore_tls_errors: bool = False
     css_selectors: Dict[str, str] = field(default_factory=dict)
 
-    def fill_from_pb(self, pb: pb.PageLoadTest) -> None:
-        self.target = pb.target
-        self.timeout = pb.timeout
-        self.headers = pb.headers
-        self.ignore_tls_errors = pb.ignore_tls_errors
-        self.css_selectors = pb.css_selectors
+    def fill_from_pb(self, src: pb.PageLoadTest) -> None:
+        self.target = src.target
+        self.timeout = src.timeout
+        self.headers = src.headers
+        self.ignore_tls_errors = src.ignore_tls_errors
+        self.css_selectors = src.css_selectors
 
-    def to_pb(self, pb: pb.PageLoadTest) -> None:
-        pb.target = self.target
-        pb.timeout = self.timeout
-        pb_assign_map(self.headers, pb.headers)
-        pb.ignore_tls_errors = self.ignore_tls_errors
-        pb_assign_map(self.css_selectors, pb.css_selectors)
+    def to_pb(self, dst: pb.PageLoadTest) -> None:
+        dst.target = self.target
+        dst.timeout = self.timeout
+        pb_assign_map(self.headers, dst.headers)
+        dst.ignore_tls_errors = self.ignore_tls_errors
+        pb_assign_map(self.css_selectors, dst.css_selectors)
 
 
 @dataclass
@@ -39,16 +40,16 @@ class PageLoadTestSettings(PingTraceTestSettings):
     def task_name(cls) -> Optional[str]:
         return "page-load"
 
-    def fill_from_pb(self, pb: pb.TestSettings) -> None:
-        super().fill_from_pb(pb)
-        self.page_load.fill_from_pb(pb.page_load)
+    def fill_from_pb(self, src: pb.TestSettings) -> None:
+        super().fill_from_pb(src)
+        self.page_load.fill_from_pb(src.page_load)
 
-    def to_pb(self, pb: pb.TestSettings) -> None:
-        super().to_pb(pb)
-        self.page_load.to_pb(pb.page_load)
+    def to_pb(self, dst: pb.TestSettings) -> None:
+        super().to_pb(dst)
+        self.page_load.to_pb(dst.page_load)
 
 
-PageLoadTestType = TypeVar("PageLoadTestType", bound="PageLoadTest")
+PageLoadTestT = TypeVar("PageLoadTestT", bound="PageLoadTest")
 
 
 @dataclass
@@ -57,13 +58,13 @@ class PageLoadTest(PingTraceTest):
     settings: PageLoadTestSettings = field(default_factory=PageLoadTestSettings)
 
     @classmethod
-    def validate_http_timeout(cls: Type[PageLoadTestType], timeout: int):
+    def validate_http_timeout(cls: Type[PageLoadTestT], timeout: int):
         if timeout < 5000:
             raise RuntimeError(f"Invalid parameter value ({timeout}): {cls.type.value} test timeout must be >= 5000ms")
 
     @classmethod
     def create(
-        cls: Type[PageLoadTestType],
+        cls: Type[PageLoadTestT],
         name: str,
         target: str,
         agent_ids: List[str],
@@ -73,7 +74,7 @@ class PageLoadTest(PingTraceTest):
         ignore_tls_errors: bool = False,
         ping: bool = False,
         trace: bool = False,
-    ) -> PageLoadTestType:
+    ) -> PageLoadTestT:
         tasks: List[TaskType] = [TaskType.PAGE_LOAD]
         if ping:
             tasks.append(TaskType.PING)

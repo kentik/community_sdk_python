@@ -1,6 +1,5 @@
 from kentik_api.public.types import ID
 from kentik_api.synthetics.synth_client import KentikSynthClient
-from kentik_api.synthetics.types import *
 from tests.unit.synthetics import clear_readonly_fields, protobuf_assert_equal, syn_test_builder
 from tests.unit.synthetics.stub_api_connector import StubAPISyntheticsConnector
 

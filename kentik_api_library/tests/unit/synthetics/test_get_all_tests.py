@@ -1,5 +1,4 @@
 from kentik_api.synthetics.synth_client import KentikSynthClient
-from kentik_api.synthetics.types import *
 from tests.unit.synthetics import syn_test_builder
 from tests.unit.synthetics.stub_api_connector import StubAPISyntheticsConnector
 

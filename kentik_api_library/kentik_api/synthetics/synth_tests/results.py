@@ -8,7 +8,7 @@ from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import Health
 
-MetricDataType = TypeVar("MetricDataType", bound="MetricData")
+MetricDataT = TypeVar("MetricDataT", bound="MetricData")
 
 
 @dataclass
@@ -19,16 +19,16 @@ class MetricData:
     health: Health = Health.NONE
 
     @classmethod
-    def from_pb(cls: Type[MetricDataType], pb: pb.MetricData) -> MetricDataType:
+    def from_pb(cls: Type[MetricDataT], src: pb.MetricData) -> MetricDataT:
         return cls(
-            current=pb.current,
-            rolling_avg=pb.rolling_avg,
-            rolling_stddev=pb.rolling_stddev,
-            health=Health(pb.health),
+            current=src.current,
+            rolling_avg=src.rolling_avg,
+            rolling_stddev=src.rolling_stddev,
+            health=Health(src.health),
         )
 
 
-PacketLossDataType = TypeVar("PacketLossDataType", bound="PacketLossData")
+PacketLossDataT = TypeVar("PacketLossDataT", bound="PacketLossData")
 
 
 @dataclass
@@ -37,11 +37,11 @@ class PacketLossData:
     health: Health = Health.NONE
 
     @classmethod
-    def from_pb(cls: Type[PacketLossDataType], pb: pb.PacketLossData) -> PacketLossDataType:
-        return cls(current=pb.current, health=Health(pb.health))
+    def from_pb(cls: Type[PacketLossDataT], src: pb.PacketLossData) -> PacketLossDataT:
+        return cls(current=src.current, health=Health(src.health))
 
 
-PingTaskResultsType = TypeVar("PingTaskResultsType", bound="PingTaskResults")
+PingTaskResultsT = TypeVar("PingTaskResultsT", bound="PingTaskResults")
 
 
 @dataclass
@@ -54,17 +54,17 @@ class PingTaskResults:
     dst_ip: IP = IP()
 
     @classmethod
-    def from_pb(cls: Type[PingTaskResultsType], pb: pb.PingResults) -> PingTaskResultsType:
+    def from_pb(cls: Type[PingTaskResultsT], src: pb.PingResults) -> PingTaskResultsT:
         return cls(
-            target=pb.target,
-            packet_loss=PacketLossData.from_pb(pb.packet_loss),
-            latency=MetricData.from_pb(pb.latency),
-            jitter=MetricData.from_pb(pb.jitter),
-            dst_ip=IP(pb.dst_ip),
+            target=src.target,
+            packet_loss=PacketLossData.from_pb(src.packet_loss),
+            latency=MetricData.from_pb(src.latency),
+            jitter=MetricData.from_pb(src.jitter),
+            dst_ip=IP(src.dst_ip),
         )
 
 
-HttpResponseDataType = TypeVar("HttpResponseDataType", bound="HttpResponseData")
+HttpResponseDataT = TypeVar("HttpResponseDataT", bound="HttpResponseData")
 
 
 @dataclass
@@ -74,11 +74,11 @@ class HttpResponseData:
     data: str = ""
 
     @classmethod
-    def from_pb(cls: Type[HttpResponseDataType], pb: pb.HTTPResponseData) -> HttpResponseDataType:
-        return cls(status=pb.status, size=pb.size, data=pb.data)
+    def from_pb(cls: Type[HttpResponseDataT], src: pb.HTTPResponseData) -> HttpResponseDataT:
+        return cls(status=src.status, size=src.size, data=src.data)
 
 
-HttpTaskResultsType = TypeVar("HttpTaskResultsType", bound="HttpTaskResults")
+HttpTaskResultsT = TypeVar("HttpTaskResultsT", bound="HttpTaskResults")
 
 
 @dataclass
@@ -90,16 +90,16 @@ class HttpTaskResults:
     dst_ip: IP = IP()
 
     @classmethod
-    def from_pb(cls: Type[HttpTaskResultsType], pb: pb.HTTPResults) -> HttpTaskResultsType:
+    def from_pb(cls: Type[HttpTaskResultsT], src: pb.HTTPResults) -> HttpTaskResultsT:
         return cls(
-            target=pb.target,
-            latency=MetricData.from_pb(pb.latency),
-            response=HttpResponseData.from_pb(pb.response),
-            dst_ip=IP(pb.dst_ip),
+            target=src.target,
+            latency=MetricData.from_pb(src.latency),
+            response=HttpResponseData.from_pb(src.response),
+            dst_ip=IP(src.dst_ip),
         )
 
 
-DnsResponseDataType = TypeVar("DnsResponseDataType", bound="DnsResponseData")
+DnsResponseDataT = TypeVar("DnsResponseDataT", bound="DnsResponseData")
 
 
 @dataclass
@@ -108,11 +108,11 @@ class DnsResponseData:
     data: str = ""
 
     @classmethod
-    def from_pb(cls: Type[DnsResponseDataType], pb: pb.DNSResponseData) -> DnsResponseDataType:
-        return cls(status=pb.status, data=pb.data)
+    def from_pb(cls: Type[DnsResponseDataT], src: pb.DNSResponseData) -> DnsResponseDataT:
+        return cls(status=src.status, data=src.data)
 
 
-DnsTaskResultsType = TypeVar("DnsTaskResultsType", bound="DnsTaskResults")
+DnsTaskResultsT = TypeVar("DnsTaskResultsT", bound="DnsTaskResults")
 
 
 @dataclass
@@ -124,16 +124,16 @@ class DnsTaskResults:
     response: DnsResponseData = DnsResponseData()
 
     @classmethod
-    def from_pb(cls: Type[DnsTaskResultsType], pb: pb.DNSResults) -> DnsTaskResultsType:
+    def from_pb(cls: Type[DnsTaskResultsT], src: pb.DNSResults) -> DnsTaskResultsT:
         return cls(
-            target=pb.target,
-            server=pb.server,
-            latency=MetricData.from_pb(pb.latency),
-            response=DnsResponseData.from_pb(pb.response),
+            target=src.target,
+            server=src.server,
+            latency=MetricData.from_pb(src.latency),
+            response=DnsResponseData.from_pb(src.response),
         )
 
 
-TaskResultsType = TypeVar("TaskResultsType", bound="TaskResults")
+TaskResultsT = TypeVar("TaskResultsT", bound="TaskResults")
 
 
 @dataclass
@@ -142,22 +142,22 @@ class TaskResults:
     task: Union[PingTaskResults, HttpTaskResults, DnsTaskResults, None] = None
 
     @classmethod
-    def from_pb(cls: Type[TaskResultsType], pb: pb.TaskResults) -> TaskResultsType:
+    def from_pb(cls: Type[TaskResultsT], src: pb.TaskResults) -> TaskResultsT:
         task: Union[PingTaskResults, HttpTaskResults, DnsTaskResults, None]
 
-        # one-of
-        if pb.HasField("ping"):
-            task = PingTaskResults.from_pb(pb.ping)
-        elif pb.HasField("http"):
-            task = HttpTaskResults.from_pb(pb.http)
-        elif pb.HasField("dns"):
-            task = DnsTaskResults.from_pb(pb.dns)
+        # task must be one of ping/http/dns
+        if src.HasField("ping"):
+            task = PingTaskResults.from_pb(src.ping)
+        elif src.HasField("http"):
+            task = HttpTaskResults.from_pb(src.http)
+        elif src.HasField("dns"):
+            task = DnsTaskResults.from_pb(src.dns)
         else:
             task = None
-        return cls(health=Health(pb.health), task=task)
+        return cls(health=Health(src.health), task=task)
 
 
-AgentResultsType = TypeVar("AgentResultsType", bound="AgentResults")
+AgentResultsT = TypeVar("AgentResultsT", bound="AgentResults")
 
 
 @dataclass
@@ -167,15 +167,15 @@ class AgentResults:
     tasks: List[TaskResults] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[AgentResultsType], pb: pb.AgentResults) -> AgentResultsType:
+    def from_pb(cls: Type[AgentResultsT], src: pb.AgentResults) -> AgentResultsT:
         return cls(
-            agent_id=ID(pb.agent_id),
-            health=Health(pb.health),
-            tasks=[TaskResults.from_pb(task) for task in pb.tasks],
+            agent_id=ID(src.agent_id),
+            health=Health(src.health),
+            tasks=[TaskResults.from_pb(task) for task in src.tasks],
         )
 
 
-TestResultsType = TypeVar("TestResultsType", bound="TestResults")
+TestResultsT = TypeVar("TestResultsT", bound="TestResults")
 
 
 @dataclass
@@ -187,10 +187,10 @@ class TestResults:
     agents: List[AgentResults] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[TestResultsType], pb: pb.TestResults) -> TestResultsType:
+    def from_pb(cls: Type[TestResultsT], src: pb.TestResults) -> TestResultsT:
         return cls(
-            test_id=ID(pb.test_id),
-            time=pb_to_datetime_utc(pb.time),
-            health=Health(pb.health),
-            agents=[AgentResults.from_pb(agent) for agent in pb.agents],
+            test_id=ID(src.test_id),
+            time=pb_to_datetime_utc(src.time),
+            health=Health(src.health),
+            agents=[AgentResults.from_pb(agent) for agent in src.agents],
         )

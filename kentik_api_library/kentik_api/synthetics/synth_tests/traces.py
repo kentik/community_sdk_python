@@ -7,7 +7,7 @@ from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 
-LocationType = TypeVar("LocationType", bound="Location")
+LocationT = TypeVar("LocationT", bound="Location")
 
 
 @dataclass
@@ -19,17 +19,17 @@ class Location:
     city: str = ""
 
     @classmethod
-    def from_pb(cls: Type[LocationType], pb: pb.Location) -> LocationType:
+    def from_pb(cls: Type[LocationT], src: pb.Location) -> LocationT:
         return cls(
-            latitude=pb.latitude,
-            longitude=pb.longitude,
-            country=pb.country,
-            region=pb.region,
-            city=pb.city,
+            latitude=src.latitude,
+            longitude=src.longitude,
+            country=src.country,
+            region=src.region,
+            city=src.city,
         )
 
 
-NetNodeType = TypeVar("NetNodeType", bound="NetNode")
+NetNodeT = TypeVar("NetNodeT", bound="NetNode")
 
 
 @dataclass
@@ -43,19 +43,19 @@ class NetNode:
     site_id: ID = ID()
 
     @classmethod
-    def from_pb(cls: Type[NetNodeType], pb: pb.NetNode) -> NetNodeType:
+    def from_pb(cls: Type[NetNodeT], src: pb.NetNode) -> NetNodeT:
         return cls(
-            ip=IP(pb.ip),
-            asn=pb.asn,
-            as_name=pb.as_name,
-            location=Location.from_pb(pb.location),
-            dns_name=pb.dns_name,
-            device_id=ID(pb.device_id),
-            site_id=ID(pb.site_id),
+            ip=IP(src.ip),
+            asn=src.asn,
+            as_name=src.as_name,
+            location=Location.from_pb(src.location),
+            dns_name=src.dns_name,
+            device_id=ID(src.device_id),
+            site_id=ID(src.site_id),
         )
 
 
-StatsType = TypeVar("StatsType", bound="Stats")
+StatsT = TypeVar("StatsT", bound="Stats")
 
 
 @dataclass
@@ -65,11 +65,11 @@ class Stats:
     max: int = 0
 
     @classmethod
-    def from_pb(cls: Type[StatsType], pb: pb.Stats) -> StatsType:
-        return cls(average=pb.average, min=pb.min, max=pb.max)
+    def from_pb(cls: Type[StatsT], src: pb.Stats) -> StatsT:
+        return cls(average=src.average, min=src.min, max=src.max)
 
 
-TraceHopType = TypeVar("TraceHopType", bound="TraceHop")
+TraceHopT = TypeVar("TraceHopT", bound="TraceHop")
 
 
 @dataclass
@@ -78,11 +78,11 @@ class TraceHop:
     node_id: str = ""
 
     @classmethod
-    def from_pb(cls: Type[TraceHopType], pb: pb.TraceHop) -> TraceHopType:
-        return cls(latency=pb.latency, node_id=pb.node_id)
+    def from_pb(cls: Type[TraceHopT], src: pb.TraceHop) -> TraceHopT:
+        return cls(latency=src.latency, node_id=src.node_id)
 
 
-PathTraceType = TypeVar("PathTraceType", bound="PathTrace")
+PathTraceT = TypeVar("PathTraceT", bound="PathTrace")
 
 
 @dataclass
@@ -92,15 +92,15 @@ class PathTrace:
     hops: List[TraceHop] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[PathTraceType], pb: pb.PathTrace) -> PathTraceType:
+    def from_pb(cls: Type[PathTraceT], src: pb.PathTrace) -> PathTraceT:
         return cls(
-            as_path=pb.as_path,
-            is_complete=pb.is_complete,
-            hops=[TraceHop.from_pb(th) for th in pb.hops],
+            as_path=src.as_path,
+            is_complete=src.is_complete,
+            hops=[TraceHop.from_pb(th) for th in src.hops],
         )
 
 
-PathType = TypeVar("PathType", bound="Path")
+PathT = TypeVar("PathT", bound="Path")
 
 
 @dataclass
@@ -113,18 +113,18 @@ class Path:
     time: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
 
     @classmethod
-    def from_pb(cls: Type[PathType], pb: pb.Path) -> PathType:
+    def from_pb(cls: Type[PathT], src: pb.Path) -> PathT:
         return cls(
-            agent_id=ID(pb.agent_id),
-            target_ip=IP(pb.target_ip),
-            hop_count=Stats.from_pb(pb.hop_count),
-            max_as_path_length=pb.max_as_path_length,
-            traces=[PathTrace.from_pb(t) for t in pb.traces],
-            time=pb_to_datetime_utc(pb.time),
+            agent_id=ID(src.agent_id),
+            target_ip=IP(src.target_ip),
+            hop_count=Stats.from_pb(src.hop_count),
+            max_as_path_length=src.max_as_path_length,
+            traces=[PathTrace.from_pb(t) for t in src.traces],
+            time=pb_to_datetime_utc(src.time),
         )
 
 
-TraceResponseType = TypeVar("TraceResponseType", bound="TraceResponse")
+TraceResponseT = TypeVar("TraceResponseT", bound="TraceResponse")
 
 
 @dataclass
@@ -133,7 +133,7 @@ class TraceResponse:
     paths: List[Path] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[TraceResponseType], pb: pb.GetTraceForTestResponse) -> TraceResponseType:
-        nodes = {k: NetNode.from_pb(v) for k, v in pb.nodes.items()}
-        paths = [Path.from_pb(p) for p in pb.paths]
+    def from_pb(cls: Type[TraceResponseT], src: pb.GetTraceForTestResponse) -> TraceResponseT:
+        nodes = {k: NetNode.from_pb(v) for k, v in src.nodes.items()}
+        paths = [Path.from_pb(p) for p in src.paths]
         return cls(nodes=nodes, paths=paths)

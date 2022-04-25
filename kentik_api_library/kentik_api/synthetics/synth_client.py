@@ -6,10 +6,22 @@ from kentik_api.public.errors import KentikAPIError
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.agent import Agent, AgentOwnershipType
 from kentik_api.synthetics.api_connector_protocol import APISyntheticsConnectorProtocol
-from kentik_api.synthetics.synth_tests import *
-from kentik_api.synthetics.synth_tests import SynTest, TestResults, TraceResponse
+from kentik_api.synthetics.synth_tests import (
+    AgentTest,
+    DNSGridTest,
+    DNSTest,
+    FlowTest,
+    HostnameTest,
+    IPTest,
+    NetworkGridTest,
+    NetworkMeshTest,
+    PageLoadTest,
+    SynTest,
+    TestResults,
+    TraceResponse,
+    UrlTest,
+)
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime
-from kentik_api.synthetics.synth_tests.traces import TraceResponse
 from kentik_api.synthetics.types import TestStatus, TestType
 
 
@@ -21,8 +33,8 @@ class KentikSynthClient:
         pb_agents = self._connector.get_all_agents()
         return [Agent.from_pb(agent) for agent in pb_agents]
 
-    def get_agent(self, id: ID) -> Agent:
-        pb_agent = self._connector.get_agent(str(id))
+    def get_agent(self, agent_id: ID) -> Agent:
+        pb_agent = self._connector.get_agent(str(agent_id))
         return Agent.from_pb(pb_agent)
 
     def update_agent(self, agent: Agent) -> Agent:
@@ -32,15 +44,15 @@ class KentikSynthClient:
         pb_output_agent = self._connector.update_agent(pb_input_agent)
         return Agent.from_pb(pb_output_agent)
 
-    def delete_agent(self, id: ID) -> None:
-        self._connector.delete_agent(str(id))
+    def delete_agent(self, agent_id: ID) -> None:
+        self._connector.delete_agent(str(agent_id))
 
     def get_all_tests(self) -> List[SynTest]:
         pb_tests = self._connector.get_all_tests()
         return [make_synth_test(pb_test) for pb_test in pb_tests]
 
-    def get_test(self, id: ID) -> SynTest:
-        pb_test = self._connector.get_test(str(id))
+    def get_test(self, test_id: ID) -> SynTest:
+        pb_test = self._connector.get_test(str(test_id))
         return make_synth_test(pb_test)
 
     def create_test(self, test: SynTest) -> SynTest:
@@ -55,11 +67,11 @@ class KentikSynthClient:
         pb_output_test = self._connector.update_test(pb_input_test)
         return make_synth_test(pb_output_test)
 
-    def delete_test(self, id: ID) -> None:
-        self._connector.delete_test(str(id))
+    def delete_test(self, test_id: ID) -> None:
+        self._connector.delete_test(str(test_id))
 
-    def set_test_status(self, id: ID, status: TestStatus) -> None:
-        self._connector.test_status_update(str(id), status.value)
+    def set_test_status(self, test_id: ID, status: TestStatus) -> None:
+        self._connector.test_status_update(str(test_id), status.value)
 
     def results_for_tests(
         self,

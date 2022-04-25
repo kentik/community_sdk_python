@@ -4,6 +4,9 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 
+# This class implements APISyntheticsConnectorProtocol protocol, but doesn't use most of it's arguments
+# pragma pylint: disable=unused-argument
+
 
 class StubAPISyntheticsConnector:
     """
@@ -13,8 +16,8 @@ class StubAPISyntheticsConnector:
 
     def __init__(
         self,
-        agents_response: Union[pb.Agent, List[pb.Agent]] = [],
-        tests_response: Union[pb.Test, List[pb.Test]] = [],
+        agents_response: Union[pb.Agent, List[pb.Agent], None] = None,
+        tests_response: Union[pb.Test, List[pb.Test], None] = None,
         results_response: pb.GetResultsForTestsResponse = pb.GetResultsForTestsResponse(),
         traces_response: pb.GetTraceForTestResponse = pb.GetTraceForTestResponse(),
     ):
@@ -76,3 +79,6 @@ class StubAPISyntheticsConnector:
         target_ips: Optional[List[str]] = None,
     ) -> pb.GetTraceForTestResponse:
         return self._traces_response
+
+
+# pragma pylint: enable=unused-argument

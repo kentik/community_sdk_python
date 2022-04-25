@@ -29,7 +29,7 @@ class AgentOwnershipType(Enum):
     GLOBAL = "global"
 
 
-AgentType = TypeVar("AgentType", bound="Agent")
+AgentT = TypeVar("AgentT", bound="Agent")
 
 
 @dataclass
@@ -84,28 +84,28 @@ class Agent:
         )
 
     @classmethod
-    def from_pb(cls: Type[AgentType], pb: pb.Agent) -> AgentType:
+    def from_pb(cls: Type[AgentT], pba: pb.Agent) -> AgentT:
         return cls(
-            id=ID(pb.id),
-            site_name=pb.site_name,
-            status=AgentStatus(pb.status),
-            alias=pb.alias,
-            type=AgentOwnershipType(pb.type),
-            os=pb.os,
-            ip=IP(pb.ip),
-            lat=pb.lat,
-            long=pb.long,
-            last_authed=pb_to_datetime_utc(pb.last_authed),
-            family=IPFamily(pb.family),
-            asn=pb.asn,
-            site_id=ID(pb.site_id),
-            version=pb.version,
-            city=pb.city,
-            region=pb.region,
-            country=pb.country,
-            test_ids=[ID(id) for id in pb.test_ids],
-            local_ip=IP(pb.local_ip),
-            cloud_region=pb.cloud_region,
-            cloud_provider=pb.cloud_provider,
-            agent_impl=AgentImplementType(pb.agent_impl),
+            id=ID(pba.id),
+            site_name=pba.site_name,
+            status=AgentStatus(pba.status),
+            alias=pba.alias,
+            type=AgentOwnershipType(pba.type),
+            os=pba.os,
+            ip=IP(pba.ip),
+            lat=pba.lat,
+            long=pba.long,
+            last_authed=pb_to_datetime_utc(pba.last_authed),
+            family=IPFamily(pba.family),
+            asn=pba.asn,
+            site_id=ID(pba.site_id),
+            version=pba.version,
+            city=pba.city,
+            region=pba.region,
+            country=pba.country,
+            test_ids=[ID(id) for id in pba.test_ids],
+            local_ip=IP(pba.local_ip),
+            cloud_region=pba.cloud_region,
+            cloud_provider=pba.cloud_provider,
+            agent_impl=AgentImplementType(pba.agent_impl),
         )

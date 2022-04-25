@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Type, TypeVar
 
-from kentik_api.synthetics.types import *
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.synthetics.types import DNSRecordType, TaskType, TestType
 
 from .base import SynTest, SynTestSettings, list_factory
 from .protobuf_tools import pb_assign_collection
@@ -15,19 +16,19 @@ class DNSTestSpecific:
     servers: List[str] = field(default_factory=list)
     port: int = 0
 
-    def fill_from_pb(self, pb: pb.DnsTest) -> None:
-        self.target = pb.target
-        self.timeout = pb.timeout
-        self.record_type = DNSRecordType(pb.record_type)
-        self.servers = pb.servers
-        self.port = pb.port
+    def fill_from_pb(self, src: pb.DnsTest) -> None:
+        self.target = src.target
+        self.timeout = src.timeout
+        self.record_type = DNSRecordType(src.record_type)
+        self.servers = src.servers
+        self.port = src.port
 
-    def to_pb(self, pb: pb.DnsTest) -> None:
-        pb.target = self.target
-        pb.timeout = self.timeout
-        pb.record_type = self.record_type.value
-        pb_assign_collection(self.servers, pb.servers)
-        pb.port = self.port
+    def to_pb(self, dst: pb.DnsTest) -> None:
+        dst.target = self.target
+        dst.timeout = self.timeout
+        dst.record_type = self.record_type.value
+        pb_assign_collection(self.servers, dst.servers)
+        dst.port = self.port
 
 
 @dataclass
@@ -39,16 +40,16 @@ class DNSTestSettings(SynTestSettings):
     def task_name(cls) -> Optional[str]:
         return "dns"
 
-    def fill_from_pb(self, pb: pb.TestSettings) -> None:
-        super().fill_from_pb(pb)
-        self.dns.fill_from_pb(pb.dns)
+    def fill_from_pb(self, src: pb.TestSettings) -> None:
+        super().fill_from_pb(src)
+        self.dns.fill_from_pb(src.dns)
 
-    def to_pb(self, pb: pb.TestSettings) -> None:
-        super().to_pb(pb)
-        self.dns.to_pb(pb.dns)
+    def to_pb(self, dst: pb.TestSettings) -> None:
+        super().to_pb(dst)
+        self.dns.to_pb(dst.dns)
 
 
-DNSTestType = TypeVar("DNSTestType", bound="DNSTest")
+DNSTestT = TypeVar("DNSTestT", bound="DNSTest")
 
 
 @dataclass
@@ -58,7 +59,7 @@ class DNSTest(SynTest):
 
     @classmethod
     def create(
-        cls: Type[DNSTestType],
+        cls: Type[DNSTestT],
         name: str,
         target: str,
         agent_ids: List[str],
@@ -66,7 +67,7 @@ class DNSTest(SynTest):
         record_type: DNSRecordType = DNSRecordType.A,
         timeout: int = 5000,
         port: int = 53,
-    ) -> DNSTestType:
+    ) -> DNSTestT:
         return cls(
             name=name,
             settings=DNSTestSettings(

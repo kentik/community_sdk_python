@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Type, TypeVar
 
-from kentik_api.synthetics.types import *
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.synthetics.types import DirectionType, FlowTestSubType, TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory
 
@@ -16,23 +17,23 @@ class FlowTestSpecific:
     inet_direction: DirectionType = DirectionType.NONE
     direction: DirectionType = DirectionType.NONE
 
-    def fill_from_pb(self, pb: pb.FlowTest) -> None:
-        self.target = pb.target
-        self.target_refresh_interval_millis = pb.target_refresh_interval_millis
-        self.max_providers = pb.max_providers
-        self.max_ip_targets = pb.max_ip_targets
-        self.type = FlowTestSubType(pb.type)
-        self.inet_direction = DirectionType(pb.inet_direction)
-        self.direction = DirectionType(pb.direction)
+    def fill_from_pb(self, src: pb.FlowTest) -> None:
+        self.target = src.target
+        self.target_refresh_interval_millis = src.target_refresh_interval_millis
+        self.max_providers = src.max_providers
+        self.max_ip_targets = src.max_ip_targets
+        self.type = FlowTestSubType(src.type)
+        self.inet_direction = DirectionType(src.inet_direction)
+        self.direction = DirectionType(src.direction)
 
-    def to_pb(self, pb: pb.FlowTest) -> None:
-        pb.target = self.target
-        pb.target_refresh_interval_millis = self.target_refresh_interval_millis
-        pb.max_providers = self.max_providers
-        pb.max_ip_targets = self.max_ip_targets
-        pb.type = self.type.value
-        pb.inet_direction = self.inet_direction.value
-        pb.direction = self.direction.value
+    def to_pb(self, dst: pb.FlowTest) -> None:
+        dst.target = self.target
+        dst.target_refresh_interval_millis = self.target_refresh_interval_millis
+        dst.max_providers = self.max_providers
+        dst.max_ip_targets = self.max_ip_targets
+        dst.type = self.type.value
+        dst.inet_direction = self.inet_direction.value
+        dst.direction = self.direction.value
 
 
 @dataclass
@@ -44,16 +45,16 @@ class FlowTestSettings(PingTraceTestSettings):
     def task_name(cls) -> Optional[str]:
         return "flow"
 
-    def fill_from_pb(self, pb: pb.TestSettings) -> None:
-        super().fill_from_pb(pb)
-        self.flow.fill_from_pb(pb.flow)
+    def fill_from_pb(self, src: pb.TestSettings) -> None:
+        super().fill_from_pb(src)
+        self.flow.fill_from_pb(src.flow)
 
-    def to_pb(self, pb: pb.TestSettings) -> None:
-        super().to_pb(pb)
-        self.flow.to_pb(pb.flow)
+    def to_pb(self, dst: pb.TestSettings) -> None:
+        super().to_pb(dst)
+        self.flow.to_pb(dst.flow)
 
 
-FlowTestType = TypeVar("FlowTestType", bound="FlowTest")
+FlowTestT = TypeVar("FlowTestT", bound="FlowTest")
 
 
 @dataclass
@@ -64,7 +65,7 @@ class FlowTest(PingTraceTest):
     # noinspection PyShadowingBuiltins
     @classmethod
     def create(
-        cls: Type[FlowTestType],
+        cls: Type[FlowTestT],
         name: str,
         target: str,
         agent_ids: List[str],
@@ -74,7 +75,7 @@ class FlowTest(PingTraceTest):
         max_ip_targets: int = 10,
         max_providers: int = 3,
         target_refresh_interval_millis: int = 43200000,
-    ) -> FlowTestType:
+    ) -> FlowTestT:
         return cls(
             name=name,
             settings=FlowTestSettings(

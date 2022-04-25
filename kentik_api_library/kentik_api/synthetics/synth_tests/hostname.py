@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Type, TypeVar
 
-from kentik_api.synthetics.types import *
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.synthetics.types import TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory
 
@@ -10,11 +11,11 @@ from .base import PingTraceTest, PingTraceTestSettings, list_factory
 class HostnameTestSpecific:
     target: str = ""
 
-    def fill_from_pb(self, pb: pb.HostnameTest) -> None:
-        self.target = pb.target
+    def fill_from_pb(self, src: pb.HostnameTest) -> None:
+        self.target = src.target
 
-    def to_pb(self, pb: pb.HostnameTest) -> None:
-        pb.target = self.target
+    def to_pb(self, dst: pb.HostnameTest) -> None:
+        dst.target = self.target
 
 
 @dataclass
@@ -22,16 +23,16 @@ class HostnameTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     hostname: HostnameTestSpecific = HostnameTestSpecific()
 
-    def fill_from_pb(self, pb: pb.TestSettings) -> None:
-        super().fill_from_pb(pb)
-        self.hostname.fill_from_pb(pb.hostname)
+    def fill_from_pb(self, src: pb.TestSettings) -> None:
+        super().fill_from_pb(src)
+        self.hostname.fill_from_pb(src.hostname)
 
-    def to_pb(self, pb: pb.TestSettings) -> None:
-        super().to_pb(pb)
-        self.hostname.to_pb(pb.hostname)
+    def to_pb(self, dst: pb.TestSettings) -> None:
+        super().to_pb(dst)
+        self.hostname.to_pb(dst.hostname)
 
 
-HostnameTestType = TypeVar("HostnameTestType", bound="HostnameTest")
+HostnameTestT = TypeVar("HostnameTestT", bound="HostnameTest")
 
 
 @dataclass
@@ -40,7 +41,7 @@ class HostnameTest(PingTraceTest):
     settings: HostnameTestSettings = field(default_factory=HostnameTestSettings)
 
     @classmethod
-    def create(cls: Type[HostnameTestType], name: str, target: str, agent_ids: List[str]) -> HostnameTestType:
+    def create(cls: Type[HostnameTestT], name: str, target: str, agent_ids: List[str]) -> HostnameTestT:
         return cls(
             name=name, settings=HostnameTestSettings(agent_ids=agent_ids, hostname=HostnameTestSpecific(target=target))
         )

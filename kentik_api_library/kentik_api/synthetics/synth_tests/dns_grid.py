@@ -1,33 +1,13 @@
 from dataclasses import dataclass, field
 from typing import List, Type, TypeVar
 
-from kentik_api.synthetics.types import *
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.synthetics.types import DNSRecordType, TaskType, TestType
 
 from .base import SynTest, SynTestSettings, list_factory
-from .protobuf_tools import pb_assign_collection
+from .dns import DNSTestSpecific
 
-
-@dataclass
-class DSNGridTestSpecific:
-    target: str = ""
-    timeout: int = 0
-    record_type: DNSRecordType = DNSRecordType.A
-    servers: List[str] = field(default_factory=list)
-    port: int = 0
-
-    def fill_from_pb(self, pb: pb.DnsTest) -> None:
-        self.target = pb.target
-        self.timeout = pb.timeout
-        self.record_type = DNSRecordType(pb.record_type)
-        self.servers = pb.servers
-        self.port = pb.port
-
-    def to_pb(self, pb: pb.DnsTest) -> None:
-        pb.target = self.target
-        pb.timeout = self.timeout
-        pb.record_type = self.record_type.value
-        pb_assign_collection(self.servers, pb.servers)
-        pb.port = self.port
+DSNGridTestSpecific = DNSTestSpecific
 
 
 @dataclass
@@ -35,16 +15,16 @@ class DNSGridTestSettings(SynTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.DNS]))
     dns_grid: DSNGridTestSpecific = DSNGridTestSpecific()
 
-    def fill_from_pb(self, pb: pb.TestSettings) -> None:
-        super().fill_from_pb(pb)
-        self.dns_grid.fill_from_pb(pb.dns_grid)
+    def fill_from_pb(self, src: pb.TestSettings) -> None:
+        super().fill_from_pb(src)
+        self.dns_grid.fill_from_pb(src.dns_grid)
 
-    def to_pb(self, pb: pb.TestSettings) -> None:
-        super().to_pb(pb)
-        self.dns_grid.to_pb(pb.dns_grid)
+    def to_pb(self, dst: pb.TestSettings) -> None:
+        super().to_pb(dst)
+        self.dns_grid.to_pb(dst.dns_grid)
 
 
-DNSGridTestType = TypeVar("DNSGridTestType", bound="DNSGridTest")
+DNSGridTestT = TypeVar("DNSGridTestT", bound="DNSGridTest")
 
 
 @dataclass
@@ -54,7 +34,7 @@ class DNSGridTest(SynTest):
 
     @classmethod
     def create(
-        cls: Type[DNSGridTestType],
+        cls: Type[DNSGridTestT],
         name: str,
         target: str,
         agent_ids: List[str],
@@ -62,7 +42,7 @@ class DNSGridTest(SynTest):
         record_type: DNSRecordType = DNSRecordType.A,
         timeout: int = 5000,
         port: int = 53,
-    ) -> DNSGridTestType:
+    ) -> DNSGridTestT:
         return cls(
             name=name,
             settings=DNSGridTestSettings(

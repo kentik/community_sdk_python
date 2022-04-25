@@ -25,11 +25,25 @@ testpaths = ["tests/integration", "tests/unit"]
 
 [tool.pylint.master]
 fail-under=8.5
+
+# allow single-letter names
 variable-rgx="[a-z_][a-z0-9_]{0,30}$"
 argument-rgx="[a-z_][a-z0-9_]{0,30}$"
 attr-rgx="[a-z_][a-z0-9_]{0,30}$"
 attribute-rgx="[a-z_][a-z0-9_]{0,30}$"
 class-attribute-rgx="([A-Za-z_][A-Za-z0-9_]{0,30}|(__.*__))$"
+
+# don't consider import sections nor method signatures as duplicates
+ignore-imports=true
+ignore-signatures=true
+
+# SDK provides dataclasses with multiple attributes and multiple constructor arguments and this should not be reported
+max-attributes = 30
+max-args = 30
+
+# disable typecheck for protobuf dynamic classes (no-member errors)
+[tool.pylint.typecheck]
+ignored-classes="Test"
 
 [tool.pylint.message_control]
 max-line-length = 120

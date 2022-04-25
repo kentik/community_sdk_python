@@ -53,7 +53,7 @@ class APISyntheticsConnector:
     def get_all_agents(self) -> List[pb.Agent]:
         request = pb.ListAgentsRequest()
         agents = self._admin.ListAgents(request=request, metadata=self._credentials, target=self._url).agents
-        return [agent for agent in agents]  # convert from protobuf internal container type to list
+        return list(agents)
 
     @wrap_grpc_errors
     def get_agent(self, agent_id: str) -> pb.Agent:
@@ -74,7 +74,7 @@ class APISyntheticsConnector:
     def get_all_tests(self) -> List[pb.Test]:
         request = pb.ListTestsRequest()
         tests = self._admin.ListTests(request=request, metadata=self._credentials, target=self._url).tests
-        return [test for test in tests]  # convert from protobuf internal container type to list
+        return list(tests)
 
     @wrap_grpc_errors
     def get_test(self, test_id: str) -> pb.Test:
@@ -142,7 +142,7 @@ class APISyntheticsConnector:
 def new_api_error(error: RpcError) -> KentikAPIError:
     """Create API error from gRPC error"""
 
-    PROTOCOL_GRPC = "gRPC"
+    protocol_grpc = "gRPC"
 
     if not isinstance(error, _InactiveRpcError):
         return KentikAPIError(str(error))
@@ -151,22 +151,16 @@ def new_api_error(error: RpcError) -> KentikAPIError:
     code: StatusCode = error.code()
     status_code, status_name = code.value
 
-    if code == StatusCode.INVALID_ARGUMENT:
-        return BadRequestError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.DEADLINE_EXCEEDED:
-        return TimedOutError(f"grpc_status: {status_code} - '{status_name}'")
-    if code == StatusCode.NOT_FOUND:
-        return NotFoundError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.ALREADY_EXISTS:
-        return BadRequestError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.PERMISSION_DENIED:
-        return AuthError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.UNIMPLEMENTED:
-        return BadRequestError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.UNAVAILABLE:
-        return UnavailabilityError(PROTOCOL_GRPC, status_code, status_name)
-    if code == StatusCode.UNAUTHENTICATED:
-        return AuthError(PROTOCOL_GRPC, status_code, status_name)
+    errors = {
+        StatusCode.INVALID_ARGUMENT: BadRequestError(protocol_grpc, status_code, status_name),
+        StatusCode.DEADLINE_EXCEEDED: TimedOutError(f"grpc_status: {status_code} - '{status_name}'"),
+        StatusCode.NOT_FOUND: NotFoundError(protocol_grpc, status_code, status_name),
+        StatusCode.ALREADY_EXISTS: BadRequestError(protocol_grpc, status_code, status_name),
+        StatusCode.PERMISSION_DENIED: AuthError(protocol_grpc, status_code, status_name),
+        StatusCode.UNIMPLEMENTED: BadRequestError(protocol_grpc, status_code, status_name),
+        StatusCode.UNAVAILABLE: UnavailabilityError(protocol_grpc, status_code, status_name),
+        StatusCode.UNAUTHENTICATED: AuthError(protocol_grpc, status_code, status_name),
+    }
 
     # StatusCode.CANCELLED
     # StatusCode.UNKNOWN
@@ -175,4 +169,6 @@ def new_api_error(error: RpcError) -> KentikAPIError:
     # StatusCode.OUT_OF_RANGE
     # StatusCode.INTERNAL
     # StatusCode.DATA_LOSS
-    return ProtocolError(PROTOCOL_GRPC, status_code, status_name)
+    default_error = ProtocolError(protocol_grpc, status_code, status_name)
+
+    return errors.get(status_code, default_error)

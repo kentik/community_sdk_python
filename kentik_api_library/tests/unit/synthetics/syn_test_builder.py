@@ -25,7 +25,16 @@ from kentik_api.synthetics.synth_tests.base import (
     TraceTask,
     UserInfo,
 )
-from kentik_api.synthetics.types import *
+from kentik_api.synthetics.types import (
+    DirectionType,
+    DNSRecordType,
+    FlowTestSubType,
+    IPFamily,
+    Protocol,
+    TaskType,
+    TestStatus,
+    TestType,
+)
 
 
 def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
@@ -38,11 +47,14 @@ def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
     out_pb_test.type = TestType.NONE.value  # to be set later - in target test type
     out_pb_test.status = TestStatus.ACTIVE.value
 
+    # setup read-only fields for testing purpose
+    # pragma pylint: disable=protected-access
     out_test._id = ID("1234")
     out_test._cdate = datetime.fromtimestamp(1649057685, timezone.utc)
     out_test._edate = datetime.fromtimestamp(1649058245, timezone.utc)
     out_test._created_by = UserInfo(id="67", email="creator@company.com", full_name="Bob Creator")
     out_test._last_updated_by = UserInfo(id="89", email="editor@company.com", full_name="Joe Editor")
+    # pragma pylint: enable=protected-access
     out_test.name = "example_test"
     out_test.type = TestType.NONE  # to be set later - in target test type
     out_test.status = TestStatus.ACTIVE
