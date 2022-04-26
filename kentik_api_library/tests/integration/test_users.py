@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 
 import httpretty
@@ -16,14 +15,14 @@ from kentik_api.public.errors import (
     RateLimitExceededError,
     UnavailabilityError,
 )
-from kentik_api.public.user import User
 
 AUTH_EMAIL_KEY: str = "X-CH-Auth-Email"
 AUTH_API_TOKEN_KEY: str = "X-CH-Auth-API-Token"
 DUMMY_AUTH_EMAIL: str = "email@example.com"
 DUMMY_TOKEN: str = "api-test-token"
 DUMMY_USER_ID: int = 1337
-FAKE_API_URL: str = "https://api.fakekentik.com/api/v5"
+FAKE_API_HOST: str = "api.fakekentik.com"
+FAKE_API_V5_URL: str = KentikAPI.make_api_v5_url(FAKE_API_HOST)
 
 
 @httpretty.activate
@@ -31,7 +30,7 @@ def test_get_user_fails_when_uncommon_http_error_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=418,
         body='{"error":"I\'m a Teapot"}',
     )
@@ -57,7 +56,7 @@ def test_get_user_fails_when_status_bad_request_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.BAD_REQUEST.value,
         body='{"error":"Bad Request"}',
     )
@@ -81,7 +80,7 @@ def test_get_user_fails_when_status_unauthorized_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.UNAUTHORIZED.value,
         body='{"error":"Unauthorized"}',
     )
@@ -105,7 +104,7 @@ def test_get_user_fails_when_status_forbidden_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.FORBIDDEN.value,
         body='{"error":"Forbidden"}',
     )
@@ -129,7 +128,7 @@ def test_get_user_fails_when_status_not_found_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.NOT_FOUND.value,
         body='{"error":"Not Found"}',
     )
@@ -153,7 +152,7 @@ def test_get_user_fails_when_status_too_many_requests_received(kentik_api) -> No
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.TOO_MANY_REQUESTS.value,
         body='{"error":"Too Many Requests"}',
     )
@@ -177,7 +176,7 @@ def test_get_user_fails_when_status_internal_server_error_received(kentik_api) -
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
         body='{"error":"Internal Server Error"}',
     )
@@ -201,7 +200,7 @@ def test_get_user_fails_when_status_service_unavailable_received(kentik_api) -> 
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.SERVICE_UNAVAILABLE.value,
         body='{"error":"Service Unavailable"}',
     )
@@ -225,7 +224,7 @@ def test_get_user_fails_when_gateway_timeout_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.GATEWAY_TIMEOUT.value,
         body='{"error":"Gateway Timeout"}',
     )
@@ -249,7 +248,7 @@ def test_get_user_fails_when_invalid_response_body_received(kentik_api) -> None:
     # given
     httpretty.register_uri(
         httpretty.GET,
-        f"{FAKE_API_URL}/user/{DUMMY_USER_ID}",
+        f"{FAKE_API_V5_URL}/user/{DUMMY_USER_ID}",
         status=HTTPStatus.OK.value,
         body='"{"dummy":"invalid response body"}"',
     )
@@ -275,4 +274,4 @@ def test_get_user_fails_when_server_is_down(kentik_api) -> None:
 
 @pytest.fixture
 def kentik_api():
-    return KentikAPI(DUMMY_AUTH_EMAIL, DUMMY_TOKEN, api_url=FAKE_API_URL, retry_strategy=Retry(total=1))
+    return KentikAPI(DUMMY_AUTH_EMAIL, DUMMY_TOKEN, api_host=FAKE_API_HOST, retry_strategy=Retry(total=1))
