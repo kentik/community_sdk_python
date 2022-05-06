@@ -148,9 +148,8 @@ class CreateRequest:
 
     @staticmethod
     def validate(tag: Tag) -> None:
-        class_op = "Create Tag"
         if tag.flow_tag is None:
-            raise IncompleteObjectError(class_op, "flow_tag is required")
+            raise IncompleteObjectError("Create", tag.__class__.__name__, "flow_tag is required")
 
 
 CreateResponse = GetResponse

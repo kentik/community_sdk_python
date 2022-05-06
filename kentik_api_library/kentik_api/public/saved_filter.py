@@ -166,13 +166,13 @@ class SavedFilter:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("SavedFilter", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
     def company_id(self) -> ID:
         if self._company_id is None:
-            raise IncompleteObjectError("SavedFilter", "_company_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_company_id is required")
         return self._company_id
 
 
