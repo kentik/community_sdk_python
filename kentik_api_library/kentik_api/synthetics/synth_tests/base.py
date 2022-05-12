@@ -29,10 +29,9 @@ def sort_ip_address_list(addresses: List[str]) -> List[IP]:
     Sort list of IP addresses in standard notation in true address order
     """
     ip_addrs = [ip_address(_a) for _a in addresses]
-    return [
-        IP(str(a))
-        for a in sorted([_a for _a in ip_addrs if _a.version == 4]) + sorted([_a for _a in ip_addrs if _a.version == 6])
-    ]
+    ipv4_addrs = sorted([_a for _a in ip_addrs if _a.version == 4])
+    ipv6_addrs = sorted([_a for _a in ip_addrs if _a.version == 6])
+    return [IP(str(a)) for a in ipv4_addrs] + [IP(str(a)) for a in ipv6_addrs]
 
 
 @dataclass
