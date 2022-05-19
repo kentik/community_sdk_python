@@ -1,4 +1,4 @@
-# Kentik API python library.
+# Kentik API python library
 
 This is a python wrapper for kentik rest api.  
 For more information on how to interact with kentik resources using this library, see examples in examples/ folder.
@@ -80,7 +80,7 @@ The general approach is that every single KentikAPI resource is represented in t
   "api-key": "<the API key>"
 }
 ```
-Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in 
+Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in
 `${KTAPI_HOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
 
 ### Support for caching of device data
