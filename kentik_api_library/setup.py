@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from distutils.cmd import Command
 from distutils import log
 import os
