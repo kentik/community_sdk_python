@@ -5,7 +5,6 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory
-from .protobuf_tools import pb_assign_map
 
 
 @dataclass
@@ -23,12 +22,14 @@ class PageLoadTestSpecific:
         self.ignore_tls_errors = src.ignore_tls_errors
         self.css_selectors = src.css_selectors
 
-    def to_pb(self, dst: pb.PageLoadTest) -> None:
-        dst.target = self.target
-        dst.timeout = self.timeout
-        pb_assign_map(self.headers, dst.headers)
-        dst.ignore_tls_errors = self.ignore_tls_errors
-        pb_assign_map(self.css_selectors, dst.css_selectors)
+    def to_pb(self) -> pb.PageLoadTest:
+        return pb.PageLoadTest(
+            target=self.target,
+            timeout=self.timeout,
+            headers=self.headers,
+            ignore_tls_errors=self.ignore_tls_errors,
+            css_selectors=self.css_selectors,
+        )
 
 
 @dataclass
@@ -44,9 +45,10 @@ class PageLoadTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.page_load.fill_from_pb(src.page_load)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.page_load.to_pb(dst.page_load)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.page_load.CopyFrom(self.page_load.to_pb())
+        return obj
 
 
 PageLoadTestT = TypeVar("PageLoadTestT", bound="PageLoadTest")

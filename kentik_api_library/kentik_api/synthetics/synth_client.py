@@ -56,14 +56,12 @@ class KentikSynthClient:
         return make_synth_test(pb_test)
 
     def create_test(self, test: SynTest) -> SynTest:
-        pb_input_test = pb.Test()
-        test.to_pb(pb_input_test)
+        pb_input_test = test.to_pb()
         pb_output_test = self._connector.create_test(pb_input_test)
         return make_synth_test(pb_output_test)
 
     def update_test(self, test: SynTest) -> SynTest:
-        pb_input_test = pb.Test()
-        test.to_pb(pb_input_test)
+        pb_input_test = test.to_pb()
         pb_output_test = self._connector.update_test(pb_input_test)
         return make_synth_test(pb_output_test)
 

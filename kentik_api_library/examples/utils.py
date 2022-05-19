@@ -14,8 +14,10 @@ def is_non_empty_data_structure_list(v: Any) -> bool:
 
 
 def new_line_if_needed(v: Any) -> str:
-    newline_needed = is_class(v) or isinstance(v, dict) or is_non_empty_data_structure_list(v)
-    return "\n" if newline_needed else ""
+    if is_class(v) or isinstance(v, dict) or is_non_empty_data_structure_list(v):
+        return "\n"
+    else:
+        return ""
 
 
 def pretty_print(v: Any, indent_level: int = 1) -> None:

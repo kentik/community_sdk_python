@@ -19,9 +19,10 @@ class GridTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.network_grid.fill_from_pb(src.network_grid)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.network_grid.to_pb(dst.network_grid)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.network_grid.CopyFrom(self.network_grid.to_pb())
+        return obj
 
 
 NetworkGridTestT = TypeVar("NetworkGridTestT", bound="NetworkGridTest")

@@ -17,9 +17,11 @@ class AgentTestSpecific:
         self.target = ID(src.target)
         self.user_local_ip = src.use_local_ip
 
-    def to_pb(self, dst: pb.AgentTest) -> None:
-        dst.target = str(self.target)
-        dst.use_local_ip = self.user_local_ip
+    def to_pb(self) -> pb.AgentTest:
+        return pb.AgentTest(
+            target=str(self.target),
+            use_local_ip=self.user_local_ip,
+        )
 
 
 @dataclass
@@ -31,9 +33,10 @@ class AgentTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.agent.fill_from_pb(src.agent)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.agent.to_pb(dst.agent)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.agent.CopyFrom(self.agent.to_pb())
+        return obj
 
 
 AgentTestT = TypeVar("AgentTestT", bound="AgentTest")

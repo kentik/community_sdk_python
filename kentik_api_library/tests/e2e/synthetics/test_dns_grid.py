@@ -4,15 +4,15 @@ from kentik_api.synthetics.synth_tests import DNSGridTest
 from kentik_api.synthetics.synth_tests.dns_grid import DNSGridTestSettings, DSNGridTestSpecific
 from kentik_api.synthetics.types import DNSRecordType, IPFamily, TestStatus, TestType
 
-from .utils import HEALTH, client, credentials_missing_str, credentials_present
+from .utils import HEALTH, client, credentials_missing_str, credentials_present, pick_agent_ids
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
 def test_dns_grid_crud() -> None:
     settings = DNSGridTestSettings(
-        family=IPFamily.DUAL,
+        family=IPFamily.V4,
         period=60,
-        agent_ids=["841"],
+        agent_ids=pick_agent_ids(),
         health_settings=HEALTH,
         dns_grid=DSNGridTestSpecific(
             target="123",

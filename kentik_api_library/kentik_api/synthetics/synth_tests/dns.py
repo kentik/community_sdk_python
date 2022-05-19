@@ -5,7 +5,6 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import DNSRecordType, TaskType, TestType
 
 from .base import SynTest, SynTestSettings, list_factory
-from .protobuf_tools import pb_assign_collection
 
 
 @dataclass
@@ -23,12 +22,14 @@ class DNSTestSpecific:
         self.servers = src.servers
         self.port = src.port
 
-    def to_pb(self, dst: pb.DnsTest) -> None:
-        dst.target = self.target
-        dst.timeout = self.timeout
-        dst.record_type = self.record_type.value
-        pb_assign_collection(self.servers, dst.servers)
-        dst.port = self.port
+    def to_pb(self) -> pb.DnsTest:
+        return pb.DnsTest(
+            target=self.target,
+            timeout=self.timeout,
+            record_type=self.record_type.value,
+            servers=self.servers,
+            port=self.port,
+        )
 
 
 @dataclass
@@ -44,9 +45,10 @@ class DNSTestSettings(SynTestSettings):
         super().fill_from_pb(src)
         self.dns.fill_from_pb(src.dns)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.dns.to_pb(dst.dns)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.dns.CopyFrom(self.dns.to_pb())
+        return obj
 
 
 DNSTestT = TypeVar("DNSTestT", bound="DNSTest")

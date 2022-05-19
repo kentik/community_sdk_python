@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime, timezone
 from typing import List
 
@@ -99,4 +100,17 @@ def test_update_agent() -> None:
     client.update_agent(AGENTS[0])
 
     # then
-    protobuf_assert_equal(connector.last_payload, PB_AGENTS[0], "Agent")
+    protobuf_assert_equal(connector.last_payload, clear_readonly_fields(PB_AGENTS[0]), "Agent")
+
+
+def clear_readonly_fields(agent: pb.Agent) -> pb.Agent:
+    """For sending a request - clear the server-generated fields"""
+
+    agent = copy.deepcopy(agent)
+    agent.ClearField("type")
+    agent.ClearField("os")
+    agent.ClearField("last_authed")
+    agent.ClearField("version")
+    agent.ClearField("test_ids")
+    agent.ClearField("agent_impl")
+    return agent

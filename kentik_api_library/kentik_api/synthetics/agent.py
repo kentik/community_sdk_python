@@ -6,7 +6,7 @@ from typing import List, Type, TypeVar
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime, pb_to_datetime_utc
+from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import IPFamily
 
 
@@ -34,28 +34,31 @@ AgentT = TypeVar("AgentT", bound="Agent")
 
 @dataclass
 class Agent:
+    # read-only
+    type: AgentOwnershipType = AgentOwnershipType.NONE
+    os: str = ""
+    last_authed: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
+    test_ids: List[ID] = field(default_factory=list)
+    version: str = ""
+    agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
+
+    # read-write
     id: ID = ID()
     site_name: str = ""
     status: AgentStatus = AgentStatus.UNSPECIFIED
     alias: str = ""
-    type: AgentOwnershipType = AgentOwnershipType.NONE
-    os: str = ""
     ip: IP = IP()
     lat: float = 0.0
     long: float = 0.0
-    last_authed: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
     family: IPFamily = IPFamily.UNSPECIFIED
     asn: int = 0
     site_id: ID = ID()
-    version: str = ""
     city: str = ""
     region: str = ""
     country: str = ""
-    test_ids: List[ID] = field(default_factory=list)
     local_ip: IP = IP()
     cloud_region: str = ""
     cloud_provider: str = ""
-    agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
 
     def to_pb(self) -> pb.Agent:
         return pb.Agent(
@@ -63,24 +66,18 @@ class Agent:
             site_name=self.site_name,
             status=self.status.value,
             alias=self.alias,
-            type=self.type.value,
-            os=self.os,
             ip=str(self.ip),
             lat=self.lat,
             long=self.long,
-            last_authed=pb_from_datetime(self.last_authed),
             family=self.family.value,
             asn=self.asn,
             site_id=str(self.site_id),
-            version=self.version,
             city=self.city,
             region=self.region,
             country=self.country,
-            test_ids=[str(id) for id in self.test_ids],
             local_ip=str(self.local_ip),
             cloud_region=self.cloud_region,
             cloud_provider=self.cloud_provider,
-            agent_impl=self.agent_impl.value,
         )
 
     @classmethod

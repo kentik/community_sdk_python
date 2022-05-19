@@ -6,15 +6,15 @@ from kentik_api.synthetics.synth_tests.base import PingTask, TraceTask
 from kentik_api.synthetics.synth_tests.network_grid import GridTestSettings, NetworkGridTestSpecific
 from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus, TestType
 
-from .utils import HEALTH, client, credentials_missing_str, credentials_present
+from .utils import HEALTH, client, credentials_missing_str, credentials_present, pick_agent_ids
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
 def test_network_grid_crud() -> None:
     settings = GridTestSettings(
-        family=IPFamily.DUAL,
+        family=IPFamily.V4,
         period=60,
-        agent_ids=["841"],
+        agent_ids=pick_agent_ids(),
         health_settings=HEALTH,
         ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP, port=2222),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),

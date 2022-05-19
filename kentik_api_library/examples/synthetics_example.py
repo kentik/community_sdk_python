@@ -2,7 +2,7 @@
 Examples of using the Synthetics API
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from examples.utils import client, pretty_print
 from kentik_api.public.types import ID
@@ -14,8 +14,8 @@ from kentik_api.synthetics.types import IPFamily, Protocol, TestStatus
 
 def tests_list() -> None:
     print("### TESTS LIST")
-    items = client().synthetics.get_all_tests()
-    for test in items:
+    tests = client().synthetics.get_all_tests()
+    for test in tests:
         pretty_print(test.id)
         pretty_print(test)
         print()
@@ -45,9 +45,9 @@ def test_crud() -> None:
     settings = HostnameTestSettings(
         family=IPFamily.DUAL,
         period=60,
-        agent_ids=["841"],
+        agent_ids=[pick_agent_id()],
         health_settings=health,
-        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP, port=2222),
+        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         hostname=HostnameTestSpecific(target="www.example.com"),
     )
@@ -88,7 +88,7 @@ def agents_list() -> None:
 
 def agent_crud() -> None:
     print("### AGENT GET")
-    received_agent = client().synthetics.get_agent(ID("34004"))
+    received_agent = client().synthetics.get_agent(pick_agent_id())
     pretty_print(received_agent)
     print()
 
@@ -104,9 +104,9 @@ def agent_crud() -> None:
 
 
 def get_results_for_tests() -> None:
-    test_id = ID("6232")
-    start = datetime(2022, 4, 13, 0, 0, 0, 0, timezone.utc)
+    test_id = pick_test_id()
     end = datetime.now(timezone.utc)
+    start = end - timedelta(hours=1)
 
     print("### GET RESULTS FOR TESTS")
     results = client().synthetics.results_for_tests(
@@ -122,9 +122,9 @@ def get_results_for_tests() -> None:
 
 
 def get_trace_for_test() -> None:
-    test_id = ID("6232")
-    start = datetime(2022, 4, 13, 12, 0, 0, 0, timezone.utc)
-    end = datetime(2022, 4, 13, 12, 5, 0, 0, timezone.utc)
+    test_id = pick_test_id()
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(hours=1)
 
     print("### GET TRACE FOR TESTS")
     trace = client().synthetics.trace_for_test(
@@ -136,6 +136,20 @@ def get_trace_for_test() -> None:
     )
     pretty_print(trace)
     print()
+
+
+def pick_agent_id() -> ID:
+    agents = client().synthetics.get_all_agents()
+    if not agents:
+        raise RuntimeError("No agents for synthetic testing are available")
+    return agents[0].id
+
+
+def pick_test_id() -> ID:
+    tests = client().synthetics.get_all_tests()
+    if not tests:
+        raise RuntimeError("No synthetic tests are available")
+    return tests[0].id
 
 
 if __name__ == "__main__":

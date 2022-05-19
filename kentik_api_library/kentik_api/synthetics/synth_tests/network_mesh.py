@@ -14,8 +14,8 @@ class NetworkMeshTestSpecific:
     def fill_from_pb(self, src: pb.NetworkMeshTest) -> None:
         self.use_local_ip = src.use_local_ip
 
-    def to_pb(self, dst: pb.NetworkMeshTest) -> None:
-        dst.use_local_ip = self.use_local_ip
+    def to_pb(self) -> pb.NetworkMeshTest:
+        return pb.NetworkMeshTest(use_local_ip=self.use_local_ip)
 
 
 @dataclass
@@ -27,9 +27,10 @@ class NetworkMeshTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.network_mesh.fill_from_pb(src.network_mesh)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.network_mesh.to_pb(dst.network_mesh)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.network_mesh.CopyFrom(self.network_mesh.to_pb())
+        return obj
 
 
 NetworkMeshTestT = TypeVar("NetworkMeshTestT", bound="NetworkMeshTest")

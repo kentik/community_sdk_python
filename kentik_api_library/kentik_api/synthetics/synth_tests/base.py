@@ -9,7 +9,7 @@ import inflection
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU, DEFAULT_ID
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_assign_collection, pb_to_datetime_utc
+from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import IPFamily, Protocol, TaskType, TestStatus, TestType
 
 log = logging.getLogger("synth_tests")
@@ -120,12 +120,14 @@ class PingTask(_MonitoringTask):
         self.protocol = Protocol(src.protocol)
         self.port = src.port
 
-    def to_pb(self, dst: pb.TestPingSettings) -> None:
-        dst.count = self.count
-        dst.timeout = self.timeout
-        dst.delay = self.delay
-        dst.protocol = self.protocol.value
-        dst.port = self.port
+    def to_pb(self) -> pb.TestPingSettings:
+        return pb.TestPingSettings(
+            count=self.count,
+            timeout=self.timeout,
+            delay=self.delay,
+            protocol=self.protocol.value,
+            port=self.port,
+        )
 
 
 @dataclass
@@ -149,13 +151,15 @@ class TraceTask(_MonitoringTask):
         self.protocol = Protocol(src.protocol)
         self.port = src.port
 
-    def to_pb(self, dst: pb.TestTraceSettings) -> None:
-        dst.count = self.count
-        dst.timeout = self.timeout
-        dst.limit = self.limit
-        dst.delay = self.delay
-        dst.protocol = self.protocol.value
-        dst.port = self.port
+    def to_pb(self) -> pb.TestTraceSettings:
+        return pb.TestTraceSettings(
+            count=self.count,
+            timeout=self.timeout,
+            limit=self.limit,
+            delay=self.delay,
+            protocol=self.protocol.value,
+            port=self.port,
+        )
 
 
 @dataclass
@@ -171,11 +175,13 @@ class ActivationSettings(_ConfigElement):
         self.time_window = src.time_window
         self.times = src.times
 
-    def to_pb(self, dst: pb.ActivationSettings) -> None:
-        dst.grace_period = self.grace_period
-        dst.time_unit = self.time_unit
-        dst.time_window = self.time_window
-        dst.times = self.times
+    def to_pb(self) -> pb.ActivationSettings:
+        return pb.ActivationSettings(
+            grace_period=self.grace_period,
+            time_unit=self.time_unit,
+            time_window=self.time_window,
+            times=self.times,
+        )
 
 
 @dataclass
@@ -219,25 +225,27 @@ class HealthSettings(_ConfigElement):
         self.unhealthy_subtest_threshold = src.unhealthy_subtest_threshold
         self.activation.fill_from_pb(src.activation)
 
-    def to_pb(self, dst: pb.HealthSettings) -> None:
-        dst.latency_critical = self.latency_critical
-        dst.latency_warning = self.latency_warning
-        dst.latency_critical_stddev = self.latency_critical_stddev
-        dst.latency_warning_stddev = self.latency_warning_stddev
-        dst.packet_loss_critical = self.packet_loss_critical
-        dst.packet_loss_warning = self.packet_loss_warning
-        dst.jitter_critical = self.jitter_critical
-        dst.jitter_warning = self.jitter_warning
-        dst.jitter_critical_stddev = self.jitter_critical_stddev
-        dst.jitter_warning_stddev = self.jitter_warning_stddev
-        dst.http_latency_critical = self.http_latency_critical
-        dst.http_latency_warning = self.http_latency_warning
-        dst.http_latency_critical_stddev = self.http_latency_critical_stddev
-        dst.http_latency_warning_stddev = self.http_latency_warning_stddev
-        pb_assign_collection(self.http_valid_codes, dst.http_valid_codes)
-        pb_assign_collection(self.dns_valid_codes, dst.dns_valid_codes)
-        dst.unhealthy_subtest_threshold = self.unhealthy_subtest_threshold
-        self.activation.to_pb(dst.activation)
+    def to_pb(self) -> pb.HealthSettings:
+        return pb.HealthSettings(
+            latency_critical=self.latency_critical,
+            latency_warning=self.latency_warning,
+            latency_critical_stddev=self.latency_critical_stddev,
+            latency_warning_stddev=self.latency_warning_stddev,
+            packet_loss_critical=self.packet_loss_critical,
+            packet_loss_warning=self.packet_loss_warning,
+            jitter_critical=self.jitter_critical,
+            jitter_warning=self.jitter_warning,
+            jitter_critical_stddev=self.jitter_critical_stddev,
+            jitter_warning_stddev=self.jitter_warning_stddev,
+            http_latency_critical=self.http_latency_critical,
+            http_latency_warning=self.http_latency_warning,
+            http_latency_critical_stddev=self.http_latency_critical_stddev,
+            http_latency_warning_stddev=self.http_latency_warning_stddev,
+            http_valid_codes=self.http_valid_codes,
+            dns_valid_codes=self.dns_valid_codes,
+            unhealthy_subtest_threshold=self.unhealthy_subtest_threshold,
+            activation=self.activation.to_pb(),
+        )
 
 
 @dataclass
@@ -261,13 +269,15 @@ class SynTestSettings(_ConfigElement):
         self.health_settings.fill_from_pb(src.health_settings)
         self.notification_channels = src.notification_channels
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        dst.family = self.family.value
-        dst.period = self.period
-        pb_assign_collection([str(id) for id in self.agent_ids], dst.agent_ids)
-        pb_assign_collection([task.value for task in self.tasks], dst.tasks)
-        self.health_settings.to_pb(dst.health_settings)
-        pb_assign_collection(self.notification_channels, dst.notification_channels)
+    def to_pb(self) -> pb.TestSettings:
+        return pb.TestSettings(
+            family=self.family.value,
+            period=self.period,
+            agent_ids=[str(id) for id in self.agent_ids],
+            tasks=[task.value for task in self.tasks],
+            health_settings=self.health_settings.to_pb(),
+            notification_channels=self.notification_channels,
+        )
 
     def to_dict(self) -> dict:
         def _id(i: str) -> str:
@@ -325,12 +335,14 @@ class SynTest(_ConfigElement):
         self._created_by.fill_from_pb(src.created_by)
         self._last_updated_by.fill_from_pb(src.last_updated_by)
 
-    def to_pb(self, dst: pb.Test) -> None:
-        dst.id = str(self._id)  # required for "update" api call
-        dst.name = self.name
-        dst.type = self.type.value
-        dst.status = self.status.value
-        self.settings.to_pb(dst.settings)
+    def to_pb(self) -> pb.Test:
+        return pb.Test(
+            id=str(self._id),  # required for "update" api call
+            name=self.name,
+            type=self.type.value,
+            status=self.status.value,
+            settings=self.settings.to_pb(),
+        )
 
     @property
     def deployed(self) -> bool:
@@ -407,10 +419,11 @@ class PingTraceTestSettings(SynTestSettings):
         self.ping.fill_from_pb(src.ping)
         self.trace.fill_from_pb(src.trace)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.ping.to_pb(dst.ping)
-        self.trace.to_pb(dst.trace)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.ping.CopyFrom(self.ping.to_pb())
+        obj.trace.CopyFrom(self.trace.to_pb())
+        return obj
 
 
 @dataclass

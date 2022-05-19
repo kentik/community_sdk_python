@@ -5,7 +5,6 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory
-from .protobuf_tools import pb_assign_map
 
 
 @dataclass
@@ -25,13 +24,15 @@ class URLTestSpecific:
         self.body = src.body
         self.ignore_tls_errors = src.ignore_tls_errors
 
-    def to_pb(self, dst: pb.UrlTest) -> None:
-        dst.target = self.target
-        dst.timeout = self.timeout
-        dst.method = self.http_method
-        pb_assign_map(self.headers, dst.headers)
-        dst.body = self.body
-        dst.ignore_tls_errors = self.ignore_tls_errors
+    def to_pb(self) -> pb.UrlTest:
+        return pb.UrlTest(
+            target=self.target,
+            timeout=self.timeout,
+            method=self.http_method,
+            headers=self.headers,
+            body=self.body,
+            ignore_tls_errors=self.ignore_tls_errors,
+        )
 
 
 @dataclass
@@ -47,9 +48,10 @@ class UrlTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.url.fill_from_pb(src.url)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.url.to_pb(dst.url)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.url.CopyFrom(self.url.to_pb())
+        return obj
 
 
 UrlTestT = TypeVar("UrlTestT", bound="UrlTest")

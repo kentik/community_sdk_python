@@ -26,14 +26,16 @@ class FlowTestSpecific:
         self.inet_direction = DirectionType(src.inet_direction)
         self.direction = DirectionType(src.direction)
 
-    def to_pb(self, dst: pb.FlowTest) -> None:
-        dst.target = self.target
-        dst.target_refresh_interval_millis = self.target_refresh_interval_millis
-        dst.max_providers = self.max_providers
-        dst.max_ip_targets = self.max_ip_targets
-        dst.type = self.type.value
-        dst.inet_direction = self.inet_direction.value
-        dst.direction = self.direction.value
+    def to_pb(self) -> pb.FlowTest:
+        return pb.FlowTest(
+            target=self.target,
+            target_refresh_interval_millis=self.target_refresh_interval_millis,
+            max_providers=self.max_providers,
+            max_ip_targets=self.max_ip_targets,
+            type=self.type.value,
+            inet_direction=self.inet_direction.value,
+            direction=self.direction.value,
+        )
 
 
 @dataclass
@@ -49,9 +51,10 @@ class FlowTestSettings(PingTraceTestSettings):
         super().fill_from_pb(src)
         self.flow.fill_from_pb(src.flow)
 
-    def to_pb(self, dst: pb.TestSettings) -> None:
-        super().to_pb(dst)
-        self.flow.to_pb(dst.flow)
+    def to_pb(self) -> pb.TestSettings:
+        obj = super().to_pb()
+        obj.flow.CopyFrom(self.flow.to_pb())
+        return obj
 
 
 FlowTestT = TypeVar("FlowTestT", bound="FlowTest")

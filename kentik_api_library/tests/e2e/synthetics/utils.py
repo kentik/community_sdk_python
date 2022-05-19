@@ -1,6 +1,9 @@
 import os
+from typing import List
 
 from kentik_api import KentikAPI
+from kentik_api.public.types import ID
+from kentik_api.synthetics.agent import AgentImplementType
 from kentik_api.synthetics.synth_tests.base import ActivationSettings, HealthSettings
 from kentik_api.utils import get_credentials
 
@@ -34,3 +37,22 @@ def client() -> KentikAPI:
 
     email, token = get_credentials()
     return KentikAPI(email, token)
+
+
+def pick_agent_ids(count: int = 1, page_load_support: bool = False) -> List[ID]:
+    """Pick requested number of Agent IDs from the list of available agents"""
+
+    # test types that an Agent supports depend on agent_impl attribute:
+    #   for page_load tests - use AgentImplementType.NODE
+    #   for all other tests - use AgentImplementType.RUST
+    agent_impl = AgentImplementType.NODE if page_load_support else AgentImplementType.RUST
+    agents = [a for a in client().synthetics.get_all_agents() if a.agent_impl == agent_impl]
+    num_agents = len(agents)
+    if num_agents < count:
+        raise RuntimeError(
+            f"No enough agents for synthetic testing are available. Requested: {count}, available: {num_agents}"
+        )
+    requested_agents = agents[0:count]
+    ids = [a.id for a in requested_agents]
+    print("### Selected Agent IDs:", ids)
+    return ids

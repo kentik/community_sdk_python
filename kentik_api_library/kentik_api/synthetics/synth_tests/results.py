@@ -4,6 +4,7 @@ from typing import List, Type, TypeVar, Union
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
+from kentik_api.public.errors import DeserializationError
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import Health
@@ -47,7 +48,7 @@ PingTaskResultsT = TypeVar("PingTaskResultsT", bound="PingTaskResults")
 @dataclass
 class PingTaskResults:
     type: str = "ping"
-    target: str = ""  # url
+    target: str = ""  # hostname or IP
     packet_loss: PacketLossData = PacketLossData()
     latency: MetricData = MetricData()
     jitter: MetricData = MetricData()
@@ -153,7 +154,7 @@ class TaskResults:
         elif src.HasField("dns"):
             task = DnsTaskResults.from_pb(src.dns)
         else:
-            task = None
+            raise DeserializationError(cls.__name__, "none of ping/http/dns fields found in source protobuf object")
         return cls(health=Health(src.health), task=task)
 
 
