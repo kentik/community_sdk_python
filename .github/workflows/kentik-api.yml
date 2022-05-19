@@ -85,6 +85,7 @@ jobs:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_ISORT: false
           PYTHON_BLACK_CONFIG_FILE: black.toml
       - name: Archive code
         uses: actions/upload-artifact@v2
