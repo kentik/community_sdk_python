@@ -22,7 +22,6 @@ from kentik_api.requests_payload.conversions import (
     convert_list_or_none,
     convert_or_none,
     dict_from_json,
-    enum_to_str,
     from_dict,
     list_from_json,
     permissive_enum_to_str,
@@ -71,8 +70,8 @@ class SNMPv3ConfPayload:
 class LabelPayload:
     """
     This datastructure represents JSON Device.Label payload as it is transmitted to and from KentikAPI
-    LabelPayload embedded under Device differs from standalone LabelPayload in that it lacks devices list, and in field names,
-    eg. cdate vs created_date, edate vs updated_date
+    LabelPayload embedded under Device differs from standalone LabelPayload in that it lacks devices list,
+    and in field names, eg. cdate vs created_date, edate vs updated_date
     """
 
     id: int
@@ -466,7 +465,7 @@ class ApplyLabelsResponse:
         )
 
     def to_applied_labels(self) -> AppliedLabels:
-        labels = [l.to_device_label() for l in self.labels]
+        labels = [label.to_device_label() for label in self.labels]
         return AppliedLabels(
             id=convert(self.id, ID),
             device_name=self.device_name,
