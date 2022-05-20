@@ -78,6 +78,16 @@ jobs:
         run: |
           pip3 install -r requirements.txt
           python3 setup.py build sdist bdist_wheel
+      - name: Run Super-Linter
+        uses: github/super-linter@v3.17.0
+        env:
+          LINTER_RULES_PATH: /.github/linters
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_ISORT: false
+          PYTHON_BLACK_CONFIG_FILE: black.toml
+          PYTHON_FLAKE8_CONFIG_FILE: flake8.ini
       - name: Archive code
         uses: actions/upload-artifact@v2
         with:

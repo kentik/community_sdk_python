@@ -82,12 +82,12 @@ class GetAllResponse(List[GetResponse]):
         labels = cls()
         for item in items:
             item["devices"] = _DeviceArray.from_list(item["devices"])
-            l = from_dict(GetResponse, item)
-            labels.append(l)
+            label = from_dict(GetResponse, item)
+            labels.append(label)
         return labels
 
     def to_device_labels(self) -> List[DeviceLabel]:
-        return [l.to_device_label() for l in self]
+        return [label.to_device_label() for label in self]
 
 
 @dataclass()

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from kentik_api.api_calls.api_call import APICall
 from kentik_api.api_calls.api_call_decorators import get, payload_type, post
 

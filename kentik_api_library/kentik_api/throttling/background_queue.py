@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import logging
 import time
 from dataclasses import dataclass

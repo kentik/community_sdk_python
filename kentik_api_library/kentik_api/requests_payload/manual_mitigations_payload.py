@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from kentik_api.public.errors import DataFormatError
-from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert, ManualMitigation
+from kentik_api.public.manual_mitigation import Alarm, HistoricalAlert
 from kentik_api.public.types import ID
 from kentik_api.requests_payload.conversions import convert, convert_or_none, dict_from_json, from_dict, list_from_json
 

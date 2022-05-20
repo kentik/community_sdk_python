@@ -4,7 +4,7 @@
 
 Precondition: python3 and pip3 are already installed.
 
-### Recommended steps:
+### Recommended steps
 
 1. Install virtualenv - this allows you to create a python sandbox for your project  
 `pip3 install virtualenv`
