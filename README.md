@@ -26,3 +26,4 @@ Implemented API resources:
 - plans
 - alerts
 - alerts active
+- synthetics

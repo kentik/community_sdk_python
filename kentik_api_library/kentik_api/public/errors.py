@@ -36,7 +36,7 @@ class DataFormatError(KentikAPIError):
 
 
 class DeserializationError(KentikAPIError):
-    """DeserializationError is raised when Kentik API HTTP response JSON deserialization failed
+    """DeserializationError is raised when Kentik API HTTP/GRPC response deserialization failed
     because of e.g. missing required field or corrupted JSON document."""
 
     def __init__(self, class_name: str, description: str):
