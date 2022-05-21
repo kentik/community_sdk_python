@@ -229,7 +229,7 @@ class Device:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("Device", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
@@ -286,7 +286,7 @@ class Device:
     @property
     def plan(self) -> Plan:
         if self._plan is None:
-            raise IncompleteObjectError("Device", "_plan is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_plan is required")
         return self._plan
 
     @property
@@ -442,7 +442,7 @@ class VRFAttributes:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("VRFAttributes", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
@@ -520,7 +520,7 @@ class Interface:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("Interface", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
@@ -530,7 +530,7 @@ class Interface:
     @property
     def device_id(self) -> ID:
         if self._device_id is None:
-            raise IncompleteObjectError("Interface", "_device_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_device_id is required")
         return self._device_id
 
     @property

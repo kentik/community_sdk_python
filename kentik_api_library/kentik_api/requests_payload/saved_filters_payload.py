@@ -141,17 +141,17 @@ class UpdateRequest:
 UpdateResponse = GetResponse
 
 
-def validate(saved_filter: SavedFilter, method: str):
-    class_op = f"{method} SavedFilters"
-    if method == "Update":
+def validate(saved_filter: SavedFilter, operation: str):
+    class_name = saved_filter.__class__.__name__
+    if operation == "Update":
         if saved_filter.id is None:
-            raise IncompleteObjectError(class_op, "ID has to be provided")
+            raise IncompleteObjectError(operation, class_name, "ID has to be provided")
     if saved_filter.filter_name is None:
-        raise IncompleteObjectError(class_op, "filter must have name")
+        raise IncompleteObjectError(operation, class_name, "filter must have name")
     if saved_filter.filters is not None:
         if saved_filter.filters.connector is None:
-            raise IncompleteObjectError(class_op, "connector is required")
+            raise IncompleteObjectError(operation, class_name, "connector is required")
         if not all(i.connector is not None for i in saved_filter.filters.filterGroups):
-            raise IncompleteObjectError(class_op, "filterGroups connector is required")
+            raise IncompleteObjectError(operation, class_name, "filterGroups connector is required")
         if not all(i.not_ is not None for i in saved_filter.filters.filterGroups):
-            raise IncompleteObjectError(class_op, "not_ is required")
+            raise IncompleteObjectError(operation, class_name, "not_ is required")

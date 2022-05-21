@@ -97,7 +97,7 @@ class CreateRequest:
     @staticmethod
     def validate(custom_application: CustomApplication) -> None:
         if custom_application.name is None:
-            raise IncompleteObjectError("Create Custom Application", "name is required")
+            raise IncompleteObjectError("Create", custom_application.__class__.__name__, "name is required")
 
 
 CreateResponse = GetResponse
