@@ -7,7 +7,7 @@ Precondition: python3 and pip3 are already installed.
 ### Recommended steps:
 
 1. Install virtualenv - this allows you to create a python sandbox for your project  
-`pip3 install virtualenv`
+`pip install virtualenv`
 
 1. Create dedicated virtual environment  
 `virtualenv .venv`
@@ -18,19 +18,26 @@ Precondition: python3 and pip3 are already installed.
 1. Clone the library repo  
 `git clone https://github.com/kentik/community_sdk_python.git`
 
-1. `cd community_sdk_python/`
+1. `cd community_sdk_python/kentik_api_library/`
+
+1. Install Python dependencies  
+`python -m pip install --upgrade -r requirements.txt`  
+`python -m pip install --upgrade -r requirements-dev.txt`  
+
+1. Generate grpc client code  
+`python setup.py grpc_stubs`
 
 1. Install the library from repo  
-`pip3 install -e kentik_api_library/`
+`pip install -e .`
 
 1. Run unit tests  
-`pytest kentik_api_library/tests/unit/ kentik_api_library/tests/integration/`
+`python setup.py pytest`
 
 1. Run mypy  
-`mypy kentik_api_library/kentik_api kentik_api_library/tests/ kentik_api_library/examples/`
+`python setup.py mypy`
 
 1. Run black check  
-`black --fast --line-length 120 --check kentik_api_library`
+`python setup.py format --check`
 
 ## Example
 
@@ -38,12 +45,12 @@ The example below illustrates how to create a new device using the library:
 
 ```python
 # library-specific imports
+from kentik_api.public.types import ID
 from kentik_api import (
     KentikAPI,
     Device,
     DeviceSubtype,
     CDNAttribute,
-    ID,
 )
 
 # initialize Kentik API client
