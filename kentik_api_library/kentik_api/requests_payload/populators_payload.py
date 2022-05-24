@@ -177,14 +177,13 @@ class UpdateRequest:
 UpdateResponse = GetResponse
 
 
-def validate(populator: Populator, method: str):
-    class_op = f"{method} Populator"
+def validate(populator: Populator, operation: str):
     if populator.value is None:
-        raise IncompleteObjectError(class_op, "value is required")
+        raise IncompleteObjectError(operation, populator.__class__.__name__, "value is required")
     if populator.direction is None:
-        raise IncompleteObjectError(class_op, "direction is required")
+        raise IncompleteObjectError(operation, populator.__class__.__name__, "direction is required")
     if populator.dimension_id is None:
-        raise IncompleteObjectError(class_op, "dimension_id is required")
+        raise IncompleteObjectError(operation, populator.__class__.__name__, "dimension_id is required")
 
 
 # @dataclass()

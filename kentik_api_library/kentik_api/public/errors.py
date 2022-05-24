@@ -36,7 +36,7 @@ class DataFormatError(KentikAPIError):
 
 
 class DeserializationError(KentikAPIError):
-    """DeserializationError is raised when Kentik API HTTP response JSON deserialization failed
+    """DeserializationError is raised when Kentik API HTTP/GRPC response deserialization failed
     because of e.g. missing required field or corrupted JSON document."""
 
     def __init__(self, class_name: str, description: str):
@@ -51,12 +51,13 @@ class DeserializationError(KentikAPIError):
 class IncompleteObjectError(KentikAPIError):
     """IncompleteObjectError is raised when object to be sent in Kentik API request is incomplete."""
 
-    def __init__(self, operation_class_name: str, description: str):
+    def __init__(self, operation: str, class_name: str, description: str):
         """
-        operation_class_name - e.g. "Create Interface"
+        operation - e.g. "Create"
+        class_name - e.g. "Interface"
         description - failure reason, e.g. "snmp_id is required"
         """
-        msg = f"{operation_class_name}: {description}"
+        msg = f"{operation} {class_name}: {description}"
         super(IncompleteObjectError, self).__init__(msg)
 
 

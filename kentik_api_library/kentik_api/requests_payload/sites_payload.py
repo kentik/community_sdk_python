@@ -136,7 +136,7 @@ class CreateRequest:
     @staticmethod
     def validate(site: Site):
         if site.site_name is None:
-            raise IncompleteObjectError("Create Sites", "site_name has to be provided")
+            raise IncompleteObjectError("Create", site.__class__.__name__, "site_name has to be provided")
 
 
 @dataclass

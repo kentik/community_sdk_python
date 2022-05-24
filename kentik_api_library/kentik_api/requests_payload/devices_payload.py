@@ -346,15 +346,15 @@ class CreateRequest:
 
     @staticmethod
     def validate(device: Device) -> None:
-        class_op = "Create Device"
+        operation = "Create"
         if device.device_name is None:
-            raise IncompleteObjectError(class_op, "device_name is required")
+            raise IncompleteObjectError(operation, device.__class__.__name__, "device_name is required")
         if device.device_subtype is None:
-            raise IncompleteObjectError(class_op, "device_subtype is required")
+            raise IncompleteObjectError(operation, device.__class__.__name__, "device_subtype is required")
         if device.device_sample_rate is None:
-            raise IncompleteObjectError(class_op, "device_sample_rate is required")
+            raise IncompleteObjectError(operation, device.__class__.__name__, "device_sample_rate is required")
 
-        validate_device_bgp_snmp_conf(device, class_op)
+        validate_device_bgp_snmp_conf(device, operation)
 
 
 @dataclass
@@ -368,46 +368,56 @@ class UpdateRequest:
 
     @staticmethod
     def validate(device: Device) -> None:
-        class_op = "Update Device"
-        validate_device_bgp_snmp_conf(device, class_op)
+        operation = "Update"
+        validate_device_bgp_snmp_conf(device, operation)
 
 
-def validate_device_bgp_snmp_conf(device: Device, class_op: str) -> None:
+def validate_device_bgp_snmp_conf(device: Device, operation: str) -> None:
     """Common validations for CreateRequest and UpdateRequest"""
-
+    class_name = device.__class__.__name__
     # device-specific
     if device.device_type == DeviceType.router:
         if device.sending_ips == []:
-            raise IncompleteObjectError(class_op, "for device_type=router, sending_ips is required")
+            raise IncompleteObjectError(operation, class_name, "for device_type=router, sending_ips is required")
         if device.minimize_snmp is None:
-            raise IncompleteObjectError(class_op, "for device_type=router, minimize_snmp is required")
+            raise IncompleteObjectError(operation, class_name, "for device_type=router, minimize_snmp is required")
     elif device.device_type == DeviceType.host_nprobe_dns_www:
         if device.cdn_attr is None:
-            raise IncompleteObjectError(class_op, "for device_type=host_nprobe_dns_www, cdn_attr is required")
+            raise IncompleteObjectError(
+                operation, class_name, "for device_type=host_nprobe_dns_www, cdn_attr is required"
+            )
 
     # bgp-specific
     if device.device_bgp_type == DeviceBGPType.device:
         if device.device_bgp_neighbor_asn is None:
-            raise IncompleteObjectError(class_op, "for device_bgp_type=device, device_bgp_neighbor_asn is required")
+            raise IncompleteObjectError(
+                operation, class_name, "for device_bgp_type=device, device_bgp_neighbor_asn is required"
+            )
         if device.device_bgp_neighbor_ip is None and device.device_bgp_neighbor_ip6 is None:
             raise IncompleteObjectError(
-                class_op,
+                operation,
+                class_name,
                 "for device_bgp_type=device, either device_bgp_neighbor_ip or device_bgp_neighbor_ip6 is required",
             )
     elif device.device_bgp_type == DeviceBGPType.other_device:
         if device.use_bgp_device_id is None:
-            raise IncompleteObjectError(class_op, "for device_bgp_type=other_device, use_bgp_device_id is required")
+            raise IncompleteObjectError(
+                operation, class_name, "for device_bgp_type=other_device, use_bgp_device_id is required"
+            )
 
     # snmp-specific
     if device.device_snmp_v3_conf is not None:
         if device.device_snmp_v3_conf.user_name is None:
-            raise IncompleteObjectError(class_op, "for specified device_snmp_v3_conf, user_name is required")
+            raise IncompleteObjectError(
+                operation, class_name, "for specified device_snmp_v3_conf, user_name is required"
+            )
         if (
             device.device_snmp_v3_conf.authentication_protocol != AuthenticationProtocol.no_auth
             and device.device_snmp_v3_conf.authentication_passphrase == ""
         ):
             raise IncompleteObjectError(
-                class_op,
+                operation,
+                class_name,
                 "for device_snmp_v3_conf.authentication_protocol != no_auth, authentication_passphrase is required",
             )
         if (
@@ -415,7 +425,8 @@ def validate_device_bgp_snmp_conf(device: Device, class_op: str) -> None:
             and device.device_snmp_v3_conf.privacy_passphrase == ""
         ):
             raise IncompleteObjectError(
-                class_op,
+                operation,
+                class_name,
                 "for device_snmp_v3_conf.privacy_protocol != no_priv, privacy_passphrase is required",
             )
 

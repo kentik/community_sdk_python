@@ -2,7 +2,7 @@ import importlib
 import sys
 
 
-def test_import(library: str) -> None:
+def try_import_library(library: str) -> None:
     error = None
     try:
         _ = importlib.import_module(library)
@@ -13,4 +13,4 @@ def test_import(library: str) -> None:
 
 
 if __name__ == "__main__":
-    test_import(sys.argv[1])
+    try_import_library(sys.argv[1])

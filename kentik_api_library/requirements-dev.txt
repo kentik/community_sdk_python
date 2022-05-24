@@ -7,5 +7,6 @@ pylint>=2.8.3
 pytest-pylint>=0.18.0
 pytest>=6.2.4
 PyYAML>=6.0
+types-protobuf>=3.18.0
 types-PyYAML>=5.4.1
 types-requests>=2.26.0
