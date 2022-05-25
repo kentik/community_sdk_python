@@ -154,7 +154,10 @@ class TaskResults:
         elif src.HasField("dns"):
             task = DnsTaskResults.from_pb(src.dns)
         else:
-            raise DeserializationError(cls.__name__, "none of ping/http/dns fields found in source protobuf object")
+            raise DeserializationError(
+                cls.__name__,
+                "none of ping/http/dns fields found in source protobuf object",
+            )
         return cls(health=Health(src.health), task=task)
 
 

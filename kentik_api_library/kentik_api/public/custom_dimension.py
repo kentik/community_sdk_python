@@ -132,8 +132,9 @@ class CustomDimension:
         company_id: Optional[ID] = None,
     ) -> None:
         # read-write
-        self.name = name  # must start with c_ and be unique even against deleted dimensions
+        # name must start with c_ and be unique even against deleted dimensions
         # (deleted names are retained for 1 year)
+        self.name = name
         self.display_name = display_name
         self.type = type
         self.populators = populators

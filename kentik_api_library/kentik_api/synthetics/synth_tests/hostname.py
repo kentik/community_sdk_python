@@ -44,5 +44,6 @@ class HostnameTest(PingTraceTest):
     @classmethod
     def create(cls: Type[HostnameTestT], name: str, target: str, agent_ids: List[str]) -> HostnameTestT:
         return cls(
-            name=name, settings=HostnameTestSettings(agent_ids=agent_ids, hostname=HostnameTestSpecific(target=target))
+            name=name,
+            settings=HostnameTestSettings(agent_ids=agent_ids, hostname=HostnameTestSpecific(target=target)),
         )

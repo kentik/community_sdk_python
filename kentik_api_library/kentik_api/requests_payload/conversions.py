@@ -32,9 +32,9 @@ def as_dict(obj: Any) -> Dict[str, Any]:
     return result
 
 
-def process_list(lst: List[Any]) -> List[Any]:
+def process_list(l: List[Any]) -> List[Any]:
     result = list()
-    for item in lst:
+    for item in l:
         if isinstance(item, Enum):
             result.append(item.value)
         elif hasattr(item, "__dict__") or isinstance(item, dict):

@@ -132,7 +132,14 @@ def setup_ping_trace_test(out_pb_test: pb.Test, out_test: PingTraceTest) -> None
         pb.TestPingSettings(timeout=3000, count=10, delay=555, protocol=Protocol.TCP.value, port=333)
     )
     out_pb_test.settings.trace.CopyFrom(
-        pb.TestTraceSettings(timeout=11222, count=10, limit=50, delay=25, protocol=Protocol.ICMP.value, port=33444)
+        pb.TestTraceSettings(
+            timeout=11222,
+            count=10,
+            limit=50,
+            delay=25,
+            protocol=Protocol.ICMP.value,
+            port=33444,
+        )
     )
 
     out_test.settings.tasks = [TaskType.PING, TaskType.TRACE_ROUTE]
@@ -223,7 +230,11 @@ def make_url_test_pair() -> Tuple[pb.Test, url.UrlTest]:
 def make_page_load_test_pair() -> Tuple[pb.Test, page_load.PageLoadTest]:
     # general test config
     pb_test = pb.Test()
-    test = page_load.PageLoadTest(name="", status=TestStatus.UNSPECIFIED, settings=page_load.PageLoadTestSettings())
+    test = page_load.PageLoadTest(
+        name="",
+        status=TestStatus.UNSPECIFIED,
+        settings=page_load.PageLoadTestSettings(),
+    )
     setup_ping_trace_test(pb_test, test)
 
     # PageLoad-test specific config
@@ -254,7 +265,9 @@ def make_network_mesh_test_pair() -> Tuple[pb.Test, network_mesh.NetworkMeshTest
     # general test config
     pb_test = pb.Test()
     test = network_mesh.NetworkMeshTest(
-        name="", status=TestStatus.UNSPECIFIED, settings=network_mesh.NetworkMeshTestSettings()
+        name="",
+        status=TestStatus.UNSPECIFIED,
+        settings=network_mesh.NetworkMeshTestSettings(),
     )
     setup_ping_trace_test(pb_test, test)
 

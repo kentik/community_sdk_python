@@ -30,7 +30,9 @@ def run_crud() -> None:
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_create = SavedFilter(
-        filter_name="test_filter1", filters=filters, filter_description="This is test filter description"
+        filter_name="test_filter1",
+        filters=filters,
+        filter_description="This is test filter description",
     )
     created = client.saved_filters.create(to_create)
     print(created.__dict__)

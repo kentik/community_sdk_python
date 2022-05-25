@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import os
 import pathlib
 import shutil
@@ -154,7 +155,10 @@ class Format(Command):
     """Custom command to run black + isort"""
 
     description = "run black and isort on all relevant code; read configuration from pyproject.toml"
-    user_options = [("dirs=", None, "Directories to check"), ("check", None, "Run in check mode")]
+    user_options = [
+        ("dirs=", None, "Directories to check"),
+        ("check", None, "Run in check mode"),
+    ]
 
     def initialize_options(self) -> None:
         self.dirs = ["kentik_api", "tests", "examples"]

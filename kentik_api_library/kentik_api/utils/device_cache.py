@@ -63,7 +63,11 @@ class DeviceCache:
                 log.critical("Duplicate device id: %d", device.id)
             else:
                 self._devices_by_id[device.id] = device
-        log.debug("Got %d devices (%d duplicate names)", len(self._devices_by_name), self.duplicate_names)
+        log.debug(
+            "Got %d devices (%d duplicate names)",
+            len(self._devices_by_name),
+            self.duplicate_names,
+        )
 
     def __repr__(self) -> str:
         return f"DeviceCache: {self.count} devices"

@@ -20,12 +20,12 @@ Steps:
 1. Activate virtualenv  
 `source .venv/bin/activate`
 
-1. Clone the library repo  
+1. Clone the library repository  
 `git clone https://github.com/kentik/community_sdk_python.git`
 
 1. `cd community_sdk_python/`
 
-1. Install the library from repo  
+1. Install the library from repository  
 `pip3 install -e kentik_api_library/`
 
 1. Install demo requirements & jupyter-notebook

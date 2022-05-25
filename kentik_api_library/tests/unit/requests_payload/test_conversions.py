@@ -290,7 +290,7 @@ def test_convert_list_or_none_provided_invalid_data_format_raises_error() -> Non
 
     # when - then
     with pytest.raises(DataFormatError):
-        result = convert_list_or_none(attrs, convert_func)
+        convert_list_or_none(attrs, convert_func)
 
 
 def test_enum_to_str() -> None:

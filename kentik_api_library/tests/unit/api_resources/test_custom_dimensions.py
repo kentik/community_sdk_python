@@ -530,7 +530,11 @@ def test_get_and_update_custom_dimension_with_unknown_enum_fields() -> None:
     assert connector.last_payload is None
 
     # then get response properly parsed
-    check_dimension_one(dimension, expected_value="testapi-dimension-value-3", expected_direction="D_TEAPOT")
+    check_dimension_one(
+        dimension,
+        expected_value="testapi-dimension-value-3",
+        expected_direction="D_TEAPOT",
+    )
 
     # given
     update_response_payload = """
@@ -664,7 +668,11 @@ def check_dimension_one(dimension, expected_value, expected_direction) -> None:
 
     assert dimension.populators is not None
     assert len(dimension.populators) == 1
-    check_populator_one(dimension.populators[0], expected_value=expected_value, expected_direction=expected_direction)
+    check_populator_one(
+        dimension.populators[0],
+        expected_value=expected_value,
+        expected_direction=expected_direction,
+    )
 
 
 def check_populator_one(populator, expected_value, expected_direction) -> None:

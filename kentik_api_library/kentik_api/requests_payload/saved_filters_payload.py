@@ -23,7 +23,11 @@ class SavedFilterPayload:
             {
                 "connector": i.connector,
                 "filters": [
-                    {"filterField": j.filterField, "filterValue": j.filterValue, "operator": j.operator}
+                    {
+                        "filterField": j.filterField,
+                        "filterValue": j.filterValue,
+                        "operator": j.operator,
+                    }
                     for j in i.filters
                 ],
                 "not": i.not_,

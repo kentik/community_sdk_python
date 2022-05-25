@@ -35,8 +35,18 @@ def run_query_data() -> None:
     email, token = get_credentials()
     client = KentikAPI(email, token)
 
-    agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
-    agg2 = Aggregate(name="p95th_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.percentile, rank=95)
+    agg1 = Aggregate(
+        name="avg_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.average,
+        raw=True,
+    )
+    agg2 = Aggregate(
+        name="p95th_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.percentile,
+        rank=95,
+    )
     agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
     query = Query(
         dimension=[DimensionType.Traffic],
@@ -73,8 +83,18 @@ def run_query_chart() -> None:
     email, token = get_credentials()
     client = KentikAPI(email, token)
 
-    agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
-    agg2 = Aggregate(name="p95th_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.percentile, rank=95)
+    agg1 = Aggregate(
+        name="avg_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.average,
+        raw=True,
+    )
+    agg2 = Aggregate(
+        name="p95th_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.percentile,
+        rank=95,
+    )
     agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
     query = Query(
         dimension=[DimensionType.Traffic],

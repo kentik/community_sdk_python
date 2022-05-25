@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 import logging
 import time
 from dataclasses import dataclass
@@ -36,7 +35,13 @@ class BackgroundCmdQueue:
         self._logger = logging.getLogger(__name__)
         Thread(target=self._worker, daemon=True).start()
 
-    def put(self, cmd: Cmd, num_attempts: int = 1, on_success: SuccessFunc = nop, on_abort: AbortFunc = nop) -> None:
+    def put(
+        self,
+        cmd: Cmd,
+        num_attempts: int = 1,
+        on_success: SuccessFunc = nop,
+        on_abort: AbortFunc = nop,
+    ) -> None:
         bcmd = BackgroundCmd(
             cmd=cmd,
             num_attempts_total=num_attempts,
@@ -72,7 +77,15 @@ class BackgroundCmdQueue:
             self._queue.task_done()
 
     def _log_retry(self, err: Exception) -> None:
-        self._logger.error('request failed with "%s". Retrying in %0.2f seconds...', err, self._retry_delay_seconds)
+        self._logger.error(
+            'request failed with "%s". Retrying in %0.2f seconds...',
+            err,
+            self._retry_delay_seconds,
+        )
 
     def _log_abort(self, err: Exception, item: BackgroundCmd) -> None:
-        self._logger.error('request failed with "%s". Giving up after %d attempts', err, item.num_attempts_total)
+        self._logger.error(
+            'request failed with "%s". Giving up after %d attempts',
+            err,
+            item.num_attempts_total,
+        )

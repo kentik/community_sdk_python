@@ -274,4 +274,9 @@ def test_get_user_fails_when_server_is_down(kentik_api) -> None:
 
 @pytest.fixture
 def kentik_api():
-    return KentikAPI(DUMMY_AUTH_EMAIL, DUMMY_TOKEN, api_host=FAKE_API_HOST, retry_strategy=Retry(total=1))
+    return KentikAPI(
+        DUMMY_AUTH_EMAIL,
+        DUMMY_TOKEN,
+        api_host=FAKE_API_HOST,
+        retry_strategy=Retry(total=1),
+    )

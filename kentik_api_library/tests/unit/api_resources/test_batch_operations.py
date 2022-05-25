@@ -19,7 +19,10 @@ def test_batch_operation_on_flow_tags_success() -> None:
     deletion1 = Deletion("del_value1")
     deletion2 = Deletion("del_value2")
     batch_operation = BatchOperationPart(
-        replace_all=False, complete=True, upserts=[upsert1, upsert2], deletes=[deletion1, deletion2]
+        replace_all=False,
+        complete=True,
+        upserts=[upsert1, upsert2],
+        deletes=[deletion1, deletion2],
     )
     connector = StubAPIConnector(response_payload, HTTPStatus.OK)
     batch_api = BatchAPI(connector)
@@ -56,7 +59,11 @@ def test_batch_operation_on_populators_success() -> None:
     upsert = Upsert("value", [criterion])
     deletion = Deletion("del_value")
     batch_operation = BatchOperationPart(
-        replace_all=False, complete=True, upserts=[upsert], deletes=[deletion], guid="guid2137"
+        replace_all=False,
+        complete=True,
+        upserts=[upsert],
+        deletes=[deletion],
+        guid="guid2137",
     )
     connector = StubAPIConnector(response_payload, HTTPStatus.OK)
     batch_api = BatchAPI(connector)

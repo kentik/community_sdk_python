@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 import logging
 import sys
 from datetime import datetime, timedelta, timezone
@@ -149,7 +148,10 @@ class DFCache:
         print(f"newest data: {self.newest}", file=out)
 
     def files_in_range(
-        self, start: Optional[datetime] = None, end: Optional[datetime] = None, contained: bool = False
+        self,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        contained: bool = False,
     ) -> Generator[Path, None, None]:
         """
         Generator yielding files with data in specific time interval
@@ -286,4 +288,11 @@ class DFCache:
             start = now - timedelta(hours=23, minutes=59)
         else:
             start = self.newest  # type: ignore
-        return self.fetch(query_fn, start=start, end=now, step=step, dedup_columns=dedup_columns, **kwargs)
+        return self.fetch(
+            query_fn,
+            start=start,
+            end=now,
+            step=step,
+            dedup_columns=dedup_columns,
+            **kwargs,
+        )

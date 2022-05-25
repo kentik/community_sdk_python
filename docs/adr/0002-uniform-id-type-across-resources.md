@@ -9,7 +9,7 @@ Accepted
 ## Context
 
 Kentik HTTP API returns "id" for different resources as integers or as strings.
-Some resources reference others by id and then the id types sometimes differ.
+Some resources reference others by ID and then the ID types sometimes differ.
 Exposing this to the library client can provoke questions and cause confusion.
 
 ## Decision

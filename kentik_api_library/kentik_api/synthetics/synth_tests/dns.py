@@ -75,7 +75,11 @@ class DNSTest(SynTest):
             settings=DNSTestSettings(
                 agent_ids=agent_ids,
                 dns=DNSTestSpecific(
-                    target=target, record_type=record_type, servers=servers, timeout=timeout, port=port
+                    target=target,
+                    record_type=record_type,
+                    servers=servers,
+                    timeout=timeout,
+                    port=port,
                 ),
             ),
         )

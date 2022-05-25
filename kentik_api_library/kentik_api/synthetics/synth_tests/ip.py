@@ -46,5 +46,8 @@ class IPTest(PingTraceTest):
     def create(cls: Type[IPTestT], name: str, targets: List[str], agent_ids: List[str]) -> IPTestT:
         return cls(
             name=name,
-            settings=IPTestSettings(agent_ids=agent_ids, ip=IPTestSpecific(targets=sort_ip_address_list(targets))),
+            settings=IPTestSettings(
+                agent_ids=agent_ids,
+                ip=IPTestSpecific(targets=sort_ip_address_list(targets)),
+            ),
         )
