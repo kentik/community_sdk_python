@@ -21,8 +21,8 @@ Precondition: python3 and pip3 are already installed.
 1. `cd community_sdk_python/kentik_api_library/`
 
 1. Install Python dependencies  
-`python -m pip install --upgrade -r requirements.txt`  
-`python -m pip install --upgrade -r requirements-dev.txt`  
+`pip install -r requirements.txt`  
+`pip install -r requirements-dev.txt`  
 
 1. Generate grpc client code  
 `python setup.py grpc_stubs`
@@ -36,7 +36,7 @@ Precondition: python3 and pip3 are already installed.
 1. Run mypy  
 `python setup.py mypy`
 
-1. Run black check  
+1. Run black and isort checks  
 `python setup.py format --check`
 
 ## Example
