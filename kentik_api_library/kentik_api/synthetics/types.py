@@ -25,6 +25,7 @@ class TestType(SerializableEnum):
     NETWORK_MESH = "network_mesh"
     NETWORK_GRID = "network_grid"
     PAGE_LOAD = "page_load"
+    TRANSACTION = "transaction"
     URL = "url"
 
 
@@ -35,6 +36,7 @@ class TaskType(SerializableEnum):
     DNS = "dns"
     HTTP = "http"
     PAGE_LOAD = "page-load"
+    TRANSACTION = "transaction"
 
 
 class TestStatus(SerializableEnum):

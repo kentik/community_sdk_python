@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from .api_connection.api_connector import APIConnector
 from .api_connection.retryable_session import Retry
@@ -33,6 +33,10 @@ class KentikAPI:
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
+        grpc_client_options: Tuple[Tuple[str, Any]] = (
+            ("grpc.enable_deadline_checking", 0),
+            ("grpc.max_receive_message_length", 40 * 1024 * 1024),
+        ),
     ) -> None:
         api_v5_url = self.make_api_v5_url(api_host)
         connector = APIConnector(api_v5_url, auth_email, auth_token, timeout, retry_strategy, proxy)
@@ -51,7 +55,7 @@ class KentikAPI:
         self.alerting = AlertingAPI(connector)
 
         api_v6_url = self.make_api_v6_url(api_host)
-        synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token)
+        synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token, options=grpc_client_options)
         self.synthetics = KentikSynthClient(synth_connector)
 
     @staticmethod
