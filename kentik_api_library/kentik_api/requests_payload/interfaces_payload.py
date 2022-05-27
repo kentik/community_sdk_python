@@ -246,13 +246,13 @@ class CreateRequest(InterfacePayload):
 
     @staticmethod
     def validate(interface: Interface) -> None:
-        class_op = "Create Interface"
+        operation = "Create"
         if interface.snmp_id is None:
-            raise IncompleteObjectError(class_op, "snmp_id is required")
+            raise IncompleteObjectError(operation, interface.__class__.__name__, "snmp_id is required")
         if interface.snmp_speed is None:
-            raise IncompleteObjectError(class_op, "snmp_speed is required")
+            raise IncompleteObjectError(operation, interface.__class__.__name__, "snmp_speed is required")
         if interface.interface_description is None:
-            raise IncompleteObjectError(class_op, "interface_description is required")
+            raise IncompleteObjectError(operation, interface.__class__.__name__, "interface_description is required")
 
 
 @dataclass

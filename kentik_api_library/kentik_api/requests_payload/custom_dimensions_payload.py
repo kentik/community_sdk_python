@@ -97,15 +97,14 @@ class UpdateRequest:
 UpdateResponse = GetResponse
 
 
-def validate(custom_dimension: CustomDimension, method: str):
-    class_op = f"{method} CustomDimensions"
-    if method == "Create":
+def validate(custom_dimension: CustomDimension, operation: str):
+    if operation == "Create":
         if custom_dimension.name is None:
-            raise IncompleteObjectError(class_op, "name is required")
+            raise IncompleteObjectError(operation, custom_dimension.__class__.__name__, "name is required")
         if custom_dimension.type is None:
-            raise IncompleteObjectError(class_op, "type is required")
+            raise IncompleteObjectError(operation, custom_dimension.__class__.__name__, "type is required")
     if custom_dimension.display_name is None:
-        raise IncompleteObjectError(class_op, "display_name is required")
+        raise IncompleteObjectError(operation, custom_dimension.__class__.__name__, "display_name is required")
 
 
 # @dataclass()
