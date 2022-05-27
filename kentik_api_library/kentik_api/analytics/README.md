@@ -141,7 +141,7 @@ Where:
   `source` field defines how values of the column are constructed from SQL response columns. The content of the
   field is `str.format` expression. Key-value pairs representing all columns in a SQL response row are passed as
   values to the `str.format`. Example mapping entry:
-  ```bash
+  ```yaml
   link:
     source: '{i_device_name}:{i_output_interface_description}'
   ```

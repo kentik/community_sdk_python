@@ -27,18 +27,18 @@ testpaths = ["tests/integration", "tests/unit"]
 fail-under=8.5
 
 [flake8]
-    max-line-length = 120
-    extend-ignore = """
-        E203,
-        E402,
-        E501,
-        E712,
-        E741,
-        F401,
-        F403,
-        F405,
-        F541,
-    """
+max-line-length = 120
+extend-ignore = """
+    E203,
+    E402,
+    E501,
+    E712,
+    E741,
+    F401,
+    F403,
+    F405,
+    F541,
+"""
 
 # allow single-letter names
 variable-rgx="[a-z_][a-z0-9_]{0,30}$"
