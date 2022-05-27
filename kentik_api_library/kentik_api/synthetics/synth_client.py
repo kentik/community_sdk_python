@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any, List, Optional
 
@@ -8,6 +9,7 @@ from kentik_api.synthetics.agent import Agent, AgentOwnershipType
 from kentik_api.synthetics.api_connector_protocol import APISyntheticsConnectorProtocol
 from kentik_api.synthetics.synth_tests import (
     AgentTest,
+    BGPMonitorTest,
     DNSGridTest,
     DNSTest,
     FlowTest,
@@ -23,6 +25,8 @@ from kentik_api.synthetics.synth_tests import (
 )
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime
 from kentik_api.synthetics.types import TestStatus, TestType
+
+log = logging.getLogger("synth_tests")
 
 
 class KentikSynthClient:
@@ -114,7 +118,6 @@ class KentikSynthClient:
 def make_synth_test(pb_object: pb.Test) -> SynTest:
     def _cls_from_type(test_type: TestType) -> Any:
         return {
-            # TestType.bgp_monitor: SynTest,
             TestType.IP: IPTest,
             TestType.AGENT: AgentTest,
             TestType.HOSTNAME: HostnameTest,
@@ -125,13 +128,15 @@ def make_synth_test(pb_object: pb.Test) -> SynTest:
             TestType.NETWORK_GRID: NetworkGridTest,
             TestType.PAGE_LOAD: PageLoadTest,
             TestType.FLOW: FlowTest,
+            TestType.BGP_MONITOR: BGPMonitorTest,  # special case: not fully supported by Synthetic Tests API
         }.get(test_type)
 
     test_type = str(pb_object.type)
     cls = _cls_from_type(TestType(test_type))
     if cls is None:
         raise KentikAPIError(f"Unsupported test type: {test_type}")
-
+    if cls is BGPMonitorTest:
+        log.warning("'%s' tests are not fully supported in the API. Test will have incomplete attributes", test_type)
     test = cls(pb_object.name)
     test.fill_from_pb(pb_object)
     return test

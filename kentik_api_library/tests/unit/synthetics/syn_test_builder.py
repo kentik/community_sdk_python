@@ -7,6 +7,7 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests import (
     agent,
+    bgp_monitor,
     dns,
     dns_grid,
     flow,
@@ -140,6 +141,21 @@ def setup_ping_trace_test(out_pb_test: pb.Test, out_test: PingTraceTest) -> None
     out_test.settings.trace = TraceTask(timeout=11222, count=10, limit=50, delay=25, protocol=Protocol.ICMP, port=33444)
 
 
+def make_bgp_test_pair() -> Tuple[pb.Test, bgp_monitor.BGPMonitorTest]:
+    """BGP Monitor is a special case; not fully supported in Synthetic Tests API"""
+
+    # general test config
+    pb_test = pb.Test()
+    test = bgp_monitor.BGPMonitorTest(name="", status=TestStatus.UNSPECIFIED, settings=SynTestSettings())
+    setup_syn_test(pb_test, test)
+
+    # BGP-test config
+    pb_test.type = TestType.BGP_MONITOR.value
+    test.type = TestType.BGP_MONITOR
+
+    return (pb_test, test)
+
+
 def make_ip_test_pair() -> Tuple[pb.Test, ip.IPTest]:
     # general test config
     pb_test = pb.Test()
@@ -167,7 +183,7 @@ def make_agent_test_pair() -> Tuple[pb.Test, agent.AgentTest]:
     pb_test.settings.agent.CopyFrom(pb.AgentTest(target="38", use_local_ip=True))
 
     test.type = TestType.AGENT
-    test.settings.agent = agent.AgentTestSpecific(target=ID("38"), user_local_ip=True)
+    test.settings.agent = agent.AgentTestSpecific(target=ID("38"), use_local_ip=True)
 
     return (pb_test, test)
 

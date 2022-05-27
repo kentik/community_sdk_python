@@ -1,13 +1,13 @@
 import logging
 from dataclasses import dataclass, field, fields
-from datetime import datetime
+from datetime import datetime, timezone
 from ipaddress import ip_address
 from typing import Any, Callable, Dict, List, Optional, Set, Type, TypeVar
 
 import inflection
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU, DEFAULT_ID
+from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import IPFamily, Protocol, TaskType, TestStatus, TestType
@@ -319,8 +319,8 @@ class SynTest(_ConfigElement):
 
     # read-only
     _id: ID = field(default=DEFAULT_ID, init=False)
-    _cdate: datetime = field(default=datetime.fromisoformat(DEFAULT_DATE_NO_ZULU), init=False)
-    _edate: datetime = field(default=datetime.fromisoformat(DEFAULT_DATE_NO_ZULU), init=False)
+    _cdate: datetime = field(default=datetime.fromtimestamp(0, tz=timezone.utc), init=False)
+    _edate: datetime = field(default=datetime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
     _last_updated_by: UserInfo = field(default_factory=UserInfo, init=False)
 

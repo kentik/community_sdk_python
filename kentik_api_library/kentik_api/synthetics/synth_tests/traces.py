@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Type, TypeVar
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 
@@ -110,7 +109,7 @@ class Path:
     hop_count: Stats = Stats()
     max_as_path_length: int = 0
     traces: List[PathTrace] = field(default_factory=list)
-    time: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
+    time: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
 
     @classmethod
     def from_pb(cls: Type[PathT], src: pb.Path) -> PathT:

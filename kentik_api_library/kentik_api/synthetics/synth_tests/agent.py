@@ -11,16 +11,16 @@ from .base import PingTraceTest, PingTraceTestSettings, list_factory
 @dataclass
 class AgentTestSpecific:
     target: ID = ID()
-    user_local_ip: bool = False
+    use_local_ip: bool = False
 
     def fill_from_pb(self, src: pb.AgentTest) -> None:
         self.target = ID(src.target)
-        self.user_local_ip = src.use_local_ip
+        self.use_local_ip = src.use_local_ip
 
     def to_pb(self) -> pb.AgentTest:
         return pb.AgentTest(
             target=str(self.target),
-            use_local_ip=self.user_local_ip,
+            use_local_ip=self.use_local_ip,
         )
 
 

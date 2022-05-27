@@ -1,10 +1,9 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Type, TypeVar
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import IPFamily
@@ -37,7 +36,7 @@ class Agent:
     # read-only
     type: AgentOwnershipType = AgentOwnershipType.NONE
     os: str = ""
-    last_authed: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
+    last_authed: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
     test_ids: List[ID] = field(default_factory=list)
     version: str = ""
     agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED

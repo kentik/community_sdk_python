@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Type, TypeVar, Union
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-from kentik_api.public.defaults import DEFAULT_DATE_NO_ZULU
 from kentik_api.public.errors import DeserializationError
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
@@ -183,7 +182,7 @@ TestResultsT = TypeVar("TestResultsT", bound="TestResults")
 class TestResults:
     __test__ = False  # mark class as "Not a test"; to avoid pytest warnings
     test_id: ID = ID()
-    time: datetime = datetime.fromisoformat(DEFAULT_DATE_NO_ZULU)
+    time: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
     health: Health = Health.NONE
     agents: List[AgentResults] = field(default_factory=list)
 
