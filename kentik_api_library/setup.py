@@ -18,7 +18,7 @@ README = (HERE / "README.md").read_text()
 
 # Package list generated with: python setup.py packages
 PACKAGES = [
-    "kentik_api.",
+    "kentik_api",
     "kentik_api.auth",
     "kentik_api.throttling",
     "kentik_api.analytics",

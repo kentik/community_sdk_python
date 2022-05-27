@@ -26,6 +26,8 @@ from kentik_api.synthetics.types import TestStatus, TestType
 
 
 class KentikSynthClient:
+    IGNORED_TEST_TYPES = ["bgp_monitor", "transaction"]
+
     def __init__(self, connector: APISyntheticsConnectorProtocol):
         self._connector = connector
 
@@ -49,10 +51,13 @@ class KentikSynthClient:
 
     def get_all_tests(self) -> List[SynTest]:
         pb_tests = self._connector.get_all_tests()
-        return [make_synth_test(pb_test) for pb_test in pb_tests]
+        return [make_synth_test(pb_test) for pb_test in pb_tests if str(pb_test.type) not in self.IGNORED_TEST_TYPES]
 
     def get_test(self, test_id: ID) -> SynTest:
         pb_test = self._connector.get_test(str(test_id))
+        if str(pb_test.type) in self.IGNORED_TEST_TYPES:
+            raise KentikAPIError(f"Unsupported test type: {str(pb_test.type)}")
+
         return make_synth_test(pb_test)
 
     def create_test(self, test: SynTest) -> SynTest:
@@ -112,9 +117,8 @@ class KentikSynthClient:
 
 
 def make_synth_test(pb_object: pb.Test) -> SynTest:
-    def _cls_from_type(test_type: TestType) -> Any:
+    def _cls_from_type(tt: TestType) -> Any:
         return {
-            # TestType.bgp_monitor: SynTest,
             TestType.IP: IPTest,
             TestType.AGENT: AgentTest,
             TestType.HOSTNAME: HostnameTest,
@@ -125,7 +129,7 @@ def make_synth_test(pb_object: pb.Test) -> SynTest:
             TestType.NETWORK_GRID: NetworkGridTest,
             TestType.PAGE_LOAD: PageLoadTest,
             TestType.FLOW: FlowTest,
-        }.get(test_type)
+        }.get(tt)
 
     test_type = str(pb_object.type)
     cls = _cls_from_type(TestType(test_type))

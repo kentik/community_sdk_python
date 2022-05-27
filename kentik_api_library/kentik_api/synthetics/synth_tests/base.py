@@ -257,15 +257,15 @@ class SynTestSettings(_ConfigElement):
     health_settings: HealthSettings = field(default_factory=HealthSettings)
     notification_channels: List[str] = field(default_factory=list)
 
-    @classmethod
-    def task_name(cls) -> Optional[str]:
-        return None
-
     def fill_from_pb(self, src: pb.TestSettings) -> None:
+        LEGACY_TASK_TYPE_MAP = {"knock": "ping"}
+        IGNORED_TASK_TYPES = ["bgp-monitor"]
         self.family = IPFamily(src.family)
         self.period = src.period
-        self.agent_ids = [ID(id) for id in src.agent_ids]
-        self.tasks = [TaskType(task) for task in src.tasks]
+        self.agent_ids = [ID(aid) for aid in src.agent_ids]
+        self.tasks = [
+            TaskType(LEGACY_TASK_TYPE_MAP.get(task, task)) for task in src.tasks if task not in IGNORED_TASK_TYPES
+        ]
         self.health_settings.fill_from_pb(src.health_settings)
         self.notification_channels = src.notification_channels
 
@@ -316,6 +316,7 @@ class SynTest(_ConfigElement):
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
+    labels: List[str] = field(default_factory=list)
 
     # read-only
     _id: ID = field(default=DEFAULT_ID, init=False)
@@ -381,20 +382,6 @@ class SynTest(_ConfigElement):
             pass
         log.debug("'%s' (type: '%s'): Test has no targets", self.name, self.type.value)
         return []
-
-    @property
-    def configured_tasks(self) -> Set[str]:
-        tasks = set(
-            f.name
-            for f in fields(self.settings)
-            if f.name
-            and hasattr(f.type, "task_name")
-            and self.settings.__getattribute__(f.name).task_name in self.settings.tasks
-        )
-        n = self.settings.task_name()
-        if n:
-            tasks.add(n)
-        return tasks
 
     def undeploy(self):
         self._id = DEFAULT_ID
