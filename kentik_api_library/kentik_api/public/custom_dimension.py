@@ -83,7 +83,7 @@ class Populator:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("Populator", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
@@ -93,7 +93,7 @@ class Populator:
     @property
     def dimension_id(self) -> ID:
         if self._dimension_id is None:
-            raise IncompleteObjectError("Populator", "_dimension_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_dimension_id is required")
         return self._dimension_id
 
     @property
@@ -146,7 +146,7 @@ class CustomDimension:
     @property
     def id(self) -> ID:
         if self._id is None:
-            raise IncompleteObjectError("CustomDimension", "_id is required")
+            raise IncompleteObjectError("", self.__class__.__name__, "_id is required")
         return self._id
 
     @property
