@@ -16,8 +16,9 @@ class APISyntheticsConnector:
     Allows sending authorized grpc requests to Kentik Synthetics API
     """
 
-    def __init__(self, api_url: str, auth_email: str, auth_token: str,
-                 options: Tuple[Tuple[str, Any]] = ()):  # type: ignore
+    def __init__(
+        self, api_url: str, auth_email: str, auth_token: str, options: Tuple[Tuple[str, Any]] = ()  # type: ignore
+    ):
         self._url = api_url
         self._options = options
         self._admin = SyntheticsAdminService()
