@@ -36,7 +36,7 @@ class KentikAPI:
         grpc_client_options: Tuple[Tuple[str, Any]] = (
             ("grpc.enable_deadline_checking", 0),
             ("grpc.max_receive_message_length", 40 * 1024 * 1024),
-        ),
+        ),  # type: ignore
     ) -> None:
         api_v5_url = self.make_api_v5_url(api_host)
         connector = APIConnector(api_v5_url, auth_email, auth_token, timeout, retry_strategy, proxy)
