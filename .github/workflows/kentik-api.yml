@@ -55,11 +55,11 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_PYLINT: false
           PYTHON_BLACK_CONFIG_FILE: pyproject.toml
           PYTHON_ISORT_CONFIG_FILE: pyproject.toml
           PYTHON_FLAKE8_CONFIG_FILE: pyproject.toml
           PYTHON_MYPY_CONFIG_FILE: pyproject.toml
-          PYTHON_PYLINT_CONFIG_FILE: pyproject.toml
       - name: PyTest
         working-directory: ./kentik_api_library
         run: python3 setup.py pytest
