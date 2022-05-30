@@ -10,7 +10,7 @@ from .base import SynTest, SynTestSettings, list_factory
 @dataclass
 class DNSTestSpecific:
     target: str = ""
-    timeout: int = 0
+    timeout: int = 0  # currently support for timeout attribute in DNS tests is suspended
     record_type: DNSRecordType = DNSRecordType.A
     servers: List[str] = field(default_factory=list)
     port: int = 0
@@ -67,7 +67,7 @@ class DNSTest(SynTest):
         agent_ids: List[str],
         servers: List[str],
         record_type: DNSRecordType = DNSRecordType.A,
-        timeout: int = 5000,
+        timeout: int = 0,  # currently support for timeout attribute in DNS tests is suspended
         port: int = 53,
     ) -> DNSTestT:
         return cls(

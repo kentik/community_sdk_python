@@ -1,6 +1,5 @@
 from .agent import AgentTest
 from .base import HealthSettings, SynTest
-from .bgp_monitor import BGPMonitorTest
 from .dns import DNSTest
 from .dns_grid import DNSGridTest
 from .flow import FlowTest

@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pytest
 
 from kentik_api.synthetics.synth_tests import DNSTest
@@ -16,26 +18,22 @@ def test_dns_crud() -> None:
         agent_ids=[agents[0]],
         health_settings=HEALTH1,
         dns=DNSTestSpecific(
-            target="123",
-            timeout=100,
+            target="www.example.com",
             record_type=DNSRecordType.AAAA,
-            servers=["4.4.4.4", "8.8.8.8"],
+            servers=["1.1.1.1", "8.8.8.8"],
             port=53,
         ),
     )
-    settings2 = DNSTestSettings(
-        family=IPFamily.V4,  # family update doesn't take effect
-        period=120,
-        agent_ids=[agents[1]],
-        health_settings=HEALTH2,
-        dns=DNSTestSpecific(
-            target="123",  # target can't be updated after a test has been created
-            timeout=100,  # timeout update doesn't take effect
-            record_type=DNSRecordType.A,
-            servers=["5.5.5.5", "9.9.9.9"],
-            port=63,
-        ),
-    )
+    settings2 = deepcopy(settings1)
+    # settings2.family = IPFamily.V6  # family update doesn't take effect
+    settings2.period = 120
+    settings2.agent_ids = [agents[1]]
+    settings2.health_settings = HEALTH2
+    # settings2.dns.target="www.wikipedia.org"  # target can't be updated after a test has been created
+    settings2.dns.record_type = DNSRecordType.A
+    settings2.dns.servers = ["8.8.8.8", "9.9.9.9"]
+    settings2.dns.port = 63
+
     try:
         # create
         test = DNSTest("e2e-dns-test", TestStatus.ACTIVE, settings1)
@@ -57,11 +55,12 @@ def test_dns_crud() -> None:
         # update
         created_test.name = "e2e-dns-test-updated"
         created_test.settings = settings2
+        created_test.status = TestStatus.PAUSED  # to safely update DNS port to arbitrary value
         updated_test = client().synthetics.update_test(created_test)
         assert isinstance(updated_test, DNSTest)
         assert updated_test.name == "e2e-dns-test-updated"
         assert updated_test.type == TestType.DNS
-        assert updated_test.status == TestStatus.ACTIVE
+        assert updated_test.status == TestStatus.PAUSED
         assert updated_test.settings == settings2
     finally:
         # delete (even if assertion failed)

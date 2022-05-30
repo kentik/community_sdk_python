@@ -1,6 +1,7 @@
+from copy import deepcopy
+
 import pytest
 
-from kentik_api.public.types import ID
 from kentik_api.synthetics.synth_tests import AgentTest
 from kentik_api.synthetics.synth_tests.agent import AgentTestSettings, AgentTestSpecific
 from kentik_api.synthetics.synth_tests.base import PingTask, TraceTask
@@ -17,19 +18,25 @@ def test_agent_test_crud() -> None:
         period=60,
         agent_ids=[agents[0]],
         health_settings=HEALTH1,
-        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP, port=2222),
+        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         agent=AgentTestSpecific(target=agents[1], use_local_ip=False),
     )
-    settings2 = AgentTestSettings(
-        family=IPFamily.V6,
-        period=60,  # period update doesn't take effect
-        agent_ids=[agents[2]],
-        health_settings=HEALTH2,
-        ping=PingTask(timeout=4000, count=6, delay=300, protocol=Protocol.ICMP, port=3333),
-        trace=TraceTask(timeout=22750, count=4, limit=40, delay=30, protocol=Protocol.ICMP, port=4343),
-        agent=AgentTestSpecific(target=agents[3], use_local_ip=True),
-    )
+    settings2 = deepcopy(settings1)
+    settings2.family = IPFamily.V6
+    # settings2.period = 120  # period update doesn't take effect
+    settings2.agent_ids = [agents[2]]
+    settings2.health_settings = HEALTH2
+    settings2.ping.timeout = 4000
+    settings2.ping.count = 6
+    settings2.ping.delay = 300
+    settings2.trace.timeout = 22750
+    settings2.trace.count = 4
+    settings2.trace.limit = 40
+    settings2.trace.delay = 30
+    settings2.trace.protocol = Protocol.ICMP
+    settings2.agent.target = agents[3]
+    settings2.agent.use_local_ip = True
 
     try:
         # create
@@ -57,7 +64,7 @@ def test_agent_test_crud() -> None:
         updated_test = client().synthetics.update_test(created_test)
         assert isinstance(updated_test, AgentTest)
         assert updated_test.name == "e2e-agent-test-updated"
-        assert received_test.type == TestType.AGENT
+        assert updated_test.type == TestType.AGENT
         assert updated_test.status == TestStatus.ACTIVE
         assert updated_test.settings == settings2
     finally:

@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pytest
 
 from kentik_api.synthetics.synth_tests import FlowTest
@@ -16,10 +18,10 @@ def test_flow_crud() -> None:
         period=60,
         agent_ids=[agents[0]],
         health_settings=HEALTH1,
-        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP, port=2222),
+        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         flow=FlowTestSpecific(
-            target="123",
+            target="www.example.com",
             target_refresh_interval_millis=150,
             max_providers=5,
             max_ip_targets=4,
@@ -28,23 +30,27 @@ def test_flow_crud() -> None:
             direction=DirectionType.DST,
         ),
     )
-    settings2 = FlowTestSettings(
-        family=IPFamily.V6,
-        period=60,  # period update doesn't take effect
-        agent_ids=[agents[1]],
-        health_settings=HEALTH2,
-        ping=PingTask(timeout=4000, count=6, delay=300, protocol=Protocol.ICMP, port=3333),
-        trace=TraceTask(timeout=22750, count=4, limit=40, delay=30, protocol=Protocol.ICMP, port=4343),
-        flow=FlowTestSpecific(
-            target="123",  # target can't be updated after a test has been created
-            target_refresh_interval_millis=250,
-            max_providers=6,
-            max_ip_targets=5,
-            type=FlowTestSubType.CITY,  # type update doesn't take effect
-            inet_direction=DirectionType.SRC,
-            direction=DirectionType.SRC,
-        ),
-    )
+    settings2 = deepcopy(settings1)
+    settings2.family = IPFamily.V6
+    # settings2.period = 120  # period update doesn't take effect
+    settings2.agent_ids = [agents[1]]
+    settings2.health_settings = HEALTH2
+    settings2.ping.timeout = 4000
+    settings2.ping.count = 6
+    settings2.ping.delay = 300
+    settings2.trace.timeout = 22750
+    settings2.trace.count = 4
+    settings2.trace.limit = 40
+    settings2.trace.delay = 30
+    settings2.trace.protocol = Protocol.ICMP
+    # settings2.flow.target="www.wikipedia.org"  # target can't be updated after a test has been created
+    settings2.flow.target_refresh_interval_millis = 250
+    settings2.flow.max_providers = 6
+    settings2.flow.max_ip_targets = 5
+    # settings2.flow.type = FlowTestSubType.REGION  # type update doesn't take effect
+    settings2.flow.inet_direction = DirectionType.SRC
+    settings2.flow.direction = DirectionType.SRC
+
     try:
         # create
         test = FlowTest("e2e-flow-test", TestStatus.ACTIVE, settings1)

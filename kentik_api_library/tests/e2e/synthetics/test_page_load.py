@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pytest
 
 from kentik_api.synthetics.synth_tests import PageLoadTest
@@ -17,7 +19,7 @@ def test_page_load_crud() -> None:
         agent_ids=[agents[0]],
         health_settings=HEALTH1,
         tasks=[TaskType.PING, TaskType.TRACE_ROUTE, TaskType.PAGE_LOAD],
-        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP, port=2222),
+        ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         page_load=PageLoadTestSpecific(
             target="https://www.example.com",
@@ -27,22 +29,26 @@ def test_page_load_crud() -> None:
             css_selectors={"id": "#id", "class": ".class"},
         ),
     )
-    settings2 = PageLoadTestSettings(
-        family=IPFamily.V6,
-        period=120,
-        agent_ids=[agents[1]],
-        health_settings=HEALTH2,
-        tasks=[TaskType.PING, TaskType.TRACE_ROUTE, TaskType.PAGE_LOAD],
-        ping=PingTask(timeout=4000, count=6, delay=300, protocol=Protocol.ICMP, port=3333),
-        trace=TraceTask(timeout=22750, count=4, limit=40, delay=30, protocol=Protocol.ICMP, port=4343),
-        page_load=PageLoadTestSpecific(
-            target="https://www.example.com",  # target can't be updated after test has been created
-            timeout=8000,
-            headers={"x-auth-token": "0FS230FJXGJK4234"},
-            ignore_tls_errors=False,
-            css_selectors={},
-        ),
-    )
+    settings2 = deepcopy(settings1)
+    settings2.family = IPFamily.V6
+    settings2.period = 120
+    settings2.agent_ids = [agents[1]]
+    settings2.health_settings = HEALTH2
+    settings2.tasks = [TaskType.PING, TaskType.TRACE_ROUTE, TaskType.PAGE_LOAD]
+    settings2.ping.timeout = 4000
+    settings2.ping.count = 6
+    settings2.ping.delay = 300
+    settings2.trace.timeout = 22750
+    settings2.trace.count = 4
+    settings2.trace.limit = 40
+    settings2.trace.delay = 30
+    settings2.trace.protocol = Protocol.ICMP
+    # settings2.page_load.target="https://www.wikipedia.org"  # target can't be updated after test has been created
+    settings2.page_load.timeout = 8000
+    settings2.page_load.headers = {"x-auth-token": "0FS230FJXGJK4234"}
+    settings2.page_load.ignore_tls_errors = False
+    settings2.page_load.css_selectors = {}
+
     try:
         # create
         test = PageLoadTest("e2e-pageload-test", TestStatus.ACTIVE, settings1)

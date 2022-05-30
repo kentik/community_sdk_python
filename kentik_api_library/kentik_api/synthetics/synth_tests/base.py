@@ -107,7 +107,7 @@ class PingTask(_MonitoringTask):
     timeout: int = 3000
     delay: int = 200  # inter-probe delay
     protocol: Protocol = Protocol.ICMP
-    port: int = 0
+    port: int = 0  # unused when protocol=Protocol.ICMP
 
     @property
     def task_name(self):
@@ -137,7 +137,7 @@ class TraceTask(_MonitoringTask):
     limit: int = 30  # max. hop count
     delay: int = 0  # inter-probe delay
     protocol: Protocol = Protocol.ICMP
-    port: int = 33434
+    port: int = 0  # unused when protocol=Protocol.ICMP
 
     @property
     def task_name(self):
@@ -252,7 +252,7 @@ class HealthSettings(_ConfigElement):
 class SynTestSettings(_ConfigElement):
     tasks: List[TaskType] = field(default_factory=list)
     family: IPFamily = Defaults.family
-    period: int = Defaults.period
+    period: int = Defaults.period  # in seconds
     agent_ids: List[ID] = field(default_factory=list)
     health_settings: HealthSettings = field(default_factory=HealthSettings)
     notification_channels: List[str] = field(default_factory=list)

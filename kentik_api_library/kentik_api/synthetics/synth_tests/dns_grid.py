@@ -41,7 +41,7 @@ class DNSGridTest(SynTest):
         agent_ids: List[str],
         servers: List[str],
         record_type: DNSRecordType = DNSRecordType.A,
-        timeout: int = 5000,
+        timeout: int = 0,  # currently support for timeout attribute in DNS tests is suspended
         port: int = 53,
     ) -> DNSGridTestT:
         return cls(
