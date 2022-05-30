@@ -260,7 +260,7 @@ setup(
         "requests[socks]>=2.25.0",
         "typing-extensions>=3.7.4.3",
         "urllib3>=1.26.0",
-        "protobuf>=3.19.1",
+        "protobuf==3.20.1",
         "grpcio>=1.38.1",
         "inflection>=0.5.1",
     ],
