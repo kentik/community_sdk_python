@@ -3,12 +3,10 @@ import pathlib
 import shutil
 import subprocess
 from distutils import log
-from distutils.cmd import Command
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List
 
-from setuptools import setup
+from setuptools import Command, setup
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
