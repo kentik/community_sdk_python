@@ -3,14 +3,13 @@ from typing import Optional
 
 from requests import Session
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3 import Retry
 
 from kentik_api.auth.auth import KentikAuth
 
 log = logging.getLogger(__name__)
 
 
-# mypy: ignore-errors
 class RetryableSession(Session):
     DEFAULT_RETRY_STRATEGY = Retry(
         total=3,
