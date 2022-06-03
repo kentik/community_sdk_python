@@ -5,6 +5,7 @@ Example of using the users API
 
 import logging
 
+from examples.utils import pretty_print
 from kentik_api import KentikAPI, User
 from kentik_api.utils import get_credentials
 
@@ -29,29 +30,29 @@ def run_crud() -> None:
         email_product=True,
     )
     created = client.users.create(user)
-    print(created.__dict__)
+    pretty_print(created)
     print()
 
     print("### GET_ALL")
     all_users = client.users.get_all()
-    for i in all_users:
-        print(i.__dict__)
+    pretty_print(all_users)
     print()
 
     print("### UPDATE")
     created.full_name = "User Testing"
     got = client.users.update(created)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
     print("### GET")
     got = client.users.get(created.id)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
     print("### DELETE")
     deleted = client.users.delete(created.id)
     print(deleted)
+    print()
 
 
 if __name__ == "__main__":
