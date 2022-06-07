@@ -4,6 +4,7 @@ Example of using the batch API
 
 import logging
 
+from examples.utils import pretty_print
 from kentik_api import BatchOperationPart, Criterion, Deletion, KentikAPI, Upsert
 from kentik_api.utils import get_credentials
 
@@ -24,12 +25,12 @@ def run_crud() -> None:
     deletion = Deletion("value_to_delete")
     batch = BatchOperationPart(False, True, [upsert], [deletion])
     status = client.batch.batch_operation_on_flow_tags(batch)
-    print(status.__dict__)
+    pretty_print(status)
     print()
 
     print("### GET STATUS")
     got = client.batch.get_status(status.guid)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
 

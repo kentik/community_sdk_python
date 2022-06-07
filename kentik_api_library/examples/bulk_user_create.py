@@ -1,15 +1,18 @@
 import argparse
-import os
+import logging
 
 import yaml
 
-import kentik_api
+from kentik_api import KentikAPI, User
+from kentik_api.utils import get_credentials
+
+logging.basicConfig(level=logging.INFO)
 
 
 def load_kentik_users_from_file(filename):
     with open(filename, "r") as users_yaml_file:
         users_from_file = yaml.load(users_yaml_file, yaml.FullLoader)["users"]
-        return [kentik_api.User(**user) for user in users_from_file]
+        return [User(**user) for user in users_from_file]
         # Calls kentik_api.User(full_name=user["full_name"], email=user["email"], role=user["role"],
         #                       email_service=user["email_service"], email_product=user["email_product"])
         # for each entry in the file
@@ -38,7 +41,7 @@ def print_all_users(api_client):
     print_users(users)
 
 
-if __name__ == "__main__":
+def get_users_filename() -> str:
     parser = argparse.ArgumentParser(description="Load users from file and create them in Kentik API.")
     parser.add_argument(
         "--filename",
@@ -53,18 +56,22 @@ if __name__ == "__main__":
         help="API token to be used to authenticate with Kentik API",
     )
     args = parser.parse_args()
+    return args.filename
 
-    email = args.email or os.getenv("KTAPI_AUTH_EMAIL")
-    token = args.token or os.getenv("KTAPI_AUTH_TOKEN")
-    assert isinstance(email, str)
-    assert isinstance(token, str)
-    api = kentik_api.KentikAPI(email, token)
 
-    print_all_users(api)
+if __name__ == "__main__":
+    email, token = get_credentials()
+    client = KentikAPI(email, token)
 
-    kentik_users = load_kentik_users_from_file(args.filename)
-    created_users = create_users_in_kentik_api(api, kentik_users)
+    print_all_users(client)
+    print()
+
+    kentik_users = load_kentik_users_from_file(get_users_filename())
+    created_users = create_users_in_kentik_api(client, kentik_users)
     print("Users created:")
     print_users(created_users)
+    print()
 
-    print_all_users(api)
+    print("Delete created users...")
+    delete_users_from_kentik_api(client, created_users)
+    print("Done")
