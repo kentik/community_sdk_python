@@ -1,1 +1,1 @@
-setuptools_scm>=6.4.2
+build>=0.8.0
