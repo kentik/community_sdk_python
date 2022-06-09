@@ -8,6 +8,7 @@ from io import BytesIO
 
 from PIL import Image  # type: ignore
 
+from examples.utils import pretty_print
 from kentik_api import (
     Aggregate,
     AggregateFunctionType,
@@ -61,8 +62,8 @@ def run_query_data() -> None:
     result = client.query.data(query_object)
 
     print("Results:")
-    for item in result.results:
-        print(item)
+    pretty_print(result.results)
+    print()
 
 
 def run_query_chart() -> None:
@@ -139,7 +140,8 @@ def run_query_url() -> None:
     result = client.query.url(query_object)
 
     print("Result:")
-    print(result)
+    pretty_print(result)
+    print()
 
 
 def run_query_sql() -> None:
@@ -171,7 +173,8 @@ def run_query_sql() -> None:
     result = client.query.sql(sql_query)
 
     print("Result:")
-    print(result.rows)
+    pretty_print(result.rows)
+    print()
 
 
 if __name__ == "__main__":
