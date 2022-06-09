@@ -5,17 +5,13 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID
 from kentik_api.synthetics.types import TaskType, TestType
 
-from .base import PingTraceTest, PingTraceTestSettings, list_factory
+from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_factory
 
 
 @dataclass
-class AgentTestSpecific:
+class AgentTestSpecific(_ConfigElement):
     target: ID = ID()
     use_local_ip: bool = False
-
-    def fill_from_pb(self, src: pb.AgentTest) -> None:
-        self.target = ID(src.target)
-        self.use_local_ip = src.use_local_ip
 
     def to_pb(self) -> pb.AgentTest:
         return pb.AgentTest(
@@ -28,10 +24,6 @@ class AgentTestSpecific:
 class AgentTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     agent: AgentTestSpecific = AgentTestSpecific()
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.agent.fill_from_pb(src.agent)
 
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()

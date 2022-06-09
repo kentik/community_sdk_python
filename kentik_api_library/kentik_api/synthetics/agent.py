@@ -1,28 +1,27 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from enum import Enum
-from typing import List, Type, TypeVar
+from typing import List, TypeVar
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
-from kentik_api.synthetics.types import IPFamily
+from kentik_api.synthetics.synth_tests.base import _ConfigElement
+from kentik_api.synthetics.types import IPFamily, SerializableEnum
 
 
-class AgentStatus(Enum):
+class AgentStatus(SerializableEnum):
     UNSPECIFIED = pb.AgentStatus.AGENT_STATUS_UNSPECIFIED
     OK = pb.AgentStatus.AGENT_STATUS_OK
     WAIT = pb.AgentStatus.AGENT_STATUS_WAIT
     DELETED = pb.AgentStatus.AGENT_STATUS_DELETED
 
 
-class AgentImplementType(Enum):
+class AgentImplementType(SerializableEnum):
     UNSPECIFIED = pb.ImplementType.IMPLEMENT_TYPE_UNSPECIFIED
     RUST = pb.ImplementType.IMPLEMENT_TYPE_RUST
     NODE = pb.ImplementType.IMPLEMENT_TYPE_NODE
 
 
-class AgentOwnershipType(Enum):
+class AgentOwnershipType(SerializableEnum):
     NONE = ""
     PRIVATE = "private"
     GLOBAL = "global"
@@ -32,7 +31,7 @@ AgentT = TypeVar("AgentT", bound="Agent")
 
 
 @dataclass
-class Agent:
+class Agent(_ConfigElement):
     # read-only
     type: AgentOwnershipType = AgentOwnershipType.NONE
     os: str = ""
@@ -77,31 +76,4 @@ class Agent:
             local_ip=str(self.local_ip),
             cloud_region=self.cloud_region,
             cloud_provider=self.cloud_provider,
-        )
-
-    @classmethod
-    def from_pb(cls: Type[AgentT], pba: pb.Agent) -> AgentT:
-        return cls(
-            id=ID(pba.id),
-            site_name=pba.site_name,
-            status=AgentStatus(pba.status),
-            alias=pba.alias,
-            type=AgentOwnershipType(pba.type),
-            os=pba.os,
-            ip=IP(pba.ip),
-            lat=pba.lat,
-            long=pba.long,
-            last_authed=pb_to_datetime_utc(pba.last_authed),
-            family=IPFamily(pba.family),
-            asn=pba.asn,
-            site_id=ID(pba.site_id),
-            version=pba.version,
-            city=pba.city,
-            region=pba.region,
-            country=pba.country,
-            test_ids=[ID(id) for id in pba.test_ids],
-            local_ip=IP(pba.local_ip),
-            cloud_region=pba.cloud_region,
-            cloud_provider=pba.cloud_provider,
-            agent_impl=AgentImplementType(pba.agent_impl),
         )

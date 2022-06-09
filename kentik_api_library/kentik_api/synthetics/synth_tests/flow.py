@@ -4,11 +4,11 @@ from typing import List, Optional, Type, TypeVar
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import DirectionType, FlowTestSubType, TaskType, TestType
 
-from .base import PingTraceTest, PingTraceTestSettings, list_factory
+from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_factory
 
 
 @dataclass
-class FlowTestSpecific:
+class FlowTestSpecific(_ConfigElement):
     target: str = ""
     target_refresh_interval_millis: int = 0
     max_providers: int = 0
@@ -16,15 +16,6 @@ class FlowTestSpecific:
     type: FlowTestSubType = FlowTestSubType.NONE
     inet_direction: DirectionType = DirectionType.NONE
     direction: DirectionType = DirectionType.NONE
-
-    def fill_from_pb(self, src: pb.FlowTest) -> None:
-        self.target = src.target
-        self.target_refresh_interval_millis = src.target_refresh_interval_millis
-        self.max_providers = src.max_providers
-        self.max_ip_targets = src.max_ip_targets
-        self.type = FlowTestSubType(src.type)
-        self.inet_direction = DirectionType(src.inet_direction)
-        self.direction = DirectionType(src.direction)
 
     def to_pb(self) -> pb.FlowTest:
         return pb.FlowTest(
@@ -46,10 +37,6 @@ class FlowTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "flow"
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.flow.fill_from_pb(src.flow)
 
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()

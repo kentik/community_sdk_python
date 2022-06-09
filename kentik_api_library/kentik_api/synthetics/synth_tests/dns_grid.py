@@ -15,10 +15,6 @@ class DNSGridTestSettings(SynTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.DNS]))
     dns_grid: DSNGridTestSpecific = DSNGridTestSpecific()
 
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.dns_grid.fill_from_pb(src.dns_grid)
-
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()
         obj.dns_grid.CopyFrom(self.dns_grid.to_pb())

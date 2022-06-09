@@ -24,7 +24,7 @@ def test_url_crud() -> None:
         url=URLTestSpecific(
             target="https://www.example.com",
             timeout=7000,
-            http_method="GET",
+            method="GET",
             headers={"origin": "url-test"},
             body="BODY",
             ignore_tls_errors=False,

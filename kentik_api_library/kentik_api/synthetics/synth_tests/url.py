@@ -4,31 +4,23 @@ from typing import Dict, List, Optional, Type, TypeVar
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
-from .base import PingTraceTest, PingTraceTestSettings, list_factory
+from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_factory
 
 
 @dataclass
-class URLTestSpecific:
+class URLTestSpecific(_ConfigElement):
     target: str = ""
     timeout: int = 0
-    http_method: str = ""
+    method: str = ""  # HTTP method
     headers: Dict[str, str] = field(default_factory=dict)
     body: str = ""
     ignore_tls_errors: bool = False
-
-    def fill_from_pb(self, src: pb.UrlTest) -> None:
-        self.target = src.target
-        self.timeout = src.timeout
-        self.http_method = src.method
-        self.headers = src.headers
-        self.body = src.body
-        self.ignore_tls_errors = src.ignore_tls_errors
 
     def to_pb(self) -> pb.UrlTest:
         return pb.UrlTest(
             target=self.target,
             timeout=self.timeout,
-            method=self.http_method,
+            method=self.method,
             headers=self.headers,
             body=self.body,
             ignore_tls_errors=self.ignore_tls_errors,
@@ -43,10 +35,6 @@ class UrlTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "http"
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.url.fill_from_pb(src.url)
 
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()
@@ -94,7 +82,7 @@ class UrlTest(PingTraceTest):
                 url=URLTestSpecific(
                     target=target,
                     timeout=timeout,
-                    http_method=method,
+                    method=method,
                     body=body,
                     headers=headers or {},
                     ignore_tls_errors=ignore_tls_errors,

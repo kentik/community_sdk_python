@@ -211,7 +211,7 @@ def make_url_test_pair() -> Tuple[pb.Test, url.UrlTest]:
     test.settings.url = url.URLTestSpecific(
         target="www.example.com",
         timeout=7000,
-        http_method="GET",
+        method="GET",
         headers={"origin": "url-test"},
         body="BODY",
         ignore_tls_errors=True,

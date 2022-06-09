@@ -5,7 +5,7 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 
 class SerializableEnum(Enum):
     @classmethod
-    def from_dict(cls, value: str):
+    def from_pb(cls, value: str):
         return cls(value)
 
     def to_dict(self):

@@ -134,6 +134,4 @@ def make_synth_test(pb_object: pb.Test) -> SynTest:
     cls = _cls_from_type(TestType(test_type))
     if cls is None:
         raise KentikAPIError(f"Unsupported test type: {test_type}")
-    test = cls(pb_object.name)
-    test.fill_from_pb(pb_object)
-    return test
+    return cls.from_pb(pb_object)

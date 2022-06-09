@@ -4,15 +4,12 @@ from typing import List, Type, TypeVar
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
-from .base import PingTraceTest, PingTraceTestSettings, list_factory
+from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_factory
 
 
 @dataclass
-class HostnameTestSpecific:
+class HostnameTestSpecific(_ConfigElement):
     target: str = ""
-
-    def fill_from_pb(self, src: pb.HostnameTest) -> None:
-        self.target = src.target
 
     def to_pb(self) -> pb.HostnameTest:
         return pb.HostnameTest(target=self.target)
@@ -22,10 +19,6 @@ class HostnameTestSpecific:
 class HostnameTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     hostname: HostnameTestSpecific = HostnameTestSpecific()
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.hostname.fill_from_pb(src.hostname)
 
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()

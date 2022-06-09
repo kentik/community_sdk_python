@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone
 from ipaddress import ip_address
-from typing import Any, Callable, Dict, List, Optional, Set, Type, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Set, Type, TypeVar, get_args
 
 import inflection
 
@@ -16,7 +16,9 @@ log = logging.getLogger("synth_tests")
 
 
 def list_factory(l: List[Any]) -> Callable[[], List[Any]]:
-    """Return method that returns a list"""
+    """
+    Return a method that returns the provided list
+    """
 
     def wrapped() -> List[Any]:
         return l
@@ -44,8 +46,12 @@ class Defaults:
 _ConfigElementT = TypeVar("_ConfigElementT", bound="_ConfigElement")
 
 
-@dataclass
 class _ConfigElement:
+    """
+    Base class that enables automatic protobuf class -> user facing dataclass deserialization.
+    Protobuf class and user facing dataclass need to have fields named exactly the same.
+    """
+
     def to_dict(self) -> Dict:
         def value_to_dict(value: Any) -> Any:
             if hasattr(value, "to_dict"):
@@ -62,34 +68,35 @@ class _ConfigElement:
         return ret
 
     @classmethod
-    def from_dict(cls: Type[_ConfigElementT], d: Dict) -> _ConfigElementT:
-        # noinspection PyProtectedMember
-        def get_value(f, v):
-            if hasattr(f, "from_dict"):
-                return f.from_dict(v)
+    def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
+        def get_value(dst_type: Type[Any], src_value: Any):
+            if dst_type is datetime:
+                return pb_to_datetime_utc(src_value)
+
+            if hasattr(dst_type, "from_pb"):
+                return dst_type.from_pb(src_value)
 
             try:
-                return f(v)
+                return dst_type(src_value)
             except TypeError as error:
-                if f._name == "List":
-                    return [get_value(type(i), i) for i in v]
-                if f._name == "Dict":
-                    return {_k: get_value(type(_v), _v) for _k, _v in v.items()}
-                raise RuntimeError(f"Don't know how to instantiate '{f}' (value: '{v}')") from error
+                if dst_type._name == "List":
+                    list_item_type = get_args(dst_type)[0]
+                    return [get_value(list_item_type, i) for i in src_value]
+                if dst_type._name == "Dict":
+                    dict_value_type = get_args(dst_type)[1]
+                    return {_k: get_value(dict_value_type, _v) for _k, _v in src_value.items()}
+                raise RuntimeError(f"Don't know how to instantiate '{dst_type}' (value: '{src_value}')") from error
 
-        _init_fields = {f.name: f for f in fields(cls) if f.init}
-        args = {k: get_value(_init_fields[k].type, v) for k, v in d.items() if k in _init_fields.keys()}
-        # noinspection PyArgumentList
-        inst = cls(**args)  # type: ignore
-        _other_fields = {f.name: f for f in fields(cls) if not f.init}
-        for n, f in _other_fields.items():
-            if n[0] == "_":
-                k = n.split("_")[1]
-            else:
-                k = n
-            if k in d:
-                setattr(inst, n, get_value(f.type, d[k]))
-        return inst
+        _init_fields = [f for f in fields(cls) if f.init]
+        args = {f.name: get_value(f.type, getattr(obj, f.name)) for f in _init_fields}
+        instance = cls(**args)
+
+        _remaining_fields = [f for f in fields(cls) if not f.init]
+        for f in _remaining_fields:
+            name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
+            v = get_value(f.type, getattr(obj, name))
+            setattr(instance, f.name, v)
+        return instance
 
 
 @dataclass
@@ -112,13 +119,6 @@ class PingTask(_MonitoringTask):
     @property
     def task_name(self):
         return "ping"
-
-    def fill_from_pb(self, src: pb.TestPingSettings) -> None:
-        self.count = src.count
-        self.timeout = src.timeout
-        self.delay = src.delay
-        self.protocol = Protocol(src.protocol)
-        self.port = src.port
 
     def to_pb(self) -> pb.TestPingSettings:
         return pb.TestPingSettings(
@@ -143,14 +143,6 @@ class TraceTask(_MonitoringTask):
     def task_name(self):
         return "traceroute"
 
-    def fill_from_pb(self, src: pb.TestTraceSettings) -> None:
-        self.count = src.count
-        self.timeout = src.timeout
-        self.limit = src.limit
-        self.delay = src.delay
-        self.protocol = Protocol(src.protocol)
-        self.port = src.port
-
     def to_pb(self) -> pb.TestTraceSettings:
         return pb.TestTraceSettings(
             count=self.count,
@@ -168,12 +160,6 @@ class ActivationSettings(_ConfigElement):
     time_unit: str = "m"
     time_window: str = ""
     times: str = "2"
-
-    def fill_from_pb(self, src: pb.ActivationSettings) -> None:
-        self.grace_period = src.grace_period
-        self.time_unit = src.time_unit
-        self.time_window = src.time_window
-        self.times = src.times
 
     def to_pb(self) -> pb.ActivationSettings:
         return pb.ActivationSettings(
@@ -204,26 +190,6 @@ class HealthSettings(_ConfigElement):
     dns_valid_codes: List[int] = field(default_factory=list)
     unhealthy_subtest_threshold: int = 1
     activation: ActivationSettings = field(default_factory=ActivationSettings)
-
-    def fill_from_pb(self, src: pb.HealthSettings) -> None:
-        self.latency_critical = src.latency_critical
-        self.latency_warning = src.latency_warning
-        self.latency_critical_stddev = src.latency_critical_stddev
-        self.latency_warning_stddev = src.latency_warning_stddev
-        self.packet_loss_critical = src.packet_loss_critical
-        self.packet_loss_warning = src.packet_loss_warning
-        self.jitter_critical = src.jitter_critical
-        self.jitter_warning = src.jitter_warning
-        self.jitter_critical_stddev = src.jitter_critical_stddev
-        self.jitter_warning_stddev = src.jitter_warning_stddev
-        self.http_latency_critical = src.http_latency_critical
-        self.http_latency_warning = src.http_latency_warning
-        self.http_latency_critical_stddev = src.http_latency_critical_stddev
-        self.http_latency_warning_stddev = src.http_latency_warning_stddev
-        self.http_valid_codes = src.http_valid_codes
-        self.dns_valid_codes = src.dns_valid_codes
-        self.unhealthy_subtest_threshold = src.unhealthy_subtest_threshold
-        self.activation.fill_from_pb(src.activation)
 
     def to_pb(self) -> pb.HealthSettings:
         return pb.HealthSettings(
@@ -261,14 +227,6 @@ class SynTestSettings(_ConfigElement):
     def task_name(cls) -> Optional[str]:
         return None
 
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        self.family = IPFamily(src.family)
-        self.period = src.period
-        self.agent_ids = [ID(id) for id in src.agent_ids]
-        self.tasks = [TaskType(task) for task in src.tasks]
-        self.health_settings.fill_from_pb(src.health_settings)
-        self.notification_channels = src.notification_channels
-
     def to_pb(self) -> pb.TestSettings:
         return pb.TestSettings(
             family=self.family.value,
@@ -279,20 +237,10 @@ class SynTestSettings(_ConfigElement):
             notification_channels=self.notification_channels,
         )
 
-    def to_dict(self) -> dict:
-        def _id(i: str) -> str:
-            try:
-                return f"{int(i):010}"
-            except ValueError:
-                return i
-
-        self.agent_ids.sort(key=_id)
-        return super().to_dict()
-
 
 @dataclass
 class UserInfo(_ConfigElement):
-    id: str = ""
+    id: str = ""  # should this be of type ID, like in case of other resources in Kentik ???
     email: str = ""
     full_name: str = ""
 
@@ -302,11 +250,6 @@ class UserInfo(_ConfigElement):
         if self.full_name:
             return f"{self.full_name} user_id: {self.id} e-mail: {self.email}"
         return f"user_id: {self.id} e-mail: {self.email}"
-
-    def fill_from_pb(self, src: pb.UserInfo) -> None:
-        self.id = ID(src.id)
-        self.email = src.email
-        self.full_name = src.full_name
 
 
 @dataclass
@@ -323,17 +266,6 @@ class SynTest(_ConfigElement):
     _edate: datetime = field(default=datetime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
     _last_updated_by: UserInfo = field(default_factory=UserInfo, init=False)
-
-    def fill_from_pb(self, src: pb.Test) -> None:
-        self.name = src.name
-        self.type = TestType(src.type)
-        self.status = TestStatus(src.status)
-        self.settings.fill_from_pb(src.settings)
-        self._id = ID(src.id)
-        self._cdate = pb_to_datetime_utc(src.cdate)
-        self._edate = pb_to_datetime_utc(src.edate)
-        self._created_by.fill_from_pb(src.created_by)
-        self._last_updated_by.fill_from_pb(src.last_updated_by)
 
     def to_pb(self) -> pb.Test:
         return pb.Test(
@@ -413,11 +345,6 @@ class SynTest(_ConfigElement):
 class PingTraceTestSettings(SynTestSettings):
     ping: PingTask = field(default_factory=PingTask)
     trace: TraceTask = field(default_factory=TraceTask)
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.ping.fill_from_pb(src.ping)
-        self.trace.fill_from_pb(src.trace)
 
     def to_pb(self) -> pb.TestSettings:
         obj = super().to_pb()
