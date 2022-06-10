@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Type, TypeVar
 
-import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import DNSRecordType, TaskType, TestType
 
 from .base import SynTest, SynTestSettings, list_factory
@@ -14,11 +13,6 @@ DSNGridTestSpecific = DNSTestSpecific
 class DNSGridTestSettings(SynTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.DNS]))
     dns_grid: DSNGridTestSpecific = DSNGridTestSpecific()
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.dns_grid.CopyFrom(self.dns_grid.to_pb())
-        return obj
 
 
 DNSGridTestT = TypeVar("DNSGridTestT", bound="DNSGridTest")

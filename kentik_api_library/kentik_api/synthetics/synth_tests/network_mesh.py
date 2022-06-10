@@ -9,21 +9,15 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class NetworkMeshTestSpecific(_ConfigElement):
-    use_local_ip: bool = False
+    PB_TYPE = pb.NetworkMeshTest
 
-    def to_pb(self) -> pb.NetworkMeshTest:
-        return pb.NetworkMeshTest(use_local_ip=self.use_local_ip)
+    use_local_ip: bool = False
 
 
 @dataclass
 class NetworkMeshTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     network_mesh: NetworkMeshTestSpecific = NetworkMeshTestSpecific()
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.network_mesh.CopyFrom(self.network_mesh.to_pb())
-        return obj
 
 
 NetworkMeshTestT = TypeVar("NetworkMeshTestT", bound="NetworkMeshTest")

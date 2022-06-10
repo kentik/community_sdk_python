@@ -9,20 +9,13 @@ from .base import SynTest, SynTestSettings, _ConfigElement, list_factory
 
 @dataclass
 class DNSTestSpecific(_ConfigElement):
+    PB_TYPE = pb.DnsTest
+
     target: str = ""
     timeout: int = 0  # currently support for timeout attribute in DNS tests is suspended
     record_type: DNSRecordType = DNSRecordType.A
     servers: List[str] = field(default_factory=list)
     port: int = 0
-
-    def to_pb(self) -> pb.DnsTest:
-        return pb.DnsTest(
-            target=self.target,
-            timeout=self.timeout,
-            record_type=self.record_type.value,
-            servers=self.servers,
-            port=self.port,
-        )
 
 
 @dataclass
@@ -33,11 +26,6 @@ class DNSTestSettings(SynTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "dns"
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.dns.CopyFrom(self.dns.to_pb())
-        return obj
 
 
 DNSTestT = TypeVar("DNSTestT", bound="DNSTest")

@@ -22,7 +22,7 @@ from kentik_api.synthetics.synth_tests import (
     TraceResponse,
     UrlTest,
 )
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime
+from kentik_api.synthetics.synth_tests.base import DateTime
 from kentik_api.synthetics.types import TestStatus, TestType
 
 log = logging.getLogger("synth_tests")
@@ -88,8 +88,8 @@ class KentikSynthClient:
         tasks = [str(id) for id in task_ids] if task_ids else []
         response = self._connector.results_for_tests(
             test_ids=ids,
-            start=pb_from_datetime(start),
-            end=pb_from_datetime(end),
+            start=DateTime.fromtimestamp(start.timestamp(), start.tzinfo).to_pb(),
+            end=DateTime.fromtimestamp(end.timestamp(), end.tzinfo).to_pb(),
             agent_ids=agents,
             task_ids=tasks,
         )
@@ -107,8 +107,8 @@ class KentikSynthClient:
         targets = [str(ip) for ip in target_ips] if target_ips else []
         response = self._connector.trace_for_test(
             test_id=str(test_id),
-            start=pb_from_datetime(start),
-            end=pb_from_datetime(end),
+            start=DateTime.fromtimestamp(start.timestamp(), start.tzinfo).to_pb(),
+            end=DateTime.fromtimestamp(end.timestamp(), end.tzinfo).to_pb(),
             agent_ids=agents,
             target_ips=targets,
         )

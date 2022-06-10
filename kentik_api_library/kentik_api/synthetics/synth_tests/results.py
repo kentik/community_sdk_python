@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import List, Type, TypeVar, Union
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.errors import DeserializationError
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.base import _ConfigElement
+from kentik_api.synthetics.synth_tests.base import DateTime, _ConfigElement
 from kentik_api.synthetics.types import Health
 
 MetricDataT = TypeVar("MetricDataT", bound="MetricData")
@@ -124,6 +124,6 @@ TestResultsT = TypeVar("TestResultsT", bound="TestResults")
 class TestResults(_ConfigElement):
     __test__ = False  # mark class as "Not a test"; to avoid pytest warnings
     test_id: ID = ID()
-    time: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
+    time: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)
     health: Health = Health.NONE
     agents: List[AgentResults] = field(default_factory=list)

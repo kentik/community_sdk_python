@@ -1,15 +1,15 @@
 import logging
 from dataclasses import dataclass, field, fields
-from datetime import datetime, timezone
+from datetime import datetime, timezone, tzinfo
 from ipaddress import ip_address
-from typing import Any, Callable, Dict, List, Optional, Set, Type, TypeVar, get_args
+from typing import Any, Callable, List, Optional, Set, Type, TypeVar, get_args
 
 import inflection
+from google.protobuf.timestamp_pb2 import Timestamp
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_to_datetime_utc
 from kentik_api.synthetics.types import IPFamily, Protocol, TaskType, TestStatus, TestType
 
 log = logging.getLogger("synth_tests")
@@ -17,7 +17,7 @@ log = logging.getLogger("synth_tests")
 
 def list_factory(l: List[Any]) -> Callable[[], List[Any]]:
     """
-    Return a method that returns the provided list
+    Return a method that returns the provided list. For initializing fields of type List in dataclasses
     """
 
     def wrapped() -> List[Any]:
@@ -43,39 +43,65 @@ class Defaults:
     family: IPFamily = IPFamily.DUAL
 
 
+class DoNotSerializeMarker:
+    """
+    Marker type for _ConfigElement.to_pb() method: skip objects with field PB_TYPE == NotSerializableMarker during serialization to protobuf object
+    """
+
+
 _ConfigElementT = TypeVar("_ConfigElementT", bound="_ConfigElement")
 
 
 class _ConfigElement:
     """
-    Base class that enables automatic protobuf class -> user facing dataclass deserialization.
+    Base class that enables automatic protobuf class <-> user facing dataclass serialization/deserialization.
     Protobuf class and user facing dataclass need to have fields named exactly the same.
     """
 
-    def to_dict(self) -> Dict:
-        def value_to_dict(value: Any) -> Any:
-            if hasattr(value, "to_dict"):
-                return value.to_dict()
-            if isinstance(value, dict):
-                return {_k: value_to_dict(_v) for _k, _v in value.items()}
-            if isinstance(value, list):
-                return [value_to_dict(_v) for _v in value]
-            return value
+    PB_TYPE = DoNotSerializeMarker  # Target protobuf type for serialization. To be overridden by inheriting class
 
-        ret: Dict[str, Dict] = {}
-        for k, v in [(f.name, self.__getattribute__(f.name)) for f in fields(self) if f.name[0] != "_"]:
-            ret[k] = value_to_dict(v)
-        return ret
+    def to_pb(self) -> Any:
+        """
+        Serialize self to protobuf object type determined by "PB_TYPE"
+        """
+
+        def skip_serialization(obj: Any) -> bool:
+            return hasattr(obj, "PB_TYPE") and obj.PB_TYPE == DoNotSerializeMarker
+
+        def get_value(dst_type: Type[Any], src_value: Any) -> Any:
+            if skip_serialization(src_value):
+                return None  # None values are not serialized into output protobuf object
+            if hasattr(src_value, "to_pb"):
+                return src_value.to_pb()
+            if isinstance(src_value, list):
+                if not src_value:
+                    return []
+                list_item_type = type(src_value[0])  # assuming either primitive type or type with "to_pb()" method
+                return [get_value(list_item_type, e) for e in src_value]
+            if isinstance(src_value, dict):
+                if not src_value:
+                    return {}
+                dict_value_type = type(list(src_value.values())[0])  # assuming primitive type or type with "to_pb()"
+                return {k: get_value(dict_value_type, v) for k, v in src_value.items()}
+            try:
+                return dst_type(src_value)
+            except TypeError as error:
+                raise RuntimeError(f"Don't know how to serialize to '{dst_type}' (value: '{src_value}')") from error
+
+        dummy_pb_instance = self.PB_TYPE()  # used only for examining the destination protobuf object field types
+        args = {}
+        for f in fields(self):
+            dst_field_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
+            dst_field_type = type(getattr(dummy_pb_instance, dst_field_name))
+            src_field_value = getattr(self, f.name)
+            args[dst_field_name] = get_value(dst_field_type, src_field_value)
+        return self.PB_TYPE(**args)
 
     @classmethod
     def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
-        def get_value(dst_type: Type[Any], src_value: Any):
-            if dst_type is datetime:
-                return pb_to_datetime_utc(src_value)
-
+        def get_value(dst_type: Type[Any], src_value: Any) -> Any:
             if hasattr(dst_type, "from_pb"):
                 return dst_type.from_pb(src_value)
-
             try:
                 return dst_type(src_value)
             except TypeError as error:
@@ -93,10 +119,43 @@ class _ConfigElement:
 
         _remaining_fields = [f for f in fields(cls) if not f.init]
         for f in _remaining_fields:
-            name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
-            v = get_value(f.type, getattr(obj, name))
+            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
+            v = get_value(f.type, getattr(obj, src_name))
             setattr(instance, f.name, v)
         return instance
+
+
+DateTimeT = TypeVar("DateTimeT", bound="DateTime")
+
+
+class DateTime(datetime):
+    """
+    A datetime type with protobuf serialization logic
+    """
+
+    PB_TYPE = DoNotSerializeMarker  # datetime fields are read-only - provided by the server. Skip serialization
+
+    @classmethod
+    def fromtimestamp(cls: Type[DateTimeT], timestamp: float, tz: Optional[tzinfo] = None) -> DateTimeT:
+        dt = datetime.fromtimestamp(timestamp, tz)
+        return cls(
+            year=dt.year,
+            month=dt.month,
+            day=dt.day,
+            hour=dt.hour,
+            minute=dt.minute,
+            second=dt.second,
+            microsecond=dt.microsecond,
+            tzinfo=dt.tzinfo,
+        )
+
+    @classmethod
+    def from_pb(cls: Type[DateTimeT], value: Timestamp) -> DateTimeT:
+        return cls.fromtimestamp(value.seconds, timezone.utc)
+
+    def to_pb(self) -> Timestamp:
+        seconds = int(self.timestamp())
+        return Timestamp(seconds=seconds, nanos=0)
 
 
 @dataclass
@@ -110,6 +169,8 @@ class _MonitoringTask(_ConfigElement):
 
 @dataclass
 class PingTask(_MonitoringTask):
+    PB_TYPE = pb.TestPingSettings
+
     count: int = 5
     timeout: int = 3000
     delay: int = 200  # inter-probe delay
@@ -120,18 +181,11 @@ class PingTask(_MonitoringTask):
     def task_name(self):
         return "ping"
 
-    def to_pb(self) -> pb.TestPingSettings:
-        return pb.TestPingSettings(
-            count=self.count,
-            timeout=self.timeout,
-            delay=self.delay,
-            protocol=self.protocol.value,
-            port=self.port,
-        )
-
 
 @dataclass
 class TraceTask(_MonitoringTask):
+    PB_TYPE = pb.TestTraceSettings
+
     count: int = 3
     timeout: int = 22500
     limit: int = 30  # max. hop count
@@ -143,35 +197,21 @@ class TraceTask(_MonitoringTask):
     def task_name(self):
         return "traceroute"
 
-    def to_pb(self) -> pb.TestTraceSettings:
-        return pb.TestTraceSettings(
-            count=self.count,
-            timeout=self.timeout,
-            limit=self.limit,
-            delay=self.delay,
-            protocol=self.protocol.value,
-            port=self.port,
-        )
-
 
 @dataclass
 class ActivationSettings(_ConfigElement):
+    PB_TYPE = pb.ActivationSettings
+
     grace_period: str = "1"
     time_unit: str = "m"
     time_window: str = ""
     times: str = "2"
 
-    def to_pb(self) -> pb.ActivationSettings:
-        return pb.ActivationSettings(
-            grace_period=self.grace_period,
-            time_unit=self.time_unit,
-            time_window=self.time_window,
-            times=self.times,
-        )
-
 
 @dataclass
 class HealthSettings(_ConfigElement):
+    PB_TYPE = pb.HealthSettings
+
     latency_critical: float = 0.0
     latency_warning: float = 0.0
     latency_critical_stddev: float = 0.0
@@ -191,31 +231,11 @@ class HealthSettings(_ConfigElement):
     unhealthy_subtest_threshold: int = 1
     activation: ActivationSettings = field(default_factory=ActivationSettings)
 
-    def to_pb(self) -> pb.HealthSettings:
-        return pb.HealthSettings(
-            latency_critical=self.latency_critical,
-            latency_warning=self.latency_warning,
-            latency_critical_stddev=self.latency_critical_stddev,
-            latency_warning_stddev=self.latency_warning_stddev,
-            packet_loss_critical=self.packet_loss_critical,
-            packet_loss_warning=self.packet_loss_warning,
-            jitter_critical=self.jitter_critical,
-            jitter_warning=self.jitter_warning,
-            jitter_critical_stddev=self.jitter_critical_stddev,
-            jitter_warning_stddev=self.jitter_warning_stddev,
-            http_latency_critical=self.http_latency_critical,
-            http_latency_warning=self.http_latency_warning,
-            http_latency_critical_stddev=self.http_latency_critical_stddev,
-            http_latency_warning_stddev=self.http_latency_warning_stddev,
-            http_valid_codes=self.http_valid_codes,
-            dns_valid_codes=self.dns_valid_codes,
-            unhealthy_subtest_threshold=self.unhealthy_subtest_threshold,
-            activation=self.activation.to_pb(),
-        )
-
 
 @dataclass
 class SynTestSettings(_ConfigElement):
+    PB_TYPE = pb.TestSettings
+
     tasks: List[TaskType] = field(default_factory=list)
     family: IPFamily = Defaults.family
     period: int = Defaults.period  # in seconds
@@ -227,20 +247,12 @@ class SynTestSettings(_ConfigElement):
     def task_name(cls) -> Optional[str]:
         return None
 
-    def to_pb(self) -> pb.TestSettings:
-        return pb.TestSettings(
-            family=self.family.value,
-            period=self.period,
-            agent_ids=[str(id) for id in self.agent_ids],
-            tasks=[task.value for task in self.tasks],
-            health_settings=self.health_settings.to_pb(),
-            notification_channels=self.notification_channels,
-        )
-
 
 @dataclass
 class UserInfo(_ConfigElement):
-    id: str = ""  # should this be of type ID, like in case of other resources in Kentik ???
+    PB_TYPE = DoNotSerializeMarker  # UserInfo is read-only - provided by the server. Skip serialization
+
+    id: ID = ID()
     email: str = ""
     full_name: str = ""
 
@@ -254,27 +266,20 @@ class UserInfo(_ConfigElement):
 
 @dataclass
 class SynTest(_ConfigElement):
+    PB_TYPE = pb.Test
+
     # read-write
     name: str
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
 
-    # read-only
+    # read-only (although _id is serialized for Update call)
     _id: ID = field(default=DEFAULT_ID, init=False)
-    _cdate: datetime = field(default=datetime.fromtimestamp(0, tz=timezone.utc), init=False)
-    _edate: datetime = field(default=datetime.fromtimestamp(0, tz=timezone.utc), init=False)
+    _cdate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
+    _edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
     _last_updated_by: UserInfo = field(default_factory=UserInfo, init=False)
-
-    def to_pb(self) -> pb.Test:
-        return pb.Test(
-            id=str(self._id),  # required for "update" api call
-            name=self.name,
-            type=self.type.value,
-            status=self.status.value,
-            settings=self.settings.to_pb(),
-        )
 
     @property
     def deployed(self) -> bool:
@@ -316,6 +321,7 @@ class SynTest(_ConfigElement):
 
     @property
     def configured_tasks(self) -> Set[str]:
+        # What is the purpose of this property? Do we need it?
         tasks = set(
             f.name
             for f in fields(self.settings)
@@ -331,9 +337,6 @@ class SynTest(_ConfigElement):
     def undeploy(self):
         self._id = DEFAULT_ID
 
-    def to_dict(self) -> dict:
-        return {"test": super().to_dict()}
-
     def set_period(self, period_seconds: int):
         self.settings.period = period_seconds
 
@@ -345,12 +348,6 @@ class SynTest(_ConfigElement):
 class PingTraceTestSettings(SynTestSettings):
     ping: PingTask = field(default_factory=PingTask)
     trace: TraceTask = field(default_factory=TraceTask)
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.ping.CopyFrom(self.ping.to_pb())
-        obj.trace.CopyFrom(self.trace.to_pb())
-        return obj
 
 
 @dataclass

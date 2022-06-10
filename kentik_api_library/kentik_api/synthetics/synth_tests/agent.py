@@ -10,25 +10,16 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class AgentTestSpecific(_ConfigElement):
+    PB_TYPE = pb.AgentTest
+
     target: ID = ID()
     use_local_ip: bool = False
-
-    def to_pb(self) -> pb.AgentTest:
-        return pb.AgentTest(
-            target=str(self.target),
-            use_local_ip=self.use_local_ip,
-        )
 
 
 @dataclass
 class AgentTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     agent: AgentTestSpecific = AgentTestSpecific()
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.agent.CopyFrom(self.agent.to_pb())
-        return obj
 
 
 AgentTestT = TypeVar("AgentTestT", bound="AgentTest")

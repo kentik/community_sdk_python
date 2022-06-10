@@ -9,6 +9,8 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class FlowTestSpecific(_ConfigElement):
+    PB_TYPE = pb.FlowTest
+
     target: str = ""
     target_refresh_interval_millis: int = 0
     max_providers: int = 0
@@ -16,17 +18,6 @@ class FlowTestSpecific(_ConfigElement):
     type: FlowTestSubType = FlowTestSubType.NONE
     inet_direction: DirectionType = DirectionType.NONE
     direction: DirectionType = DirectionType.NONE
-
-    def to_pb(self) -> pb.FlowTest:
-        return pb.FlowTest(
-            target=self.target,
-            target_refresh_interval_millis=self.target_refresh_interval_millis,
-            max_providers=self.max_providers,
-            max_ip_targets=self.max_ip_targets,
-            type=self.type.value,
-            inet_direction=self.inet_direction.value,
-            direction=self.direction.value,
-        )
 
 
 @dataclass
@@ -37,11 +28,6 @@ class FlowTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "flow"
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.flow.CopyFrom(self.flow.to_pb())
-        return obj
 
 
 FlowTestT = TypeVar("FlowTestT", bound="FlowTest")

@@ -9,22 +9,14 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class URLTestSpecific(_ConfigElement):
+    PB_TYPE = pb.UrlTest
+
     target: str = ""
     timeout: int = 0
     method: str = ""  # HTTP method
     headers: Dict[str, str] = field(default_factory=dict)
     body: str = ""
     ignore_tls_errors: bool = False
-
-    def to_pb(self) -> pb.UrlTest:
-        return pb.UrlTest(
-            target=self.target,
-            timeout=self.timeout,
-            method=self.method,
-            headers=self.headers,
-            body=self.body,
-            ignore_tls_errors=self.ignore_tls_errors,
-        )
 
 
 @dataclass
@@ -35,11 +27,6 @@ class UrlTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "http"
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.url.CopyFrom(self.url.to_pb())
-        return obj
 
 
 UrlTestT = TypeVar("UrlTestT", bound="UrlTest")

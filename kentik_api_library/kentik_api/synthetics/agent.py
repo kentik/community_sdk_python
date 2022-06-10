@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import List, TypeVar
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.base import _ConfigElement
+from kentik_api.synthetics.synth_tests.base import DateTime, _ConfigElement
 from kentik_api.synthetics.types import IPFamily, SerializableEnum
 
 
@@ -35,7 +35,7 @@ class Agent(_ConfigElement):
     # read-only
     type: AgentOwnershipType = AgentOwnershipType.NONE
     os: str = ""
-    last_authed: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
+    last_authed: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)
     test_ids: List[ID] = field(default_factory=list)
     version: str = ""
     agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
@@ -59,6 +59,10 @@ class Agent(_ConfigElement):
     cloud_provider: str = ""
 
     def to_pb(self) -> pb.Agent:
+        """
+        Need only to serialize the read-write fields; so can't use the  _ConfigElement.to_pb() method that serializes all fields
+        """
+
         return pb.Agent(
             id=str(self.id),
             site_name=self.site_name,

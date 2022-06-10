@@ -10,21 +10,15 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class IPTestSpecific(_ConfigElement):
-    targets: List[IP] = field(default_factory=list)
+    PB_TYPE = pb.IpTest
 
-    def to_pb(self) -> pb.IpTest:
-        return pb.IpTest(targets=[str(ip) for ip in self.targets])
+    targets: List[IP] = field(default_factory=list)
 
 
 @dataclass
 class IPTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     ip: IPTestSpecific = IPTestSpecific()
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.ip.CopyFrom(self.ip.to_pb())
-        return obj
 
 
 IPTestT = TypeVar("IPTestT", bound="IPTest")

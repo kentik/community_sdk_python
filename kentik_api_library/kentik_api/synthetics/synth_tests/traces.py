@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Dict, List, TypeVar
 
 from kentik_api.public.types import ID, IP
-from kentik_api.synthetics.synth_tests.base import _ConfigElement
+from kentik_api.synthetics.synth_tests.base import DateTime, _ConfigElement
 
 LocationT = TypeVar("LocationT", bound="Location")
 
@@ -70,7 +70,7 @@ class Path(_ConfigElement):
     hop_count: Stats = Stats()
     max_as_path_length: int = 0
     traces: List[PathTrace] = field(default_factory=list)
-    time: datetime = datetime.fromtimestamp(0, tz=timezone.utc)
+    time: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)
 
 
 TraceResponseT = TypeVar("TraceResponseT", bound="TraceResponse")

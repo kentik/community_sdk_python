@@ -9,21 +9,15 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class HostnameTestSpecific(_ConfigElement):
-    target: str = ""
+    PB_TYPE = pb.HostnameTest
 
-    def to_pb(self) -> pb.HostnameTest:
-        return pb.HostnameTest(target=self.target)
+    target: str = ""
 
 
 @dataclass
 class HostnameTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     hostname: HostnameTestSpecific = HostnameTestSpecific()
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.hostname.CopyFrom(self.hostname.to_pb())
-        return obj
 
 
 HostnameTestT = TypeVar("HostnameTestT", bound="HostnameTest")

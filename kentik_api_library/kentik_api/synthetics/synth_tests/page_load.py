@@ -9,20 +9,13 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 
 @dataclass
 class PageLoadTestSpecific(_ConfigElement):
+    PB_TYPE = pb.PageLoadTest
+
     target: str = ""
     timeout: int = 0
     headers: Dict[str, str] = field(default_factory=dict)
     ignore_tls_errors: bool = False
     css_selectors: Dict[str, str] = field(default_factory=dict)
-
-    def to_pb(self) -> pb.PageLoadTest:
-        return pb.PageLoadTest(
-            target=self.target,
-            timeout=self.timeout,
-            headers=self.headers,
-            ignore_tls_errors=self.ignore_tls_errors,
-            css_selectors=self.css_selectors,
-        )
 
 
 @dataclass
@@ -33,11 +26,6 @@ class PageLoadTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "page-load"
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.page_load.CopyFrom(self.page_load.to_pb())
-        return obj
 
 
 PageLoadTestT = TypeVar("PageLoadTestT", bound="PageLoadTest")
