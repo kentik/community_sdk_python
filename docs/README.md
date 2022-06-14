@@ -6,11 +6,9 @@ Precondition: python3 and pip3 are already installed.
 
 ### Recommended steps:
 
-1. Install virtualenv - this allows you to create a python sandbox for your project  
-`pip install virtualenv`
 
 1. Create dedicated virtual environment  
-`virtualenv .venv`
+`python -m venv .venv`
 
 1. Activate virtualenv  
 `source .venv/bin/activate`
