@@ -2,4 +2,3 @@ from kentik_api.public.types import ID
 
 DEFAULT_ID = ID(-1)
 DEFAULT_DATE_NO_ZULU = "1970-01-01T00:00:00.000"
-DEFAULT_DATE = DEFAULT_DATE_NO_ZULU + "Z"
