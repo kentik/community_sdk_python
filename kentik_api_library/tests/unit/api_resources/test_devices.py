@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
@@ -529,15 +530,15 @@ def test_get_device_router_success() -> None:
     assert len(device.labels) == 2
     assert device.labels[0].id == ID(2590)
     assert device.labels[0].name == "AWS: terraform-demo-aws"
-    assert device.labels[0].updated_date == "2020-10-05T15:28:00.276Z"
-    assert device.labels[0].created_date == "2020-10-05T15:28:00.276Z"
+    assert device.labels[0].updated_date == datetime(2020, 10, 5, 15, 28, 0, 276000, tzinfo=timezone.utc)
+    assert device.labels[0].created_date == datetime(2020, 10, 5, 15, 28, 0, 276000, tzinfo=timezone.utc)
     assert device.labels[0].user_id == ID(133210)
     assert device.labels[0].company_id == ID(74333)
     assert device.labels[0].color == "#5340A5"
     assert device.labels[1].id == ID(2751)
     assert device.labels[1].name == "GCP: traffic-generator-gcp"
-    assert device.labels[1].updated_date == "2020-11-20T12:54:49.575Z"
-    assert device.labels[1].created_date == "2020-11-20T12:54:49.575Z"
+    assert device.labels[1].updated_date == datetime(2020, 11, 20, 12, 54, 49, 575000, tzinfo=timezone.utc)
+    assert device.labels[1].created_date == datetime(2020, 11, 20, 12, 54, 49, 575000, tzinfo=timezone.utc)
     assert device.labels[1].user_id == ID(136885)
     assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
@@ -1136,15 +1137,15 @@ def test_get_all_devices_success() -> None:
     assert len(device.labels) == 2
     assert device.labels[0].id == ID(2590)
     assert device.labels[0].name == "AWS: terraform-demo-aws"
-    assert device.labels[0].updated_date == "2020-10-05T15:28:00.276Z"
-    assert device.labels[0].created_date == "2020-10-05T15:28:00.276Z"
+    assert device.labels[0].updated_date == datetime(2020, 10, 5, 15, 28, 0, 276000, tzinfo=timezone.utc)
+    assert device.labels[0].created_date == datetime(2020, 10, 5, 15, 28, 0, 276000, tzinfo=timezone.utc)
     assert device.labels[0].user_id == ID(133210)
     assert device.labels[0].company_id == ID(74333)
     assert device.labels[0].color == "#5340A5"
     assert device.labels[1].id == ID(2751)
     assert device.labels[1].name == "GCP: traffic-generator-gcp"
-    assert device.labels[1].updated_date == "2020-11-20T12:54:49.575Z"
-    assert device.labels[1].created_date == "2020-11-20T12:54:49.575Z"
+    assert device.labels[1].updated_date == datetime(2020, 11, 20, 12, 54, 49, 575000, tzinfo=timezone.utc)
+    assert device.labels[1].created_date == datetime(2020, 11, 20, 12, 54, 49, 575000, tzinfo=timezone.utc)
     assert device.labels[1].user_id is None
     assert device.labels[1].company_id == ID(74333)
     assert device.labels[1].color == "#5289D9"
@@ -1238,15 +1239,15 @@ def test_apply_labels_success() -> None:
     assert len(apply_result.labels) == 2
     assert apply_result.labels[0].id == ID(3011)
     assert apply_result.labels[0].name == "apitest-label-red"
-    assert apply_result.labels[0].created_date == "2021-01-11T08:38:08.678Z"
-    assert apply_result.labels[0].updated_date == "2021-01-11T08:38:08.678Z"
+    assert apply_result.labels[0].created_date == datetime(2021, 1, 11, 8, 38, 8, 678000, tzinfo=timezone.utc)
+    assert apply_result.labels[0].updated_date == datetime(2021, 1, 11, 8, 38, 8, 678000, tzinfo=timezone.utc)
     assert apply_result.labels[0].user_id == ID(144319)
     assert apply_result.labels[0].company_id == ID(74333)
     assert apply_result.labels[0].color == "#FF0000"
     assert apply_result.labels[1].id == ID(3012)
     assert apply_result.labels[1].name == "apitest-label-blue"
-    assert apply_result.labels[1].created_date == "2021-01-11T08:38:42.627Z"
-    assert apply_result.labels[1].updated_date == "2021-01-11T08:38:42.627Z"
+    assert apply_result.labels[1].created_date == datetime(2021, 1, 11, 8, 38, 42, 627000, tzinfo=timezone.utc)
+    assert apply_result.labels[1].updated_date == datetime(2021, 1, 11, 8, 38, 42, 627000, tzinfo=timezone.utc)
     assert apply_result.labels[1].user_id == ID(144319)
     assert apply_result.labels[1].company_id == ID(74333)
     assert apply_result.labels[1].color == "#0000FF"

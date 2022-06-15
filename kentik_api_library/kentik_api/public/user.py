@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Dict, List
+from datetime import datetime
+from typing import Dict, List, Optional
 
+from kentik_api.internal.datetime_zulu import from_iso_format_zulu
 from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID
 
@@ -62,16 +64,16 @@ class User:
         return self._id
 
     @property
-    def last_login(self) -> str:
-        return self._last_login
+    def last_login(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._last_login) if self._last_login else None
 
     @property
-    def created_date(self) -> str:
-        return self._created_date
+    def created_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._created_date) if self._created_date else None
 
     @property
-    def updated_date(self) -> str:
-        return self._updated_date
+    def updated_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._updated_date) if self._updated_date else None
 
 
 # pylint: enable=too-many-instance-attributes
