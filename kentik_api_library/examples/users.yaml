@@ -1,30 +1,35 @@
 ---
 users:
   - full_name: Test User 1
+    username: test1
     email: test_1@example.com
     role: Member
     email_service: False
     email_product: False
 
   - full_name: Test User 2
+    username: test2
     email: test_2@example.com
     role: Administrator
     email_service: False
     email_product: False
 
   - full_name: Test User 3
+    username: test3
     email: test_3@example.com
     role: Member
     email_service: True
     email_product: False
 
   - full_name: Test User 4
+    username: test4
     email: test_4@example.com
     role: Member
     email_service: True
     email_product: True
 
   - full_name: Test User 5
+    username: test5
     email: test_5@example.com
     role: Member
     email_service: False

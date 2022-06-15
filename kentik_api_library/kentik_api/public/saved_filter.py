@@ -22,6 +22,18 @@ class Filter:
 # noinspection PyPep8Naming
 @dataclass()
 class FilterGroups:
+    connector: str
+    filters: List[Filter]
+    not_: bool = False
+    filterString: Optional[str] = None
+    id: Optional[ID] = None
+    metric: Optional[str] = None
+    name: Optional[str] = None
+    named: Optional[bool] = False
+    autoAdded: Optional[str] = None
+    filterGroups: Optional["FilterGroups"] = None  # mypy struggles with FilterGroupsType in auto-generated __init__
+    saved_filters: Optional["SavedFilter"] = None  # mypy struggles with SavedFilterType in auto-generated __init__
+
     @classmethod
     def from_dict(cls: Type[FilterGroupsType], data: Dict) -> FilterGroupsType:
         """
@@ -46,35 +58,10 @@ class FilterGroups:
         saved_filters = data.get("saved_filtes")
         if saved_filters:
             _d["saved_filters"] = [SavedFilter.from_dict(f) for f in data["saved_filters"]]
+
         return cls(**_d)
 
-    def __init__(
-        self,
-        connector: str,
-        filters: List[Filter],
-        not_: bool = False,
-        filterString: Optional[str] = None,
-        id: Optional[ID] = None,
-        metric: Optional[str] = None,
-        name: Optional[str] = None,
-        named: Optional[bool] = False,
-        autoAdded: Optional[str] = None,
-        filterGroups: Optional[FilterGroupsType] = None,
-        saved_filters: Optional[SavedFilterType] = None,
-    ) -> None:
-        self.connector = connector
-        self.filters = filters
-        setattr(self, "not", not_)
-        self.filterString = filterString
-        self.id = id
-        self.metric = metric
-        self.name = name
-        self.named = named
-        self.autoAdded = autoAdded
-        self.filterGroups = filterGroups
-        self.saved_filters = saved_filters
-
-    @property
+    @property  # type: ignore # redefinition of "not_" attribute to store it as "not" - for serialization
     def not_(self) -> bool:
         return getattr(self, "not")
 

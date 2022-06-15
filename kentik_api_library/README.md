@@ -68,7 +68,11 @@ The general approach is that every single KentikAPI resource is represented in t
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
 
+## Development
+[Instruction for developers](../docs/README.md)
+
 ## Additional utilities available in the `utils` sub-module
+
 ### Authentication support
 - `get_credentials`: function for retrieving authentication credentials from the environment or a profile stored on disk.
   API authentication credentials can be provided via environment variables `KTAPI_AUTH_EMAIL` and `KTAPI_AUTH_TOKEN`

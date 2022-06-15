@@ -5,6 +5,7 @@ Example of using the My Kentik Portal API
 
 import logging
 
+from examples.utils import pretty_print
 from kentik_api import KentikAPI
 from kentik_api.utils import get_credentials
 
@@ -21,24 +22,24 @@ def run_crud() -> None:
 
     print("### GET_ALL")
     all_tenants = client.my_kentik_portal.get_all()
-    for i in all_tenants:
-        print(i.__dict__)
+    pretty_print(all_tenants)
     print()
 
     print("### CREATE")
     tenant_user_email = "user2@testtenant.com"
     created = client.my_kentik_portal.create_tenant_user(all_tenants[0].id, tenant_user_email)
-    print(created.__dict__)
+    pretty_print(created)
     created_id = created.id
     print()
 
     print("### DELETE")
     deleted = client.my_kentik_portal.delete_tenant_user(all_tenants[0].id, created_id)
     print(deleted)
+    print()
 
     print("### GET")
     got = client.my_kentik_portal.get(all_tenants[0].id)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
 

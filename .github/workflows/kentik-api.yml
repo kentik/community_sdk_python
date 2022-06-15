@@ -82,7 +82,7 @@ jobs:
         run: |
           pip3 install -r requirements.txt
           python3 setup.py grpc_stubs # fetching grpc stubs must go before building
-          python3 setup.py build sdist bdist_wheel
+          python3 -m build
       - name: Archive code
         uses: actions/upload-artifact@v2
         with:
