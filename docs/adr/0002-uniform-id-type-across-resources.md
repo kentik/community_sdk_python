@@ -1,4 +1,4 @@
-# 2. Common ID type across kentik resources
+# 2. Common ID type across Kentik resources
 
 Date: 2021-01-19
 

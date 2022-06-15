@@ -488,7 +488,7 @@ class ApplyLabelsResponse:
         )
 
     def to_applied_labels(self) -> AppliedLabels:
-        labels = [label.to_device_label() for label in self.labels]
+        labels = [l.to_device_label() for l in self.labels]
         return AppliedLabels(
             id=convert(self.id, ID),
             device_name=self.device_name,

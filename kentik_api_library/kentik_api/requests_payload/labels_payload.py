@@ -82,8 +82,7 @@ class GetAllResponse(List[GetResponse]):
         labels = cls()
         for item in items:
             item["devices"] = _DeviceArray.from_list(item["devices"])
-            label = from_dict(GetResponse, item)
-            labels.append(label)
+            labels.append(from_dict(GetResponse, item))
         return labels
 
     def to_device_labels(self) -> List[DeviceLabel]:

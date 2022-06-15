@@ -1,7 +1,7 @@
 # Kentik API python library
 
-This is a python wrapper for kentik rest API.  
-For more information on how to interact with kentik resources using this library, see examples in examples/ folder.
+This is a python wrapper for Kentik rest API.  
+For more information on how to interact with Kentik resources using this library, see examples in examples/ folder.
 
 ## Installation with pip
 

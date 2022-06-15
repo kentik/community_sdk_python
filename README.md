@@ -21,7 +21,7 @@ Implemented API resources:
 - custom dimensions (with populators)
 - custom applications
 - saved filters
-- my kentik portal
+- my Kentik portal
 - query methods
 - plans
 - alerts
