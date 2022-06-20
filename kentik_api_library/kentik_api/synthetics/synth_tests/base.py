@@ -1,8 +1,9 @@
 import logging
+from copy import deepcopy
 from dataclasses import dataclass, field, fields
 from datetime import datetime, timezone, tzinfo
 from ipaddress import ip_address
-from typing import Any, Callable, List, Optional, Set, Type, TypeVar, get_args
+from typing import Any, Callable, List, Optional, Type, TypeVar, get_args
 
 import inflection
 from google.protobuf.timestamp_pb2 import Timestamp
@@ -99,6 +100,12 @@ class _ConfigElement:
 
     @classmethod
     def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
+        """from_pb can be overridden in a child class to tweak deserialization behavior, and still call _from_protobuf"""
+
+        return cls._from_protobuf(obj)
+
+    @classmethod
+    def _from_protobuf(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
         def get_value(dst_type: Type[Any], src_value: Any) -> Any:
             if hasattr(dst_type, "from_pb"):
                 return dst_type.from_pb(src_value)
@@ -244,8 +251,26 @@ class SynTestSettings(_ConfigElement):
     notification_channels: List[str] = field(default_factory=list)
 
     @classmethod
-    def task_name(cls) -> Optional[str]:
-        return None
+    def from_pb(cls: Type[_ConfigElementT], obj: Any):
+        """Tweak inherited "from_pb" method to handle ignored and legacy task types"""
+
+        IGNORED_TASK_TYPES = ["bgp-monitor"]
+        LEGACY_TASK_TYPES = {"knock": "ping"}
+
+        obj = deepcopy(obj)
+
+        # remove ignored task types
+        for ignored in IGNORED_TASK_TYPES:
+            while ignored in obj.tasks:
+                obj.tasks.remove(ignored)
+
+        # replace legacy task types
+        for legacy, replacement in LEGACY_TASK_TYPES.items():
+            while legacy in obj.tasks:
+                obj.tasks.remove(legacy)
+                obj.tasks.append(replacement)
+
+        return cls._from_protobuf(obj)
 
 
 @dataclass
@@ -273,6 +298,7 @@ class SynTest(_ConfigElement):
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
+    # labels: List[str] = field(default_factory=list) # not supported yet
 
     # read-only (although _id is serialized for Update call)
     _id: ID = field(default=DEFAULT_ID, init=False)
@@ -318,21 +344,6 @@ class SynTest(_ConfigElement):
             pass
         log.debug("'%s' (type: '%s'): Test has no targets", self.name, self.type.value)
         return []
-
-    @property
-    def configured_tasks(self) -> Set[str]:
-        # What is the purpose of this property? Do we need it?
-        tasks = set(
-            f.name
-            for f in fields(self.settings)
-            if f.name
-            and hasattr(f.type, "task_name")
-            and self.settings.__getattribute__(f.name).task_name in self.settings.tasks
-        )
-        n = self.settings.task_name()
-        if n:
-            tasks.add(n)
-        return tasks
 
     def undeploy(self):
         self._id = DEFAULT_ID

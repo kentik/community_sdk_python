@@ -29,6 +29,8 @@ log = logging.getLogger("synth_tests")
 
 
 class KentikSynthClient:
+    IGNORED_TEST_TYPES = [TestType.BGP_MONITOR.value, TestType.TRANSACTION.value]
+
     def __init__(self, connector: APISyntheticsConnectorProtocol):
         self._connector = connector
 
@@ -52,11 +54,13 @@ class KentikSynthClient:
 
     def get_all_tests(self) -> List[SynTest]:
         pb_tests = self._connector.get_all_tests()
-        # Filter out BGP_MONITOR as it belongs to a different API and should not show up here
-        return [make_synth_test(pb_test) for pb_test in pb_tests if pb_test.type != TestType.BGP_MONITOR.value]
+        return [make_synth_test(pb_test) for pb_test in pb_tests if str(pb_test.type) not in self.IGNORED_TEST_TYPES]
 
     def get_test(self, test_id: ID) -> SynTest:
         pb_test = self._connector.get_test(str(test_id))
+        if str(pb_test.type) in self.IGNORED_TEST_TYPES:
+            raise KentikAPIError(f"Unsupported test type: {str(pb_test.type)}")
+
         return make_synth_test(pb_test)
 
     def create_test(self, test: SynTest) -> SynTest:

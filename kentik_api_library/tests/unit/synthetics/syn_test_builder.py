@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Tuple
 
 from google.protobuf.timestamp_pb2 import Timestamp
