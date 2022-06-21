@@ -21,7 +21,7 @@ def test_flow_crud() -> None:
         ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         flow=FlowTestSpecific(
-            target="www.example.com",
+            target="San Francisco",
             target_refresh_interval_millis=150,
             max_providers=5,
             max_ip_targets=4,

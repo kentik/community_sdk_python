@@ -57,6 +57,7 @@ class _ConfigElement:
     """
     Base class that enables automatic protobuf class <-> user facing dataclass serialization/deserialization.
     Protobuf class and user facing dataclass need to have fields named exactly the same.
+    Fields starting with underscore "_" are treated as read-only and are not serialized to protobuf.
     """
 
     PB_TYPE = DoNotSerializeMarker  # Target protobuf type for serialization. To be overridden by inheriting class
@@ -75,15 +76,9 @@ class _ConfigElement:
             if hasattr(src_value, "to_pb"):
                 return src_value.to_pb()
             if isinstance(src_value, list):
-                if not src_value:
-                    return []
-                list_item_type = type(src_value[0])  # assuming either primitive type or type with "to_pb()" method
-                return [get_value(list_item_type, e) for e in src_value]
+                return [get_value(type(e), e) for e in src_value]
             if isinstance(src_value, dict):
-                if not src_value:
-                    return {}
-                dict_value_type = type(list(src_value.values())[0])  # assuming primitive type or type with "to_pb()"
-                return {k: get_value(dict_value_type, v) for k, v in src_value.items()}
+                return {k: get_value(type(v), v) for k, v in src_value.items()}
             try:
                 return dst_type(src_value)
             except TypeError as error:
@@ -92,10 +87,11 @@ class _ConfigElement:
         dummy_pb_instance = self.PB_TYPE()  # used only for examining the destination protobuf object field types
         args = {}
         for f in fields(self):
-            dst_field_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
-            dst_field_type = type(getattr(dummy_pb_instance, dst_field_name))
+            if f.name[0] == "_":
+                continue  # don't serialize read-only fields
+            dst_field_type = type(getattr(dummy_pb_instance, f.name))
             src_field_value = getattr(self, f.name)
-            args[dst_field_name] = get_value(dst_field_type, src_field_value)
+            args[f.name] = get_value(dst_field_type, src_field_value)
         return self.PB_TYPE(**args)
 
     @classmethod
@@ -113,20 +109,21 @@ class _ConfigElement:
                 return dst_type(src_value)
             except TypeError as error:
                 if dst_type._name == "List":
-                    list_item_type = get_args(dst_type)[0]
-                    return [get_value(list_item_type, i) for i in src_value]
+                    return [get_value(get_args(dst_type)[0], i) for i in src_value]
                 if dst_type._name == "Dict":
-                    dict_value_type = get_args(dst_type)[1]
-                    return {_k: get_value(dict_value_type, _v) for _k, _v in src_value.items()}
+                    return {_k: get_value(get_args(dst_type)[1], _v) for _k, _v in src_value.items()}
                 raise RuntimeError(f"Don't know how to instantiate '{dst_type}' (value: '{src_value}')") from error
 
         _init_fields = [f for f in fields(cls) if f.init]
-        args = {f.name: get_value(f.type, getattr(obj, f.name)) for f in _init_fields}
+        args = {}
+        for f in _init_fields:
+            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
+            args[f.name] = get_value(f.type, getattr(obj, src_name))
         instance = cls(**args)
 
         _remaining_fields = [f for f in fields(cls) if not f.init]
         for f in _remaining_fields:
-            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle private fields that start with "_"
+            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
             v = get_value(f.type, getattr(obj, src_name))
             setattr(instance, f.name, v)
         return instance
@@ -141,20 +138,6 @@ class DateTime(datetime):
     """
 
     PB_TYPE = DoNotSerializeMarker  # datetime fields are read-only - provided by the server. Skip serialization
-
-    @classmethod
-    def fromtimestamp(cls: Type[DateTimeT], timestamp: float, tz: Optional[tzinfo] = None) -> DateTimeT:
-        dt = datetime.fromtimestamp(timestamp, tz)
-        return cls(
-            year=dt.year,
-            month=dt.month,
-            day=dt.day,
-            hour=dt.hour,
-            minute=dt.minute,
-            second=dt.second,
-            microsecond=dt.microsecond,
-            tzinfo=dt.tzinfo,
-        )
 
     @classmethod
     def from_pb(cls: Type[DateTimeT], value: Timestamp) -> DateTimeT:
@@ -294,14 +277,14 @@ class SynTest(_ConfigElement):
     PB_TYPE = pb.Test
 
     # read-write
+    id: ID = field(default=DEFAULT_ID, init=False)  # id is written for Update request
     name: str
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
     # labels: List[str] = field(default_factory=list) # not supported yet
 
-    # read-only (although _id is serialized for Update call)
-    _id: ID = field(default=DEFAULT_ID, init=False)
+    # read-only
     _cdate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
     _edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
@@ -310,10 +293,6 @@ class SynTest(_ConfigElement):
     @property
     def deployed(self) -> bool:
         return self.id != DEFAULT_ID
-
-    @property
-    def id(self) -> ID:
-        return self._id
 
     @property
     def created_date(self) -> datetime:

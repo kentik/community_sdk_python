@@ -11,7 +11,7 @@ from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_fac
 class FlowTestSpecific(_ConfigElement):
     PB_TYPE = pb.FlowTest
 
-    target: str = ""
+    target: str = ""  # city name
     target_refresh_interval_millis: int = 0
     max_providers: int = 0
     max_ip_targets: int = 0

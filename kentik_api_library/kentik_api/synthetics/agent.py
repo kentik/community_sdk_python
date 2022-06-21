@@ -32,16 +32,18 @@ AgentT = TypeVar("AgentT", bound="Agent")
 
 @dataclass
 class Agent(_ConfigElement):
+    PB_TYPE = pb.Agent
+
     # read-only
-    type: AgentOwnershipType = AgentOwnershipType.NONE
-    os: str = ""
-    last_authed: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)
-    test_ids: List[ID] = field(default_factory=list)
-    version: str = ""
-    agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
+    _os: str = ""
+    _version: str = ""
+    _test_ids: List[ID] = field(default_factory=list)
+    _type: AgentOwnershipType = AgentOwnershipType.NONE
+    _agent_impl: AgentImplementType = AgentImplementType.UNSPECIFIED
+    _last_authed: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)
 
     # read-write
-    id: ID = ID()
+    id: ID = ID()  # id is written in agent update request
     site_name: str = ""
     status: AgentStatus = AgentStatus.UNSPECIFIED
     alias: str = ""
@@ -58,26 +60,26 @@ class Agent(_ConfigElement):
     cloud_region: str = ""
     cloud_provider: str = ""
 
-    def to_pb(self) -> pb.Agent:
-        """
-        Need only to serialize the read-write fields; so can't use the  _ConfigElement.to_pb() method that serializes all fields
-        """
+    @property
+    def os(self) -> str:
+        return self.os
 
-        return pb.Agent(
-            id=str(self.id),
-            site_name=self.site_name,
-            status=self.status.value,
-            alias=self.alias,
-            ip=str(self.ip),
-            lat=self.lat,
-            long=self.long,
-            family=self.family.value,
-            asn=self.asn,
-            site_id=str(self.site_id),
-            city=self.city,
-            region=self.region,
-            country=self.country,
-            local_ip=str(self.local_ip),
-            cloud_region=self.cloud_region,
-            cloud_provider=self.cloud_provider,
-        )
+    @property
+    def version(self) -> str:
+        return self._version
+
+    @property
+    def test_ids(self) -> List[ID]:
+        return self._test_ids
+
+    @property
+    def type(self) -> AgentOwnershipType:
+        return self._type
+
+    @property
+    def agent_impl(self) -> AgentImplementType:
+        return self._agent_impl
+
+    @property
+    def last_authed(self) -> DateTime:
+        return self._last_authed
