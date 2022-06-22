@@ -62,7 +62,7 @@ class Agent(_ConfigElement):
 
     @property
     def os(self) -> str:
-        return self.os
+        return self._os
 
     @property
     def version(self) -> str:

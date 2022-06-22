@@ -51,7 +51,6 @@ def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
     # setup read-only fields for testing purpose
     # pragma pylint: disable=protected-access
     out_test._cdate = DateTime.fromtimestamp(1649057685, timezone.utc)
-    out_test._edate = DateTime.fromtimestamp(1649058245, timezone.utc)
     out_test._created_by = UserInfo(id="67", email="creator@company.com", full_name="Bob Creator")
     out_test._last_updated_by = UserInfo(id="89", email="editor@company.com", full_name="Joe Editor")
     # pragma pylint: enable=protected-access
@@ -59,6 +58,7 @@ def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
     out_test.name = "example_test"
     out_test.type = TestType.NONE  # to be set later - in target test type
     out_test.status = TestStatus.ACTIVE
+    out_test.edate = DateTime.fromtimestamp(1649058245, timezone.utc)
 
     setup_syn_test_settings(out_pb_test.settings, out_test.settings)
 

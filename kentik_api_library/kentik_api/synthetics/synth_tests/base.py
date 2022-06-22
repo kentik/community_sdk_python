@@ -137,7 +137,7 @@ class DateTime(datetime):
     A datetime type with protobuf serialization logic
     """
 
-    PB_TYPE = DoNotSerializeMarker  # datetime fields are read-only - provided by the server. Skip serialization
+    PB_TYPE = Timestamp
 
     @classmethod
     def from_pb(cls: Type[DateTimeT], value: Timestamp) -> DateTimeT:
@@ -283,10 +283,10 @@ class SynTest(_ConfigElement):
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
     # labels: List[str] = field(default_factory=list) # not supported yet
+    edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)  # yes, edate is read-write
 
     # read-only
     _cdate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
-    _edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
     _last_updated_by: UserInfo = field(default_factory=UserInfo, init=False)
 
@@ -300,7 +300,7 @@ class SynTest(_ConfigElement):
 
     @property
     def updated_date(self) -> datetime:
-        return self._edate
+        return self.edate
 
     @property
     def created_by(self) -> UserInfo:
