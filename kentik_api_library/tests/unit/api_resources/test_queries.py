@@ -121,8 +121,18 @@ def test_query_data_success() -> None:
     query_api = QueryAPI(connector)
 
     # when
-    agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
-    agg2 = Aggregate(name="p95th_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.percentile, rank=95)
+    agg1 = Aggregate(
+        name="avg_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.average,
+        raw=True,
+    )
+    agg2 = Aggregate(
+        name="p95th_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.percentile,
+        rank=95,
+    )
     agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
     query = Query(
         dimension=[DimensionType.Traffic],
@@ -189,8 +199,18 @@ def test_query_chart_success() -> None:
     query_api = QueryAPI(connector)
 
     # when
-    agg1 = Aggregate(name="avg_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.average, raw=True)
-    agg2 = Aggregate(name="p95th_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.percentile, rank=95)
+    agg1 = Aggregate(
+        name="avg_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.average,
+        raw=True,
+    )
+    agg2 = Aggregate(
+        name="p95th_bits_per_sec",
+        column="f_sum_both_bytes",
+        fn=AggregateFunctionType.percentile,
+        rank=95,
+    )
     agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
     filter_ = Filter(filterField="dst_as", operator="=", filterValue="")
     filter_group = FilterGroups(connector="All", not_=False, filters=[filter_])

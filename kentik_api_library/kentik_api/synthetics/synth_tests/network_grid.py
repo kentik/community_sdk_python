@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Type, TypeVar
 
-import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
 from .base import PingTraceTest, PingTraceTestSettings, list_factory, sort_ip_address_list
@@ -14,15 +13,6 @@ NetworkGridTestSpecific = IPTestSpecific
 class GridTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
     network_grid: NetworkGridTestSpecific = NetworkGridTestSpecific()
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.network_grid.fill_from_pb(src.network_grid)
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.network_grid.CopyFrom(self.network_grid.to_pb())
-        return obj
 
 
 NetworkGridTestT = TypeVar("NetworkGridTestT", bound="NetworkGridTest")
@@ -38,6 +28,7 @@ class NetworkGridTest(PingTraceTest):
         return cls(
             name=name,
             settings=GridTestSettings(
-                agent_ids=agent_ids, network_grid=NetworkGridTestSpecific(targets=sort_ip_address_list(targets))
+                agent_ids=agent_ids,
+                network_grid=NetworkGridTestSpecific(targets=sort_ip_address_list(targets)),
             ),
         )

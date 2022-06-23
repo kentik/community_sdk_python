@@ -18,7 +18,6 @@ def clear_readonly_fields(test: pb.Test) -> pb.Test:
     """For sending a request - clear the server-generated fields"""
 
     test.ClearField("cdate")
-    test.ClearField("edate")
     test.ClearField("created_by")
     test.ClearField("last_updated_by")
     return test

@@ -18,7 +18,12 @@ query_data = {
                     "starting_time": "{start}",
                     "ending_time": "{end}",
                     "aggregates": [
-                        {"column": "f_sum_both_bytes", "fn": "average", "name": "avg_bits_per_sec", "raw": True}
+                        {
+                            "column": "f_sum_both_bytes",
+                            "fn": "average",
+                            "name": "avg_bits_per_sec",
+                            "raw": True,
+                        }
                     ],
                     "all_devices": True,
                     "dimension": ["i_device_id", "InterfaceID_dst"],
@@ -34,7 +39,11 @@ query_data = {
                                         "filterValue": "external",
                                         "operator": "=",
                                     },
-                                    {"filterField": "i_trf_termination", "filterValue": "outside", "operator": "="},
+                                    {
+                                        "filterField": "i_trf_termination",
+                                        "filterValue": "outside",
+                                        "operator": "=",
+                                    },
                                 ],
                                 "not": False,
                             }
@@ -49,7 +58,10 @@ query_data = {
     },
     "mappings": {
         "all": {
-            "link": {"source": "{i_device_name}:{output_port}", "type": '@fixup: lambda x: x.split(" : ")[0]'},
+            "link": {
+                "source": "{i_device_name}:{output_port}",
+                "type": '@fixup: lambda x: x.split(" : ")[0]',
+            },
             "bps_out": {"source": "@TS.both_bits_per_sec.value", "type": "float64"},
             "avg_bps_out": {"source": "{avg_bits_per_sec}", "type": "float64"},
             "period": {"source": "@TS.both_bits_per_sec.period", "type": "int64"},

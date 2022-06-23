@@ -1,5 +1,6 @@
-black>=21.11b1
-isort>=5.8.0
+black>=22.1.0
+flake8>=4.0.1
+isort>=5.10.1
 mypy-extensions>=0.4.3
 mypy>=0.902
 Pillow>=8.4.0

@@ -26,7 +26,7 @@ def handle_errors() -> None:
 
     try:
         fake_id = ID("-1")
-        user = client.users.get(fake_id)  # there is no user with -1 ID
+        client.users.get(fake_id)  # there is no user with -1 ID
 
     except NotFoundError:
         print("User with ID: {} not exist".format(fake_id))

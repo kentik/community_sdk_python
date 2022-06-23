@@ -1,14 +1,13 @@
+# mypy: ignore-errors
 import os
 import pathlib
 import shutil
 import subprocess
 from distutils import log
-from distutils.cmd import Command
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List
 
-from setuptools import setup
+from setuptools import setup, Command
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -18,7 +17,7 @@ README = (HERE / "README.md").read_text()
 
 # Package list generated with: python setup.py packages
 PACKAGES = [
-    "kentik_api.",
+    "kentik_api",
     "kentik_api.auth",
     "kentik_api.throttling",
     "kentik_api.analytics",
@@ -155,7 +154,10 @@ class Format(Command):
     """Custom command to run black + isort"""
 
     description = "run black and isort on all relevant code; read configuration from pyproject.toml"
-    user_options = [("dirs=", None, "Directories to check"), ("check", None, "Run in check mode")]
+    user_options = [
+        ("dirs=", None, "Directories to check"),
+        ("check", None, "Run in check mode"),
+    ]
 
     def initialize_options(self) -> None:
         self.dirs = ["kentik_api", "tests", "examples"]
