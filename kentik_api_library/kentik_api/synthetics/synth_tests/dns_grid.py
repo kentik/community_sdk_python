@@ -39,7 +39,11 @@ class DNSGridTest(SynTest):
             settings=DNSGridTestSettings(
                 agent_ids=agent_ids,
                 dns_grid=DSNGridTestSpecific(
-                    target=target, record_type=record_type, servers=servers, timeout=timeout, port=port
+                    target=target,
+                    record_type=record_type,
+                    servers=servers,
+                    timeout=timeout,
+                    port=port,
                 ),
             ),
         )

@@ -56,7 +56,9 @@ class MappingEntry:
                 #  automatically set data_type for time series timestamps
                 if self.data_type is not None:
                     logging.warning(
-                        "Overriding 'data_type: %s' for time_series timestamp (source: %s)", self.data_type, self.source
+                        "Overriding 'data_type: %s' for time_series timestamp (source: %s)",
+                        self.data_type,
+                        self.source,
                     )
                 self.data_type = "unix_timestamp_millis"
 
@@ -75,7 +77,11 @@ def set_data_types_and_index(df: DataFrame, mapping: Generator[Tuple[str, Mappin
     index_columns = list()
     for k, m in mapping:
         if k not in df:
-            logging.debug("mapping column %s not in DataFrames (columns: %s)", k, ",".join(df.columns))
+            logging.debug(
+                "mapping column %s not in DataFrames (columns: %s)",
+                k,
+                ",".join(df.columns),
+            )
             continue
         if m.data_type is not None:
             if m.data_type == "time":
@@ -120,7 +126,11 @@ class ResultMapping:
                 raise RuntimeError(f"Duplicate mapping for column '{c}' in query definition ({data})")
             if type(d) != dict or "source" not in d.keys():
                 raise RuntimeError(f"'source' is missing in query definition entry for column {c} ({data})")
-            mapping[c] = MappingEntry(source=d["source"], data_type=d.get("type"), is_index=d.get("index", False))
+            mapping[c] = MappingEntry(
+                source=d["source"],
+                data_type=d.get("type"),
+                is_index=d.get("index", False),
+            )
         return cls(entries=mapping)
 
     def __init__(self, entries: Optional[Dict[str, MappingEntry]] = None) -> None:
@@ -361,7 +371,11 @@ def data_result_to_df(mappings: Dict[str, ResultMapping], data: QueryDataResult)
     for i, r in enumerate(data.results):
         mapping = mappings.get(r["bucket"], mappings.get("all"))
         if mapping is None or mapping.is_empty:
-            logging.critical("No applicable mapping for result[%d] bucket: %s. Result ignored", i, r["bucket"])
+            logging.critical(
+                "No applicable mapping for result[%d] bucket: %s. Result ignored",
+                i,
+                r["bucket"],
+            )
             continue
         result_label = r["bucket"]
         if result_label in out:
@@ -455,5 +469,10 @@ def data_result_to_df(mappings: Dict[str, ResultMapping], data: QueryDataResult)
                     )
         out[result_label] = DataFrame.from_dict(out_data)
         set_data_types_and_index(out[result_label], mapping.items)
-        logging.debug("result[%d]: label: %s df shape: (%d, %d)", i, result_label, *out[result_label].shape)
+        logging.debug(
+            "result[%d]: label: %s df shape: (%d, %d)",
+            i,
+            result_label,
+            *out[result_label].shape,
+        )
     return out

@@ -30,11 +30,15 @@ class NetworkMeshTest(PingTraceTest):
 
     @classmethod
     def create(
-        cls: Type[NetworkMeshTestT], name: str, agent_ids: List[str], use_local_ip: bool = False
+        cls: Type[NetworkMeshTestT],
+        name: str,
+        agent_ids: List[str],
+        use_local_ip: bool = False,
     ) -> NetworkMeshTestT:
         return cls(
             name=name,
             settings=NetworkMeshTestSettings(
-                agent_ids=agent_ids, network_mesh=NetworkMeshTestSpecific(use_local_ip=use_local_ip)
+                agent_ids=agent_ids,
+                network_mesh=NetworkMeshTestSpecific(use_local_ip=use_local_ip),
             ),
         )

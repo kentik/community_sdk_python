@@ -28,6 +28,7 @@ class NetworkGridTest(PingTraceTest):
         return cls(
             name=name,
             settings=GridTestSettings(
-                agent_ids=agent_ids, network_grid=NetworkGridTestSpecific(targets=sort_ip_address_list(targets))
+                agent_ids=agent_ids,
+                network_grid=NetworkGridTestSpecific(targets=sort_ip_address_list(targets)),
             ),
         )

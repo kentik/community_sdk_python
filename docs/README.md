@@ -4,7 +4,7 @@
 
 Precondition: python3 and pip3 are already installed.
 
-### Recommended steps:
+### Recommended steps
 
 1. Install virtualenv - this allows you to create a python sandbox for your project  
 `pip install virtualenv`
@@ -15,7 +15,7 @@ Precondition: python3 and pip3 are already installed.
 1. Activate virtualenv  
 `source .venv/bin/activate`
 
-1. Clone the library repo  
+1. Clone the library repository  
 `git clone https://github.com/kentik/community_sdk_python.git`
 
 1. `cd community_sdk_python/kentik_api_library/`
@@ -27,7 +27,7 @@ Precondition: python3 and pip3 are already installed.
 1. Generate grpc client code  
 `python setup.py grpc_stubs`
 
-1. Install the library from repo  
+1. Install the library from repository  
 `pip install -e .`
 
 1. Run unit tests  

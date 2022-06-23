@@ -16,7 +16,11 @@ PB_TRACES = pb.GetTraceForTestResponse(
             asn=1,
             as_name="Gdansk,PL",
             location=pb.Location(
-                latitude=18.6466, longitude=54.3520, country="Poland", region="Pomeranian", city="Gdańsk"
+                latitude=18.6466,
+                longitude=54.3520,
+                country="Poland",
+                region="Pomeranian",
+                city="Gdańsk",
             ),
             dns_name="aws.route53.com",
             device_id="50",
@@ -27,7 +31,11 @@ PB_TRACES = pb.GetTraceForTestResponse(
             asn=2,
             as_name="SERVINGA-EE,DE",
             location=pb.Location(
-                latitude=59.436958, longitude=24.753531, country="Estonia", region="Harjumaa", city="Tallinn"
+                latitude=59.436958,
+                longitude=24.753531,
+                country="Estonia",
+                region="Harjumaa",
+                city="Tallinn",
             ),
             dns_name=" - ",
             device_id="",
@@ -38,7 +46,11 @@ PB_TRACES = pb.GetTraceForTestResponse(
             asn=3,
             as_name="Bezeq International,IL",
             location=pb.Location(
-                latitude=32.09174, longitude=34.885029, country="Israel", region="HaMerkaz", city="Petah Tikva"
+                latitude=32.09174,
+                longitude=34.885029,
+                country="Israel",
+                region="HaMerkaz",
+                city="Petah Tikva",
             ),
             dns_name="bzq-219-189-226.cablep.bezeqint.net",
             device_id="",
@@ -49,7 +61,11 @@ PB_TRACES = pb.GetTraceForTestResponse(
             asn=4,
             as_name="Cogent,US",
             location=pb.Location(
-                latitude=44.804008, longitude=20.46513, country="Serbia", region="Beograd", city="Belgrade"
+                latitude=44.804008,
+                longitude=20.46513,
+                country="Serbia",
+                region="Beograd",
+                city="Belgrade",
             ),
             dns_name="be3077.ccr31.bio02.atlas.cogentco.com",
             device_id="",
@@ -60,7 +76,11 @@ PB_TRACES = pb.GetTraceForTestResponse(
             asn=5,
             as_name="Stackpath (Highwinds),US",
             location=pb.Location(
-                latitude=39.04372, longitude=-77.487488, country="United States", region="Virginia", city="Ashburn"
+                latitude=39.04372,
+                longitude=-77.487488,
+                country="United States",
+                region="Virginia",
+                city="Ashburn",
             ),
             dns_name=" - ",
             device_id="",
@@ -116,7 +136,11 @@ TRACES = TraceResponse(
             asn=1,
             as_name="Gdansk,PL",
             location=Location(
-                latitude=18.6466, longitude=54.3520, country="Poland", region="Pomeranian", city="Gdańsk"
+                latitude=18.6466,
+                longitude=54.3520,
+                country="Poland",
+                region="Pomeranian",
+                city="Gdańsk",
             ),
             dns_name="aws.route53.com",
             device_id=ID("50"),
@@ -127,7 +151,11 @@ TRACES = TraceResponse(
             asn=2,
             as_name="SERVINGA-EE,DE",
             location=Location(
-                latitude=59.436958, longitude=24.753531, country="Estonia", region="Harjumaa", city="Tallinn"
+                latitude=59.436958,
+                longitude=24.753531,
+                country="Estonia",
+                region="Harjumaa",
+                city="Tallinn",
             ),
             dns_name=" - ",
             device_id=ID(""),
@@ -138,7 +166,11 @@ TRACES = TraceResponse(
             asn=3,
             as_name="Bezeq International,IL",
             location=Location(
-                latitude=32.09174, longitude=34.885029, country="Israel", region="HaMerkaz", city="Petah Tikva"
+                latitude=32.09174,
+                longitude=34.885029,
+                country="Israel",
+                region="HaMerkaz",
+                city="Petah Tikva",
             ),
             dns_name="bzq-219-189-226.cablep.bezeqint.net",
             device_id=ID(""),
@@ -149,7 +181,11 @@ TRACES = TraceResponse(
             asn=4,
             as_name="Cogent,US",
             location=Location(
-                latitude=44.804008, longitude=20.46513, country="Serbia", region="Beograd", city="Belgrade"
+                latitude=44.804008,
+                longitude=20.46513,
+                country="Serbia",
+                region="Beograd",
+                city="Belgrade",
             ),
             dns_name="be3077.ccr31.bio02.atlas.cogentco.com",
             device_id=ID(""),
@@ -160,7 +196,11 @@ TRACES = TraceResponse(
             asn=5,
             as_name="Stackpath (Highwinds),US",
             location=Location(
-                latitude=39.04372, longitude=-77.487488, country="United States", region="Virginia", city="Ashburn"
+                latitude=39.04372,
+                longitude=-77.487488,
+                country="United States",
+                region="Virginia",
+                city="Ashburn",
             ),
             dns_name=" - ",
             device_id=ID(""),
@@ -218,7 +258,11 @@ def test_results_for_tests() -> None:
 
     # when
     traces = client.trace_for_test(
-        test_id=ID("1234"), start=datetime(2020, 1, 1), end=datetime(2020, 1, 2), agent_ids=[], target_ips=[]
+        test_id=ID("1234"),
+        start=datetime(2020, 1, 1),
+        end=datetime(2020, 1, 2),
+        agent_ids=[],
+        target_ips=[],
     )
 
     # then

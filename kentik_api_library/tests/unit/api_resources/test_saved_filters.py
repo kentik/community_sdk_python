@@ -41,7 +41,9 @@ def test_create_saved_filter_success() -> None:
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_create = SavedFilter(
-        filter_name="test_filter1", filters=filters, filter_description="This is test filter description"
+        filter_name="test_filter1",
+        filters=filters,
+        filter_description="This is test filter description",
     )
     created = saved_filters_api.create(to_create)
 
@@ -159,7 +161,10 @@ def test_update_saved_filter_success() -> None:
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_update = SavedFilter(
-        filter_name="test_filter1", filters=filters, id=filter_id, filter_description="Updated Saved Filter description"
+        filter_name="test_filter1",
+        filters=filters,
+        id=filter_id,
+        filter_description="Updated Saved Filter description",
     )
     updated = saved_filters_api.update(to_update)
 

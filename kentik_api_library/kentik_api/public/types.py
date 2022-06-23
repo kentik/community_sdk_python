@@ -34,8 +34,22 @@ class PermissiveEnumMeta(EnumMeta):
 
     def __call__(cls, value, names=None, *, module=None, qualname=None, type=None, start=1):
         if names is not None:
-            return super().__call__(value, names=names, module=module, qualname=qualname, type=type, start=start)
+            return super().__call__(
+                value,
+                names=names,
+                module=module,
+                qualname=qualname,
+                type=type,
+                start=start,
+            )
         try:
-            return super().__call__(value, names=names, module=module, qualname=qualname, type=type, start=start)
+            return super().__call__(
+                value,
+                names=names,
+                module=module,
+                qualname=qualname,
+                type=type,
+                start=start,
+            )
         except ValueError:
             return value

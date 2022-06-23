@@ -37,9 +37,17 @@ PB_RESULTS = [
                             target="151.139.47.114",
                             packet_loss=pb.PacketLossData(current=0.1, health="healthy"),
                             latency=pb.MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health="healthy"
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health="healthy",
                             ),
-                            jitter=pb.MetricData(current=40, rolling_avg=150, rolling_stddev=100, health="healthy"),
+                            jitter=pb.MetricData(
+                                current=40,
+                                rolling_avg=150,
+                                rolling_stddev=100,
+                                health="healthy",
+                            ),
                             dst_ip="39.101.222.33",
                         ),
                     ),
@@ -55,7 +63,10 @@ PB_RESULTS = [
                             target="151.139.47.114",
                             server="4.4.4.4",
                             latency=pb.MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health="warning"
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health="warning",
                             ),
                             response=pb.DNSResponseData(status=1, data="dns response data"),
                         ),
@@ -71,7 +82,10 @@ PB_RESULTS = [
                         http=pb.HTTPResults(
                             target="151.139.47.114",
                             latency=pb.MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health="critical"
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health="critical",
                             ),
                             response=pb.HTTPResponseData(status=403, size=9, data="forbidden"),
                             dst_ip="39.101.222.33",
@@ -98,9 +112,17 @@ RESULTS = [
                             target="151.139.47.114",
                             packet_loss=PacketLossData(current=0.1, health=Health.HEALTHY),
                             latency=MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health=Health.HEALTHY
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health=Health.HEALTHY,
                             ),
-                            jitter=MetricData(current=40, rolling_avg=150, rolling_stddev=100, health=Health.HEALTHY),
+                            jitter=MetricData(
+                                current=40,
+                                rolling_avg=150,
+                                rolling_stddev=100,
+                                health=Health.HEALTHY,
+                            ),
                             dst_ip=IP("39.101.222.33"),
                         ),
                     )
@@ -116,7 +138,10 @@ RESULTS = [
                             target="151.139.47.114",
                             server="4.4.4.4",
                             latency=MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health=Health.WARNING
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health=Health.WARNING,
                             ),
                             response=DnsResponseData(status=1, data="dns response data"),
                         ),
@@ -132,7 +157,10 @@ RESULTS = [
                         task=HttpTaskResults(
                             target="151.139.47.114",
                             latency=MetricData(
-                                current=400000, rolling_avg=300000, rolling_stddev=50000, health=Health.CRITICAL
+                                current=400000,
+                                rolling_avg=300000,
+                                rolling_stddev=50000,
+                                health=Health.CRITICAL,
                             ),
                             response=HttpResponseData(status=403, size=9, data="forbidden"),
                             dst_ip=IP("39.101.222.33"),

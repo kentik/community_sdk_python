@@ -30,7 +30,9 @@ class BatchAPI(BaseAPI):
         return batch_operations_payload.BatchStatusResponse.from_json(response.text)
 
     @staticmethod
-    def _get_payload(operation_part: BatchOperationPart) -> batch_operations_payload.BatchRequest:
+    def _get_payload(
+        operation_part: BatchOperationPart,
+    ) -> batch_operations_payload.BatchRequest:
         return batch_operations_payload.BatchRequest(
             replace_all=operation_part.replace_all,
             complete=operation_part.complete,

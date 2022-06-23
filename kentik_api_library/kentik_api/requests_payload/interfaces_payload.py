@@ -252,7 +252,11 @@ class CreateRequest(InterfacePayload):
         if interface.snmp_speed is None:
             raise IncompleteObjectError(operation, interface.__class__.__name__, "snmp_speed is required")
         if interface.interface_description is None:
-            raise IncompleteObjectError(operation, interface.__class__.__name__, "interface_description is required")
+            raise IncompleteObjectError(
+                operation,
+                interface.__class__.__name__,
+                "interface_description is required",
+            )
 
 
 @dataclass
