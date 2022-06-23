@@ -21,6 +21,10 @@ class IP:
     def __repr__(self) -> str:
         return self.addr
 
+    def to_pb(self) -> str:
+        """Support for serialization to protobuf"""
+        return str(self)
+
 
 class PermissiveEnumMeta(EnumMeta):
     """

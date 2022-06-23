@@ -1,42 +1,67 @@
+from copy import deepcopy
+
 import pytest
 
 from kentik_api.synthetics.synth_tests import DNSTest
 from kentik_api.synthetics.synth_tests.dns import DNSTestSettings, DNSTestSpecific
 from kentik_api.synthetics.types import DNSRecordType, IPFamily, TestStatus, TestType
 
-from .utils import HEALTH, client, credentials_missing_str, credentials_present, pick_agent_ids
+from .utils import HEALTH1, HEALTH2, client, credentials_missing_str, credentials_present, pick_agent_ids
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
 def test_dns_crud() -> None:
-    settings = DNSTestSettings(
+    agents = pick_agent_ids(count=2)
+    settings1 = DNSTestSettings(
         family=IPFamily.V4,
         period=60,
-        agent_ids=pick_agent_ids(),
-        health_settings=HEALTH,
+        agent_ids=[agents[0]],
+        health_settings=HEALTH1,
         dns=DNSTestSpecific(
-            target="123",
-            timeout=100,
+            target="www.example.com",
             record_type=DNSRecordType.AAAA,
-            servers=["4.4.4.4", "8.8.8.8"],
+            servers=["1.1.1.1", "8.8.8.8"],
             port=53,
         ),
     )
+    settings2 = deepcopy(settings1)
+    # settings2.family = IPFamily.V6  # family update doesn't take effect
+    settings2.period = 120
+    settings2.agent_ids = [agents[1]]
+    settings2.health_settings = HEALTH2
+    # settings2.dns.target="www.wikipedia.org"  # target can't be updated after a test has been created
+    settings2.dns.record_type = DNSRecordType.A
+    settings2.dns.servers = ["8.8.8.8", "9.9.9.9"]
+    settings2.dns.port = 63
 
-    # create
-    test = DNSTest("e2e-dns-test", TestStatus.ACTIVE, settings)
-    created_test = client().synthetics.create_test(test)
-    assert created_test.type == TestType.DNS
+    try:
+        # create
+        test = DNSTest("e2e-dns-test", TestStatus.ACTIVE, settings1)
+        created_test = client().synthetics.create_test(test)
+        assert isinstance(created_test, DNSTest)
+        assert created_test.name == "e2e-dns-test"
+        assert created_test.type == TestType.DNS
+        assert created_test.status == TestStatus.ACTIVE
+        assert created_test.settings == settings1
 
-    # set status and read
-    client().synthetics.set_test_status(created_test.id, TestStatus.PAUSED)
-    received_test = client().synthetics.get_test(created_test.id)
-    assert received_test.status == TestStatus.PAUSED
+        # read
+        received_test = client().synthetics.get_test(created_test.id)
+        assert isinstance(received_test, DNSTest)
+        assert received_test.name == "e2e-dns-test"
+        assert received_test.type == TestType.DNS
+        assert received_test.status == TestStatus.ACTIVE
+        assert received_test.settings == settings1
 
-    # update
-    created_test.name = "e2e-dns-test-updated"
-    updated_test = client().synthetics.update_test(created_test)
-    assert updated_test.name == "e2e-dns-test-updated"
-
-    # delete
-    client().synthetics.delete_test(created_test.id)
+        # update
+        created_test.name = "e2e-dns-test-updated"
+        created_test.settings = settings2
+        created_test.status = TestStatus.PAUSED  # to safely update DNS port to arbitrary value
+        updated_test = client().synthetics.update_test(created_test)
+        assert isinstance(updated_test, DNSTest)
+        assert updated_test.name == "e2e-dns-test-updated"
+        assert updated_test.type == TestType.DNS
+        assert updated_test.status == TestStatus.PAUSED
+        assert updated_test.settings == settings2
+    finally:
+        # delete (even if assertion failed)
+        client().synthetics.delete_test(created_test.id)

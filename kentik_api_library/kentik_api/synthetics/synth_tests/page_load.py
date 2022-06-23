@@ -4,32 +4,18 @@ from typing import Dict, List, Optional, Type, TypeVar
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.synthetics.types import TaskType, TestType
 
-from .base import PingTraceTest, PingTraceTestSettings, list_factory
+from .base import PingTraceTest, PingTraceTestSettings, _ConfigElement, list_factory
 
 
 @dataclass
-class PageLoadTestSpecific:
+class PageLoadTestSpecific(_ConfigElement):
+    PB_TYPE = pb.PageLoadTest
+
     target: str = ""
     timeout: int = 0
     headers: Dict[str, str] = field(default_factory=dict)
     ignore_tls_errors: bool = False
     css_selectors: Dict[str, str] = field(default_factory=dict)
-
-    def fill_from_pb(self, src: pb.PageLoadTest) -> None:
-        self.target = src.target
-        self.timeout = src.timeout
-        self.headers = src.headers
-        self.ignore_tls_errors = src.ignore_tls_errors
-        self.css_selectors = src.css_selectors
-
-    def to_pb(self) -> pb.PageLoadTest:
-        return pb.PageLoadTest(
-            target=self.target,
-            timeout=self.timeout,
-            headers=self.headers,
-            ignore_tls_errors=self.ignore_tls_errors,
-            css_selectors=self.css_selectors,
-        )
 
 
 @dataclass
@@ -40,15 +26,6 @@ class PageLoadTestSettings(PingTraceTestSettings):
     @classmethod
     def task_name(cls) -> Optional[str]:
         return "page-load"
-
-    def fill_from_pb(self, src: pb.TestSettings) -> None:
-        super().fill_from_pb(src)
-        self.page_load.fill_from_pb(src.page_load)
-
-    def to_pb(self) -> pb.TestSettings:
-        obj = super().to_pb()
-        obj.page_load.CopyFrom(self.page_load.to_pb())
-        return obj
 
 
 PageLoadTestT = TypeVar("PageLoadTestT", bound="PageLoadTest")

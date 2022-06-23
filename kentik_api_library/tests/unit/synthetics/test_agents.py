@@ -1,5 +1,5 @@
 import copy
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import List
 
 from google.protobuf.timestamp_pb2 import Timestamp
@@ -8,6 +8,7 @@ import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.agent import Agent, AgentImplementType, AgentOwnershipType, AgentStatus
 from kentik_api.synthetics.synth_client import KentikSynthClient
+from kentik_api.synthetics.synth_tests.base import DateTime
 from kentik_api.synthetics.types import IPFamily
 from tests.unit.synthetics import protobuf_assert_equal
 from tests.unit.synthetics.stub_api_connector import StubAPISyntheticsConnector
@@ -45,24 +46,24 @@ AGENTS: List[Agent] = [
         site_name="site name",
         status=AgentStatus.OK,
         alias="agent alias",
-        type=AgentOwnershipType.PRIVATE,
-        os="SVR4",
         ip=IP("100.10.200.20"),
         lat=54.0,
         long=18.0,
-        last_authed=datetime.fromtimestamp(649057685, timezone.utc),
         family=IPFamily.V4,
         asn=1500,
         site_id=ID("7"),
-        version="2.0.0",
         city="Gdańsk",
         region="Pomeranian",
         country="PL",
-        test_ids=[ID("100"), ID("200"), ID("300")],
         local_ip=IP("150.15.250.25"),
         cloud_region="eu-central-1",
         cloud_provider="aws",
-        agent_impl=AgentImplementType.RUST,
+        _os="SVR4",
+        _version="2.0.0",
+        _test_ids=[ID("100"), ID("200"), ID("300")],
+        _type=AgentOwnershipType.PRIVATE,
+        _agent_impl=AgentImplementType.RUST,
+        _last_authed=DateTime.fromtimestamp(649057685, timezone.utc),
     )
 ]
 

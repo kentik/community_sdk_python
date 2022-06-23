@@ -5,6 +5,7 @@ from google.protobuf.timestamp_pb2 import Timestamp
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_client import KentikSynthClient
+from kentik_api.synthetics.synth_tests.base import DateTime
 from kentik_api.synthetics.synth_tests.results import (
     AgentResults,
     DnsResponseData,
@@ -84,7 +85,7 @@ PB_RESULTS = [
 RESULTS = [
     TestResults(
         test_id=ID("1234"),
-        time=datetime.fromtimestamp(1649057685, timezone.utc),
+        time=DateTime.fromtimestamp(1649057685, timezone.utc),
         health=Health.WARNING,
         agents=[
             AgentResults(

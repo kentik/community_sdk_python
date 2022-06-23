@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from kentik_api.public.defaults import DEFAULT_DATE, DEFAULT_ID
+from kentik_api.public.defaults import DEFAULT_DATE_STR, DEFAULT_ID
 from kentik_api.public.types import ID
 
 # pylint: disable=too-many-instance-attributes
@@ -22,9 +22,9 @@ class User:
     _filters: Dict = field(default_factory=dict)
     _saved_filters: List = field(default_factory=list)
     _id: ID = DEFAULT_ID
-    _last_login: str = DEFAULT_DATE
-    _created_date: str = DEFAULT_DATE
-    _updated_date: str = DEFAULT_DATE
+    _last_login: str = DEFAULT_DATE_STR
+    _created_date: str = DEFAULT_DATE_STR
+    _updated_date: str = DEFAULT_DATE_STR
 
     @classmethod
     def new(

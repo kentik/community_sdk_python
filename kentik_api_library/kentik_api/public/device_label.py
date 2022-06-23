@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from kentik_api.public.defaults import DEFAULT_DATE, DEFAULT_ID
+from kentik_api.public.defaults import DEFAULT_DATE_STR, DEFAULT_ID
 from kentik_api.public.types import ID
 
 
@@ -27,8 +27,8 @@ class DeviceLabel:
     _id: ID = DEFAULT_ID
     _user_id: Optional[ID] = DEFAULT_ID
     _company_id: ID = DEFAULT_ID
-    _created_date: str = DEFAULT_DATE
-    _updated_date: str = DEFAULT_DATE
+    _created_date: str = DEFAULT_DATE_STR
+    _updated_date: str = DEFAULT_DATE_STR
 
     @classmethod
     def new(cls, name: str, color: str):

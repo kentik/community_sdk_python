@@ -5,6 +5,7 @@ from google.protobuf.timestamp_pb2 import Timestamp
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_client import KentikSynthClient
+from kentik_api.synthetics.synth_tests.base import DateTime
 from kentik_api.synthetics.synth_tests.traces import Location, NetNode, Path, PathTrace, Stats, TraceHop, TraceResponse
 from tests.unit.synthetics.stub_api_connector import StubAPISyntheticsConnector
 
@@ -204,7 +205,7 @@ TRACES = TraceResponse(
                     ],
                 ),
             ],
-            time=datetime.fromtimestamp(1577923200, timezone.utc),
+            time=DateTime.fromtimestamp(1577923200, timezone.utc),
         ),
     ],
 )
