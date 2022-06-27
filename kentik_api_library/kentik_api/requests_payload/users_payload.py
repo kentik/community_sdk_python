@@ -91,6 +91,7 @@ class CreateRequest:
 
     user: _CreateData
     # pylint: disable=too-many-arguments
+
     def __init__(
         self,
         user_email: str,

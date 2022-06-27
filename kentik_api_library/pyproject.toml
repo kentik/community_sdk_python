@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "setuptools_scm", "gitpython"]
+requires = ["setuptools_scm", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -131,3 +131,17 @@ disable = [
     "exception-escape",
     "comprehension-escape"
 ]
+
+[flake8]
+max-line-length = 120
+extend-ignore = """
+    E203,
+    E402,
+    E501,
+    E712,
+    E741,
+    F401,
+    F403,
+    F405,
+    F541,
+"""

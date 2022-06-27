@@ -5,6 +5,7 @@ Example of using the saved filters API
 
 import logging
 
+from examples.utils import pretty_print
 from kentik_api import Filter, FilterGroups, Filters, KentikAPI, SavedFilter
 from kentik_api.utils import get_credentials
 
@@ -21,8 +22,7 @@ def run_crud() -> None:
 
     print("### GET_ALL")
     all_saved_filters = client.saved_filters.get_all()
-    for i in all_saved_filters:
-        print(i.__dict__)
+    pretty_print(all_saved_filters)
     print()
 
     print("### CREATE")
@@ -30,28 +30,31 @@ def run_crud() -> None:
     filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_create = SavedFilter(
-        filter_name="test_filter1", filters=filters, filter_description="This is test filter description"
+        filter_name="test_filter1",
+        filters=filters,
+        filter_description="This is test filter description",
     )
     created = client.saved_filters.create(to_create)
-    print(created.__dict__)
     created_id = created.id
+    pretty_print(created)
     print()
 
     print("### UPDATE")
     to_update = created
     to_update.filter_description = "Updated Saved Filter description"
     got = client.saved_filters.update(to_update)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
     print("### GET")
     got = client.saved_filters.get(created_id)
-    print(got.__dict__)
+    pretty_print(got)
     print()
 
     print("### DELETE")
     deleted = client.saved_filters.delete(created_id)
     print(deleted)
+    print()
 
 
 if __name__ == "__main__":

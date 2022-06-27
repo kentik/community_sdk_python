@@ -50,14 +50,14 @@ def new_api_error(error: RpcError) -> KentikAPIError:
         StatusCode.UNAVAILABLE: UnavailabilityError(protocol_grpc, status_code, status_name),
         StatusCode.UNAUTHENTICATED: AuthError(protocol_grpc, status_code, status_name),
     }
-
-    # StatusCode.CANCELLED
-    # StatusCode.UNKNOWN
-    # StatusCode.FAILED_PRECONDITION
-    # StatusCode.ABORTED
-    # StatusCode.OUT_OF_RANGE
-    # StatusCode.INTERNAL
-    # StatusCode.DATA_LOSS
+    # Status Codes covered by default_error:
+    #   StatusCode.CANCELLED
+    #   StatusCode.UNKNOWN
+    #   StatusCode.FAILED_PRECONDITION
+    #   StatusCode.ABORTED
+    #   StatusCode.OUT_OF_RANGE
+    #   StatusCode.INTERNAL
+    #   StatusCode.DATA_LOSS
     default_error = ProtocolError(protocol_grpc, status_code, status_name)
 
     return errors.get(status_code, default_error)

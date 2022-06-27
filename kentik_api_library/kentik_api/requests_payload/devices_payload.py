@@ -22,7 +22,6 @@ from kentik_api.requests_payload.conversions import (
     convert_list_or_none,
     convert_or_none,
     dict_from_json,
-    enum_to_str,
     from_dict,
     list_from_json,
     permissive_enum_to_str,
@@ -71,8 +70,8 @@ class SNMPv3ConfPayload:
 class LabelPayload:
     """
     This datastructure represents JSON Device.Label payload as it is transmitted to and from KentikAPI
-    LabelPayload embedded under Device differs from standalone LabelPayload in that it lacks devices list, and in field names,
-    eg. cdate vs created_date, edate vs updated_date
+    LabelPayload embedded under Device differs from standalone LabelPayload in that it lacks devices list,
+    and in field names, eg. cdate vs created_date, edate vs updated_date
     """
 
     id: int
@@ -381,18 +380,26 @@ def validate_device_bgp_snmp_conf(device: Device, operation: str) -> None:
         if device.sending_ips == []:
             raise IncompleteObjectError(operation, class_name, "for device_type=router, sending_ips is required")
         if device.minimize_snmp is None:
-            raise IncompleteObjectError(operation, class_name, "for device_type=router, minimize_snmp is required")
+            raise IncompleteObjectError(
+                operation,
+                class_name,
+                "for device_type=router, minimize_snmp is required",
+            )
     elif device.device_type == DeviceType.host_nprobe_dns_www:
         if device.cdn_attr is None:
             raise IncompleteObjectError(
-                operation, class_name, "for device_type=host_nprobe_dns_www, cdn_attr is required"
+                operation,
+                class_name,
+                "for device_type=host_nprobe_dns_www, cdn_attr is required",
             )
 
     # bgp-specific
     if device.device_bgp_type == DeviceBGPType.device:
         if device.device_bgp_neighbor_asn is None:
             raise IncompleteObjectError(
-                operation, class_name, "for device_bgp_type=device, device_bgp_neighbor_asn is required"
+                operation,
+                class_name,
+                "for device_bgp_type=device, device_bgp_neighbor_asn is required",
             )
         if device.device_bgp_neighbor_ip is None and device.device_bgp_neighbor_ip6 is None:
             raise IncompleteObjectError(
@@ -403,14 +410,18 @@ def validate_device_bgp_snmp_conf(device: Device, operation: str) -> None:
     elif device.device_bgp_type == DeviceBGPType.other_device:
         if device.use_bgp_device_id is None:
             raise IncompleteObjectError(
-                operation, class_name, "for device_bgp_type=other_device, use_bgp_device_id is required"
+                operation,
+                class_name,
+                "for device_bgp_type=other_device, use_bgp_device_id is required",
             )
 
     # snmp-specific
     if device.device_snmp_v3_conf is not None:
         if device.device_snmp_v3_conf.user_name is None:
             raise IncompleteObjectError(
-                operation, class_name, "for specified device_snmp_v3_conf, user_name is required"
+                operation,
+                class_name,
+                "for specified device_snmp_v3_conf, user_name is required",
             )
         if (
             device.device_snmp_v3_conf.authentication_protocol != AuthenticationProtocol.no_auth

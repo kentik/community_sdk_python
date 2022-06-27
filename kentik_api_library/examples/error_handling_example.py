@@ -25,13 +25,13 @@ def handle_errors() -> None:
     users = client.users.get_all()
 
     try:
-        fake_id = ID(-1)
-        user = client.users.get(fake_id)  # there is no user with -1 ID
+        fake_id = ID("-1")
+        client.users.get(fake_id)  # there is no user with -1 ID
 
     except NotFoundError:
         print("User with ID: {} not exist".format(fake_id))
 
-    new_device = Device(plan_id=ID(10))  # device without required fields to create it
+    new_device = Device(plan_id=ID("10"))  # device without required fields to create it
     try:
         client.devices.create(new_device)
     except IncompleteObjectError:

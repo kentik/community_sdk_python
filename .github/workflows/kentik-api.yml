@@ -48,15 +48,18 @@ jobs:
           python3 -m pip install --upgrade -r requirements.txt
           python3 -m pip install --upgrade -r requirements-dev.txt
           python3 setup.py grpc_stubs
-      - name: Code formatting
-        working-directory: ./kentik_api_library
-        run: python3 setup.py format --check
-      - name: Mypy
-        working-directory: ./kentik_api_library
-        run: python3 setup.py mypy
-      - name: PyLint
-        working-directory: ./kentik_api_library
-        run: python3 setup.py pylint
+      - name: Run Super-Linter
+        uses: github/super-linter@v4.9.2
+        env:
+          LINTER_RULES_PATH: /kentik_api_library
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_PYLINT: false
+          PYTHON_BLACK_CONFIG_FILE: pyproject.toml
+          PYTHON_ISORT_CONFIG_FILE: pyproject.toml
+          PYTHON_FLAKE8_CONFIG_FILE: pyproject.toml
+          PYTHON_MYPY_CONFIG_FILE: pyproject.toml
       - name: PyTest
         working-directory: ./kentik_api_library
         run: python3 setup.py pytest
@@ -79,7 +82,7 @@ jobs:
         run: |
           pip3 install -r requirements.txt
           python3 setup.py grpc_stubs # fetching grpc stubs must go before building
-          python3 setup.py build sdist bdist_wheel
+          python3 -m build
       - name: Archive code
         uses: actions/upload-artifact@v2
         with:

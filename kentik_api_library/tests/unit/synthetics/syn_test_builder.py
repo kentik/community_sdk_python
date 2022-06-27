@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Tuple
 
 from google.protobuf.timestamp_pb2 import Timestamp
@@ -18,6 +18,7 @@ from kentik_api.synthetics.synth_tests import (
     url,
 )
 from kentik_api.synthetics.synth_tests.base import (
+    DateTime,
     PingTask,
     PingTraceTest,
     SynTest,
@@ -49,15 +50,15 @@ def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
 
     # setup read-only fields for testing purpose
     # pragma pylint: disable=protected-access
-    out_test._id = ID("1234")
-    out_test._cdate = datetime.fromtimestamp(1649057685, timezone.utc)
-    out_test._edate = datetime.fromtimestamp(1649058245, timezone.utc)
+    out_test._cdate = DateTime.fromtimestamp(1649057685, timezone.utc)
     out_test._created_by = UserInfo(id="67", email="creator@company.com", full_name="Bob Creator")
     out_test._last_updated_by = UserInfo(id="89", email="editor@company.com", full_name="Joe Editor")
     # pragma pylint: enable=protected-access
+    out_test.id = ID("1234")
     out_test.name = "example_test"
     out_test.type = TestType.NONE  # to be set later - in target test type
     out_test.status = TestStatus.ACTIVE
+    out_test.edate = DateTime.fromtimestamp(1649058245, timezone.utc)
 
     setup_syn_test_settings(out_pb_test.settings, out_test.settings)
 
@@ -132,7 +133,14 @@ def setup_ping_trace_test(out_pb_test: pb.Test, out_test: PingTraceTest) -> None
         pb.TestPingSettings(timeout=3000, count=10, delay=555, protocol=Protocol.TCP.value, port=333)
     )
     out_pb_test.settings.trace.CopyFrom(
-        pb.TestTraceSettings(timeout=11222, count=10, limit=50, delay=25, protocol=Protocol.ICMP.value, port=33444)
+        pb.TestTraceSettings(
+            timeout=11222,
+            count=10,
+            limit=50,
+            delay=25,
+            protocol=Protocol.ICMP.value,
+            port=33444,
+        )
     )
 
     out_test.settings.tasks = [TaskType.PING, TaskType.TRACE_ROUTE]
@@ -167,7 +175,7 @@ def make_agent_test_pair() -> Tuple[pb.Test, agent.AgentTest]:
     pb_test.settings.agent.CopyFrom(pb.AgentTest(target="38", use_local_ip=True))
 
     test.type = TestType.AGENT
-    test.settings.agent = agent.AgentTestSpecific(target=ID("38"), user_local_ip=True)
+    test.settings.agent = agent.AgentTestSpecific(target=ID("38"), use_local_ip=True)
 
     return (pb_test, test)
 
@@ -211,7 +219,7 @@ def make_url_test_pair() -> Tuple[pb.Test, url.UrlTest]:
     test.settings.url = url.URLTestSpecific(
         target="www.example.com",
         timeout=7000,
-        http_method="GET",
+        method="GET",
         headers={"origin": "url-test"},
         body="BODY",
         ignore_tls_errors=True,
@@ -223,7 +231,11 @@ def make_url_test_pair() -> Tuple[pb.Test, url.UrlTest]:
 def make_page_load_test_pair() -> Tuple[pb.Test, page_load.PageLoadTest]:
     # general test config
     pb_test = pb.Test()
-    test = page_load.PageLoadTest(name="", status=TestStatus.UNSPECIFIED, settings=page_load.PageLoadTestSettings())
+    test = page_load.PageLoadTest(
+        name="",
+        status=TestStatus.UNSPECIFIED,
+        settings=page_load.PageLoadTestSettings(),
+    )
     setup_ping_trace_test(pb_test, test)
 
     # PageLoad-test specific config
@@ -254,7 +266,9 @@ def make_network_mesh_test_pair() -> Tuple[pb.Test, network_mesh.NetworkMeshTest
     # general test config
     pb_test = pb.Test()
     test = network_mesh.NetworkMeshTest(
-        name="", status=TestStatus.UNSPECIFIED, settings=network_mesh.NetworkMeshTestSettings()
+        name="",
+        status=TestStatus.UNSPECIFIED,
+        settings=network_mesh.NetworkMeshTestSettings(),
     )
     setup_ping_trace_test(pb_test, test)
 

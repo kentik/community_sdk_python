@@ -241,7 +241,13 @@ def compute_stats(
     if log.level == logging.DEBUG:
         with io.StringIO() as f:
             df.info(buf=f)
-            log.debug("Evaluating DataFrame %s, window: %s, pivot: %s, data: %s", f.getvalue(), window, pivot, data)
+            log.debug(
+                "Evaluating DataFrame %s, window: %s, pivot: %s, data: %s",
+                f.getvalue(),
+                window,
+                pivot,
+                data,
+            )
     if pivot not in df:
         raise RuntimeError(f"No {pivot} columns in DataFrame")
     if data not in df:
@@ -321,7 +327,12 @@ def analyze_flatness(
             if last is not None and last.end >= s:
                 agg_min = min(d.loc[last.end][min_column], d.loc[ts][min_column])
                 agg_max = max(d.loc[last.end][max_column], d.loc[ts][max_column])
-                log.debug("link: %s, overlap at: %s, combined range: %f", link, ts, agg_max - agg_min)
+                log.debug(
+                    "link: %s, overlap at: %s, combined range: %f",
+                    link,
+                    ts,
+                    agg_max - agg_min,
+                )
                 if agg_max - agg_min < flatness_limit:
                     merged += 1
                     log.debug("link: %s, merging: [%s, %s]", link, results[link][-1].start, ts)
@@ -374,7 +385,10 @@ def flatness_analysis(
         log.debug("Computing bandwidth via each link")
         if not has_uniform_datetime_index(data):
             resolution = min_index_resolution(data).total_seconds()
-            log.info("Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling", resolution)
+            log.info(
+                "Retrieved data have non-uniform sampling (min resolution: %f seconds) - resampling",
+                resolution,
+            )
             data = resample_volume_data(data, f"{resolution}S")
         link_bw = compute_link_bandwidth(data)
     else:
@@ -391,5 +405,9 @@ def flatness_analysis(
     stats = compute_stats(link_util, window=window)
     log.debug("Analyzing flatness")
     return analyze_flatness(
-        stats, flatness_limit=flatness_limit, window=window, min_valid=min_valid, max_valid=max_valid
+        stats,
+        flatness_limit=flatness_limit,
+        window=window,
+        min_valid=min_valid,
+        max_valid=max_valid,
     )

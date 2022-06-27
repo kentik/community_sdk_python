@@ -6,6 +6,7 @@ Examples of using the alerting API
 import logging
 from datetime import datetime
 
+from examples.utils import pretty_print
 from kentik_api import AlertFilter, KentikAPI, ManualMitigation
 from kentik_api.utils import get_credentials
 
@@ -23,14 +24,13 @@ def run_crud():
 
     print("### GET ALERTS")
     alerts = client.alerting.get_active_alerts(start_time, end_time)
-    for alert in alerts:
-        print(alert)
+    pretty_print(alerts)
+    print()
 
     print("### GET ALERTS HISTORY")
-
-    alerts = client.alerting.get_alerts_history(start_time, end_time, AlertFilter.ALERT_KEY, "443")
-    for alert in alerts:
-        print(alert)
+    historical_alerts = client.alerting.get_alerts_history(start_time, end_time, AlertFilter.ALERT_KEY, "443")
+    pretty_print(historical_alerts)
+    print()
 
     print("### CREATE")
     # below ManualMitigation values are invalid and will cause error 404
@@ -40,7 +40,7 @@ def run_crud():
     except Exception:
         return
 
-    print(created)
+    pretty_print(created)
     print()
 
 

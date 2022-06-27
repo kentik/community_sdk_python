@@ -16,7 +16,11 @@ def load_credential_profile(profile: str) -> Dict:
             try:
                 cfg = json.load(f)
             except json.decoder.JSONDecodeError as ex:
-                log.critical("Failed to parse JSON in profile file '%s' (exception: %s)", filename, ex)
+                log.critical(
+                    "Failed to parse JSON in profile file '%s' (exception: %s)",
+                    filename,
+                    ex,
+                )
                 return {}
     except OSError as e:
         log.critical("Cannot open config file: %s (%s)", filename, str(e))

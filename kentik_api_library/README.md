@@ -1,7 +1,7 @@
-# Kentik API python library.
+# Kentik API python library
 
-This is a python wrapper for kentik rest api.  
-For more information on how to interact with kentik resources using this library, see examples in examples/ folder.
+This is a python wrapper for Kentik rest API.  
+For more information on how to interact with Kentik resources using this library, see examples in examples/ folder.
 
 ## Installation with pip
 
@@ -68,7 +68,11 @@ The general approach is that every single KentikAPI resource is represented in t
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
 
+## Development
+[Instruction for developers](../docs/README.md)
+
 ## Additional utilities available in the `utils` sub-module
+
 ### Authentication support
 - `get_credentials`: function for retrieving authentication credentials from the environment or a profile stored on disk.
   API authentication credentials can be provided via environment variables `KTAPI_AUTH_EMAIL` and `KTAPI_AUTH_TOKEN`
@@ -80,7 +84,7 @@ The general approach is that every single KentikAPI resource is represented in t
   "api-key": "<the API key>"
 }
 ```
-Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in 
+Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is first searched in
 `${KTAPI_HOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
 
 ### Support for caching of device data

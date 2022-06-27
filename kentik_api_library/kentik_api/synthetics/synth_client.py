@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any, List, Optional
 
@@ -21,11 +22,15 @@ from kentik_api.synthetics.synth_tests import (
     TraceResponse,
     UrlTest,
 )
-from kentik_api.synthetics.synth_tests.protobuf_tools import pb_from_datetime
+from kentik_api.synthetics.synth_tests.base import DateTime
 from kentik_api.synthetics.types import TestStatus, TestType
+
+log = logging.getLogger("synth_tests")
 
 
 class KentikSynthClient:
+    IGNORED_TEST_TYPES = [TestType.BGP_MONITOR.value, TestType.TRANSACTION.value]
+
     def __init__(self, connector: APISyntheticsConnectorProtocol):
         self._connector = connector
 
@@ -49,10 +54,13 @@ class KentikSynthClient:
 
     def get_all_tests(self) -> List[SynTest]:
         pb_tests = self._connector.get_all_tests()
-        return [make_synth_test(pb_test) for pb_test in pb_tests]
+        return [make_synth_test(pb_test) for pb_test in pb_tests if str(pb_test.type) not in self.IGNORED_TEST_TYPES]
 
     def get_test(self, test_id: ID) -> SynTest:
         pb_test = self._connector.get_test(str(test_id))
+        if str(pb_test.type) in self.IGNORED_TEST_TYPES:
+            raise KentikAPIError(f"Unsupported test type: {str(pb_test.type)}")
+
         return make_synth_test(pb_test)
 
     def create_test(self, test: SynTest) -> SynTest:
@@ -84,8 +92,8 @@ class KentikSynthClient:
         tasks = [str(id) for id in task_ids] if task_ids else []
         response = self._connector.results_for_tests(
             test_ids=ids,
-            start=pb_from_datetime(start),
-            end=pb_from_datetime(end),
+            start=DateTime.fromtimestamp(start.timestamp(), start.tzinfo).to_pb(),
+            end=DateTime.fromtimestamp(end.timestamp(), end.tzinfo).to_pb(),
             agent_ids=agents,
             task_ids=tasks,
         )
@@ -103,8 +111,8 @@ class KentikSynthClient:
         targets = [str(ip) for ip in target_ips] if target_ips else []
         response = self._connector.trace_for_test(
             test_id=str(test_id),
-            start=pb_from_datetime(start),
-            end=pb_from_datetime(end),
+            start=DateTime.fromtimestamp(start.timestamp(), start.tzinfo).to_pb(),
+            end=DateTime.fromtimestamp(end.timestamp(), end.tzinfo).to_pb(),
             agent_ids=agents,
             target_ips=targets,
         )
@@ -114,7 +122,6 @@ class KentikSynthClient:
 def make_synth_test(pb_object: pb.Test) -> SynTest:
     def _cls_from_type(test_type: TestType) -> Any:
         return {
-            # TestType.bgp_monitor: SynTest,
             TestType.IP: IPTest,
             TestType.AGENT: AgentTest,
             TestType.HOSTNAME: HostnameTest,
@@ -131,7 +138,4 @@ def make_synth_test(pb_object: pb.Test) -> SynTest:
     cls = _cls_from_type(TestType(test_type))
     if cls is None:
         raise KentikAPIError(f"Unsupported test type: {test_type}")
-
-    test = cls(pb_object.name)
-    test.fill_from_pb(pb_object)
-    return test
+    return cls.from_pb(pb_object)
