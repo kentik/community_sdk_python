@@ -12,8 +12,8 @@ class KentikCloudExportClient:
         pb_exports = self._connector.get_all()
         return ListCloudExportResponse.from_pb(pb_exports)
 
-    def get(self, id: ID) -> CloudExport:
-        pb_export = self._connector.get(str(id))
+    def get(self, export_id: ID) -> CloudExport:
+        pb_export = self._connector.get(str(export_id))
         return CloudExport.from_pb(pb_export)
 
     def create(self, export: CloudExport) -> CloudExport:
@@ -33,5 +33,5 @@ class KentikCloudExportClient:
         pb_output_export = self._connector.update(pb_input_export)
         return CloudExport.from_pb(pb_output_export)
 
-    def delete(self, id: ID) -> None:
-        return self._connector.delete(str(id))
+    def delete(self, export_id: ID) -> None:
+        return self._connector.delete(str(export_id))

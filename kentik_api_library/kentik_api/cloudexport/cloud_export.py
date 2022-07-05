@@ -87,7 +87,13 @@ class CloudExport(_ConfigElement):
     gce: Optional[GceProperties] = None
     ibm: Optional[IbmProperties] = None
     bgp: Optional[BgpProperties] = None
-    current_status: Status = Status()
+
+    # read-only
+    _current_status: Status = Status()
+
+    @property
+    def current_status(self) -> Status:
+        return self._current_status
 
 
 @dataclass
