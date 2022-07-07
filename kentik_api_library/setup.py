@@ -7,7 +7,7 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import setup, Command
+from setuptools import Command, setup
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
@@ -62,6 +63,8 @@ def test_create_user_success() -> None:
     assert created.role == "Member"
     assert created.email_service is True
     assert created.email_product is True
+    assert created.created_date == datetime(2020, 12, 9, 14, 33, 28, 330000, tzinfo=timezone.utc)
+    assert created.updated_date == datetime(2020, 12, 9, 14, 33, 28, 369000, tzinfo=timezone.utc)
 
 
 def test_get_user_success() -> None:
@@ -105,6 +108,8 @@ def test_get_user_success() -> None:
     assert user.role == "Member"
     assert user.email_service is True
     assert user.email_product is True
+    assert user.created_date == datetime(2020, 12, 9, 14, 48, 42, 187000, tzinfo=timezone.utc)
+    assert user.updated_date == datetime(2020, 12, 9, 14, 48, 43, 243000, tzinfo=timezone.utc)
 
 
 def test_update_user_success() -> None:
@@ -154,6 +159,8 @@ def test_update_user_success() -> None:
     assert updated.id == ID(146034)
     assert updated.full_name == "User Testing"
     assert updated.email == "test@user.example"
+    assert updated.created_date == datetime(2020, 12, 9, 15, 23, 29, 768000, tzinfo=timezone.utc)
+    assert updated.updated_date == datetime(2020, 12, 9, 15, 23, 31, 108000, tzinfo=timezone.utc)
 
 
 def test_delete_user_success() -> None:
