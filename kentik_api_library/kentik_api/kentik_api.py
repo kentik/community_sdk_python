@@ -1,3 +1,4 @@
+import logging
 from typing import Any, List, Optional, Tuple, Union
 
 from .api_connection.api_connector import APIConnector
@@ -35,6 +36,9 @@ class KentikAPI:
         proxy: Optional[str] = None,
         grpc_client_options: Optional[List[Tuple[str, Any]]] = None,
     ) -> None:
+        if not api_host:
+            logging.debug("KentikAPI: null api_host, setting to %s", self.API_HOST_US)
+            api_host = self.API_HOST_US
         api_v5_url = self.make_api_v5_url(api_host)
         connector = APIConnector(api_v5_url, auth_email, auth_token, timeout, retry_strategy, proxy)
         self.device_labels = DeviceLabelsAPI(connector)
