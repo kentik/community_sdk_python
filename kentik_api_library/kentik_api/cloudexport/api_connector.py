@@ -10,7 +10,7 @@ from kentik_api.internal.grpc import wrap_grpc_errors
 class APICloudExportConnector:
     """
     APICloudExportConnector implements APICloudExportConnectorProtocol.
-    Allows sending authorized grpc requests to Kentik CloudExport API
+    Allows sending authorized gRPC requests to Kentik CloudExport API
     """
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str, options: List[Tuple[str, Any]] = []):

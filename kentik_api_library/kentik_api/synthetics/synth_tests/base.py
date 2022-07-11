@@ -138,6 +138,9 @@ class HealthSettings(_ConfigElement):
     activation: ActivationSettings = field(default_factory=ActivationSettings)
 
 
+SynTestSettingsT = TypeVar("SynTestSettingsT", bound="SynTestSettings")
+
+
 @dataclass
 class SynTestSettings(_ConfigElement):
     PB_TYPE = pb.TestSettings
@@ -150,7 +153,7 @@ class SynTestSettings(_ConfigElement):
     notification_channels: List[str] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[_ConfigElementT], obj: Any):
+    def from_pb(cls: Type[SynTestSettingsT], obj: Any) -> SynTestSettingsT:
         """Tweak inherited "from_pb" method to handle ignored and legacy task types"""
 
         IGNORED_TASK_TYPES = ["bgp-monitor"]
@@ -169,7 +172,7 @@ class SynTestSettings(_ConfigElement):
                 obj.tasks.remove(legacy)
                 obj.tasks.append(replacement)
 
-        return cls._from_protobuf(obj)
+        return super().from_pb(obj)
 
 
 @dataclass

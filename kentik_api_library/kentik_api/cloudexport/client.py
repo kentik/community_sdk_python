@@ -22,7 +22,9 @@ class KentikCloudExportClient:
         return CloudExport.from_pb(pb_output_export)
 
     def patch(self, export: CloudExport, modified: str) -> CloudExport:
-        """modified: eg. export.name"""
+        """
+        :param modified comma-separated list of fields to be modified, eg. "export.name,export.description"
+        """
 
         pb_input_export = export.to_pb()
         pb_output_export = self._connector.patch(pb_input_export, modified)

@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
@@ -16,46 +16,52 @@ class CloudExportType(SerializableEnum):
 class AwsProperties(_ConfigElement):
     PB_TYPE = pb.AwsProperties
 
-    bucket: str = ""
-    iam_role_arn: str = ""
-    region: str = ""
-    delete_after_read: bool = False
-    multiple_buckets: bool = False
+    bucket: str
+    iam_role_arn: str
+    region: str
+    delete_after_read: bool
+    multiple_buckets: bool
 
 
 @dataclass
 class AzureProperties(_ConfigElement):
     PB_TYPE = pb.AzureProperties
 
-    location: str = ""
-    resource_group: str = ""
-    storage_account: str = ""
-    subscription_id: str = ""
-    security_principal_enabled: bool = False
+    location: str
+    resource_group: str
+    storage_account: str
+    subscription_id: str
+    security_principal_enabled: bool
 
 
 @dataclass
 class GceProperties(_ConfigElement):
     PB_TYPE = pb.GceProperties
 
-    project: str = ""
-    subscription: str = ""
+    project: str
+    subscription: str
 
 
 @dataclass
 class IbmProperties(_ConfigElement):
     PB_TYPE = pb.IbmProperties
 
-    bucket: str = ""
+    bucket: str
+
+
+class DeviceBGPType(SerializableEnum):
+    NONE = "none"
+    OTHER_DEVICE = "other_device"
+    DEVICE = "device"
 
 
 @dataclass
 class BgpProperties(_ConfigElement):
     PB_TYPE = pb.BgpProperties
 
-    apply_bgp: bool = False
-    use_bgp_device_id: ID = ID()
-    device_bgp_type: str = "none"  # device/other_device/none
+    apply_bgp: bool
+    use_bgp_device_id: ID
+    device_bgp_type: DeviceBGPType
 
 
 @dataclass
@@ -69,26 +75,35 @@ class Status(_ConfigElement):
     storage_account_access: bool = False
 
 
+class CloudProviderType(SerializableEnum):
+    AWS = "aws"
+    AZURE = "azure"
+    GCE = "gce"
+    IBM = "ibm"
+    BGP = "bgp"
+
+
 @dataclass
 class CloudExport(_ConfigElement):
     PB_TYPE = pb.CloudExport
 
-    id: ID = ID()
-    type: CloudExportType = CloudExportType.UNSPECIFIED
-    enabled: bool = False
-    name: str = ""
-    description: str = ""
-    api_root: str = ""
-    flow_dest: str = ""
-    plan_id: ID = ID()
-    cloud_provider: str = ""  # not an enum as there will be more clouds supported. Currently: aws/azure/gce/ibm/bgp
+    # read-write
+    name: str
+    description: str
+    type: CloudExportType
+    plan_id: ID
+    cloud_provider: CloudProviderType
     aws: Optional[AwsProperties] = None
     azure: Optional[AzureProperties] = None
     gce: Optional[GceProperties] = None
     ibm: Optional[IbmProperties] = None
     bgp: Optional[BgpProperties] = None
+    enabled: bool = True
+    id: ID = ID()
 
     # read-only
+    _api_root: str = ""
+    _flow_dest: str = ""
     _current_status: Status = Status()
 
     @property
@@ -100,5 +115,5 @@ class CloudExport(_ConfigElement):
 class ListCloudExportResponse(_ConfigElement):
     PB_TYPE = DoNotSerializeMarker  # response is read-only
 
-    exports: List[CloudExport] = field(default_factory=list)
-    invalid_exports_count: int = 0
+    exports: List[CloudExport]
+    invalid_exports_count: int

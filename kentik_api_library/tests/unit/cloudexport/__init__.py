@@ -8,4 +8,6 @@ def clear_readonly_fields(export: pb.CloudExport) -> pb.CloudExport:
 
     export = deepcopy(export)  # to avoid interference between tests
     export.ClearField("current_status")
+    export.ClearField("api_root")
+    export.ClearField("flow_dest")
     return export

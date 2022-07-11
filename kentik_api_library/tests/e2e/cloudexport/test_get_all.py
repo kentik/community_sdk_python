@@ -5,6 +5,6 @@ from tests.e2e.cloudexport.utils import client, credentials_missing_str, credent
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_ibm_crud() -> None:
+def test_get_all_tests() -> None:
     exports = client().cloud_export.get_all()
     assert isinstance(exports, ListCloudExportResponse)

@@ -2,7 +2,14 @@ from google.protobuf.wrappers_pb2 import BoolValue
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
-from kentik_api.cloudexport.cloud_export import BgpProperties, CloudExport, CloudExportType, Status
+from kentik_api.cloudexport.cloud_export import (
+    BgpProperties,
+    CloudExport,
+    CloudExportType,
+    CloudProviderType,
+    DeviceBGPType,
+    Status,
+)
 from kentik_api.public.types import ID
 from tests.unit.cloudexport import clear_readonly_fields
 from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnector
@@ -14,9 +21,9 @@ PB_BGP = pb.CloudExport(
     enabled=True,
     name="test_bgp_cloudexport",
     description="Test BGP CloudExport description",
+    plan_id="5678",
     api_root="https://api.kentik.com",
     flow_dest="https://flow.kentik.com",
-    plan_id="5678",
     current_status=pb.Status(
         status="ERROR",
         error_message="Flow not found",
@@ -28,7 +35,7 @@ PB_BGP = pb.CloudExport(
     bgp=pb.BgpProperties(
         apply_bgp=True,
         use_bgp_device_id="42",
-        device_bgp_type="device",
+        device_bgp_type=DeviceBGPType.DEVICE.value,
     ),
 )
 
@@ -38,9 +45,9 @@ BGP = CloudExport(
     enabled=True,
     name="test_bgp_cloudexport",
     description="Test BGP CloudExport description",
-    api_root="https://api.kentik.com",
-    flow_dest="https://flow.kentik.com",
     plan_id=ID("5678"),
+    _api_root="https://api.kentik.com",
+    _flow_dest="https://flow.kentik.com",
     _current_status=Status(
         status="ERROR",
         error_message="Flow not found",
@@ -48,11 +55,11 @@ BGP = CloudExport(
         api_access=False,
         storage_account_access=False,
     ),
-    cloud_provider="bgp",
+    cloud_provider=CloudProviderType.BGP,
     bgp=BgpProperties(
         apply_bgp=True,
         use_bgp_device_id="42",
-        device_bgp_type="device",
+        device_bgp_type=DeviceBGPType.DEVICE,
     ),
 )
 

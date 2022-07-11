@@ -2,7 +2,7 @@ from google.protobuf.wrappers_pb2 import BoolValue
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
-from kentik_api.cloudexport.cloud_export import CloudExport, CloudExportType, GceProperties, Status
+from kentik_api.cloudexport.cloud_export import CloudExport, CloudExportType, CloudProviderType, GceProperties, Status
 from kentik_api.public.types import ID
 from tests.unit.cloudexport import clear_readonly_fields
 from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnector
@@ -14,9 +14,9 @@ PB_GCE = pb.CloudExport(
     enabled=True,
     name="test_gce_cloudexport",
     description="Test GCE CloudExport description",
+    plan_id="5678",
     api_root="https://api.kentik.com",
     flow_dest="https://flow.kentik.com",
-    plan_id="5678",
     current_status=pb.Status(
         status="OK",
         error_message="NO ERROR",
@@ -34,9 +34,9 @@ GCE = CloudExport(
     enabled=True,
     name="test_gce_cloudexport",
     description="Test GCE CloudExport description",
-    api_root="https://api.kentik.com",
-    flow_dest="https://flow.kentik.com",
     plan_id=ID("5678"),
+    _api_root="https://api.kentik.com",
+    _flow_dest="https://flow.kentik.com",
     _current_status=Status(
         status="OK",
         error_message="NO ERROR",
@@ -44,7 +44,7 @@ GCE = CloudExport(
         api_access=True,
         storage_account_access=True,
     ),
-    cloud_provider="gce",
+    cloud_provider=CloudProviderType.GCE,
     gce=GceProperties(project="testproject", subscription="gcesubscription"),
 )
 

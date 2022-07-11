@@ -55,7 +55,8 @@ _ConfigElementT = TypeVar("_ConfigElementT", bound="_ConfigElement")
 class _ConfigElement:
     """
     Base class that enables automatic protobuf class <-> user facing dataclass serialization/deserialization.
-    Protobuf class and user facing dataclass need to have fields named exactly the same.
+    Protobuf class and user facing dataclass need to have fields named exactly the same, otherwise the deviations
+    must be handled explicitly by defining custom from_pb/to_pb methods for the respective class.
     Fields starting with underscore "_" are treated as read-only and are not serialized to protobuf.
     """
 
@@ -81,7 +82,9 @@ class _ConfigElement:
             try:
                 return dst_type(src_value)
             except TypeError as error:
-                raise RuntimeError(f"Don't know how to serialize to '{dst_type}' (value: '{src_value}')") from error
+                raise RuntimeError(
+                    f"Don't know how to serialize to '{dst_type}' (type: '{type(src_value)}', value: '{src_value}')"
+                ) from error
 
         dummy_pb_instance = self.PB_TYPE()  # used only for examining the destination protobuf object field types
         args = {}
@@ -95,12 +98,10 @@ class _ConfigElement:
 
     @classmethod
     def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
-        """from_pb can be overridden in a child class to tweak deserialization behavior, and still call _from_protobuf"""
+        """
+        Deserialize protobuf obj into a respective dataclass
+        """
 
-        return cls._from_protobuf(obj)
-
-    @classmethod
-    def _from_protobuf(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
         def get_value(dst_type: Type[Any], src_value: Any) -> Any:
             if hasattr(dst_type, "from_pb"):
                 return dst_type.from_pb(src_value)
@@ -124,13 +125,13 @@ class _ConfigElement:
         _init_fields = [f for f in fields(cls) if f.init]
         args = {}
         for f in _init_fields:
-            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
+            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # remove leading underscore from attribute name
             args[f.name] = get_value(f.type, getattr(obj, src_name))
         instance = cls(**args)
 
         _remaining_fields = [f for f in fields(cls) if not f.init]
         for f in _remaining_fields:
-            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
+            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # remove leading underscore from attribute name
             v = get_value(f.type, getattr(obj, src_name))
             setattr(instance, f.name, v)
         return instance

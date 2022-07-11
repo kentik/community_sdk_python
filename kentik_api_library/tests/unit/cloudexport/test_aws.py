@@ -2,7 +2,7 @@ from google.protobuf.wrappers_pb2 import BoolValue
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
-from kentik_api.cloudexport.cloud_export import AwsProperties, CloudExport, CloudExportType, Status
+from kentik_api.cloudexport.cloud_export import AwsProperties, CloudExport, CloudExportType, CloudProviderType, Status
 from kentik_api.public.types import ID
 from tests.unit.cloudexport import clear_readonly_fields
 from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnector
@@ -40,9 +40,9 @@ AWS = CloudExport(
     enabled=True,
     name="test_aws_cloudexport",
     description="Test AWS CloudExport description",
-    api_root="https://api.kentik.com",
-    flow_dest="https://flow.kentik.com",
     plan_id=ID("5678"),
+    _api_root="https://api.kentik.com",
+    _flow_dest="https://flow.kentik.com",
     _current_status=Status(
         status="OK",
         error_message="NO ERROR",
@@ -50,7 +50,7 @@ AWS = CloudExport(
         api_access=True,
         storage_account_access=True,
     ),
-    cloud_provider="aws",
+    cloud_provider=CloudProviderType.AWS,
     aws=AwsProperties(
         bucket="cloudexport-src-s3-bucket",
         iam_role_arn="arn:aws:iam::177634097045:role/test-cloudexport-IngestRole",

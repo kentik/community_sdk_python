@@ -59,7 +59,7 @@ class KentikAPI:
                 ("grpc.max_receive_message_length", 40 * 1024 * 1024),
             ]
 
-        api_v6_url = self.make_api_v6_url(api_host)
+        api_v6_url = self.make_grpc_endpoint(api_host)
 
         synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token, grpc_client_options)
         self.synthetics = KentikSynthClient(synth_connector)
@@ -72,7 +72,7 @@ class KentikAPI:
         return f"https://{api_host}/api/v5"
 
     @staticmethod
-    def make_api_v6_url(api_host: str) -> str:
+    def make_grpc_endpoint(api_host: str) -> str:
         return f"grpc.{api_host}"
 
 
