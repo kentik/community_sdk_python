@@ -120,7 +120,7 @@ def execute_test_crud_steps(
     pause_after_creation: bool = False,
     pass_edate_in_update: bool = False,
 ) -> None:
-    test_id = 0
+    test_id = ID()
     try:
         # create
         created_test = client().synthetics.create_test(test)
