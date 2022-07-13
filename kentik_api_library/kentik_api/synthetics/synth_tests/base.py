@@ -1,11 +1,10 @@
 import logging
 from copy import deepcopy
 from dataclasses import dataclass, field, fields
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, timezone
 from ipaddress import ip_address
-from typing import Any, Callable, List, Optional, Type, TypeVar, get_args
+from typing import Any, Callable, List, Type, TypeVar, get_args
 
-import inflection
 from google.protobuf.timestamp_pb2 import Timestamp
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
@@ -46,7 +45,8 @@ class Defaults:
 
 class DoNotSerializeMarker:
     """
-    Marker type for _ConfigElement.to_pb() method: skip objects with field PB_TYPE == NotSerializableMarker during serialization to protobuf object
+    Marker type for _ConfigElement.to_pb() method: skip objects with field PB_TYPE == NotSerializableMarker
+    during serialization to protobuf object
     """
 
 
@@ -141,11 +141,11 @@ class DateTime(datetime):
 
     @classmethod
     def from_pb(cls: Type[DateTimeT], value: Timestamp) -> DateTimeT:
-        return cls.fromtimestamp(value.seconds, timezone.utc)
+        return cls.fromtimestamp(value.seconds + value.nanos / 1e9, timezone.utc)
 
     def to_pb(self) -> Timestamp:
-        seconds = int(self.timestamp())
-        return Timestamp(seconds=seconds, nanos=0)
+        ts = self.timestamp()
+        return Timestamp(seconds=int(ts), nanos=int((ts - int(ts)) * 1e9))
 
 
 @dataclass
@@ -274,6 +274,7 @@ class UserInfo(_ConfigElement):
 
 @dataclass
 class SynTest(_ConfigElement):
+    VALID_TEST_PERIODS = [1, 15, 60, 120, 300, 600, 900, 1800, 3600, 5400]
     PB_TYPE = pb.Test
 
     # read-write
@@ -289,6 +290,46 @@ class SynTest(_ConfigElement):
     _cdate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)
     _created_by: UserInfo = field(default_factory=UserInfo, init=False)
     _last_updated_by: UserInfo = field(default_factory=UserInfo, init=False)
+
+    def _common_attribute_fixups(self):
+        # Correct settings.health_settings.activation parameters if necessary
+        orig = None
+        if not self.settings.health_settings.activation.times:
+            self.settings.health_settings.activation.times = "3"
+        min_activation_window = int(
+            self.settings.period * (int(self.settings.health_settings.activation.times) + 1) / 60
+        )
+        if not self.settings.health_settings.activation.time_window:
+            orig = "{}{}".format(
+                self.settings.health_settings.activation.time_window, self.settings.health_settings.activation.time_unit
+            )
+            self.settings.health_settings.activation.time_window = str(min_activation_window)
+            self.settings.health_settings.activation.time_unit = "m"
+        else:
+            # Fixup alert time window
+            # Convert current activation window to minutes
+            if self.settings.health_settings.activation.time_unit == "h":
+                self.settings.health_settings.activation.time_window = str(
+                    int(self.settings.health_settings.activation.time_window) * 60
+                )
+                self.settings.health_settings.activation.time_unit = "m"
+            if int(self.settings.health_settings.activation.time_window) < min_activation_window:
+                orig = "{}{}".format(
+                    self.settings.health_settings.activation.time_window,
+                    self.settings.health_settings.activation.time_unit,
+                )
+                self.settings.health_settings.activation.time_window = str(min_activation_window)
+        if orig is not None:
+            log.debug(
+                "_common_attribute_fixups: test: '%s' activation.time_window changed from %s to '%s%s'",
+                self.name,
+                orig,
+                self.settings.health_settings.activation.time_window,
+                self.settings.health_settings.activation.time_unit,
+            )
+
+    def __post_init__(self):
+        self._common_attribute_fixups()
 
     @property
     def deployed(self) -> bool:
@@ -312,26 +353,35 @@ class SynTest(_ConfigElement):
 
     @property
     def targets(self) -> List[str]:
-        type_label = inflection.camelize(self.type.value, False)
+        type_label = self.type.value
         try:
             d = getattr(self.settings, type_label)
-            if "target" in d:
-                return [d["target"]]
-            if "targets" in d:
-                return sorted(d["targets"])
+            if hasattr(d, "target"):
+                return [d.target]
+            if hasattr(d, "targets"):
+                return sorted(d.targets, key=lambda x: str(x))
         except AttributeError:
             pass
         log.debug("'%s' (type: '%s'): Test has no targets", self.name, self.type.value)
         return []
 
     def undeploy(self):
-        self._id = DEFAULT_ID
+        self.id = DEFAULT_ID
 
     def set_period(self, period_seconds: int):
+        if period_seconds not in self.VALID_TEST_PERIODS:
+            log.warning(
+                "Test period (%d) is not one of allowed values (%s)",
+                period_seconds,
+                ", ".join([str(x) for x in self.VALID_TEST_PERIODS]),
+            )
+            try:
+                period_seconds = max([v for v in self.VALID_TEST_PERIODS if v < period_seconds])
+            except ValueError:
+                period_seconds = 60
+            log.warning("Test period set to: %d", period_seconds)
         self.settings.period = period_seconds
-
-    def set_timeout(self, timeout: int):
-        pass
+        self._common_attribute_fixups()
 
 
 @dataclass

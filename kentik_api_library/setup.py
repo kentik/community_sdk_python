@@ -222,7 +222,8 @@ class FetchGRPCCode(Command):
         dst.mkdir(parents=True)
         # checkout source repo and copy stubs
         with TemporaryDirectory() as tmp:
-            git.Repo.clone_from(self.repo, tmp)
+            repo = git.Repo.clone_from(self.repo, tmp)
+            repo.create_head("OK", "896729e59945404959e930f63f7a8965c109537d").checkout()
             Path(tmp).joinpath(self.src_path).rename(dst)
 
 
