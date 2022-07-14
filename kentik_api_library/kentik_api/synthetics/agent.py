@@ -59,6 +59,7 @@ class Agent(_ConfigElement):
     local_ip: IP = IP()
     cloud_region: str = ""
     cloud_provider: str = ""
+    labels: List[str] = field(default_factory=list)
 
     @property
     def os(self) -> str:
@@ -83,3 +84,11 @@ class Agent(_ConfigElement):
     @property
     def last_authed(self) -> DateTime:
         return self._last_authed
+
+    @property
+    def is_private(self) -> bool:
+        return self.type == AgentOwnershipType.PRIVATE
+
+    @property
+    def is_app_agent(self) -> bool:
+        return self.agent_impl == AgentImplementType.NODE

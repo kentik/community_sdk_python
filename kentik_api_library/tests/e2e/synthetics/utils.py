@@ -1,6 +1,6 @@
 import os
 from copy import deepcopy
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import List
 from urllib.parse import urlparse
 
@@ -65,7 +65,8 @@ credentials_present = all(v in os.environ for v in required_env_variables)
 
 
 def make_e2e_test_name(test_type: TestType) -> str:
-    return f"e2e-{test_type.value}-test"
+    now = datetime.now(tz=timezone.utc)
+    return f"pysdk_e2e-{now.isoformat()}-{test_type.value}"
 
 
 def client() -> KentikAPI:

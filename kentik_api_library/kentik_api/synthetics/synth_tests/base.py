@@ -96,7 +96,9 @@ class _ConfigElement:
 
     @classmethod
     def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
-        """from_pb can be overridden in a child class to tweak deserialization behavior, and still call _from_protobuf"""
+        """
+        from_pb can be overridden in a child class to tweak deserialization behavior, and still call _from_protobuf
+        """
 
         return cls._from_protobuf(obj)
 
@@ -283,7 +285,7 @@ class SynTest(_ConfigElement):
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
-    # labels: List[str] = field(default_factory=list) # not supported yet
+    labels: List[str] = field(default_factory=list)
     edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)  # yes, edate is read-write
 
     # read-only
