@@ -192,39 +192,61 @@ class Format(Command):
         run_cmd(cmd, self.announce)
 
 
-class FetchGRPCCode(Command):
-    """Command copying generate Python gRPC code from source repo."""
+class GenerateGRPCStubs(Command):
+    """Generate Python gRPC stubs from proto files in the source repo."""
 
-    description = "Copy generated Python stubs from source repo"
+    description = "Generate Python stubs from proto files in the source repo"
     user_options = [
         ("repo=", None, "Source repository"),
-        ("src-path=", None, "Path to generated Python code within the source repo"),
-        ("dst-path=", None, "Destination path in the local source tree"),
     ]
 
     def initialize_options(self):
         self.repo = "https://github.com/kentik/api-schema-public.git"
-        self.src_path = "gen/python"
-        self.dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
 
     def finalize_options(self):
         pass
 
     def run(self):
-        print("Fetching gRPC generated code")
-
         import git
 
+        dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
+        apis = [
+            dict(name="core", version="v202012alpha1"),
+            dict(name="synthetics", version="v202202"),
+            dict(name="cloud_export", version="v202101beta1")
+        ]
+        print(f"Building gRPC stubs from proto files in {self.repo}")
+        print("for following Kentik APIs:")
+        for a in apis:
+            print(f"\t{a['name']}/{a['version']}")
+
+        deps = [
+            "protovendor/github.com/googleapis/googleapis",
+            "protovendor/github.com/grpc-ecosystem/grpc-gateway"
+        ]
         # cleanup destination directory
-        shutil.rmtree(self.dst_path, ignore_errors=True)  # ignore "No such file or directory"
+        shutil.rmtree(dst_path, ignore_errors=True)  # ignore "No such file or directory"
         # create destination directory, if it does not exist
-        dst = Path(self.dst_path)
+        dst = Path(dst_path)
         dst.mkdir(parents=True)
         # checkout source repo and copy stubs
         with TemporaryDirectory() as tmp:
-            repo = git.Repo.clone_from(self.repo, tmp)
-            repo.create_head("OK", "896729e59945404959e930f63f7a8965c109537d").checkout()
-            Path(tmp).joinpath(self.src_path).rename(dst)
+            git.Repo.clone_from(self.repo, tmp)
+            cmd = [
+                "python", "-m", "grpc_tools.protoc",
+                f"--python_out={dst.as_posix()}",
+                f"--grpc_python_out={dst.as_posix()}",
+                f"-I{tmp}/proto/",
+            ]
+            for d in deps:
+                cmd.append(f"-I{tmp}/{d}/",)
+            for d in deps:
+                for f in Path(f"{tmp}").joinpath(d).glob("**/*.proto"):
+                    cmd.append(f.as_posix())
+            for a in apis:
+                for f in Path(f"{tmp}/proto/kentik/").joinpath(a['name']).joinpath(a['version']).glob("*.proto"):
+                    cmd.append(f.as_posix())
+            run_cmd(cmd, self.announce)
 
 
 class PrintPackages(Command):
@@ -264,8 +286,7 @@ setup(
         "typing-extensions>=3.7.4.3",
         "urllib3>=1.26.0",
         "protobuf==3.20.1",
-        "grpcio>=1.38.1",
-        "inflection>=0.5.1",
+        "grpcio>=1.47.0",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
@@ -275,7 +296,7 @@ setup(
         "pylint": Pylint,
         "pytest": Pytest,
         "format": Format,
-        "grpc_stubs": FetchGRPCCode,
+        "grpc_stubs": GenerateGRPCStubs,
         "packages": PrintPackages,
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],
