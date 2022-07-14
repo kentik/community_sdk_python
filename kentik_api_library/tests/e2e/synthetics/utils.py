@@ -1,7 +1,7 @@
 import os
 from copy import deepcopy
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from urllib.parse import urlparse
 
 from kentik_api import KentikAPI
@@ -120,9 +120,13 @@ def execute_test_crud_steps(
     update_settings: SynTestSettings,
     pause_after_creation: bool = False,
     pass_edate_in_update: bool = False,
+    labels: Optional[List[str]] = None,
 ) -> None:
     test_id = ID()
     try:
+        # set test labels if any
+        if labels:
+            test.labels = labels
         # create
         created_test = client().synthetics.create_test(test)
         test_id = created_test.id
@@ -132,6 +136,8 @@ def execute_test_crud_steps(
         assert created_test.type == test.type
         assert created_test.status == TestStatus.ACTIVE
         assert created_test.settings == normalize_activation_settings(test.settings)
+        if labels:
+            assert created_test.labels == test.labels
 
         # set status
         if pause_after_creation:
