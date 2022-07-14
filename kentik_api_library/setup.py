@@ -128,7 +128,7 @@ class Format(Command):
     ]
 
     def initialize_options(self) -> None:
-        self.dirs = ["kentik_api", "tests", "examples"]
+        self.dirs = ["kentik_api", "tests", "examples", "setup.py"]
         self.check = False
 
     def finalize_options(self):
@@ -181,17 +181,14 @@ class GenerateGRPCStubs(Command):
         apis = [
             dict(name="core", version="v202012alpha1"),
             dict(name="synthetics", version="v202202"),
-            dict(name="cloud_export", version="v202101beta1")
+            dict(name="cloud_export", version="v202101beta1"),
         ]
         print(f"Building gRPC stubs from proto files in {self.repo}")
         print("for following Kentik APIs:")
         for a in apis:
             print(f"\t{a['name']}/{a['version']}")
 
-        deps = [
-            "protovendor/github.com/googleapis/googleapis",
-            "protovendor/github.com/grpc-ecosystem/grpc-gateway"
-        ]
+        deps = ["protovendor/github.com/googleapis/googleapis", "protovendor/github.com/grpc-ecosystem/grpc-gateway"]
         # cleanup destination directory
         shutil.rmtree(dst_path, ignore_errors=True)  # ignore "No such file or directory"
         # create destination directory, if it does not exist
@@ -201,18 +198,22 @@ class GenerateGRPCStubs(Command):
         with TemporaryDirectory() as tmp:
             git.Repo.clone_from(self.repo, tmp)
             cmd = [
-                "python", "-m", "grpc_tools.protoc",
+                "python",
+                "-m",
+                "grpc_tools.protoc",
                 f"--python_out={dst.as_posix()}",
                 f"--grpc_python_out={dst.as_posix()}",
                 f"-I{tmp}/proto/",
             ]
             for d in deps:
-                cmd.append(f"-I{tmp}/{d}/",)
+                cmd.append(
+                    f"-I{tmp}/{d}/",
+                )
             for d in deps:
                 for f in Path(f"{tmp}").joinpath(d).glob("**/*.proto"):
                     cmd.append(f.as_posix())
             for a in apis:
-                for f in Path(f"{tmp}/proto/kentik/").joinpath(a['name']).joinpath(a['version']).glob("*.proto"):
+                for f in Path(f"{tmp}/proto/kentik/").joinpath(a["name"]).joinpath(a["version"]).glob("*.proto"):
                     cmd.append(f.as_posix())
             run_cmd(cmd, self.announce)
 
