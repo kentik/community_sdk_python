@@ -120,13 +120,9 @@ def execute_test_crud_steps(
     update_settings: SynTestSettings,
     pause_after_creation: bool = False,
     pass_edate_in_update: bool = False,
-    labels: Optional[List[str]] = None,
 ) -> None:
     test_id = ID()
     try:
-        # set test labels if any
-        if labels:
-            test.labels = labels
         # create
         created_test = client().synthetics.create_test(test)
         test_id = created_test.id
@@ -136,8 +132,7 @@ def execute_test_crud_steps(
         assert created_test.type == test.type
         assert created_test.status == TestStatus.ACTIVE
         assert created_test.settings == normalize_activation_settings(test.settings)
-        if labels:
-            assert created_test.labels == test.labels
+        assert created_test.labels == test.labels
 
         # set status
         if pause_after_creation:
@@ -150,6 +145,7 @@ def execute_test_crud_steps(
         assert received_test.type == created_test.type
         assert received_test.status == TestStatus.PAUSED if pause_after_creation else TestStatus.ACTIVE
         assert received_test.settings == normalize_activation_settings(test.settings)
+        assert received_test.labels == created_test.labels
 
         # update
         received_test.name = f"{test.name}-updated"
@@ -157,6 +153,9 @@ def execute_test_crud_steps(
         received_test.settings = update_settings
         if not pass_edate_in_update:
             received_test.edate = DateTime.fromtimestamp(0, tz=timezone.utc)
+        # test resetting labels, if any were provided
+        if received_test.labels:
+            received_test.labels = []
 
         print(f"received id: {received_test.id} edate: {received_test.edate.isoformat()}")
         updated_test = client().synthetics.update_test(received_test)
@@ -165,6 +164,8 @@ def execute_test_crud_steps(
         assert updated_test.type == received_test.type
         assert updated_test.status == received_test.status
         assert updated_test.settings == normalize_activation_settings(received_test.settings)
+        assert updated_test.labels == received_test.labels
+
     finally:
         # delete the created test, if any, even if an assertion failed or other problem has occurred
         if test_id:

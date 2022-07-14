@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_url_crud() -> None:
+def test_url_crud(test_labels) -> None:
     agents = pick_agent_ids(count=2)
     initial_settings = UrlTestSettings(
         family=IPFamily.V4,
@@ -60,5 +60,6 @@ def test_url_crud() -> None:
     update_settings.url.ignore_tls_errors = True
 
     test = UrlTest(make_e2e_test_name(TestType.URL), TestStatus.ACTIVE, initial_settings)
+    test.labels = test_labels
 
     execute_test_crud_steps(test, update_settings=update_settings)
