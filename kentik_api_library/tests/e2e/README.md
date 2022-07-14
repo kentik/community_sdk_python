@@ -1,4 +1,4 @@
-# End-to-End (e2e) tests 
+# End-to-End (e2e) tests
 
 The e2e test suite verifies:
 - CRUD operations for all supported test types
@@ -15,6 +15,6 @@ set of labels can be provided using the `test_labels` argument to the `pytest` c
 The value of the argument is comma separated list of strings. Default is no labels.
 
 Example test suite invocation:
-```
+```shell
 python3 -m pytest --test_labels "label1,label2" tests/e2e/synthetics/
 ```
