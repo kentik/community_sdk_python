@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import List, Optional
 
-from kentik_api.public.defaults import DEFAULT_DATE_STR, DEFAULT_ID
+from kentik_api.internal.datetime_zulu import from_iso_format_zulu
+from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID
 
 
@@ -27,8 +29,8 @@ class DeviceLabel:
     _id: ID = DEFAULT_ID
     _user_id: Optional[ID] = DEFAULT_ID
     _company_id: ID = DEFAULT_ID
-    _created_date: str = DEFAULT_DATE_STR
-    _updated_date: str = DEFAULT_DATE_STR
+    _created_date: str = ""
+    _updated_date: str = ""
 
     @classmethod
     def new(cls, name: str, color: str):
@@ -51,12 +53,12 @@ class DeviceLabel:
         return self._devices
 
     @property
-    def created_date(self) -> str:
-        return self._created_date
+    def created_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._created_date) if self._created_date else None
 
     @property
-    def updated_date(self) -> str:
-        return self._updated_date
+    def updated_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._updated_date) if self._updated_date else None
 
 
 # pylint: enable=too-many-instance-attributes
