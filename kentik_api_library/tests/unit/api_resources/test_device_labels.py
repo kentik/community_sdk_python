@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from kentik_api.api_calls.api_call import APICallMethods
@@ -42,8 +43,8 @@ def test_create_device_label_success() -> None:
     assert created.color == "#00FF00"
     assert created.user_id == ID(52)
     assert created.company_id == ID(72)
-    assert created.created_date == "2018-05-16T20:21:10.406Z"
-    assert created.updated_date == "2018-05-16T20:21:10.406Z"
+    assert created.created_date == datetime(2018, 5, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
+    assert created.updated_date == datetime(2018, 5, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
     assert len(created.devices) == 0
 
 
@@ -85,8 +86,8 @@ def test_get_device_label_success() -> None:
     assert device_label.color == "#f1d5b9"
     assert device_label.user_id is None
     assert device_label.company_id == ID(72)
-    assert device_label.created_date == "2018-05-16T20:21:10.406Z"
-    assert device_label.updated_date == "2018-05-16T20:21:10.406Z"
+    assert device_label.created_date == datetime(2018, 5, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
+    assert device_label.updated_date == datetime(2018, 5, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
     assert len(device_label.devices) == 1
     assert device_label.devices[0].id == ID(42)
     assert device_label.devices[0].device_name == "my_device_1"
@@ -138,8 +139,8 @@ def test_update_device_label_success() -> None:
     assert updated.color == "#AA00FF"
     assert updated.user_id == ID(52)
     assert updated.company_id == ID(72)
-    assert updated.created_date == "2018-05-16T20:21:10.406Z"
-    assert updated.updated_date == "2018-06-16T20:21:10.406Z"
+    assert updated.created_date == datetime(2018, 5, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
+    assert updated.updated_date == datetime(2018, 6, 16, 20, 21, 10, 406000, tzinfo=timezone.utc)
     assert len(updated.devices) == 0
 
 
@@ -222,8 +223,8 @@ def test_get_all_device_labels_success() -> None:
     assert labels[1].color == "#3F4EA0"
     assert labels[1].user_id == ID(136885)
     assert labels[1].company_id == ID(74333)
-    assert labels[1].created_date == "2020-11-20T13:45:27.430Z"
-    assert labels[1].updated_date == "2020-11-20T13:45:27.430Z"
+    assert labels[1].created_date == datetime(2020, 11, 20, 13, 45, 27, 430000, tzinfo=timezone.utc)
+    assert labels[1].updated_date == datetime(2020, 11, 20, 13, 45, 27, 430000, tzinfo=timezone.utc)
     assert len(labels[1].devices) == 2
     assert labels[1].devices[1].id == ID(2)
     assert labels[1].devices[1].device_name == "device2"

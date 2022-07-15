@@ -7,7 +7,7 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import setup, Command
+from setuptools import Command, setup
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -17,64 +17,32 @@ README = (HERE / "README.md").read_text()
 
 # Package list generated with: python setup.py packages
 PACKAGES = [
-    "kentik_api",
-    "kentik_api.auth",
-    "kentik_api.throttling",
+    "kentik_api.",
     "kentik_api.analytics",
     "kentik_api.api_calls",
-    "kentik_api.synthetics",
-    "kentik_api.synthetics.synth_tests",
     "kentik_api.api_connection",
     "kentik_api.api_resources",
-    "kentik_api.internal",
+    "kentik_api.auth",
     "kentik_api.generated",
     "kentik_api.generated.google",
     "kentik_api.generated.google.api",
     "kentik_api.generated.google.type",
-    "kentik_api.generated.grpc",
-    "kentik_api.generated.grpc.status",
-    "kentik_api.generated.grpc.binary_log",
-    "kentik_api.generated.grpc.binary_log.v1alpha",
-    "kentik_api.generated.grpc.lb",
-    "kentik_api.generated.grpc.lb.v1",
-    "kentik_api.generated.grpc.health",
-    "kentik_api.generated.grpc.health.v1",
-    "kentik_api.generated.grpc.reflection",
-    "kentik_api.generated.grpc.reflection.v1alpha",
-    "kentik_api.generated.grpc.http_over_grpc",
-    "kentik_api.generated.grpc.channelz",
-    "kentik_api.generated.grpc.core",
     "kentik_api.generated.kentik",
-    "kentik_api.generated.kentik.cloud_maps",
-    "kentik_api.generated.kentik.cloud_maps.v202201alpha1",
-    "kentik_api.generated.kentik.cloud_gw",
-    "kentik_api.generated.kentik.cloud_gw.v202103alpha1",
-    "kentik_api.generated.kentik.mkp",
-    "kentik_api.generated.kentik.mkp.v202102alpha1",
     "kentik_api.generated.kentik.cloud_export",
     "kentik_api.generated.kentik.cloud_export.v202101beta1",
-    "kentik_api.generated.kentik.interface",
-    "kentik_api.generated.kentik.interface.v202108alpha1",
-    "kentik_api.generated.kentik.user",
-    "kentik_api.generated.kentik.user.v202106alpha1",
-    "kentik_api.generated.kentik.synthetics",
-    "kentik_api.generated.kentik.synthetics.v202202",
-    "kentik_api.generated.kentik.synthetics.backend",
-    "kentik_api.generated.kentik.synthetics.backend.v1",
-    "kentik_api.generated.kentik.site",
-    "kentik_api.generated.kentik.site.v202106alpha1",
-    "kentik_api.generated.kentik.network_class",
-    "kentik_api.generated.kentik.network_class.v202109alpha1",
-    "kentik_api.generated.kentik.notify",
-    "kentik_api.generated.kentik.notify.backend",
-    "kentik_api.generated.kentik.notify.backend.v0",
     "kentik_api.generated.kentik.core",
     "kentik_api.generated.kentik.core.v202012alpha1",
+    "kentik_api.generated.kentik.synthetics",
+    "kentik_api.generated.kentik.synthetics.v202202",
     "kentik_api.generated.protoc_gen_openapiv2",
     "kentik_api.generated.protoc_gen_openapiv2.options",
-    "kentik_api.requests_payload",
-    "kentik_api.utils",
+    "kentik_api.internal",
     "kentik_api.public",
+    "kentik_api.requests_payload",
+    "kentik_api.synthetics",
+    "kentik_api.synthetics.synth_tests",
+    "kentik_api.throttling",
+    "kentik_api.utils",
 ]
 
 
@@ -160,7 +128,7 @@ class Format(Command):
     ]
 
     def initialize_options(self) -> None:
-        self.dirs = ["kentik_api", "tests", "examples"]
+        self.dirs = ["kentik_api", "tests", "examples", "setup.py"]
         self.check = False
 
     def finalize_options(self):
@@ -192,38 +160,62 @@ class Format(Command):
         run_cmd(cmd, self.announce)
 
 
-class FetchGRPCCode(Command):
-    """Command copying generate Python gRPC code from source repo."""
+class GenerateGRPCStubs(Command):
+    """Generate Python gRPC stubs from proto files in the source repo."""
 
-    description = "Copy generated Python stubs from source repo"
+    description = "Generate Python stubs from proto files in the source repo"
     user_options = [
         ("repo=", None, "Source repository"),
-        ("src-path=", None, "Path to generated Python code within the source repo"),
-        ("dst-path=", None, "Destination path in the local source tree"),
     ]
 
     def initialize_options(self):
         self.repo = "https://github.com/kentik/api-schema-public.git"
-        self.src_path = "gen/python"
-        self.dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
 
     def finalize_options(self):
         pass
 
     def run(self):
-        print("Fetching gRPC generated code")
-
         import git
 
+        dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
+        apis = [
+            dict(name="core", version="v202012alpha1"),
+            dict(name="synthetics", version="v202202"),
+            dict(name="cloud_export", version="v202101beta1"),
+        ]
+        print(f"Building gRPC stubs from proto files in {self.repo}")
+        print("for following Kentik APIs:")
+        for a in apis:
+            print(f"\t{a['name']}/{a['version']}")
+
+        deps = ["protovendor/github.com/googleapis/googleapis", "protovendor/github.com/grpc-ecosystem/grpc-gateway"]
         # cleanup destination directory
-        shutil.rmtree(self.dst_path, ignore_errors=True)  # ignore "No such file or directory"
+        shutil.rmtree(dst_path, ignore_errors=True)  # ignore "No such file or directory"
         # create destination directory, if it does not exist
-        dst = Path(self.dst_path)
+        dst = Path(dst_path)
         dst.mkdir(parents=True)
         # checkout source repo and copy stubs
         with TemporaryDirectory() as tmp:
             git.Repo.clone_from(self.repo, tmp)
-            Path(tmp).joinpath(self.src_path).rename(dst)
+            cmd = [
+                "python",
+                "-m",
+                "grpc_tools.protoc",
+                f"--python_out={dst.as_posix()}",
+                f"--grpc_python_out={dst.as_posix()}",
+                f"-I{tmp}/proto/",
+            ]
+            for d in deps:
+                cmd.append(
+                    f"-I{tmp}/{d}/",
+                )
+            for d in deps:
+                for f in Path(f"{tmp}").joinpath(d).glob("**/*.proto"):
+                    cmd.append(f.as_posix())
+            for a in apis:
+                for f in Path(f"{tmp}/proto/kentik/").joinpath(a["name"]).joinpath(a["version"]).glob("*.proto"):
+                    cmd.append(f.as_posix())
+            run_cmd(cmd, self.announce)
 
 
 class PrintPackages(Command):
@@ -263,8 +255,7 @@ setup(
         "typing-extensions>=3.7.4.3",
         "urllib3>=1.26.0",
         "protobuf==3.20.1",
-        "grpcio>=1.38.1",
-        "inflection>=0.5.1",
+        "grpcio>=1.47.0",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
@@ -274,7 +265,7 @@ setup(
         "pylint": Pylint,
         "pytest": Pytest,
         "format": Format,
-        "grpc_stubs": FetchGRPCCode,
+        "grpc_stubs": GenerateGRPCStubs,
         "packages": PrintPackages,
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],

@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
-from typing import Dict, List
+from datetime import datetime
+from typing import Dict, List, Optional
 
-from kentik_api.public.defaults import DEFAULT_DATE_STR, DEFAULT_ID
+from kentik_api.internal.datetime_zulu import from_iso_format_zulu
+from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID
 
 # pylint: disable=too-many-instance-attributes
@@ -22,9 +24,9 @@ class User:
     _filters: Dict = field(default_factory=dict)
     _saved_filters: List = field(default_factory=list)
     _id: ID = DEFAULT_ID
-    _last_login: str = DEFAULT_DATE_STR
-    _created_date: str = DEFAULT_DATE_STR
-    _updated_date: str = DEFAULT_DATE_STR
+    _last_login: str = ""
+    _created_date: str = ""
+    _updated_date: str = ""
 
     @classmethod
     def new(
@@ -62,16 +64,16 @@ class User:
         return self._id
 
     @property
-    def last_login(self) -> str:
-        return self._last_login
+    def last_login(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._last_login) if self._last_login else None
 
     @property
-    def created_date(self) -> str:
-        return self._created_date
+    def created_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._created_date) if self._created_date else None
 
     @property
-    def updated_date(self) -> str:
-        return self._updated_date
+    def updated_date(self) -> Optional[datetime]:
+        return from_iso_format_zulu(self._updated_date) if self._updated_date else None
 
 
 # pylint: enable=too-many-instance-attributes

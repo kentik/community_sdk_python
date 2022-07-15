@@ -1,14 +1,23 @@
 import os
+from copy import deepcopy
+from datetime import timezone
 from typing import List
+from urllib.parse import urlparse
 
 from kentik_api import KentikAPI
 from kentik_api.public.types import ID
 from kentik_api.synthetics.agent import AgentImplementType
-from kentik_api.synthetics.synth_tests.base import ActivationSettings, HealthSettings
-from kentik_api.synthetics.types import IPFamily
-from kentik_api.utils import get_credentials
+from kentik_api.synthetics.synth_tests.base import (
+    ActivationSettings,
+    DateTime,
+    HealthSettings,
+    SynTest,
+    SynTestSettings,
+)
+from kentik_api.synthetics.types import IPFamily, TestStatus, TestType
+from kentik_api.utils import get_credentials, get_url
 
-HEALTH1 = HealthSettings(
+INITIAL_HEALTH_SETTINGS = HealthSettings(
     latency_critical=90,
     latency_warning=60,
     latency_critical_stddev=9,
@@ -29,7 +38,7 @@ HEALTH1 = HealthSettings(
     activation=ActivationSettings(grace_period="1", time_unit="m", time_window="5", times="3"),
 )
 
-HEALTH2 = HealthSettings(
+UPDATE_HEALTH_SETTINGS = HealthSettings(
     latency_critical=180,
     latency_warning=120,
     latency_critical_stddev=18,
@@ -50,15 +59,27 @@ HEALTH2 = HealthSettings(
     activation=ActivationSettings(grace_period="2", time_unit="h", time_window="1", times="4"),
 )
 
-credentials_missing_str = "KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN env variables are required to run the test"
-credentials_present = "KTAPI_AUTH_EMAIL" in os.environ and "KTAPI_AUTH_TOKEN" in os.environ
+required_env_variables = ["KTAPI_AUTH_EMAIL", "KTAPI_AUTH_TOKEN"]
+credentials_missing_str = f"{','.join(required_env_variables)} env variables are required to run the test"
+credentials_present = all(v in os.environ for v in required_env_variables)
+
+
+def make_e2e_test_name(test_type: TestType) -> str:
+    return f"e2e-{test_type.value}-test"
 
 
 def client() -> KentikAPI:
     """Get KentikAPI client"""
 
     email, token = get_credentials()
-    return KentikAPI(email, token)
+    url = get_url()
+    if url:
+        api_host = urlparse(url).netloc
+        if not api_host:
+            api_host = urlparse(url).path
+    else:
+        api_host = None
+    return KentikAPI(email, token, api_host=api_host)
 
 
 def pick_agent_ids(count: int = 1, page_load_support: bool = False) -> List[ID]:
@@ -83,3 +104,61 @@ def pick_agent_ids(count: int = 1, page_load_support: bool = False) -> List[ID]:
     ids = [a.id for a in requested_agents]
     print("### Selected Agent IDs:", ids)
     return ids
+
+
+def normalize_activation_settings(s: SynTestSettings) -> SynTestSettings:
+    out = deepcopy(s)
+    if out.health_settings.activation.time_unit == "h":
+        out.health_settings.activation.time_window = str(int(out.health_settings.activation.time_window) * 60)
+        out.health_settings.activation.time_unit = "m"
+    return out
+
+
+def execute_test_crud_steps(
+    test: SynTest,
+    update_settings: SynTestSettings,
+    pause_after_creation: bool = False,
+    pass_edate_in_update: bool = False,
+) -> None:
+    test_id = ID()
+    try:
+        # create
+        created_test = client().synthetics.create_test(test)
+        test_id = created_test.id
+        print(f"created  id: {test_id} edate: {created_test.edate.isoformat()}")
+        assert isinstance(created_test, type(test))
+        assert created_test.name == test.name
+        assert created_test.type == test.type
+        assert created_test.status == TestStatus.ACTIVE
+        assert created_test.settings == normalize_activation_settings(test.settings)
+
+        # set status
+        if pause_after_creation:
+            client().synthetics.set_test_status(created_test.id, TestStatus.PAUSED)
+
+        # read
+        received_test = client().synthetics.get_test(created_test.id)
+        assert isinstance(received_test, type(test))
+        assert received_test.name == created_test.name
+        assert received_test.type == created_test.type
+        assert received_test.status == TestStatus.PAUSED if pause_after_creation else TestStatus.ACTIVE
+        assert received_test.settings == normalize_activation_settings(test.settings)
+
+        # update
+        received_test.name = f"{test.name}-updated"
+        received_test.status = TestStatus.ACTIVE
+        received_test.settings = update_settings
+        if not pass_edate_in_update:
+            received_test.edate = DateTime.fromtimestamp(0, tz=timezone.utc)
+
+        print(f"received id: {received_test.id} edate: {received_test.edate.isoformat()}")
+        updated_test = client().synthetics.update_test(received_test)
+        assert isinstance(updated_test, type(test))
+        assert updated_test.name == received_test.name
+        assert updated_test.type == received_test.type
+        assert updated_test.status == received_test.status
+        assert updated_test.settings == normalize_activation_settings(received_test.settings)
+    finally:
+        # delete the created test, if any, even if an assertion failed or other problem has occurred
+        if test_id:
+            client().synthetics.delete_test(test_id)
