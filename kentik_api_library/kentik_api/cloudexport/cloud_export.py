@@ -19,8 +19,8 @@ class AwsProperties(_ConfigElement):
     bucket: str
     iam_role_arn: str
     region: str
-    delete_after_read: bool
-    multiple_buckets: bool
+    delete_after_read: bool = False
+    multiple_buckets: bool = False
 
 
 @dataclass
@@ -80,7 +80,6 @@ class CloudProviderType(SerializableEnum):
     AZURE = "azure"
     GCE = "gce"
     IBM = "ibm"
-    BGP = "bgp"
 
 
 @dataclass
@@ -97,7 +96,7 @@ class CloudExport(_ConfigElement):
     azure: Optional[AzureProperties] = None
     gce: Optional[GceProperties] = None
     ibm: Optional[IbmProperties] = None
-    bgp: Optional[BgpProperties] = None
+    bgp: Optional[BgpProperties] = None  # note: not a cloud provider type
     enabled: bool = True
     id: ID = ID()
 

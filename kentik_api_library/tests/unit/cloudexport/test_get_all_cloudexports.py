@@ -5,7 +5,6 @@ from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnecto
 
 from .test_aws import AWS, PB_AWS
 from .test_azure import AZURE, PB_AZURE
-from .test_bgp import BGP, PB_BGP
 from .test_gce import GCE, PB_GCE
 from .test_ibm import IBM, PB_IBM
 
@@ -13,11 +12,11 @@ from .test_ibm import IBM, PB_IBM
 def test_get_all_tests() -> None:
     # given
     pb_cloudexports_response = pb.ListCloudExportResponse(
-        exports=[PB_IBM, PB_AWS, PB_AZURE, PB_GCE, PB_BGP],
+        exports=[PB_IBM, PB_AWS, PB_AZURE, PB_GCE],
         invalid_exports_count=1,
     )
     expected_cloudexports_response = ListCloudExportResponse(
-        exports=[IBM, AWS, AZURE, GCE, BGP],
+        exports=[IBM, AWS, AZURE, GCE],
         invalid_exports_count=1,
     )
 

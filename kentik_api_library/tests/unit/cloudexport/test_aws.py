@@ -2,7 +2,15 @@ from google.protobuf.wrappers_pb2 import BoolValue
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
-from kentik_api.cloudexport.cloud_export import AwsProperties, CloudExport, CloudExportType, CloudProviderType, Status
+from kentik_api.cloudexport.cloud_export import (
+    AwsProperties,
+    BgpProperties,
+    CloudExport,
+    CloudExportType,
+    CloudProviderType,
+    DeviceBGPType,
+    Status,
+)
 from kentik_api.public.types import ID
 from tests.unit.cloudexport import clear_readonly_fields
 from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnector
@@ -32,6 +40,11 @@ PB_AWS = pb.CloudExport(
         delete_after_read=True,
         multiple_buckets=True,
     ),
+    bgp=pb.BgpProperties(
+        apply_bgp=True,
+        use_bgp_device_id="42",
+        device_bgp_type=DeviceBGPType.DEVICE.value,
+    ),
 )
 
 AWS = CloudExport(
@@ -57,6 +70,11 @@ AWS = CloudExport(
         region="eu-central-1",
         delete_after_read=True,
         multiple_buckets=True,
+    ),
+    bgp=BgpProperties(
+        apply_bgp=True,
+        use_bgp_device_id="42",
+        device_bgp_type=DeviceBGPType.DEVICE,
     ),
 )
 

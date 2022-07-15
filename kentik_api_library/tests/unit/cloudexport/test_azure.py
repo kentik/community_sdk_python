@@ -32,6 +32,7 @@ PB_AZURE = pb.CloudExport(
         subscription_id="bda574ce-5d2e-5d2c-83da-0f7b0762e10c",
         security_principal_enabled=True,
     ),
+    bgp=None,
 )
 
 AZURE = CloudExport(
@@ -58,6 +59,7 @@ AZURE = CloudExport(
         subscription_id="bda574ce-5d2e-5d2c-83da-0f7b0762e10c",
         security_principal_enabled=True,
     ),
+    bgp=None,
 )
 
 

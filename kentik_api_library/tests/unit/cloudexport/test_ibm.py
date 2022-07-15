@@ -2,7 +2,15 @@ from google.protobuf.wrappers_pb2 import BoolValue
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
-from kentik_api.cloudexport.cloud_export import CloudExport, CloudExportType, CloudProviderType, IbmProperties, Status
+from kentik_api.cloudexport.cloud_export import (
+    BgpProperties,
+    CloudExport,
+    CloudExportType,
+    CloudProviderType,
+    DeviceBGPType,
+    IbmProperties,
+    Status,
+)
 from kentik_api.public.types import ID
 from tests.unit.cloudexport import clear_readonly_fields
 from tests.unit.cloudexport.stub_api_connector import StubAPICloudExportConnector
@@ -26,6 +34,11 @@ PB_IBM = pb.CloudExport(
     ),
     cloud_provider="ibm",
     ibm=pb.IbmProperties(bucket="cloudexport-bucket"),
+    bgp=pb.BgpProperties(
+        apply_bgp=True,
+        use_bgp_device_id="42",
+        device_bgp_type=DeviceBGPType.NONE.value,
+    ),
 )
 
 IBM = CloudExport(
@@ -46,6 +59,11 @@ IBM = CloudExport(
     ),
     cloud_provider=CloudProviderType.IBM,
     ibm=IbmProperties(bucket="cloudexport-bucket"),
+    bgp=BgpProperties(
+        apply_bgp=True,
+        use_bgp_device_id="42",
+        device_bgp_type=DeviceBGPType.NONE,
+    ),
 )
 
 

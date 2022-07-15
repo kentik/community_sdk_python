@@ -4,7 +4,7 @@ import pytest
 
 from kentik_api.cloudexport.cloud_export import AwsProperties, CloudExport, CloudExportType, CloudProviderType
 from kentik_api.public.types import ID
-from tests.e2e.cloudexport.utils import client, credentials_missing_str, credentials_present
+from tests.e2e.cloudexport.utils import clear_readonly_fields, client, credentials_missing_str, credentials_present
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
@@ -49,23 +49,23 @@ def test_aws_crud() -> None:
 
         # read
         received = client().cloud_export.get(created.id)
-        assert received == created
+        assert clear_readonly_fields(received) == clear_readonly_fields(created)
 
         # update
         to_update = received
         to_update.type = CloudExportType.KENTIK_MANAGED
         # to_update.enabled = False  # updating 'enabled' flag doesn't take effect - always gets True
-        to_update.name = "e2e-aws-cloudexport-updated"
-        to_update.description = "E2E test AWS CloudExport description updated"
+        to_update.name = f"{received.name}-updated"
+        to_update.description = f"{received.description} updated"
         to_update.aws = PROPERTIES2
         updated = client().cloud_export.update(to_update)
-        assert updated == to_update
+        assert clear_readonly_fields(updated) == clear_readonly_fields(to_update)
 
         # patch
         to_patch = received
-        to_patch.name = "e2e-aws-cloudexport-patched"
+        to_patch.name = f"{received.name}-patched"
         patched = client().cloud_export.patch(to_patch, "export.name")
-        assert patched == to_patch
+        assert clear_readonly_fields(patched) == clear_readonly_fields(to_patch)
     finally:
         # delete (even if assertion failed)
         client().cloud_export.delete(created.id)
