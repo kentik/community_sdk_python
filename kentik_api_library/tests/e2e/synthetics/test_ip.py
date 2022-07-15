@@ -20,7 +20,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_ip_crud() -> None:
+def test_ip_crud(test_labels) -> None:
     agents = pick_agent_ids(count=2)
     initial_settings = IPTestSettings(
         family=IPFamily.V4,
@@ -47,5 +47,6 @@ def test_ip_crud() -> None:
     # update_settings.ip.targets = [IP("55.161.222.85"), IP("35.205.242.146")]  # can't update after creation
 
     test = IPTest(make_e2e_test_name(TestType.IP), TestStatus.ACTIVE, initial_settings)
+    test.labels = test_labels
 
     execute_test_crud_steps(test, update_settings=update_settings)

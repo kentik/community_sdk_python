@@ -34,9 +34,9 @@ class KentikSynthClient:
     def __init__(self, connector: APISyntheticsConnectorProtocol):
         self._connector = connector
 
-    def get_all_agents(self) -> List[Agent]:
+    def get_all_agents(self, private_only=False) -> List[Agent]:
         pb_agents = self._connector.get_all_agents()
-        return [Agent.from_pb(agent) for agent in pb_agents]
+        return [Agent.from_pb(agent) for agent in pb_agents if not private_only or agent.type == "private"]
 
     def get_agent(self, agent_id: ID) -> Agent:
         pb_agent = self._connector.get_agent(str(agent_id))

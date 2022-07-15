@@ -18,7 +18,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_dns_grid_crud() -> None:
+def test_dns_grid_crud(test_labels) -> None:
     agents = pick_agent_ids(count=2)
     initial_settings = DNSGridTestSettings(
         family=IPFamily.V4,
@@ -43,5 +43,6 @@ def test_dns_grid_crud() -> None:
     update_settings.dns_grid.port = 63
 
     test = DNSGridTest(make_e2e_test_name(TestType.DNS_GRID), TestStatus.ACTIVE, initial_settings)
+    test.labels = test_labels
 
     execute_test_crud_steps(test, update_settings=update_settings)

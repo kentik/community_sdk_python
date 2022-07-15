@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_network_mesh_crud() -> None:
+def test_network_mesh_crud(test_labels) -> None:
     agents = pick_agent_ids(count=4)
     initial_settings = NetworkMeshTestSettings(
         family=IPFamily.V4,
@@ -46,5 +46,6 @@ def test_network_mesh_crud() -> None:
     # update_settings.network_mesh.use_local_ip=False  # can't be updated after a test's been created
 
     test = NetworkMeshTest(make_e2e_test_name(TestType.NETWORK_MESH), TestStatus.ACTIVE, initial_settings)
+    test.labels = test_labels
 
     execute_test_crud_steps(test, update_settings=update_settings)
