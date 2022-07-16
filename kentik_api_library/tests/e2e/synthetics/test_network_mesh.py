@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_network_mesh_crud(test_labels) -> None:
+def test_network_mesh_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=4)
     initial_settings = NetworkMeshTestSettings(
         family=IPFamily.V4,
@@ -29,6 +29,7 @@ def test_network_mesh_crud(test_labels) -> None:
         ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         network_mesh=NetworkMeshTestSpecific(use_local_ip=True),
+        notification_channels=notification_channels,
     )
     update_settings = deepcopy(initial_settings)
     update_settings.family = IPFamily.V6
@@ -44,6 +45,7 @@ def test_network_mesh_crud(test_labels) -> None:
     update_settings.trace.delay = 30
     update_settings.trace.protocol = Protocol.ICMP
     # update_settings.network_mesh.use_local_ip=False  # can't be updated after a test's been created
+    update_settings.notification_channels = []
 
     test = NetworkMeshTest(make_e2e_test_name(TestType.NETWORK_MESH), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels

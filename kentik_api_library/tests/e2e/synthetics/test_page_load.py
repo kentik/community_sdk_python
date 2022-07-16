@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_page_load_crud(test_labels) -> None:
+def test_page_load_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=2, page_load_support=True)
     initial_settings = PageLoadTestSettings(
         family=IPFamily.V4,
@@ -36,6 +36,7 @@ def test_page_load_crud(test_labels) -> None:
             ignore_tls_errors=True,
             css_selectors={"id": "#id", "class": ".class"},
         ),
+        notification_channels=notification_channels,
     )
     update_settings = deepcopy(initial_settings)
     update_settings.family = IPFamily.V6
@@ -56,6 +57,7 @@ def test_page_load_crud(test_labels) -> None:
     update_settings.page_load.headers = {"x-auth-token": "0FS230FJXGJK4234"}
     update_settings.page_load.ignore_tls_errors = False
     update_settings.page_load.css_selectors = {}
+    update_settings.notification_channels = []
 
     test = PageLoadTest(make_e2e_test_name(TestType.PAGE_LOAD), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels
