@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_page_load_crud(test_labels, notification_channels) -> None:
+def test_page_load_crud(test_labels, notification_channels, pass_edate_on_update) -> None:
     agents = pick_agent_ids(count=2, page_load_support=True)
     initial_settings = PageLoadTestSettings(
         family=IPFamily.V4,
@@ -62,4 +62,4 @@ def test_page_load_crud(test_labels, notification_channels) -> None:
     test = PageLoadTest(make_e2e_test_name(TestType.PAGE_LOAD), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels
 
-    execute_test_crud_steps(test, update_settings=update_settings)
+    execute_test_crud_steps(test, update_settings=update_settings, pass_edate_on_update=pass_edate_on_update)

@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_agent_test_crud(test_labels, notification_channels) -> None:
+def test_agent_test_crud(test_labels, notification_channels, pass_edate_on_update) -> None:
     agents = pick_agent_ids(count=4)
     initial_settings = AgentTestSettings(
         family=IPFamily.V4,
@@ -51,4 +51,6 @@ def test_agent_test_crud(test_labels, notification_channels) -> None:
     test = AgentTest(make_e2e_test_name(TestType.AGENT), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels
 
-    execute_test_crud_steps(test, update_settings=update_settings, pause_after_creation=True)
+    execute_test_crud_steps(
+        test, update_settings=update_settings, pause_after_creation=True, pass_edate_on_update=pass_edate_on_update
+    )

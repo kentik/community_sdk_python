@@ -119,7 +119,7 @@ def execute_test_crud_steps(
     test: SynTest,
     update_settings: SynTestSettings,
     pause_after_creation: bool = False,
-    pass_edate_in_update: bool = False,
+    pass_edate_on_update: bool = False,
 ) -> None:
     test_id = ID()
     try:
@@ -152,7 +152,7 @@ def execute_test_crud_steps(
         received_test.name = f"{test.name}-updated"
         received_test.status = TestStatus.ACTIVE
         received_test.settings = update_settings
-        if not pass_edate_in_update:
+        if not pass_edate_on_update:
             received_test.edate = DateTime.fromtimestamp(0, tz=timezone.utc)
         # test resetting labels, if any were provided
         if received_test.labels:
