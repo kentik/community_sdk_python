@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_agent_test_crud(test_labels) -> None:
+def test_agent_test_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=4)
     initial_settings = AgentTestSettings(
         family=IPFamily.V4,
@@ -29,6 +29,7 @@ def test_agent_test_crud(test_labels) -> None:
         ping=PingTask(timeout=3000, count=5, delay=200, protocol=Protocol.ICMP),
         trace=TraceTask(timeout=22500, count=3, limit=30, delay=20, protocol=Protocol.UDP, port=3343),
         agent=AgentTestSpecific(target=agents[1], use_local_ip=False),
+        notification_channels=notification_channels,
     )
     update_settings = deepcopy(initial_settings)
     update_settings.family = IPFamily.V6
@@ -45,6 +46,7 @@ def test_agent_test_crud(test_labels) -> None:
     update_settings.trace.protocol = Protocol.ICMP
     update_settings.agent.target = agents[3]
     update_settings.agent.use_local_ip = True
+    update_settings.notification_channels = []
 
     test = AgentTest(make_e2e_test_name(TestType.AGENT), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels

@@ -5,16 +5,16 @@ The e2e test suite verifies:
 - listing of all tests
 - listing of all agents
 
-It interacts with production Kentik API and requires account with sufficient synthetic test
-credits. User credentials myst be passed in KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN env variables.
-Target API endpoint may be set  via the KTAPI_URL environment variable (default: "https://grpc.api.kentik.com")
+It interacts with production Kentik API and requires account with sufficient synthetic test credits.
+User credentials myst be passed in KTAPI_AUTH_EMAIL and KTAPI_AUTH_TOKEN env variables.
+Target API endpoint may be set  via the KTAPI_URL environment variable (default: "https://grpc.api.kentik.com").
 
-Since labels used for labeling synthetic tests and agents must exist in the target
-environment and there is currently no way to create them programmatically,
-set of labels can be provided using the `test_labels` argument to the `pytest` command.
-The value of the argument is comma separated list of strings. Default is no labels.
+Agent and test labels and alarm notification channels must exist in the target
+environment before they can be used. There is currently no way to create them programmatically.
+The test suite allows to pass those attributes `test_labels` and `notification_channels` to `pytest`.
+Both arguments expect comma separated list of strings and default to empty strings.
 
-Example test suite invocation:
+Example test invocations:
 ```shell
-python3 -m pytest --test_labels "label1,label2" tests/e2e/synthetics/
+python3 -m pytest --test_labels="label1,label2" --notification_channels="123,456" tests/e2e/synthetics
 ```
