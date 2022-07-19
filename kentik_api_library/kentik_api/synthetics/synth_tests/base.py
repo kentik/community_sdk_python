@@ -60,7 +60,7 @@ class DateTime(datetime):
 
     def to_pb(self) -> Timestamp:
         ts = self.timestamp()
-        return Timestamp(seconds=int(ts), nanos=int((ts - int(ts)) * 1e9))
+        return Timestamp(seconds=int(ts), nanos=int(round(ts - int(ts), 3) * 1e9))
 
 
 @dataclass
@@ -201,7 +201,7 @@ class SynTest(_ConfigElement):
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
-    # labels: List[str] = field(default_factory=list) # not supported yet
+    labels: List[str] = field(default_factory=list)
     edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)  # yes, edate is read-write
 
     # read-only
