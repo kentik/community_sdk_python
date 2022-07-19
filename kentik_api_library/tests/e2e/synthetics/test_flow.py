@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_flow_crud(test_labels, notification_channels, pass_edate_on_update) -> None:
+def test_flow_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=2)
     initial_settings = FlowTestSettings(
         family=IPFamily.V4,
@@ -64,4 +64,4 @@ def test_flow_crud(test_labels, notification_channels, pass_edate_on_update) -> 
     test = FlowTest(make_e2e_test_name(TestType.FLOW), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels
 
-    execute_test_crud_steps(test, update_settings=update_settings, pass_edate_on_update=pass_edate_on_update)
+    execute_test_crud_steps(test, update_settings=update_settings)

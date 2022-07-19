@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_network_mesh_crud(test_labels, notification_channels, pass_edate_on_update) -> None:
+def test_network_mesh_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=4)
     initial_settings = NetworkMeshTestSettings(
         family=IPFamily.V4,
@@ -50,4 +50,4 @@ def test_network_mesh_crud(test_labels, notification_channels, pass_edate_on_upd
     test = NetworkMeshTest(make_e2e_test_name(TestType.NETWORK_MESH), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels
 
-    execute_test_crud_steps(test, update_settings=update_settings, pass_edate_on_update=pass_edate_on_update)
+    execute_test_crud_steps(test, update_settings=update_settings)
