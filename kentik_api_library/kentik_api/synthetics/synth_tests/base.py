@@ -147,7 +147,7 @@ class DateTime(datetime):
 
     def to_pb(self) -> Timestamp:
         ts = self.timestamp()
-        return Timestamp(seconds=int(ts), nanos=int((ts - int(ts)) * 1e9))
+        return Timestamp(seconds=int(ts), nanos=int(round(ts - int(ts), 3) * 1e9))
 
 
 @dataclass
