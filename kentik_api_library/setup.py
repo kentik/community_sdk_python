@@ -23,6 +23,7 @@ PACKAGES = [
     "kentik_api.api_connection",
     "kentik_api.api_resources",
     "kentik_api.auth",
+    "kentik_api.cloudexport",
     "kentik_api.generated",
     "kentik_api.generated.google",
     "kentik_api.generated.google.api",

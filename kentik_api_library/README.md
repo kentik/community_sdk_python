@@ -119,6 +119,7 @@ List of available examples:
 - [analytics_example_topx.py](./examples/analytics_example_sql.py) - use of `DataQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
   (see also [analytics readme](./kentik_api/analytics/README.md))
 - [synthetics_example.py](./examples/synthetics_example.py) - interact with synthetics API
+- [cloud_export_example.py](./examples/cloud_export_example.py) - interact with cloud export API
 ## Open-source libraries
 
 This software uses the following open-source libraries:

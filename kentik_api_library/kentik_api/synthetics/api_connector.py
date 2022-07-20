@@ -13,7 +13,7 @@ from kentik_api.internal.grpc import wrap_grpc_errors
 class APISyntheticsConnector:
     """
     APISyntheticsConnector implements APISyntheticsConnectorProtocol.
-    Allows sending authorized grpc requests to Kentik Synthetics API
+    Allows sending authorized gRPC requests to Kentik Synthetics API
     """
 
     def __init__(self, api_url: str, auth_email: str, auth_token: str, options: List[Tuple[str, Any]] = []):
