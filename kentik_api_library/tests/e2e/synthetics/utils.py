@@ -125,7 +125,6 @@ def execute_test_crud_steps(
         # create
         created_test = client().synthetics.create_test(test)
         test_id = created_test.id
-        print(f"created - id: {test_id} edate: {created_test.edate.isoformat()}")
         assert isinstance(created_test, type(test))
         assert created_test.name == test.name
         assert created_test.type == test.type
@@ -139,7 +138,6 @@ def execute_test_crud_steps(
 
         # read
         received_test = client().synthetics.get_test(created_test.id)
-        print(f"received - id: {received_test.id} edate: {received_test.edate.isoformat()}")
         assert isinstance(received_test, type(test))
         assert received_test.name == created_test.name
         assert received_test.type == created_test.type
@@ -156,7 +154,6 @@ def execute_test_crud_steps(
             received_test.labels = []
 
         updated_test = client().synthetics.update_test(received_test)
-        print(f"updated - id: {received_test.id} edate: {received_test.edate.isoformat()}")
         assert isinstance(updated_test, type(test))
         assert updated_test.name == received_test.name
         assert updated_test.type == received_test.type
