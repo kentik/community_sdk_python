@@ -1,13 +1,14 @@
 import logging
 from copy import deepcopy
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from ipaddress import ip_address
-from typing import Any, Callable, List, Type, TypeVar, get_args
+from typing import Any, Callable, List, Type, TypeVar
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+from kentik_api.internal.grpc import DoNotSerializeMarker, _ConfigElement, _ConfigElementT
 from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.types import IPFamily, Protocol, TaskType, TestStatus, TestType
@@ -43,92 +44,6 @@ class Defaults:
     family: IPFamily = IPFamily.DUAL
 
 
-class DoNotSerializeMarker:
-    """
-    Marker type for _ConfigElement.to_pb() method: skip objects with field PB_TYPE == NotSerializableMarker
-    during serialization to protobuf object
-    """
-
-
-_ConfigElementT = TypeVar("_ConfigElementT", bound="_ConfigElement")
-
-
-class _ConfigElement:
-    """
-    Base class that enables automatic protobuf class <-> user facing dataclass serialization/deserialization.
-    Protobuf class and user facing dataclass need to have fields named exactly the same.
-    Fields starting with underscore "_" are treated as read-only and are not serialized to protobuf.
-    """
-
-    PB_TYPE = DoNotSerializeMarker  # Target protobuf type for serialization. To be overridden by inheriting class
-
-    def to_pb(self) -> Any:
-        """
-        Serialize self to protobuf object type determined by "PB_TYPE"
-        """
-
-        def skip_serialization(obj: Any) -> bool:
-            return hasattr(obj, "PB_TYPE") and obj.PB_TYPE == DoNotSerializeMarker
-
-        def get_value(dst_type: Type[Any], src_value: Any) -> Any:
-            if skip_serialization(src_value):
-                return None  # None values are not serialized into output protobuf object
-            if hasattr(src_value, "to_pb"):
-                return src_value.to_pb()
-            if isinstance(src_value, list):
-                return [get_value(type(e), e) for e in src_value]
-            if isinstance(src_value, dict):
-                return {k: get_value(type(v), v) for k, v in src_value.items()}
-            try:
-                return dst_type(src_value)
-            except TypeError as error:
-                raise RuntimeError(f"Don't know how to serialize to '{dst_type}' (value: '{src_value}')") from error
-
-        dummy_pb_instance = self.PB_TYPE()  # used only for examining the destination protobuf object field types
-        args = {}
-        for f in fields(self):
-            if f.name[0] == "_":
-                continue  # don't serialize read-only fields
-            dst_field_type = type(getattr(dummy_pb_instance, f.name))
-            src_field_value = getattr(self, f.name)
-            args[f.name] = get_value(dst_field_type, src_field_value)
-        return self.PB_TYPE(**args)
-
-    @classmethod
-    def from_pb(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
-        """from_pb can be overridden in a child class to tweak deserialization behavior, and still call _from_protobuf"""
-
-        return cls._from_protobuf(obj)
-
-    @classmethod
-    def _from_protobuf(cls: Type[_ConfigElementT], obj: Any) -> _ConfigElementT:
-        def get_value(dst_type: Type[Any], src_value: Any) -> Any:
-            if hasattr(dst_type, "from_pb"):
-                return dst_type.from_pb(src_value)
-            try:
-                return dst_type(src_value)
-            except TypeError as error:
-                if dst_type._name == "List":
-                    return [get_value(get_args(dst_type)[0], i) for i in src_value]
-                if dst_type._name == "Dict":
-                    return {_k: get_value(get_args(dst_type)[1], _v) for _k, _v in src_value.items()}
-                raise RuntimeError(f"Don't know how to instantiate '{dst_type}' (value: '{src_value}')") from error
-
-        _init_fields = [f for f in fields(cls) if f.init]
-        args = {}
-        for f in _init_fields:
-            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
-            args[f.name] = get_value(f.type, getattr(obj, src_name))
-        instance = cls(**args)
-
-        _remaining_fields = [f for f in fields(cls) if not f.init]
-        for f in _remaining_fields:
-            src_name = f.name[1:] if (f.name[0] == "_") else f.name  # handle read-only fields that start with "_"
-            v = get_value(f.type, getattr(obj, src_name))
-            setattr(instance, f.name, v)
-        return instance
-
-
 DateTimeT = TypeVar("DateTimeT", bound="DateTime")
 
 
@@ -145,7 +60,7 @@ class DateTime(datetime):
 
     def to_pb(self) -> Timestamp:
         ts = self.timestamp()
-        return Timestamp(seconds=int(ts), nanos=int((ts - int(ts)) * 1e9))
+        return Timestamp(seconds=int(ts), nanos=int(round(ts - int(ts), 3) * 1e9))
 
 
 @dataclass
@@ -222,6 +137,9 @@ class HealthSettings(_ConfigElement):
     activation: ActivationSettings = field(default_factory=ActivationSettings)
 
 
+SynTestSettingsT = TypeVar("SynTestSettingsT", bound="SynTestSettings")
+
+
 @dataclass
 class SynTestSettings(_ConfigElement):
     PB_TYPE = pb.TestSettings
@@ -234,7 +152,7 @@ class SynTestSettings(_ConfigElement):
     notification_channels: List[str] = field(default_factory=list)
 
     @classmethod
-    def from_pb(cls: Type[_ConfigElementT], obj: Any):
+    def from_pb(cls: Type[SynTestSettingsT], obj: Any) -> SynTestSettingsT:
         """Tweak inherited "from_pb" method to handle ignored and legacy task types"""
 
         IGNORED_TASK_TYPES = ["bgp-monitor"]
@@ -253,7 +171,7 @@ class SynTestSettings(_ConfigElement):
                 obj.tasks.remove(legacy)
                 obj.tasks.append(replacement)
 
-        return cls._from_protobuf(obj)
+        return super().from_pb(obj)
 
 
 @dataclass
@@ -283,7 +201,7 @@ class SynTest(_ConfigElement):
     type: TestType = field(init=False, default=TestType.NONE)
     status: TestStatus = field(default=TestStatus.ACTIVE)
     settings: SynTestSettings = field(default_factory=SynTestSettings)
-    # labels: List[str] = field(default_factory=list) # not supported yet
+    labels: List[str] = field(default_factory=list)
     edate: DateTime = field(default=DateTime.fromtimestamp(0, tz=timezone.utc), init=False)  # yes, edate is read-write
 
     # read-only

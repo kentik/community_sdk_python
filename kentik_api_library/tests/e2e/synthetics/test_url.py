@@ -19,7 +19,7 @@ from .utils import (
 
 
 @pytest.mark.skipif(not credentials_present, reason=credentials_missing_str)
-def test_url_crud() -> None:
+def test_url_crud(test_labels, notification_channels) -> None:
     agents = pick_agent_ids(count=2)
     initial_settings = UrlTestSettings(
         family=IPFamily.V4,
@@ -37,6 +37,7 @@ def test_url_crud() -> None:
             body="BODY",
             ignore_tls_errors=False,
         ),
+        notification_channels=notification_channels,
     )
     update_settings = deepcopy(initial_settings)
     update_settings.family = IPFamily.V6
@@ -58,7 +59,9 @@ def test_url_crud() -> None:
     update_settings.url.headers = {"api-key": "KLAJ34AJFDHLAK653LXL"}
     update_settings.url.body = ""
     update_settings.url.ignore_tls_errors = True
+    update_settings.notification_channels = []
 
     test = UrlTest(make_e2e_test_name(TestType.URL), TestStatus.ACTIVE, initial_settings)
+    test.labels = test_labels
 
     execute_test_crud_steps(test, update_settings=update_settings)
