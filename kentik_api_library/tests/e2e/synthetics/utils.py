@@ -1,19 +1,13 @@
 import os
 from copy import deepcopy
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List
 from urllib.parse import urlparse
 
 from kentik_api import KentikAPI
 from kentik_api.public.types import ID
 from kentik_api.synthetics.agent import AgentImplementType
-from kentik_api.synthetics.synth_tests.base import (
-    ActivationSettings,
-    DateTime,
-    HealthSettings,
-    SynTest,
-    SynTestSettings,
-)
+from kentik_api.synthetics.synth_tests.base import ActivationSettings, HealthSettings, SynTest, SynTestSettings
 from kentik_api.synthetics.types import IPFamily, TestStatus, TestType
 from kentik_api.utils import get_credentials, get_url
 
@@ -107,11 +101,12 @@ def pick_agent_ids(count: int = 1, page_load_support: bool = False) -> List[ID]:
     return ids
 
 
-def normalize_activation_settings(s: SynTestSettings) -> SynTestSettings:
+def normalize_settings(s: SynTestSettings) -> SynTestSettings:
     out = deepcopy(s)
     if out.health_settings.activation.time_unit == "h":
         out.health_settings.activation.time_window = str(int(out.health_settings.activation.time_window) * 60)
         out.health_settings.activation.time_unit = "m"
+    out.notification_channels.sort()
     return out
 
 
@@ -125,13 +120,12 @@ def execute_test_crud_steps(
         # create
         created_test = client().synthetics.create_test(test)
         test_id = created_test.id
-        print(f"created - id: {test_id} edate: {created_test.edate.isoformat()}")
         assert isinstance(created_test, type(test))
         assert created_test.name == test.name
         assert created_test.type == test.type
         assert created_test.status == TestStatus.ACTIVE
-        assert created_test.settings == normalize_activation_settings(test.settings)
-        assert created_test.labels == test.labels
+        assert created_test.settings == normalize_settings(test.settings)
+        assert created_test.labels == sorted(test.labels)
 
         # set status
         if pause_after_creation:
@@ -139,12 +133,11 @@ def execute_test_crud_steps(
 
         # read
         received_test = client().synthetics.get_test(created_test.id)
-        print(f"received - id: {received_test.id} edate: {received_test.edate.isoformat()}")
         assert isinstance(received_test, type(test))
         assert received_test.name == created_test.name
         assert received_test.type == created_test.type
         assert received_test.status == TestStatus.PAUSED if pause_after_creation else TestStatus.ACTIVE
-        assert received_test.settings == normalize_activation_settings(test.settings)
+        assert received_test.settings == normalize_settings(test.settings)
         assert received_test.labels == created_test.labels
 
         # update
@@ -156,12 +149,11 @@ def execute_test_crud_steps(
             received_test.labels = []
 
         updated_test = client().synthetics.update_test(received_test)
-        print(f"updated - id: {received_test.id} edate: {received_test.edate.isoformat()}")
         assert isinstance(updated_test, type(test))
         assert updated_test.name == received_test.name
         assert updated_test.type == received_test.type
         assert updated_test.status == received_test.status
-        assert updated_test.settings == normalize_activation_settings(received_test.settings)
+        assert updated_test.settings == normalize_settings(received_test.settings)
         assert updated_test.labels == received_test.labels
 
     finally:

@@ -10,7 +10,7 @@ def pytest_addoption(parser):
 def test_labels(pytestconfig):
     labels = pytestconfig.getoption("test_labels")
     if labels:
-        return labels.split(",")
+        return sorted(labels.split(","))
     else:
         return []
 
@@ -19,6 +19,6 @@ def test_labels(pytestconfig):
 def notification_channels(pytestconfig):
     channels = pytestconfig.getoption("notification_channels")
     if channels:
-        return channels.split(",")
+        return sorted(channels.split(","))
     else:
         return []
