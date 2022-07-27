@@ -33,6 +33,7 @@ class APIConnector:
         api_url: str,
         auth_email: str,
         auth_token: str,
+        client_version: str,
         timeout: Union[float, Tuple[float, float]] = (10.0, 60.0),
         retry_strategy: Optional[Retry] = None,
         proxy: Optional[str] = None,
@@ -43,6 +44,7 @@ class APIConnector:
         self._timeout = timeout
         if proxy:
             self._logger.debug("Using proxy: %s", proxy)
+        self._client_version = client_version
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
         try:
@@ -58,16 +60,16 @@ class APIConnector:
         return APICallResponse(response.status_code, response.text)
 
     def _do_request(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> Response:
-
         url = self._get_api_query_url(api_call.url_path)
+        headers = {"User-Agent": self._client_version}
         if api_call.method == APICallMethods.GET:
-            response = self._session.get(url, params=payload, timeout=self._timeout)
+            response = self._session.get(url, params=payload, headers=headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.POST:
-            response = self._session.post(url, json=payload, timeout=self._timeout)
+            response = self._session.post(url, json=payload, headers=headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.PUT:
-            response = self._session.put(url, json=payload, timeout=self._timeout)
+            response = self._session.put(url, json=payload, headers=headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.DELETE:
-            response = self._session.delete(url, json=payload, timeout=self._timeout)
+            response = self._session.delete(url, json=payload, headers=headers, timeout=self._timeout)
         else:
             raise ValueError(f"Improper API call method: {api_call.method}")
         return response

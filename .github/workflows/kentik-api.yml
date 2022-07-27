@@ -83,6 +83,7 @@ jobs:
           pip3 install -r requirements.txt
           pip3 install -r requirements-dev.txt
           python3 setup.py grpc_stubs # building grpc stubs must go before building
+          python3 setup.py setup_client_version # set sdk api client version to the latest git tag
           python3 -m build
       - name: Archive code
         uses: actions/upload-artifact@v2

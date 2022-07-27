@@ -20,6 +20,7 @@ from .cloudexport.api_connector import APICloudExportConnector
 from .cloudexport.client import KentikCloudExportClient
 from .synthetics.api_connector import APISyntheticsConnector
 from .synthetics.synth_client import KentikSynthClient
+from .version import client_version
 
 
 class KentikAPI:
@@ -42,7 +43,7 @@ class KentikAPI:
             logging.debug("KentikAPI: null api_host, setting to %s", self.API_HOST_US)
             api_host = self.API_HOST_US
         api_v5_url = self.make_api_v5_url(api_host)
-        connector = APIConnector(api_v5_url, auth_email, auth_token, timeout, retry_strategy, proxy)
+        connector = APIConnector(api_v5_url, auth_email, auth_token, client_version, timeout, retry_strategy, proxy)
         self.device_labels = DeviceLabelsAPI(connector)
         self.sites = SitesAPI(connector)
         self.users = UsersAPI(connector)
@@ -65,10 +66,14 @@ class KentikAPI:
 
         api_v6_url = self.make_grpc_endpoint(api_host)
 
-        synth_connector = APISyntheticsConnector(api_v6_url, auth_email, auth_token, grpc_client_options)
+        synth_connector = APISyntheticsConnector(
+            api_v6_url, auth_email, auth_token, client_version, grpc_client_options
+        )
         self.synthetics = KentikSynthClient(synth_connector)
 
-        cloud_export_connector = APICloudExportConnector(api_v6_url, auth_email, auth_token, grpc_client_options)
+        cloud_export_connector = APICloudExportConnector(
+            api_v6_url, auth_email, auth_token, client_version, grpc_client_options
+        )
         self.cloud_export = KentikCloudExportClient(cloud_export_connector)
 
     @staticmethod
