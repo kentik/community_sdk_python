@@ -8,6 +8,7 @@ from kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2_grpc import (
     SyntheticsDataService,
 )
 from kentik_api.internal.grpc import wrap_grpc_errors
+from kentik_api.version import client_version
 
 
 class APISyntheticsConnector:
@@ -21,7 +22,6 @@ class APISyntheticsConnector:
         api_url: str,
         auth_email: str,
         auth_token: str,
-        client_version: str,
         options: List[Tuple[str, Any]] = [],
     ):
         self._url = api_url

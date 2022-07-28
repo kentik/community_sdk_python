@@ -5,6 +5,7 @@ from google.protobuf.field_mask_pb2 import FieldMask
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2_grpc import CloudExportAdminService
 from kentik_api.internal.grpc import wrap_grpc_errors
+from kentik_api.version import client_version
 
 
 class APICloudExportConnector:
@@ -18,7 +19,6 @@ class APICloudExportConnector:
         api_url: str,
         auth_email: str,
         auth_token: str,
-        client_version: str,
         options: List[Tuple[str, Any]] = [],
     ):
         self._url = api_url
