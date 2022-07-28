@@ -6,7 +6,6 @@ Precondition: python3 and pip3 are already installed.
 
 ### Recommended steps
 
-
 1. Create dedicated virtual environment  
 `python -m venv .venv`
 

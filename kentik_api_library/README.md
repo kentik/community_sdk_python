@@ -1,7 +1,6 @@
-# Kentik API python library
+# Kentik API Python library
 
-This is a python wrapper for Kentik rest API.  
-For more information on how to interact with Kentik resources using this library, see examples in examples/ folder.
+This is a Python client library for [Kentik APIs](https://kb.kentik.com/v0/Ab09.htm). It is distributed as [_kentik-api_ PyPI package](https://pypi.org/project/kentik-api/).
 
 ## Installation with pip
 
@@ -68,12 +67,10 @@ The general approach is that every single KentikAPI resource is represented in t
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
 
-## Development
-[Instruction for developers](../docs/README.md)
-
 ## Additional utilities available in the `utils` sub-module
 
 ### Authentication support
+
 - `get_credentials`: function for retrieving authentication credentials from the environment or a profile stored on disk.
   API authentication credentials can be provided via environment variables `KTAPI_AUTH_EMAIL` and `KTAPI_AUTH_TOKEN`
   or via named profile (specified as argument to the `get_credentials` functions, defaulting to `default`) which is
@@ -88,11 +85,13 @@ Path to the profile file can be provided in `KTAPI_CFG_FILE`. Otherwise it is fi
 `${KTAPI_HOME}/<profile_name>` and then in `${HOME}/.kentik/<profile_name>`.
 
 ### Support for caching of device data
+
 The `DeviceCache` class allows caching of device related data obtained from the Kentik API. It internally builds
 index of devices by `name` and by `id`. Devices are represented by the [Device](./kentik_api/public/device.py) class which
 internally builds dictionary of device interfaces  (represented by the `DeviceInterface` class) by `name`.
 
 ## Analytic support
+
 The `analytics` package provides support for processing Kentik time series data using Pandas Dataframes.
 The [pandas](https://pandas.pydata.org) and [PyYAML](https://pyyaml.org/) modules are required by the `analytics`
 sub-module and are automatically installed with the `kentik-api[analytics]` option.
@@ -120,6 +119,20 @@ List of available examples:
   (see also [analytics readme](./kentik_api/analytics/README.md))
 - [synthetics_example.py](./examples/synthetics_example.py) - interact with synthetics API
 - [cloud_export_example.py](./examples/cloud_export_example.py) - interact with cloud export API
+
+## Development
+
+[Instructions for developers](../docs/README.md)
+
+## Release
+
+The release process for the kentik-api library is based on Git repository tags. Every tag with format `v[0-9].[0-9].[0-9]` will trigger an automatic build of the package and publish it in the PyPi repository.
+
+To build and release package:
+1. Make sure that all code that you want to release is in the _main_ branch
+1. Create a tag with format `v[0-9].[0-9].[0-9]` in GitHub. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
+1. Go to [GitHub Actions](https://github.com/kentik/community_sdk_python/actions)
+
 ## Open-source libraries
 
 This software uses the following open-source libraries:
