@@ -8,7 +8,7 @@ from kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2_grpc import (
     SyntheticsDataService,
 )
 from kentik_api.internal.grpc import wrap_grpc_errors
-from kentik_api.version import client_version
+from kentik_api.version import get_user_agent
 
 
 class APISyntheticsConnector:
@@ -31,7 +31,7 @@ class APISyntheticsConnector:
         self._metadata = [
             ("x-ch-auth-email", auth_email),
             ("x-ch-auth-api-token", auth_token),
-            ("user-agent", client_version),
+            ("user-agent", get_user_agent()),
         ]
 
     @wrap_grpc_errors

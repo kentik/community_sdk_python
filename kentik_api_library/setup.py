@@ -7,7 +7,7 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import Command, setup
+from setuptools import Command, find_packages, setup
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -15,36 +15,7 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-# Package list generated with: python setup.py packages
-PACKAGES = [
-    "kentik_api.",
-    "kentik_api.analytics",
-    "kentik_api.api_calls",
-    "kentik_api.api_connection",
-    "kentik_api.api_resources",
-    "kentik_api.auth",
-    "kentik_api.cloudexport",
-    "kentik_api.generated",
-    "kentik_api.generated.google",
-    "kentik_api.generated.google.api",
-    "kentik_api.generated.google.type",
-    "kentik_api.generated.kentik",
-    "kentik_api.generated.kentik.cloud_export",
-    "kentik_api.generated.kentik.cloud_export.v202101beta1",
-    "kentik_api.generated.kentik.core",
-    "kentik_api.generated.kentik.core.v202012alpha1",
-    "kentik_api.generated.kentik.synthetics",
-    "kentik_api.generated.kentik.synthetics.v202202",
-    "kentik_api.generated.protoc_gen_openapiv2",
-    "kentik_api.generated.protoc_gen_openapiv2.options",
-    "kentik_api.internal",
-    "kentik_api.public",
-    "kentik_api.requests_payload",
-    "kentik_api.synthetics",
-    "kentik_api.synthetics.synth_tests",
-    "kentik_api.throttling",
-    "kentik_api.utils",
-]
+PACKAGES = find_packages(HERE, exclude=("tests*", "examples*"))
 
 
 def run_cmd(cmd, reporter) -> None:
@@ -220,7 +191,7 @@ class GenerateGRPCStubs(Command):
 
 
 class PrintPackages(Command):
-    """Command helps to recreate package list"""
+    """Print list if packages include in the build"""
 
     user_options = []
 
@@ -231,39 +202,7 @@ class PrintPackages(Command):
         pass
 
     def run(self):
-        ROOT = "kentik_api/"
-
-        all_paths = [x[0] for x in os.walk(ROOT)]
-        src_paths = [p for p in all_paths if "__" not in p]  # skip __pycache__ and similar
-        packages = [".".join(p.split(os.path.sep)) for p in src_paths]
-        print(*packages, sep="\n")
-
-
-class SetupAPIClientVersion(Command):
-    """Command sets client version in version.py to the latest git repo tag"""
-
-    user_options = []
-
-    def initialize_options(self) -> None:
-        pass
-
-    def finalize_options(self) -> None:
-        pass
-
-    def run(self):
-        from setuptools_scm import get_version
-
-        try:
-            version = f"kentik_community_sdk_python/{get_version(root='..')}"
-            print("SDK API Client version:", version)
-        except LookupError:
-            print("SDK API Client version: version not available - keeping default 'development' version")
-            return
-        version_file_content = f'client_version = "{version}"'
-        version_file_path = HERE / "kentik_api/version.py"
-
-        with open(version_file_path, "w") as f:
-            f.write(version_file_content)
+        print(*PACKAGES, sep="\n")
 
 
 setup(
@@ -295,7 +234,6 @@ setup(
         "format": Format,
         "grpc_stubs": GenerateGRPCStubs,
         "packages": PrintPackages,
-        "setup_client_version": SetupAPIClientVersion,
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],
 )
