@@ -19,6 +19,7 @@ from kentik_api.public.errors import (
     TimedOutError,
     UnavailabilityError,
 )
+from kentik_api.version import client_version
 
 from .retryable_session import Retry, prepare_kentik_api_http_session
 
@@ -43,6 +44,7 @@ class APIConnector:
         self._timeout = timeout
         if proxy:
             self._logger.debug("Using proxy: %s", proxy)
+        self._headers = {"User-Agent": client_version}
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
         try:
@@ -58,16 +60,16 @@ class APIConnector:
         return APICallResponse(response.status_code, response.text)
 
     def _do_request(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> Response:
-
         url = self._get_api_query_url(api_call.url_path)
+
         if api_call.method == APICallMethods.GET:
-            response = self._session.get(url, params=payload, timeout=self._timeout)
+            response = self._session.get(url, params=payload, headers=self._headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.POST:
-            response = self._session.post(url, json=payload, timeout=self._timeout)
+            response = self._session.post(url, json=payload, headers=self._headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.PUT:
-            response = self._session.put(url, json=payload, timeout=self._timeout)
+            response = self._session.put(url, json=payload, headers=self._headers, timeout=self._timeout)
         elif api_call.method == APICallMethods.DELETE:
-            response = self._session.delete(url, json=payload, timeout=self._timeout)
+            response = self._session.delete(url, json=payload, headers=self._headers, timeout=self._timeout)
         else:
             raise ValueError(f"Improper API call method: {api_call.method}")
         return response

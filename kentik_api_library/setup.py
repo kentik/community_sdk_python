@@ -239,6 +239,33 @@ class PrintPackages(Command):
         print(*packages, sep="\n")
 
 
+class SetupAPIClientVersion(Command):
+    """Command sets client version in version.py to the latest git repo tag"""
+
+    user_options = []
+
+    def initialize_options(self) -> None:
+        pass
+
+    def finalize_options(self) -> None:
+        pass
+
+    def run(self):
+        from setuptools_scm import get_version
+
+        try:
+            version = f"kentik_community_sdk_python/{get_version(root='..')}"
+            print("SDK API Client version:", version)
+        except LookupError:
+            print("SDK API Client version: version not available - keeping default 'development' version")
+            return
+        version_file_content = f'client_version = "{version}"'
+        version_file_path = HERE / "kentik_api/version.py"
+
+        with open(version_file_path, "w") as f:
+            f.write(version_file_content)
+
+
 setup(
     name="kentik-api",
     description="SDK library for Kentik API",
@@ -268,6 +295,7 @@ setup(
         "format": Format,
         "grpc_stubs": GenerateGRPCStubs,
         "packages": PrintPackages,
+        "setup_client_version": SetupAPIClientVersion,
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],
 )
