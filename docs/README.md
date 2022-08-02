@@ -99,3 +99,12 @@ For error handling there is an exception hierarchy that allows to handle:
   - `RateLimitExceededError` - effect of throttling on KentikAPI side
 
 ![Exception Hierarchy - Class Diagram](./diagrams/error_hierarchy_class.png)
+
+## Release
+
+The release process for the kentik-api library is based on Git repository tags. Every tag with format `v[0-9].[0-9].[0-9]` will trigger an automatic build of the package and publish it in the PyPi repository.
+
+To build and release package:
+1. Make sure that all code that you want to release is in the _main_ branch
+1. Create a tag with format `v[0-9].[0-9].[0-9]` in GitHub. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
+1. Go to [GitHub Actions](https://github.com/kentik/community_sdk_python/actions)

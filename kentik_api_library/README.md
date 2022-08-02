@@ -17,42 +17,11 @@ This is a Python client library for [Kentik APIs](https://kb.kentik.com/v0/Ab09.
 
 ## Getting started
 
-The example below illustrates how to create a new device using the library:
+The best way to get started coding with the SDK is to study provided [examples](./examples).
 
-```python
-# library-specific imports
-from kentik_api import (
-    KentikAPI,
-    Device,
-    DeviceSubtype,
-    CDNAttribute,
-    ID,
-)
-
-# initialize Kentik API client
-api_client = KentikAPI("<API_EMAIL_STRING>", "<API_TOKEN_STRING>")
-
-# prepare device object
-device = Device.new_dns(
-    device_name="example-device-1",
-    device_subtype=DeviceSubtype.aws_subnet,
-    cdn_attr=CDNAttribute.yes,
-    device_sample_rate=100,
-    plan_id=ID(11466),
-    site_id=ID(8483),
-    device_bgp_flowspec=True,
-)
-
-# create the device
-created = api_client.devices.create(device)
-
-# print returned device's attributes
-print(created.__dict__)
-```
-
-As you can see, one can create a device using `KentikAPI.devices` interface.  
-Interfaces for manipulating all KentikAPI resources are available under `KentikAPI` object.  
-The general approach is that every single KentikAPI resource is represented in the library by a public class, and all the types/enums/constants related to given resource are collected together with the resource class (in the same source file):
+Interfaces for manipulating all Kentik API resources are available under the `KentikAPI` object.  
+Every Kentik API resource is represented by a public class, and all related data types are located in the same source
+file or directory as the implementation of the class:
 - [CustomApplication](./kentik_api/public/custom_application.py)
 - [CustomDimension](./kentik_api/public/custom_dimension.py)
 - [DeviceLabel](./kentik_api/public/device_label.py)
@@ -63,6 +32,7 @@ The general approach is that every single KentikAPI resource is represented in t
 - [QuerySQL](./kentik_api/public/query_sql.py)
 - [SavedFilter](./kentik_api/public/saved_filter.py)
 - [Site](./kentik_api/public/site.py)
+- [Synthetic Tests](./kentik_api/synthetics/)
 - [Tag](./kentik_api/public/tag.py)
 - [Tenant](./kentik_api/public/tenant.py)
 - [User](./kentik_api/public/user.py)
@@ -97,9 +67,8 @@ The [pandas](https://pandas.pydata.org) and [PyYAML](https://pyyaml.org/) module
 sub-module and are automatically installed with the `kentik-api[analytics]` option.
 See [analytics readme](./kentik_api/analytics/README.md) for more details.
 
-## More examples
+## Available Examples
 
-List of available examples:
 - [alerting_example.py](./examples/alerting_example.py) - create Manual Mitigation
 - [applications_example.py](./examples/applications_example.py) - create/update/delete Custom Application
 - [bulk_user_create.py](./examples/bulk_user_create.py) - create users from YAML file
@@ -123,15 +92,6 @@ List of available examples:
 ## Development
 
 [Instructions for developers](../docs/README.md)
-
-## Release
-
-The release process for the kentik-api library is based on Git repository tags. Every tag with format `v[0-9].[0-9].[0-9]` will trigger an automatic build of the package and publish it in the PyPi repository.
-
-To build and release package:
-1. Make sure that all code that you want to release is in the _main_ branch
-1. Create a tag with format `v[0-9].[0-9].[0-9]` in GitHub. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
-1. Go to [GitHub Actions](https://github.com/kentik/community_sdk_python/actions)
 
 ## Open-source libraries
 

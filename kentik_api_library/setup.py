@@ -7,7 +7,7 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import Command, find_packages, setup
+from setuptools import Command, find_namespace_packages, setup
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -15,7 +15,8 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-PACKAGES = find_packages(HERE, exclude=("tests*", "examples*"))
+# Generate list of packages (will be replaced by pyproject.toml [tool.setuptools.packages.find] once support stabilizes)
+PACKAGES = find_namespace_packages(HERE.as_posix(), exclude=("build*", "dist*", "tests*", "examples*"))
 
 
 def run_cmd(cmd, reporter) -> None:
@@ -49,6 +50,7 @@ class Pylint(Command):
         run_cmd(cmd, self.announce)
 
 
+# noinspection PyAttributeOutsideInit
 class Mypy(Command):
     """Custom command to run Mypy"""
 
@@ -90,6 +92,7 @@ class Pytest(Command):
         run_cmd(cmd, self.announce)
 
 
+# noinspection PyAttributeOutsideInit
 class Format(Command):
     """Custom command to run black + isort"""
 
@@ -132,6 +135,7 @@ class Format(Command):
         run_cmd(cmd, self.announce)
 
 
+# noinspection PyAttributeOutsideInit
 class GenerateGRPCStubs(Command):
     """Generate Python gRPC stubs from proto files in the source repo."""
 
@@ -148,6 +152,12 @@ class GenerateGRPCStubs(Command):
 
     def run(self):
         import git
+
+        def _make_python_pkg(directory):
+            directory.joinpath("__init__.py").write_text("")
+            for entry in directory.glob("*"):
+                if entry.is_dir():
+                    _make_python_pkg(entry)
 
         dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
         apis = [
@@ -188,10 +198,11 @@ class GenerateGRPCStubs(Command):
                 for f in Path(f"{tmp}/proto/kentik/").joinpath(a["name"]).joinpath(a["version"]).glob("*.proto"):
                     cmd.append(f.as_posix())
             run_cmd(cmd, self.announce)
+            # _make_python_pkg(dst)
 
 
 class PrintPackages(Command):
-    """Print list if packages include in the build"""
+    """Print list of packages included in the build"""
 
     user_options = []
 
@@ -202,7 +213,7 @@ class PrintPackages(Command):
         pass
 
     def run(self):
-        print(*PACKAGES, sep="\n")
+        print(*sorted(PACKAGES), sep="\n")
 
 
 setup(
@@ -226,7 +237,7 @@ setup(
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
-    packages=PACKAGES,
+    # packages=PACKAGES,
     cmdclass={
         "mypy": Mypy,
         "pylint": Pylint,
