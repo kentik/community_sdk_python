@@ -1,4 +1,11 @@
-# client_version is automatically updated to the latest git repo tag,
-# when a new package version is being published do PYPI.
-# e. g. "kentik_community_sdk_python/v0.4.2"
-client_version = "kentik_community_sdk_python/development"
+# noinspection PyProtectedMember
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("kentik_api")
+except PackageNotFoundError:
+    __version__ = "dev-unknown"
+
+
+def get_user_agent() -> str:
+    return f"kentik_community_sdk_python/{__version__}"

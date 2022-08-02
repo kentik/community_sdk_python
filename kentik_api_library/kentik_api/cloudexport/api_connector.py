@@ -5,7 +5,7 @@ from google.protobuf.field_mask_pb2 import FieldMask
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2_grpc import CloudExportAdminService
 from kentik_api.internal.grpc import wrap_grpc_errors
-from kentik_api.version import client_version
+from kentik_api.version import get_user_agent
 
 
 class APICloudExportConnector:
@@ -27,7 +27,7 @@ class APICloudExportConnector:
         self._metadata = [
             ("x-ch-auth-email", auth_email),
             ("x-ch-auth-api-token", auth_token),
-            ("user-agent", client_version),
+            ("user-agent", get_user_agent()),
         ]
 
     @wrap_grpc_errors

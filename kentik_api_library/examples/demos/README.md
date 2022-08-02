@@ -31,8 +31,5 @@ Steps:
 1. Install demo requirements & jupyter-notebook
 `pip3 install Pillow pandas httpretty notebook`
 
-1. Run throttling demo against stub server  
-`jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_stub.ipynb`
-
-1. Run throttling demo against live server (make sure that there is any data that can be retrieved)  
-`jupyter-notebook kentik_api_library/examples/demos/throttling_retry_demo_live.ipynb`
+1. Run query result visualization demo  
+`jupyter-notebook kentik_api_library/examples/demos/queries_visualisation_demo.ipynb`

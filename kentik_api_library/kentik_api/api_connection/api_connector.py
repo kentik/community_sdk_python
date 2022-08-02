@@ -19,7 +19,7 @@ from kentik_api.public.errors import (
     TimedOutError,
     UnavailabilityError,
 )
-from kentik_api.version import client_version
+from kentik_api.version import get_user_agent
 
 from .retryable_session import Retry, prepare_kentik_api_http_session
 
@@ -41,10 +41,10 @@ class APIConnector:
         self._api_url = api_url
         self._logger = logging.getLogger(__name__)
         self._session = prepare_kentik_api_http_session(auth_email, auth_token, retry_strategy, proxy)
+        self._session.headers["User-Agent"] = get_user_agent()
         self._timeout = timeout
         if proxy:
             self._logger.debug("Using proxy: %s", proxy)
-        self._headers = {"User-Agent": client_version}
 
     def send(self, api_call: APICall, payload: Optional[Dict[str, Any]] = None) -> APICallResponse:
         try:
@@ -63,13 +63,13 @@ class APIConnector:
         url = self._get_api_query_url(api_call.url_path)
 
         if api_call.method == APICallMethods.GET:
-            response = self._session.get(url, params=payload, headers=self._headers, timeout=self._timeout)
+            response = self._session.get(url, params=payload, timeout=self._timeout)
         elif api_call.method == APICallMethods.POST:
-            response = self._session.post(url, json=payload, headers=self._headers, timeout=self._timeout)
+            response = self._session.post(url, json=payload, timeout=self._timeout)
         elif api_call.method == APICallMethods.PUT:
-            response = self._session.put(url, json=payload, headers=self._headers, timeout=self._timeout)
+            response = self._session.put(url, json=payload, timeout=self._timeout)
         elif api_call.method == APICallMethods.DELETE:
-            response = self._session.delete(url, json=payload, headers=self._headers, timeout=self._timeout)
+            response = self._session.delete(url, json=payload, timeout=self._timeout)
         else:
             raise ValueError(f"Improper API call method: {api_call.method}")
         return response
@@ -92,6 +92,7 @@ class APIConnector:
 
 
 def new_api_error(message: str, http_status_code: int) -> KentikAPIError:
+    # noinspection PyUnresolvedReferences
     common_errors = {
         HTTPStatus.BAD_REQUEST.value: BadRequestError,
         HTTPStatus.UNAUTHORIZED.value: AuthError,
