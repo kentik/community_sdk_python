@@ -58,6 +58,8 @@ def test_page_load_crud(test_labels, notification_channels) -> None:
     update_settings.page_load.ignore_tls_errors = False
     update_settings.page_load.css_selectors = {}
     update_settings.notification_channels = []
+    update_settings.health_settings.cert_expiry_critical = 1
+    update_settings.health_settings.cert_expiry_warning = 2
 
     test = PageLoadTest(make_e2e_test_name(TestType.PAGE_LOAD), TestStatus.ACTIVE, initial_settings)
     test.labels = test_labels

@@ -86,6 +86,7 @@ class KentikSynthClient:
         end: datetime,
         agent_ids: Optional[List[ID]] = None,
         task_ids: Optional[List[ID]] = None,
+        aggregate: bool = False,
     ) -> List[TestResults]:
         ids = [str(id) for id in test_ids]
         agents = [str(id) for id in agent_ids] if agent_ids else []
@@ -96,6 +97,7 @@ class KentikSynthClient:
             end=DateTime.fromtimestamp(end.timestamp(), end.tzinfo).to_pb(),
             agent_ids=agents,
             task_ids=tasks,
+            aggregate=aggregate,
         )
         return [TestResults.from_pb(tr) for tr in response.results]
 

@@ -33,6 +33,7 @@ def test_dns_crud(test_labels, notification_channels) -> None:
         ),
         notification_channels=notification_channels,
     )
+    initial_settings.health_settings.dns_valid_ips = "6.6.6.6"
     update_settings = deepcopy(initial_settings)
     # update_settings.family = IPFamily.V6  # family update doesn't take effect
     update_settings.period = 120
@@ -42,6 +43,7 @@ def test_dns_crud(test_labels, notification_channels) -> None:
     update_settings.dns.record_type = DNSRecordType.A
     update_settings.dns.servers = ["8.8.8.8", "9.9.9.9"]
     update_settings.dns.port = 63
+    initial_settings.health_settings.dns_valid_ips = ""
     update_settings.notification_channels = []
 
     test = DNSTest(make_e2e_test_name(TestType.DNS), TestStatus.ACTIVE, initial_settings)

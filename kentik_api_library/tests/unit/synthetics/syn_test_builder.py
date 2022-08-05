@@ -86,7 +86,10 @@ def setup_syn_test_settings(out_pb_settings: pb.TestSettings, out_settings: SynT
             http_latency_critical_stddev=7,
             http_latency_warning_stddev=3.5,
             http_valid_codes=[200, 201, 301],
+            cert_expiry_warning=30,
+            cert_expiry_critical=10,
             dns_valid_codes=[1, 2, 3],
+            dns_valid_ips="",
             unhealthy_subtest_threshold=3,
             activation=pb.ActivationSettings(
                 grace_period="3",
@@ -189,9 +192,13 @@ def make_hostname_test_pair() -> Tuple[pb.Test, hostname.HostnameTest]:
     # Hostname-test specific config
     pb_test.type = TestType.HOSTNAME.value
     pb_test.settings.hostname.CopyFrom(pb.HostnameTest(target="www.example.com"))
+    pb_test.settings.ping.dscp = 1
+    pb_test.settings.trace.dscp = 1
 
     test.type = TestType.HOSTNAME
     test.settings.hostname = hostname.HostnameTestSpecific(target="www.example.com")
+    test.settings.ping.dscp = 1
+    test.settings.trace.dscp = 1
 
     return (pb_test, test)
 
@@ -249,6 +256,8 @@ def make_page_load_test_pair() -> Tuple[pb.Test, page_load.PageLoadTest]:
             css_selectors={"id": "#id", "class": ".class"},
         )
     )
+    pb_test.settings.health_settings.cert_expiry_warning = 1
+    pb_test.settings.health_settings.cert_expiry_critical = 2
 
     test.type = TestType.PAGE_LOAD
     test.settings.page_load = page_load.PageLoadTestSpecific(
@@ -258,6 +267,8 @@ def make_page_load_test_pair() -> Tuple[pb.Test, page_load.PageLoadTest]:
         ignore_tls_errors=True,
         css_selectors={"id": "#id", "class": ".class"},
     )
+    test.settings.health_settings.cert_expiry_warning = 1
+    test.settings.health_settings.cert_expiry_critical = 2
 
     return (pb_test, test)
 
@@ -353,6 +364,7 @@ def make_dns_test_pair() -> Tuple[pb.Test, dns.DNSTest]:
             port=2233,
         )
     )
+    pb_test.settings.health_settings.dns_valid_ips = "0.0.0.0"
 
     test.type = TestType.DNS
     test.settings.dns = dns.DNSTestSpecific(
@@ -362,6 +374,7 @@ def make_dns_test_pair() -> Tuple[pb.Test, dns.DNSTest]:
         servers=["1.1.1.1", "2.2.2.2"],
         port=2233,
     )
+    test.settings.health_settings.dns_valid_ips = "0.0.0.0"
 
     return (pb_test, test)
 

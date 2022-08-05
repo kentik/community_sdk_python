@@ -109,6 +109,7 @@ class APISyntheticsConnector:
         end: Timestamp,
         agent_ids: Optional[List[str]] = None,
         task_ids: Optional[List[str]] = None,
+        aggregate: bool = False,
     ) -> pb.GetResultsForTestsResponse:
         request = pb.GetResultsForTestsRequest(
             ids=test_ids,
@@ -116,6 +117,7 @@ class APISyntheticsConnector:
             end_time=end,
             agent_ids=agent_ids or [],
             targets=task_ids or [],
+            aggregate=aggregate,
         )
         return self._data.GetResultsForTests(
             request=request, metadata=self._metadata, target=self._url, options=self._options

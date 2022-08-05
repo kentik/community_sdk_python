@@ -40,6 +40,7 @@ def test_ip_crud(test_labels, notification_channels) -> None:
     update_settings.ping.timeout = 4000
     update_settings.ping.count = 6
     update_settings.ping.delay = 300
+    # update_settings.ping.dscp = 1  # does not work yet
     update_settings.trace.timeout = 22750
     update_settings.trace.count = 4
     update_settings.trace.limit = 40

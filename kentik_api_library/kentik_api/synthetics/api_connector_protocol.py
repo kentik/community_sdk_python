@@ -44,6 +44,7 @@ class APISyntheticsConnectorProtocol(Protocol):
         end: Timestamp,
         agent_ids: Optional[List[str]] = None,
         task_ids: Optional[List[str]] = None,
+        aggregate: bool = False,
     ) -> pb.GetResultsForTestsResponse:
         pass
 
