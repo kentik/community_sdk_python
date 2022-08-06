@@ -81,6 +81,7 @@ class PingTask(_MonitoringTask):
     delay: int = 200  # inter-probe delay
     protocol: Protocol = Protocol.ICMP
     port: int = 0  # unused when protocol=Protocol.ICMP
+    dscp: int = 0  # DSCP code point to use in probe packets
 
     @property
     def task_name(self):
@@ -97,6 +98,7 @@ class TraceTask(_MonitoringTask):
     delay: int = 0  # inter-probe delay
     protocol: Protocol = Protocol.ICMP
     port: int = 0  # unused when protocol=Protocol.ICMP
+    dscp: int = 0  # DSCP code point to use in probe packets
 
     @property
     def task_name(self):
@@ -133,6 +135,9 @@ class HealthSettings(_ConfigElement):
     http_latency_warning_stddev: float = 0.0
     http_valid_codes: List[int] = field(default_factory=list)
     dns_valid_codes: List[int] = field(default_factory=list)
+    cert_expiry_warning: int = 30
+    cert_expiry_critical: int = 10
+    dns_valid_ips: str = ""
     unhealthy_subtest_threshold: int = 1
     activation: ActivationSettings = field(default_factory=ActivationSettings)
 
@@ -280,7 +285,8 @@ class SynTest(_ConfigElement):
                 return sorted(d.targets, key=lambda x: str(x))
         except AttributeError:
             pass
-        log.debug("'%s' (type: '%s'): Test has no targets", self.name, self.type.value)
+        if self.type != TestType.NETWORK_MESH:
+            log.debug("'%s' (type: '%s'): Test has no targets", self.name, self.type.value)
         return []
 
     def undeploy(self):
