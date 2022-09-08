@@ -213,7 +213,7 @@ def test_query_chart_success() -> None:
     )
     agg3 = Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn=AggregateFunctionType.max)
     filter_ = Filter(filterField="dst_as", operator="=", filterValue="")
-    filter_group = FilterGroups(connector="All", not_=False, filters=[filter_])
+    filter_group = FilterGroups(connector="All", is_negation=False, filters=[filter_])
     filters = Filters(connector="", filterGroups=[filter_group])
     query = Query(
         viz_type=ChartViewType.stackedArea,

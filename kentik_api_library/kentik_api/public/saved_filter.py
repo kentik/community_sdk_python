@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Type, TypeVar
+from enum import Enum
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from kentik_api.internal.dataclass import mandatory_dataclass_attributes
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
+from kentik_api.requests_payload.conversions import as_dict
 
 FilterGroupsType = TypeVar("FilterGroupsType", bound="FilterGroups")
 FiltersType = TypeVar("FiltersType", bound="Filters")
@@ -24,7 +26,7 @@ class Filter:
 class FilterGroups:
     connector: str
     filters: List[Filter]
-    not_: bool = False
+    is_negation: bool = False
     filterString: Optional[str] = None
     id: Optional[ID] = None
     metric: Optional[str] = None
@@ -49,7 +51,7 @@ class FilterGroups:
         _d = dict()
         _d.update(data)
         if "not" in data:
-            _d["not_"] = data["not"]
+            _d["is_negation"] = data["not"]
             del _d["not"]
         _d["filters"] = [Filter(**f) for f in data["filters"]]
         filter_groups = data.get("filterGroups")
@@ -61,13 +63,24 @@ class FilterGroups:
 
         return cls(**_d)
 
-    @property  # type: ignore # redefinition of "not_" attribute to store it as "not" - for serialization
-    def not_(self) -> bool:
-        return getattr(self, "not")
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert obj to dict, removing all keys with None values"""
+        result = dict()
+        for k, v in self.__dict__.items():
+            if v is None:
+                continue
+            if k == "is_negation":
+                result["not"] = v
+            elif isinstance(v, Enum):
+                result[k] = v.value
+            elif isinstance(v, list):
+                result[k] = [as_dict(e) for e in v]
+            elif hasattr(v, "__dict__") or isinstance(v, dict):
+                result[k] = as_dict(v)
+            else:
+                result[k] = v
 
-    @not_.setter
-    def not_(self, not_: bool) -> None:
-        setattr(self, "not", not_)
+        return result
 
 
 @dataclass()

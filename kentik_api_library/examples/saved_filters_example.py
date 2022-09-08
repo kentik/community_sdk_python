@@ -27,7 +27,7 @@ def run_crud() -> None:
 
     print("### CREATE")
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
-    filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
+    filter_groups = [FilterGroups(connector="All", is_negation=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_create = SavedFilter(
         filter_name="test_filter1",
