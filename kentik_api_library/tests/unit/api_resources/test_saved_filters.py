@@ -38,7 +38,7 @@ def test_create_saved_filter_success() -> None:
 
     # when
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
-    filter_groups = [FilterGroups(connector="All", is_negation=False, filters=[filter_])]
+    filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_create = SavedFilter(
         filter_name="test_filter1",
@@ -68,7 +68,7 @@ def test_create_saved_filter_success() -> None:
     assert created.filters is not None
     assert created.filters.connector == "All"
     assert created.filters.filterGroups[0].connector == "All"
-    assert created.filters.filterGroups[0].is_negation is False
+    assert created.filters.filterGroups[0].not_ is False
     assert created.filters.filterGroups[0].filters[0].filterField == "dst_as"
     assert created.filters.filterGroups[0].filters[0].filterValue == "81"
     assert created.filters.filterGroups[0].filters[0].operator == "="
@@ -121,7 +121,7 @@ def test_get_saved_filter_success() -> None:
     assert saved_filter.filters is not None
     assert saved_filter.filters.connector == "All"
     assert saved_filter.filters.filterGroups[0].connector == "All"
-    assert saved_filter.filters.filterGroups[0].is_negation is False
+    assert saved_filter.filters.filterGroups[0].not_ is False
     assert saved_filter.filters.filterGroups[0].filters[0].filterField == "dst_as"
     assert saved_filter.filters.filterGroups[0].filters[0].filterValue == "81"
     assert saved_filter.filters.filterGroups[0].filters[0].operator == "="
@@ -158,7 +158,10 @@ def test_update_saved_filter_success() -> None:
     # when
     filter_id = ID(8153)
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
-    filter_groups = [FilterGroups(connector="All", is_negation=False, filters=[filter_])]
+    filter_groups = [FilterGroups(connector="All", filters=[filter_])]
+    # test correct initialization of the FilterGroups.not_ attribute
+    assert filter_groups[0].not_ is False
+
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_update = SavedFilter(
         filter_name="test_filter1",

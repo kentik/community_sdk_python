@@ -30,7 +30,7 @@ class SavedFilterPayload:
                     }
                     for j in i.filters
                 ],
-                "not": i.is_negation,
+                "not": i.not_,
             }
             for i in filter_groups
         ]
@@ -92,7 +92,7 @@ class GetResponse:
             filters=filters,
             id=convert_or_none(dic.get("id"), ID),
             metric=dic.get("metric"),
-            is_negation=convert(dic["not"], bool),
+            not_=convert(dic["not"], bool),
         )
 
     @staticmethod
@@ -158,5 +158,5 @@ def validate(saved_filter: SavedFilter, operation: str):
             raise IncompleteObjectError(operation, class_name, "connector is required")
         if not all(i.connector is not None for i in saved_filter.filters.filterGroups):
             raise IncompleteObjectError(operation, class_name, "filterGroups connector is required")
-        if not all(i.is_negation is not None for i in saved_filter.filters.filterGroups):
+        if not all(i.not_ is not None for i in saved_filter.filters.filterGroups):
             raise IncompleteObjectError(operation, class_name, "not_ is required")

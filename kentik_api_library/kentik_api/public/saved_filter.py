@@ -1,11 +1,10 @@
-from dataclasses import dataclass
-from enum import Enum
+from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from kentik_api.internal.dataclass import mandatory_dataclass_attributes
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
-from kentik_api.requests_payload.conversions import as_dict
+
 
 FilterGroupsType = TypeVar("FilterGroupsType", bound="FilterGroups")
 FiltersType = TypeVar("FiltersType", bound="Filters")
@@ -20,13 +19,11 @@ class Filter:
     id: Optional[ID] = None
 
 
-# noinspection PyShadowingBuiltins
-# noinspection PyPep8Naming
 @dataclass()
 class FilterGroups:
     connector: str
     filters: List[Filter]
-    is_negation: bool = False
+    not_: bool = False
     filterString: Optional[str] = None
     id: Optional[ID] = None
     metric: Optional[str] = None
@@ -51,36 +48,26 @@ class FilterGroups:
         _d = dict()
         _d.update(data)
         if "not" in data:
-            _d["is_negation"] = data["not"]
+            _d["not_"] = data["not"]
             del _d["not"]
         _d["filters"] = [Filter(**f) for f in data["filters"]]
         filter_groups = data.get("filterGroups")
         if filter_groups:
             _d["filterGroups"] = [cls.from_dict(f) for f in data["filterGroups"]]
-        saved_filters = data.get("saved_filtes")
+        saved_filters = data.get("saved_filters")
         if saved_filters:
             _d["saved_filters"] = [SavedFilter.from_dict(f) for f in data["saved_filters"]]
 
         return cls(**_d)
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert obj to dict, removing all keys with None values"""
-        result = dict()
-        for k, v in self.__dict__.items():
-            if v is None:
-                continue
-            if k == "is_negation":
-                result["not"] = v
-            elif isinstance(v, Enum):
-                result[k] = v.value
-            elif isinstance(v, list):
-                result[k] = [as_dict(e) for e in v]
-            elif hasattr(v, "__dict__") or isinstance(v, dict):
-                result[k] = as_dict(v)
-            else:
-                result[k] = v
-
-        return result
+        """Convert obj to dict, removing all keys with None values and remapping is_negation to not"""
+        d = asdict(self)
+        d["not"] = self.not_
+        del d["not_"]
+        for key in [k for k, v in d.items() if v is None]:
+            del d[key]
+        return d
 
 
 @dataclass()
