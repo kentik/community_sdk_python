@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Type, TypeVar
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from kentik_api.internal.dataclass import mandatory_dataclass_attributes
 from kentik_api.public.errors import IncompleteObjectError
@@ -18,8 +18,6 @@ class Filter:
     id: Optional[ID] = None
 
 
-# noinspection PyShadowingBuiltins
-# noinspection PyPep8Naming
 @dataclass()
 class FilterGroups:
     connector: str
@@ -55,19 +53,20 @@ class FilterGroups:
         filter_groups = data.get("filterGroups")
         if filter_groups:
             _d["filterGroups"] = [cls.from_dict(f) for f in data["filterGroups"]]
-        saved_filters = data.get("saved_filtes")
+        saved_filters = data.get("saved_filters")
         if saved_filters:
             _d["saved_filters"] = [SavedFilter.from_dict(f) for f in data["saved_filters"]]
 
         return cls(**_d)
 
-    @property  # type: ignore # redefinition of "not_" attribute to store it as "not" - for serialization
-    def not_(self) -> bool:
-        return getattr(self, "not")
-
-    @not_.setter
-    def not_(self, not_: bool) -> None:
-        setattr(self, "not", not_)
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert obj to dict, removing all keys with None values and remapping is_negation to not"""
+        d = asdict(self)
+        d["not"] = self.not_
+        del d["not_"]
+        for key in [k for k, v in d.items() if v is None]:
+            del d[key]
+        return d
 
 
 @dataclass()

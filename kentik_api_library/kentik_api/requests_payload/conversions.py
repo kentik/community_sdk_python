@@ -9,15 +9,19 @@ from kentik_api.public.errors import DataFormatError, DeserializationError
 
 def as_dict(obj: Any) -> Dict[str, Any]:
     """Convert obj to dict, removing all keys with None values"""
-
     if not (hasattr(obj, "__dict__") or isinstance(obj, dict)):
         raise DataFormatError("Object as dict", f"Input should be either class or dict , got: {type(obj)}")
 
-    if hasattr(obj, "__dict__"):
-        obj = obj.__dict__
+    if hasattr(obj, "to_dict"):
+        return obj.to_dict()
 
-    result = dict()
-    for k, v in obj.items():
+    if hasattr(obj, "__dict__"):
+        d = obj.__dict__
+    else:
+        d = obj
+
+    result: Dict[str, Any] = dict()
+    for k, v in d.items():
         if v is None:
             continue
         if isinstance(v, Enum):

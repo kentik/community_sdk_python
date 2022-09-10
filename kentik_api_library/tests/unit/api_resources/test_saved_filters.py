@@ -158,7 +158,10 @@ def test_update_saved_filter_success() -> None:
     # when
     filter_id = ID(8153)
     filter_ = Filter(filterField="dst_as", filterValue="81", operator="=")
-    filter_groups = [FilterGroups(connector="All", not_=False, filters=[filter_])]
+    filter_groups = [FilterGroups(connector="All", filters=[filter_])]
+    # test correct initialization of the FilterGroups.not_ attribute
+    assert filter_groups[0].not_ is False
+
     filters = Filters(connector="All", filterGroups=filter_groups)
     to_update = SavedFilter(
         filter_name="test_filter1",

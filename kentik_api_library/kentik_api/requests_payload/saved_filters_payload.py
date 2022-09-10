@@ -95,7 +95,8 @@ class GetResponse:
             not_=convert(dic["not"], bool),
         )
 
-    def _to_filter(self, dic) -> Filter:
+    @staticmethod
+    def _to_filter(dic) -> Filter:
         dic["id"] = convert_or_none(dic.get("id"), ID)
         return from_dict(Filter, dic)
 
