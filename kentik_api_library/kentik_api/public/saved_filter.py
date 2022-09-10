@@ -1,10 +1,9 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from kentik_api.internal.dataclass import mandatory_dataclass_attributes
 from kentik_api.public.errors import IncompleteObjectError
 from kentik_api.public.types import ID
-
 
 FilterGroupsType = TypeVar("FilterGroupsType", bound="FilterGroups")
 FiltersType = TypeVar("FiltersType", bound="Filters")
