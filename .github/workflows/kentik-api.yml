@@ -21,7 +21,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: echo "::set-output name=matrix::{\"python-version\":['3.8', '3.9']}"
+      run: echo "::set-output name=matrix::{\"python-version\":['3.8', '3.9', '3.10']}"
 
   # Static Analysis of the SDK and its code
   # Stuff like linters, etc.
@@ -132,8 +132,7 @@ jobs:
     if: contains(github.ref, '/tags/v')
     needs: [ python-versions-setup, code-tests, build, package-tests ]
     strategy: 
-      matrix: 
-        python-version: [ '3.8' ]
+      matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v2
