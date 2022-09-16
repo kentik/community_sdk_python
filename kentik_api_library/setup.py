@@ -170,7 +170,11 @@ class GenerateGRPCStubs(Command):
         for a in apis:
             print(f"\t{a['name']}/{a['version']}")
 
-        deps = ["protovendor/github.com/googleapis/googleapis", "protovendor/github.com/grpc-ecosystem/grpc-gateway"]
+        deps = [
+            "protovendor/github.com/googleapis/googleapis",
+            "protovendor/github.com/grpc-ecosystem/grpc-gateway",
+            "protovendor/github.com/protocolbuffers/src",
+        ]
         # cleanup destination directory
         shutil.rmtree(dst_path, ignore_errors=True)  # ignore "No such file or directory"
         # create destination directory, if it does not exist
@@ -201,21 +205,6 @@ class GenerateGRPCStubs(Command):
             # _make_python_pkg(dst)
 
 
-class PrintPackages(Command):
-    """Print list of packages included in the build"""
-
-    user_options = []
-
-    def initialize_options(self) -> None:
-        pass
-
-    def finalize_options(self) -> None:
-        pass
-
-    def run(self):
-        print(*sorted(PACKAGES), sep="\n")
-
-
 setup(
     name="kentik-api",
     description="SDK library for Kentik API",
@@ -237,14 +226,13 @@ setup(
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
-    # packages=PACKAGES,
+    packages=PACKAGES,
     cmdclass={
         "mypy": Mypy,
         "pylint": Pylint,
         "pytest": Pytest,
         "format": Format,
         "grpc_stubs": GenerateGRPCStubs,
-        "packages": PrintPackages,
     },
     classifiers=["License :: OSI Approved :: Apache Software License"],
 )
