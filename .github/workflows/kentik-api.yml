@@ -132,7 +132,8 @@ jobs:
     if: contains(github.ref, '/tags/v')
     needs: [ python-versions-setup, code-tests, build, package-tests ]
     strategy: 
-      matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
+      matrix:
+        python-version: [ '3.8' ]
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v2
