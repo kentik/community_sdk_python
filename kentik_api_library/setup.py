@@ -222,7 +222,7 @@ setup(
         "typing-extensions>=3.7.4.3",
         "urllib3>=1.26.0",
         "protobuf==3.20.1",
-        "grpcio>=1.47.0",
+        "grpcio==1.47.0",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
