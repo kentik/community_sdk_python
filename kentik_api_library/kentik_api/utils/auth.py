@@ -23,7 +23,7 @@ def load_credential_profile(profile: str) -> Dict:
                 )
                 return {}
     except OSError as e:
-        log.critical("Cannot open config file: %s (%s)", filename, str(e))
+        log.warning("Cannot open credential profile: %s (%s)", filename, str(e))
         return {}
     ok: bool = True
     # check for required keys
@@ -38,13 +38,13 @@ def load_credential_profile(profile: str) -> Dict:
 
 
 def get_credentials(profile: str = "default") -> Tuple[str, str]:
-    email = os.environ.get("KTAPI_AUTH_EMAIL")
-    token = os.environ.get("KTAPI_AUTH_TOKEN")
-    if email is None or token is None:
-        cfg = load_credential_profile(profile)
-        if cfg:
-            email = cfg["email"]
-            token = cfg["api-key"]
+    cfg = load_credential_profile(profile)
+    if cfg:
+        email = cfg["email"]
+        token = cfg["api-key"]
+    else:
+        email = os.environ.get("KTAPI_AUTH_EMAIL")
+        token = os.environ.get("KTAPI_AUTH_TOKEN")
     if email and token:
         return email, token
     else:
