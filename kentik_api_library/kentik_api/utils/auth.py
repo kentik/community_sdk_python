@@ -9,6 +9,8 @@ log = logging.getLogger("auth")
 
 @lru_cache
 def load_credential_profile(profile: str) -> Dict:
+    if not profile:
+        return {}
     home: str = os.environ.get("KTAPI_HOME", os.environ.get("HOME", "."))
     filename = os.environ.get("KTAPI_CFG_FILE", os.path.join(home, ".kentik", profile))
     try:
