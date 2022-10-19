@@ -19,6 +19,7 @@ class AgentImplementType(SerializableEnum):
     UNSPECIFIED = pb.ImplementType.IMPLEMENT_TYPE_UNSPECIFIED
     RUST = pb.ImplementType.IMPLEMENT_TYPE_RUST
     NODE = pb.ImplementType.IMPLEMENT_TYPE_NODE
+    NETWORK = pb.ImplementType.IMPLEMENT_TYPE_NETWORK
 
 
 class AgentOwnershipType(SerializableEnum):
