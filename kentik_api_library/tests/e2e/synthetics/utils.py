@@ -66,7 +66,7 @@ def make_e2e_test_name(test_type: TestType) -> str:
 def client() -> KentikAPI:
     """Get KentikAPI client"""
 
-    email, token = get_credentials()
+    email, token = get_credentials(profile="")
     url = get_url()
     if url:
         api_host = urlparse(url).netloc
@@ -82,18 +82,22 @@ def pick_agent_ids(count: int = 1, page_load_support: bool = False) -> List[ID]:
 
     # test types that an Agent supports depend on agent_impl attribute:
     #   for page_load tests - use AgentImplementType.NODE
-    #   for all other tests - use AgentImplementType.RUST
+    #   for all other tests - use AgentImplementType.RUST or AgentImplementType.NETWORK
     # select only tests with IPFamily.DUAL to ensure IPv4 and IPv6 support
-    required_impl = AgentImplementType.NODE if page_load_support else AgentImplementType.RUST
+    if page_load_support:
+        required_impl = [AgentImplementType.NODE]
+    else:
+        required_impl = [AgentImplementType.NODE, AgentImplementType.RUST, AgentImplementType.NETWORK]
+
     agents = [
         agent
         for agent in client().synthetics.get_all_agents()
-        if agent.agent_impl == required_impl and agent.family == IPFamily.DUAL
+        if agent.agent_impl in required_impl and agent.family == IPFamily.DUAL
     ]
     num_agents = len(agents)
     if num_agents < count:
         raise RuntimeError(
-            f"No enough agents for synthetic testing are available. Requested: {count}, available: {num_agents}"
+            f"Not enough agents for synthetic testing are available. Requested: {count}, available: {num_agents}"
         )
     requested_agents = agents[0:count]
     ids = [a.id for a in requested_agents]

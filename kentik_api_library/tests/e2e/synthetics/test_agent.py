@@ -45,7 +45,6 @@ def test_agent_test_crud(test_labels, notification_channels) -> None:
     update_settings.trace.delay = 30
     update_settings.trace.protocol = Protocol.ICMP
     update_settings.agent.target = agents[3]
-    update_settings.agent.use_local_ip = True
     update_settings.notification_channels = []
 
     test = AgentTest(make_e2e_test_name(TestType.AGENT), TestStatus.ACTIVE, initial_settings)
