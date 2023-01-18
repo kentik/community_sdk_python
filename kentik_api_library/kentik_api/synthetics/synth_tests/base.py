@@ -8,7 +8,7 @@ from typing import Any, Callable, List, Type, TypeVar
 from google.protobuf.timestamp_pb2 import Timestamp
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
-from kentik_api.internal.grpc import DoNotSerializeMarker, _ConfigElement, _ConfigElementT
+from kentik_api.internal.grpc import DoNotSerializeMarker, _ConfigElement
 from kentik_api.public.defaults import DEFAULT_ID
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.types import IPFamily, Protocol, TaskType, TestStatus, TestType
