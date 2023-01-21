@@ -16,8 +16,10 @@ skip = "generated"
 profile = "black"
 
 [tool.mypy]
+python_version = 3.8
 ignore_missing_imports = true
 exclude = "(generated|build)/"
+follow_imports = 'skip'
 
 [tool.pytest.ini_options]
 testpaths = ["tests/integration", "tests/unit"]

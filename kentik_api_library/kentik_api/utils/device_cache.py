@@ -28,9 +28,9 @@ T = TypeVar("T", bound="DeviceCache")
 
 class DeviceCache:
     @classmethod
-    def from_api(cls: Type[T], api: KentikAPI, labels: Optional[List[str]] = None) -> T:
+    def from_api(cls: Type[T], api: KentikAPI, labels: Optional[List[str]] = None, include_deleted: bool = False) -> T:
         log.debug("Fetching all devices")
-        devices = api.devices.get_all()
+        devices = [d for d in api.devices.get_all() if include_deleted or d.device_status != "D"]
         return cls(devices, labels)
 
     @classmethod
@@ -76,9 +76,10 @@ class DeviceCache:
         return DeviceCacheIterator(self)
 
     def __getitem__(self, item):
-        if type(item) == int:
-            return self._devices_by_id.get(item)
-        else:
+        try:
+            i = int(item)
+            return self._devices_by_id.get(str(i))
+        except ValueError:
             return self._devices_by_name.get(item)
 
     def info(self, out=sys.stdout) -> None:

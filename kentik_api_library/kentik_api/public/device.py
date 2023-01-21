@@ -224,7 +224,11 @@ class Device:
             self._interfaces_by_name = {i.name: i for i in self._interfaces}
 
     def __repr__(self):
-        return f"{self.device_name} (id: {self.id} type: {self.device_type.value})"
+        if hasattr(self.device_type, "value"):
+            dt = self.device_type.value
+        else:
+            dt = self.device_type
+        return f"{self.device_name} (id: {self.id} type: {dt})"
 
     @property
     def id(self) -> ID:

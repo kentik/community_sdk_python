@@ -33,9 +33,9 @@ jobs:
 
     steps:
       - name: (HELPER) Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Prepare python env
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -45,22 +45,17 @@ jobs:
           set -xe
           python3 -VV
           python3 -m site
+          python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade -r requirements.txt
           python3 -m pip install --upgrade -r requirements-dev.txt
           python3 setup.py grpc_stubs
-      - name: Run Super-Linter
-        uses: github/super-linter@v4.9.2
-        env:
-          LINTER_RULES_PATH: /kentik_api_library
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_JSCPD: false
-          VALIDATE_PYTHON_PYLINT: false
-          PYTHON_BLACK_CONFIG_FILE: pyproject.toml
-          PYTHON_ISORT_CONFIG_FILE: pyproject.toml
-          PYTHON_FLAKE8_CONFIG_FILE: pyproject.toml
-          PYTHON_MYPY_CONFIG_FILE: pyproject.toml
-      - name: PyTest
+      - name: Check formatting
+        working-directory: ./kentik_api_library
+        run: python3 setup.py format
+      - name: Run mypy
+        working-directory: ./kentik_api_library
+        run: python3 setup.py mypy
+      - name: Run unit tests
         working-directory: ./kentik_api_library
         run: python3 setup.py pytest
 
@@ -71,9 +66,9 @@ jobs:
       matrix: ${{fromJson(needs.python-versions-setup.outputs.matrix)}}
     steps:
       - name: (HELPER) Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Prepare python env
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
