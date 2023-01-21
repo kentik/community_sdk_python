@@ -221,7 +221,7 @@ setup(
         "requests[socks]>=2.25.0",
         "typing-extensions>=3.7.4.3",
         "urllib3>=1.26.0",
-        "protobuf==3.20.1",
+        "protobuf==3.20.2",
         "grpcio==1.47.0",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
