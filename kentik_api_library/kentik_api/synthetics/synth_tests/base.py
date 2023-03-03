@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from ipaddress import ip_address
 from typing import Any, Callable, List, Type, TypeVar
 
-from google.protobuf.timestamp_pb2 import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp  # type: ignore
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.internal.grpc import DoNotSerializeMarker, _ConfigElement

@@ -1,6 +1,6 @@
 from typing import Any, List, Tuple
 
-from google.protobuf.field_mask_pb2 import FieldMask
+from google.protobuf.field_mask_pb2 import FieldMask  # type: ignore
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2_grpc import CloudExportAdminService

@@ -1,9 +1,10 @@
 from datetime import timezone
 from typing import Tuple
 
-from google.protobuf.timestamp_pb2 import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp  # type: ignore
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
+import kentik_api.generated.kentik.core.v202303.user_info_pb2 as core
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests import (
     agent,
@@ -42,8 +43,8 @@ def setup_syn_test(out_pb_test: pb.Test, out_test: SynTest) -> None:
     out_pb_test.id = "1234"
     out_pb_test.cdate.CopyFrom(Timestamp(seconds=1649057685, nanos=0))
     out_pb_test.edate.CopyFrom(Timestamp(seconds=1649058245, nanos=0))
-    out_pb_test.created_by.CopyFrom(pb.UserInfo(id="67", email="creator@company.com", full_name="Bob Creator"))
-    out_pb_test.last_updated_by.CopyFrom(pb.UserInfo(id="89", email="editor@company.com", full_name="Joe Editor"))
+    out_pb_test.created_by.CopyFrom(core.UserInfo(id="67", email="creator@company.com", full_name="Bob Creator"))
+    out_pb_test.last_updated_by.CopyFrom(core.UserInfo(id="89", email="editor@company.com", full_name="Joe Editor"))
     out_pb_test.name = "example_test"
     out_pb_test.type = TestType.NONE.value  # to be set later - in target test type
     out_pb_test.status = TestStatus.ACTIVE.value
