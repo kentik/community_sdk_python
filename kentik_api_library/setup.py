@@ -224,6 +224,8 @@ setup(
         "urllib3>=1.26.4",
         "protobuf>=4.22.0",
         "grpcio==1.47.0",
+        "googleapis-common-protos==1.58.0",
+        "protoc-gen-openapiv2==0.0.1",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
     extras_require={"analytics": ["pandas>=1.5.0", "pyyaml>=6.0", "fastparquet>=0.8.3"]},
