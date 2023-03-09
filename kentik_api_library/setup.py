@@ -1,6 +1,5 @@
 # mypy: ignore-errors
 import os
-import pathlib
 import shutil
 import subprocess
 from distutils import log
@@ -10,7 +9,7 @@ from tempfile import TemporaryDirectory
 from setuptools import Command, find_namespace_packages, setup
 
 # The directory containing this file
-HERE = pathlib.Path(__file__).parent
+HERE = Path(__file__).parent
 
 # The text of the README file
 README = (HERE / "README.md").read_text()
@@ -161,7 +160,7 @@ class GenerateGRPCStubs(Command):
 
         dst_path = HERE.joinpath("kentik_api").joinpath("generated").as_posix()
         apis = [
-            dict(name="core", version="v202012alpha1"),
+            dict(name="core", version="v202303"),
             dict(name="synthetics", version="v202202"),
             dict(name="cloud_export", version="v202101beta1"),
         ]
@@ -182,7 +181,13 @@ class GenerateGRPCStubs(Command):
         dst.mkdir(parents=True)
         # checkout source repo and copy stubs
         with TemporaryDirectory() as tmp:
-            git.Repo.clone_from(self.repo, tmp)
+            if self.repo.startswith("file://"):
+                src = Path(self.repo.split("file://")[1])
+                for d in ("proto", "protovendor"):
+                    p = Path(tmp) / d
+                    p.symlink_to(src / d)
+            else:
+                git.Repo.clone_from(self.repo, tmp)
             cmd = [
                 "python",
                 "-m",
@@ -195,14 +200,10 @@ class GenerateGRPCStubs(Command):
                 cmd.append(
                     f"-I{tmp}/{d}/",
                 )
-            for d in deps:
-                for f in Path(f"{tmp}").joinpath(d).glob("**/*.proto"):
-                    cmd.append(f.as_posix())
             for a in apis:
                 for f in Path(f"{tmp}/proto/kentik/").joinpath(a["name"]).joinpath(a["version"]).glob("*.proto"):
                     cmd.append(f.as_posix())
             run_cmd(cmd, self.announce)
-            # _make_python_pkg(dst)
 
 
 setup(
@@ -218,14 +219,16 @@ setup(
     python_requires=">=3.8, <4",
     install_requires=[
         "dacite>=1.6.0",
-        "requests[socks]>=2.25.0",
-        "typing-extensions>=3.7.4.3",
-        "urllib3>=1.26.0",
-        "protobuf==3.20.1",
+        "requests[socks]>=2.28.1",
+        "typing-extensions>=4.3.0",
+        "urllib3>=1.26.4",
+        "protobuf>=4.22.0",
         "grpcio==1.47.0",
+        "googleapis-common-protos==1.58.0",
+        "protoc-gen-openapiv2==0.0.1",
     ],
     tests_require=["httpretty", "pytest", "pylint"],
-    extras_require={"analytics": ["pandas>=1.2.4", "pyyaml>=5.4.1", "fastparquet>=0.6.3"]},
+    extras_require={"analytics": ["pandas>=1.5.0", "pyyaml>=6.0", "fastparquet>=0.8.3"]},
     packages=PACKAGES,
     cmdclass={
         "mypy": Mypy,

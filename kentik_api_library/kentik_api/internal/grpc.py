@@ -3,7 +3,7 @@ from dataclasses import fields
 from enum import Enum
 from typing import Any, Callable, Type, TypeVar, Union, get_args, get_origin
 
-from google.protobuf.wrappers_pb2 import BoolValue
+from google.protobuf.wrappers_pb2 import BoolValue  # type: ignore
 from grpc import RpcError, StatusCode
 from grpc._channel import _InactiveRpcError
 

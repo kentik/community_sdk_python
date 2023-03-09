@@ -1,4 +1,4 @@
-from google.protobuf.wrappers_pb2 import BoolValue
+from google.protobuf.wrappers_pb2 import BoolValue  # type: ignore
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
 from kentik_api.cloudexport.client import KentikCloudExportClient
