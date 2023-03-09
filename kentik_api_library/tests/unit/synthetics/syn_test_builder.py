@@ -3,8 +3,8 @@ from typing import Tuple
 
 from google.protobuf.timestamp_pb2 import Timestamp  # type: ignore
 
-import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 import kentik_api.generated.kentik.core.v202303.user_info_pb2 as core
+import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.public.types import ID, IP
 from kentik_api.synthetics.synth_tests import (
     agent,

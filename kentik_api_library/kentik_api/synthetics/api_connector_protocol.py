@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from google.protobuf.timestamp_pb2 import Timestamp # type: ignore
+from google.protobuf.timestamp_pb2 import Timestamp  # type: ignore
 from typing_extensions import Protocol
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb

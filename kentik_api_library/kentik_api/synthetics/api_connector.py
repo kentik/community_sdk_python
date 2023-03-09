@@ -1,6 +1,6 @@
 from typing import Any, List, Optional, Tuple
 
-from google.protobuf.timestamp_pb2 import Timestamp # type: ignore
+from google.protobuf.timestamp_pb2 import Timestamp  # type: ignore
 
 import kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2 as pb
 from kentik_api.generated.kentik.synthetics.v202202.synthetics_pb2_grpc import (
