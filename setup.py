@@ -215,7 +215,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kentik/community_sdk_python",
     license="Apache-2.0",
-    include_package_data=True,
+    include_package_data=False,
     python_requires=">=3.8, <4",
     install_requires=[
         "dacite>=1.6.0",
