@@ -1,16 +1,11 @@
----
-name: kentik-api
+name: build
 
-# Run this workflow all on pushes to master
+# Run this workflow all on pushes to main
 on:
   pull_request:
-    paths: 
-    - 'kentik_api_library/**'
-    - '.github/workflows/kentik-api.yml'
+    branches: [ '**' ]
   push:
-    paths: 
-    - 'kentik_api_library/**'
-    - '.github/workflows/kentik-api.yml'
+    branches: [ main ]
     tags:
       - "v[0-9].[0-9]+.[0-9]+"
 
@@ -40,7 +35,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Install dependencies
-        working-directory: ./kentik_api_library
         run: |
           set -xe
           python3 -VV
@@ -50,13 +44,10 @@ jobs:
           python3 -m pip install --upgrade -r requirements-dev.txt
           python3 setup.py grpc_stubs
       - name: Check formatting
-        working-directory: ./kentik_api_library
         run: python3 setup.py format
       - name: Run mypy
-        working-directory: ./kentik_api_library
         run: python3 setup.py mypy
       - name: Run unit tests
-        working-directory: ./kentik_api_library
         run: python3 setup.py pytest
 
   build:
@@ -73,7 +64,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Build package
-        working-directory: ./kentik_api_library
         run: |
           pip3 install -r requirements.txt
           pip3 install -r requirements-dev.txt
@@ -82,15 +72,15 @@ jobs:
       - name: Archive code
         uses: actions/upload-artifact@v2
         with:
-          path: kentik_api_library/dist/*.gz
+          path: dist/*.gz
           retention-days: 5
       - name: Archive package
         uses: actions/upload-artifact@v2
         with:
           name: artifacts.python${{ matrix.python-version}}
           path: |
-            kentik_api_library/dist/
-            kentik_api_library/tests/library/test_imports.py
+            dist/
+            tests/library/test_imports.py
           retention-days: 5
 
   package-tests:
@@ -121,26 +111,3 @@ jobs:
             python artifacts/tests/library/test_imports.py ${package}
             echo "Imported package: ${package}"
           done
-  #Publish package to PyPi job, run only on main branch
-  package-publish:
-    runs-on: ubuntu-latest
-    if: contains(github.ref, '/tags/v')
-    needs: [ python-versions-setup, code-tests, build, package-tests ]
-    strategy: 
-      matrix:
-        python-version: [ '3.8' ]
-    steps:
-      - name: Prepare python env
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: artifacts.python${{ matrix.python-version }}
-          path: artifacts
-      - name: Push package to PyPi
-        run: |
-          python3 -m pip install --user --upgrade twine
-          python3 -m twine upload --repository pypi artifacts/dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}

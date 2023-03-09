@@ -213,7 +213,7 @@ setup(
     maintainer_email="martin.machacek@kentik.com",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
+    url="https://github.com/kentik/community_sdk_python",
     license="Apache-2.0",
     include_package_data=True,
     python_requires=">=3.8, <4",

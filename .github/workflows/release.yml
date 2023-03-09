@@ -1,0 +1,31 @@
+name: release
+
+on:
+  # run only on push to main with a release tag
+  push:
+    branches: [ main ]
+    tags:
+      - "v[0-9].[0-9]+.[0-9]+"
+
+jobs:
+  #Publish package to PyPi job, run only on main branch
+  package-publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.9', '3.10' ]
+    steps:
+      - name: Prepare python env
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts.python${{ matrix.python-version }}
+          path: artifacts
+      - name: Push package to PyPi
+        run: |
+          python3 -m pip install --user --upgrade twine
+          python3 -m twine upload --repository pypi artifacts/dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}
