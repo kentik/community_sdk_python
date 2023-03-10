@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        version: ${{ python_versions }}
+        version: ${{ env.python_versions }}
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
     needs: [ python-versions-setup, build ]
     strategy: 
       matrix:
-        version: ${{ python_versions }}
+        version: ${{ env.python_versions }}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v4
