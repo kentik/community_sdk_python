@@ -6,16 +6,10 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import Command, find_namespace_packages, setup
+from setuptools import Command, setup
 
 # The directory containing this file
 HERE = Path(__file__).parent
-
-# The text of the README file
-README = (HERE / "README.md").read_text()
-
-# Generate list of packages (will be replaced by pyproject.toml [tool.setuptools.packages.find] once support stabilizes)
-PACKAGES = find_namespace_packages(HERE.as_posix(), exclude=("build*", "dist*", "tests*", "examples*"))
 
 
 def run_cmd(cmd, reporter) -> None:
@@ -43,7 +37,7 @@ class Pylint(Command):
     def run(self):
         """Run command."""
         cmd = ["pylint"]
-        paths = ["kentik_api", "tests", "examples"]
+        paths = ["kentik_api"]
         for path in paths:
             cmd.append(path)
         run_cmd(cmd, self.announce)
@@ -207,29 +201,6 @@ class GenerateGRPCStubs(Command):
 
 
 setup(
-    name="kentik-api",
-    description="SDK library for Kentik API",
-    maintainer="Martin Machacek",
-    maintainer_email="martin.machacek@kentik.com",
-    long_description=README,
-    long_description_content_type="text/markdown",
-    url="https://github.com/kentik/community_sdk_python/tree/main/kentik_api_library",
-    license="Apache-2.0",
-    include_package_data=True,
-    python_requires=">=3.8, <4",
-    install_requires=[
-        "dacite>=1.6.0",
-        "requests[socks]>=2.28.1",
-        "typing-extensions>=4.3.0",
-        "urllib3>=1.26.4",
-        "protobuf>=4.22.0",
-        "grpcio==1.47.0",
-        "googleapis-common-protos==1.58.0",
-        "protoc-gen-openapiv2==0.0.1",
-    ],
-    tests_require=["httpretty", "pytest", "pylint"],
-    extras_require={"analytics": ["pandas>=1.5.0", "pyyaml>=6.0", "fastparquet>=0.8.3"]},
-    packages=PACKAGES,
     cmdclass={
         "mypy": Mypy,
         "pylint": Pylint,
@@ -237,5 +208,4 @@ setup(
         "format": Format,
         "grpc_stubs": GenerateGRPCStubs,
     },
-    classifiers=["License :: OSI Approved :: Apache Software License"],
 )

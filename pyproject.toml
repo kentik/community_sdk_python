@@ -1,0 +1,136 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kentik-api"
+description ="Kentik API SDK"
+authors = [
+    {name = "Martin Machacek", email = "martin.machacek@kentik.com"},
+]
+readme = "README.md"
+requires-python = ">=3.8,<4"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dynamic = ["version"]
+dependencies = [
+        "dacite==1.6.0",
+        "requests[socks]>=2.28.1",
+        "typing-extensions==4.3.0",
+        "urllib3==1.26.12",
+        "protobuf==4.22.0",
+        "grpcio==1.51.3",
+        "googleapis-common-protos==1.58.0",
+        "protoc-gen-openapiv2==0.0.1",
+]
+
+[project.optional-dependencies]
+analytics = [
+    "pandas>=1.5.0",
+    "pyyaml>=6.0",
+    "fastparquet>=0.8.3"
+]
+dev = [
+    "black==22.8.0",
+    "isort==5.10.1",
+    "flake8==5.0.4",
+    "GitPython==3.1.27",
+    "grpcio-tools==1.51.3",
+    "mypy==0.971",
+    "mypy-extensions==0.4.3",
+    "pylint==2.15.3",
+    "types-protobuf==4.22.0",
+    "types-PyYAML==6.0.0",
+    "types-requests==2.28.1",
+]
+test = [
+    "httpretty==1.1.4",
+    "pytest==7.1.3",
+]
+
+[tool.setuptools.packages.find]
+exclude = [
+    "examples*",
+    "tests*",
+    "docs*",
+]
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[tool.black]
+line-length = 120
+exclude = "generated"
+target-version = ['py39']
+
+[tool.isort]
+line_length = 120
+skip = "generated"
+profile = "black"
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+exclude = "(generated|build)/"
+follow_imports = 'skip'
+
+[tool.pytest.ini_options]
+testpaths = ["tests/integration", "tests/unit"]
+
+[tool.pylint.master]
+fail-under=8.5
+
+# allow single-letter names
+variable-rgx="[a-z_][a-z0-9_]{0,30}$"
+argument-rgx="[a-z_][a-z0-9_]{0,30}$"
+attr-rgx="[a-z_][a-z0-9_]{0,30}$"
+class-attribute-rgx="([A-Za-z_][A-Za-z0-9_]{0,30}|(__.*__))$"
+
+# don't consider import sections nor method signatures as duplicates
+ignore-imports=true
+ignore-signatures=true
+
+# SDK provides dataclasses with multiple attributes and multiple constructor arguments and this should not be reported
+max-attributes = 30
+max-args = 30
+
+# disable typecheck for protobuf dynamic classes (no-member errors)
+[tool.pylint.typecheck]
+ignored-classes="Test"
+
+[tool.pylint.message_control]
+max-line-length = 120
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "raw-checker-failed",
+    "bad-inline-option",
+    "locally-disabled",
+    "file-ignored",
+    "suppressed-message",
+    "useless-suppression",
+    "deprecated-pragma",
+    "use-symbolic-message-instead",
+]
+
+[flake8]
+max-line-length = 120
+extend-ignore = """
+    E203,
+    E402,
+    E501,
+    E712,
+    E741,
+    F401,
+    F403,
+    F405,
+    F541,
+"""

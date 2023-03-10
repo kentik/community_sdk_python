@@ -1,0 +1,106 @@
+name: build
+
+# Run this workflow all on pushes to main
+on:
+  pull_request:
+    branches: [ '**' ]
+  push:
+    branches: [ main ]
+    tags:
+      - "v[0-9].[0-9]+.[0-9]+"
+
+jobs:
+  # Static Analysis of the SDK and its code
+  # Stuff like linters, etc.
+  code-tests:
+    runs-on: ubuntu-latest
+    strategy: 
+      matrix:
+        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v3
+      - name: Prepare python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          architecture: x64
+      - name: Install dependencies
+        run: |
+          set -xe
+          python3 -VV
+          python3 -m site
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade -r requirements.txt
+          python3 -m pip install --upgrade -r requirements-dev.txt
+          python3 setup.py grpc_stubs
+      - name: Check formatting
+        run: python3 setup.py format
+      - name: Run mypy
+        run: python3 setup.py mypy
+      - name: Run unit tests
+        run: python3 setup.py pytest
+
+  build:
+    runs-on: ubuntu-latest
+    strategy: 
+      matrix:
+        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v3
+      - name: Prepare python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          architecture: x64
+      - name: Build package
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install -r requirements-dev.txt
+          python3 setup.py grpc_stubs # building grpc stubs must go before building
+          python3 -m build
+      - name: Archive code
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.gz
+          retention-days: 5
+      - name: Archive package
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts.python${{ matrix.version}}
+          path: |
+            dist/
+            tests/library/test_imports.py
+          retention-days: 5
+
+  package-tests:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    strategy: 
+      matrix:
+        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+    steps:
+      - name: Prepare python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          architecture: x64
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts.python${{ matrix.version }}
+          path: artifacts
+      - name: Install lib from package
+        run: |
+          pip install artifacts/dist/*.whl
+      - name: Show installed packages
+        run: pip freeze
+      - name: Check if import is possible
+        run: |
+          for package in kentik_api kentik_api.auth kentik_api.api_calls
+          do
+            python artifacts/tests/library/test_imports.py ${package}
+            echo "Imported package: ${package}"
+          done
