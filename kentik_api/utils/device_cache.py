@@ -36,7 +36,7 @@ class DeviceCache:
     @classmethod
     def from_pickle(cls: Type[T], filename: str) -> T:
         file = Path(filename)
-        log.debug(f"Reading device data from {file.resolve()}")
+        log.debug("Reading device data from %s", file.resolve())
         with file.open("rb") as f:
             return pickle.load(f)
 

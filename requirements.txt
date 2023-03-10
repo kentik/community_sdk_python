@@ -6,7 +6,7 @@ chardet==5.0.0
 dacite==1.6.0
 fastparquet==0.8.3
 googleapis-common-protos==1.58.0
-grpcio==1.47.0
+grpcio==1.51.3
 httpretty==1.1.4
 idna==3.4
 iniconfig==1.1.1

@@ -6,7 +6,7 @@ from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from setuptools import Command, find_namespace_packages, setup
+from setuptools import Command, setup
 
 # The directory containing this file
 HERE = Path(__file__).parent
@@ -37,7 +37,7 @@ class Pylint(Command):
     def run(self):
         """Run command."""
         cmd = ["pylint"]
-        paths = ["kentik_api", "tests", "examples"]
+        paths = ["kentik_api"]
         for path in paths:
             cmd.append(path)
         run_cmd(cmd, self.announce)
