@@ -1,15 +1,16 @@
 name: release
 
 on:
-  # Run only on push to main with a release tag
-  push:
-    branches: [ main ]
-    tags:
-      - "v[0-9].[0-9]+.[0-9]+"
+  release:
+    types: [published]
 
 jobs:
+  build-packages:
+    uses: ./.github/workflows/build_packages.yml
+
   # Publish packages to PyPi
-  package-publish:
+  publish-packages:
+    needs: [ build-packages ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
