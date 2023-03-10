@@ -3,13 +3,19 @@ name: build_packages
 # Run only when called from another workflow
 on:
   workflow_call:
+    inputs:
+      python_versions:
+        description: "List of Python versions for which to build packages"
+        default: ${{ vars.PYTHON_VERSIONS }}
+        required: false
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+        version: ${{ fromJson(inputs.python_versions) }}
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v3

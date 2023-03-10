@@ -7,24 +7,23 @@ on:
 jobs:
   build-packages:
     uses: ./.github/workflows/build_packages.yml
+    with:
+      python_versions: ${{ vars.RELEASE_PYTHON_VERSION }}
 
   # Publish packages to PyPi
   publish-packages:
     needs: [ build-packages ]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ vars.RELEASE_PYTHON_VERSION }}
           architecture: x64
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: artifacts.python${{ matrix.python-version }}
+          name: artifacts.python${{ vars.RELEASE_PYTHON_VERSION }}
           path: artifacts
       - name: Push package to PyPi
         run: |
