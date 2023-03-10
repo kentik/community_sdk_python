@@ -10,7 +10,7 @@ on:
       - "v[0-9].[0-9]+.[0-9]+"
 
 env:
-  python_versions: '["3.8", "3.9", "3.10"]'
+  python_versions: ["3.8", "3.9", "3.10"]
 
 jobs:
   # Static Analysis of the SDK and its code
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        version: ${{ fromJson(env.python_versions) }}
+        version: ${{ python_versions }}
 
     steps:
       - name: (HELPER) Checkout Code
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        version: ${{ fromJson(env.python_versions) }}
+        version: ${{ env.python_versions }}
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v3
@@ -83,7 +83,7 @@ jobs:
     needs: [ build ]
     strategy: 
       matrix:
-        version: ${{ fromJson(env.python_versions) }}
+        version: ${{ env.python_versions }}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v4
