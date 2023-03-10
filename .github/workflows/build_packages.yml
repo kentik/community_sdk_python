@@ -1,0 +1,39 @@
+name: build_packages
+
+# Run only when called from another workflow
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v3
+      - name: Prepare python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          architecture: x64
+      - name: Build package
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install -r requirements-dev.txt
+          python3 setup.py grpc_stubs # building grpc stubs must go before building
+          python3 -m build
+      - name: Archive code
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.gz
+          retention-days: 5
+      - name: Archive package
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts.python${{ matrix.version}}
+          path: |
+            dist/
+            tests/library/test_imports.py
+          retention-days: 5

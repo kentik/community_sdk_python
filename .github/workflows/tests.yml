@@ -1,0 +1,38 @@
+name: tests
+
+# Run only when called from another workflow
+on:
+  workflow_call:
+
+jobs:
+  # Static Analysis of the SDK and its code
+  # Stuff like linters, etc.
+  code-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
+
+    steps:
+      - name: (HELPER) Checkout Code
+        uses: actions/checkout@v3
+      - name: Prepare python env
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          architecture: x64
+      - name: Install dependencies
+        run: |
+          set -xe
+          python3 -VV
+          python3 -m site
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade -r requirements.txt
+          python3 -m pip install --upgrade -r requirements-dev.txt
+          python3 setup.py grpc_stubs
+      - name: Check formatting
+        run: python3 setup.py format
+      - name: Run mypy
+        run: python3 setup.py mypy
+      - name: Run unit tests
+        run: python3 setup.py pytest
