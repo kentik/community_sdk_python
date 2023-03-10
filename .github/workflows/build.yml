@@ -16,7 +16,7 @@ jobs:
 
   package-tests:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build-packages ]
     strategy: 
       matrix:
         version: ${{ fromJson(vars.PYTHON_VERSIONS) }}

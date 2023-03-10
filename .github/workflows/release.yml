@@ -10,6 +10,7 @@ jobs:
 
   # Publish packages to PyPi
   publish-packages:
+    needs: [ build-packages ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
