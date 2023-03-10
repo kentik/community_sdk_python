@@ -16,11 +16,10 @@ jobs:
   # Static Analysis of the SDK and its code
   # Stuff like linters, etc.
   code-tests:
-    needs: python-versions-setup
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        version: ${{ python_versions }}
+        version: ${{ fromJson(env.python_versions) }}
 
     steps:
       - name: (HELPER) Checkout Code
@@ -50,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        version: ${{ env.python_versions }}
+        version: ${{ fromJson(env.python_versions) }}
     steps:
       - name: (HELPER) Checkout Code
         uses: actions/checkout@v3
@@ -81,10 +80,10 @@ jobs:
 
   package-tests:
     runs-on: ubuntu-latest
-    needs: [ python-versions-setup, build ]
+    needs: [ build ]
     strategy: 
       matrix:
-        version: ${{ env.python_versions }}
+        version: ${{ fromJson(env.python_versions) }}
     steps:
       - name: Prepare python env
         uses: actions/setup-python@v4
