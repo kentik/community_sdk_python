@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-packages:
-    uses: ./.github/workflows/build_packages.yaml
+    uses: ./.github/workflows/build_packages.yml
 
   # Publish packages to PyPi
   publish-packages:
