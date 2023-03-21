@@ -166,7 +166,7 @@ class GenerateGRPCStubs(Command):
         deps = [
             "protovendor/github.com/googleapis/googleapis",
             "protovendor/github.com/grpc-ecosystem/grpc-gateway",
-            "protovendor/github.com/protocolbuffers/src",
+            "protovendor/github.com/protocolbuffers/protobuf/src",
         ]
         # cleanup destination directory
         shutil.rmtree(dst_path, ignore_errors=True)  # ignore "No such file or directory"
