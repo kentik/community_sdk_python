@@ -71,24 +71,24 @@ See [analytics readme](kentik_apinalytics/README.md) for more details.
 ## Available Examples
 
 - [alerting_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/alerting_example.py) - create Manual Mitigation
-- [applications_example.py](examplespplications_example.py) - create/update/delete Custom Application
-- [bulk_user_create.py](examplesulk_user_create.py) - create users from YAML file
-- [devices_example.py](examplesevices_example.py) - create/update/get/delete/list Devices
-- [dimensions_example.py](examplesimensions_example.py) - create/update/get/delete/list Custom Dimensions, create/update/delete Populator
-- [labels_example.py](examplesabels_example.py) - create/update/get/delete/list Device Labels
-- [my_kentik_portal_example.py](examplesy_kentik_portal_example.py) - get/list Tenants, create/delete Tenant User
-- [plans_example.py](exampleslans_example.py) - list plans
-- [queries_example.py](examplesueries_example.py) - query for SQL/URL/data/chart
-- [saved_filters_example.py](examplesaved_filters_example.py) - create/update/get/delete/list Saved Filters
-- [sites_example.py](examplesites_example.py) - create/update/get/delete/list Sites
-- [tags_example.py](examplesags_example.py) - create/update/get/delete/list Tags
-- [users_example.py](examplessers_example.py) - create/update/get/delete/list Users
-- [error_handling_example.py](examplesrror_handling_example.py) - handling errors raised by the library
-- [analytics_example_sql.py](examplesnalytics_example_sql.py) - use of `SQLQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
-- [analytics_example_topx.py](examplesnalytics_example_sql.py) - use of `DataQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
+- [applications_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/applications_example.py) - create/update/delete Custom Application
+- [bulk_user_create.py](https://github.com/kentik/community_sdk_python/blob/main/examples/bulk_user_create.py) - create users from YAML file
+- [devices_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/devices_example.py) - create/update/get/delete/list Devices
+- [dimensions_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/dimensions_example.py) - create/update/get/delete/list Custom Dimensions, create/update/delete Populator
+- [labels_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/labels_example.py) - create/update/get/delete/list Device Labels
+- [my_kentik_portal_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/my_kentik_portal_example.py) - get/list Tenants, create/delete Tenant User
+- [plans_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/plans_example.py) - list plans
+- [queries_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/queries_example.py) - query for SQL/URL/data/chart
+- [saved_filters_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/saved_filters_example.py) - create/update/get/delete/list Saved Filters
+- [sites_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/sites_example.py) - create/update/get/delete/list Sites
+- [tags_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/tags_example.py) - create/update/get/delete/list Tags
+- [users_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/users.yaml) - create/update/get/delete/list Users
+- [error_handling_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/error_handling_example.py) - handling errors raised by the library
+- [analytics_example_sql.py](https://github.com/kentik/community_sdk_python/blob/main/examples/analytics_example_sql.py) - use of `SQLQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
+- [analytics_example_topx.py](https://github.com/kentik/community_sdk_python/blob/main/examples/analytics_example_topx.py) - use of `DataQueryDefinition`, `flatness_analysis` method and the`DeviceCache`
   (see also [analytics readme](kentik_apinalytics/README.md))
-- [synthetics_example.py](examplesynthetics_example.py) - interact with synthetics API
-- [cloud_export_example.py](examplesloud_export_example.py) - interact with cloud export API
+- [synthetics_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/synthetics_example.py) - interact with synthetics API
+- [cloud_export_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/cloud_export_example.py) - interact with cloud export API
 
 ## Development
 
