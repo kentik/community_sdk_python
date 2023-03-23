@@ -68,7 +68,7 @@ The [pandas](https://pandas.pydata.org) and [PyYAML](https://pyyaml.org/) module
 sub-module and are automatically installed with the `kentik-api[analytics]` option.
 See [analytics readme](kentik_apinalytics/README.md) for more details.
 
-## Available Examples
+## [Available Examples] (https://github.com/kentik/community_sdk_python/tree/main/examples)
 
 - [alerting_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/alerting_example.py) - create Manual Mitigation
 - [applications_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/applications_example.py) - create/update/delete Custom Application
