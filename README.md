@@ -70,7 +70,7 @@ See [analytics readme](kentik_apinalytics/README.md) for more details.
 
 ## Available Examples
 
-- [alerting_example.py](exampleslerting_example.py) - create Manual Mitigation
+- [alerting_example.py](https://github.com/kentik/community_sdk_python/blob/main/examples/alerting_example.py) - create Manual Mitigation
 - [applications_example.py](examplespplications_example.py) - create/update/delete Custom Application
 - [bulk_user_create.py](examplesulk_user_create.py) - create users from YAML file
 - [devices_example.py](examplesevices_example.py) - create/update/get/delete/list Devices
