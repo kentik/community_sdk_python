@@ -12,7 +12,7 @@ DSNGridTestSpecific = DNSTestSpecific
 @dataclass
 class DNSGridTestSettings(SynTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.DNS]))
-    dns_grid: DSNGridTestSpecific = DSNGridTestSpecific()
+    dns_grid: DSNGridTestSpecific = field(default_factory=DSNGridTestSpecific)
 
 
 DNSGridTestT = TypeVar("DNSGridTestT", bound="DNSGridTest")

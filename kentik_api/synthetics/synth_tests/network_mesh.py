@@ -17,7 +17,7 @@ class NetworkMeshTestSpecific(_ConfigElement):
 @dataclass
 class NetworkMeshTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
-    network_mesh: NetworkMeshTestSpecific = NetworkMeshTestSpecific()
+    network_mesh: NetworkMeshTestSpecific = field(default_factory=NetworkMeshTestSpecific)
 
 
 NetworkMeshTestT = TypeVar("NetworkMeshTestT", bound="NetworkMeshTest")

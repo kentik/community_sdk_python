@@ -17,7 +17,7 @@ class HostnameTestSpecific(_ConfigElement):
 @dataclass
 class HostnameTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
-    hostname: HostnameTestSpecific = HostnameTestSpecific()
+    hostname: HostnameTestSpecific = field(default_factory=HostnameTestSpecific)
 
 
 HostnameTestT = TypeVar("HostnameTestT", bound="HostnameTest")

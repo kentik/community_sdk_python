@@ -48,7 +48,7 @@ class Agent(_ConfigElement):
     site_name: str = ""
     status: AgentStatus = AgentStatus.UNSPECIFIED
     alias: str = ""
-    ip: IP = IP()
+    ip: IP = field(default_factory=IP)
     lat: float = 0.0
     long: float = 0.0
     family: IPFamily = IPFamily.UNSPECIFIED
@@ -57,7 +57,7 @@ class Agent(_ConfigElement):
     city: str = ""
     region: str = ""
     country: str = ""
-    local_ip: IP = IP()
+    local_ip: IP = field(default_factory=IP)
     cloud_region: str = ""
     cloud_provider: str = ""
     labels: List[str] = field(default_factory=list)

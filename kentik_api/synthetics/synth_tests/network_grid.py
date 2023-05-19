@@ -12,7 +12,7 @@ NetworkGridTestSpecific = IPTestSpecific
 @dataclass
 class GridTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
-    network_grid: NetworkGridTestSpecific = NetworkGridTestSpecific()
+    network_grid: NetworkGridTestSpecific = field(default_factory=NetworkGridTestSpecific)
 
 
 NetworkGridTestT = TypeVar("NetworkGridTestT", bound="NetworkGridTest")
@@ -21,7 +21,7 @@ NetworkGridTestT = TypeVar("NetworkGridTestT", bound="NetworkGridTest")
 @dataclass
 class NetworkGridTest(PingTraceTest):
     type: TestType = field(init=False, default=TestType.NETWORK_GRID)
-    settings: GridTestSettings = field(default=GridTestSettings(agent_ids=[]))
+    settings: GridTestSettings = field(default_factory=GridTestSettings)
 
     @classmethod
     def create(cls: Type[NetworkGridTestT], name: str, targets: List[str], agent_ids: List[str]) -> NetworkGridTestT:

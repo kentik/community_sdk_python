@@ -19,7 +19,7 @@ class AgentTestSpecific(_ConfigElement):
 @dataclass
 class AgentTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
-    agent: AgentTestSpecific = AgentTestSpecific()
+    agent: AgentTestSpecific = field(default_factory=AgentTestSpecific)
 
 
 AgentTestT = TypeVar("AgentTestT", bound="AgentTest")
@@ -28,7 +28,7 @@ AgentTestT = TypeVar("AgentTestT", bound="AgentTest")
 @dataclass
 class AgentTest(PingTraceTest):
     type: TestType = field(init=False, default=TestType.AGENT)
-    settings: AgentTestSettings = field(default=AgentTestSettings(agent_ids=[]))
+    settings: AgentTestSettings = field(default_factory=AgentTestSettings)
 
     @classmethod
     def create(cls: Type[AgentTestT], name: str, target: str, agent_ids: List[str]) -> AgentTestT:

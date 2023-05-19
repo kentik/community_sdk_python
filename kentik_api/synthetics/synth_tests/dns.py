@@ -21,7 +21,7 @@ class DNSTestSpecific(_ConfigElement):
 @dataclass
 class DNSTestSettings(SynTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.DNS]))
-    dns: DNSTestSpecific = DNSTestSpecific()
+    dns: DNSTestSpecific = field(default_factory=DNSTestSpecific)
 
     @classmethod
     def task_name(cls) -> Optional[str]:

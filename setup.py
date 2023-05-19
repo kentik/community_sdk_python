@@ -1,8 +1,8 @@
 # mypy: ignore-errors
+import logging
 import os
 import shutil
 import subprocess
-from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -11,14 +11,16 @@ from setuptools import Command, setup
 # The directory containing this file
 HERE = Path(__file__).parent
 
+log = logging.getLogger()
 
-def run_cmd(cmd, reporter) -> None:
+
+def run_cmd(cmd) -> None:
     """Run arbitrary command as subprocess"""
-    reporter("Run command: {}".format(str(cmd)), level=log.DEBUG)
+    log.debug("Running command: %s", str(cmd))
     try:
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as ex:
-        reporter(str(ex), level=log.ERROR)
+        log.error("%s", ex)
         exit(1)
 
 
@@ -40,7 +42,7 @@ class Pylint(Command):
         paths = ["kentik_api"]
         for path in paths:
             cmd.append(path)
-        run_cmd(cmd, self.announce)
+        run_cmd(cmd)
 
 
 # noinspection PyAttributeOutsideInit
@@ -64,7 +66,7 @@ class Mypy(Command):
         cmd = ["mypy"]
         for package in self.packages:
             cmd.append(package)
-        run_cmd(cmd, self.announce)
+        run_cmd(cmd)
 
 
 class Pytest(Command):
@@ -82,7 +84,7 @@ class Pytest(Command):
     def run(self):
         """Run command"""
         cmd = ["pytest"]
-        run_cmd(cmd, self.announce)
+        run_cmd(cmd)
 
 
 # noinspection PyAttributeOutsideInit
@@ -116,7 +118,7 @@ class Format(Command):
             cmd.append("--check")
         for d in self.dirs:
             cmd.append(d)
-        run_cmd(cmd, self.announce)
+        run_cmd(cmd)
 
     def _isort(self) -> None:
         print("Tool: isort")
@@ -125,7 +127,7 @@ class Format(Command):
             cmd.append("--check")
         for d in self.dirs:
             cmd.append(d)
-        run_cmd(cmd, self.announce)
+        run_cmd(cmd)
 
 
 # noinspection PyAttributeOutsideInit
@@ -197,7 +199,7 @@ class GenerateGRPCStubs(Command):
             for a in apis:
                 for f in Path(f"{tmp}/proto/kentik/").joinpath(a["name"]).joinpath(a["version"]).glob("*.proto"):
                     cmd.append(f.as_posix())
-            run_cmd(cmd, self.announce)
+            run_cmd(cmd)
 
 
 setup(

@@ -18,7 +18,7 @@ class IPTestSpecific(_ConfigElement):
 @dataclass
 class IPTestSettings(PingTraceTestSettings):
     tasks: List[TaskType] = field(default_factory=list_factory([TaskType.PING, TaskType.TRACE_ROUTE]))
-    ip: IPTestSpecific = IPTestSpecific()
+    ip: IPTestSpecific = field(default_factory=IPTestSpecific)
 
 
 IPTestT = TypeVar("IPTestT", bound="IPTest")
