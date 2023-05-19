@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 import kentik_api.generated.kentik.cloud_export.v202101beta1.cloud_export_pb2 as pb
@@ -103,7 +103,7 @@ class CloudExport(_ConfigElement):
     # read-only
     _api_root: str = ""
     _flow_dest: str = ""
-    _current_status: Status = Status()
+    _current_status: Status = field(default_factory=Status)
 
     @property
     def current_status(self) -> Status:

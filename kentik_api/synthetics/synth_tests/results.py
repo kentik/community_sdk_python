@@ -34,10 +34,10 @@ PingTaskResultsT = TypeVar("PingTaskResultsT", bound="PingTaskResults")
 @dataclass
 class PingTaskResults(_ConfigElement):
     target: str = ""  # hostname or IP
-    packet_loss: PacketLossData = PacketLossData()
-    latency: MetricData = MetricData()
-    jitter: MetricData = MetricData()
-    dst_ip: IP = IP()
+    packet_loss: PacketLossData = field(default_factory=PacketLossData)
+    latency: MetricData = field(default_factory=MetricData)
+    jitter: MetricData = field(default_factory=MetricData)
+    dst_ip: IP = field(default_factory=IP)
 
 
 HttpResponseDataT = TypeVar("HttpResponseDataT", bound="HttpResponseData")
@@ -56,9 +56,9 @@ HttpTaskResultsT = TypeVar("HttpTaskResultsT", bound="HttpTaskResults")
 @dataclass
 class HttpTaskResults(_ConfigElement):
     target: str = ""  # url
-    latency: MetricData = MetricData()
-    response: HttpResponseData = HttpResponseData()
-    dst_ip: IP = IP()
+    latency: MetricData = field(default_factory=MetricData)
+    response: HttpResponseData = field(default_factory=HttpResponseData)
+    dst_ip: IP = field(default_factory=IP)
 
 
 DnsResponseDataT = TypeVar("DnsResponseDataT", bound="DnsResponseData")
@@ -77,8 +77,8 @@ DnsTaskResultsT = TypeVar("DnsTaskResultsT", bound="DnsTaskResults")
 class DnsTaskResults(_ConfigElement):
     target: str = ""  # url
     server: str = ""
-    latency: MetricData = MetricData()
-    response: DnsResponseData = DnsResponseData()
+    latency: MetricData = field(default_factory=MetricData)
+    response: DnsResponseData = field(default_factory=DnsResponseData)
 
 
 TaskResultsT = TypeVar("TaskResultsT", bound="TaskResults")

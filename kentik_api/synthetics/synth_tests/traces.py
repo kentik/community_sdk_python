@@ -22,10 +22,10 @@ NetNodeT = TypeVar("NetNodeT", bound="NetNode")
 
 @dataclass
 class NetNode(_ConfigElement):
-    ip: IP = IP()
+    ip: IP = field(default_factory=IP)
     asn: int = 0
     as_name: str = ""
-    location: Location = Location()
+    location: Location = field(default_factory=Location)
     dns_name: str = ""
     device_id: ID = ID()
     site_id: ID = ID()
@@ -66,8 +66,8 @@ PathT = TypeVar("PathT", bound="Path")
 @dataclass
 class Path(_ConfigElement):
     agent_id: ID = ID()
-    target_ip: IP = IP()
-    hop_count: Stats = Stats()
+    target_ip: IP = field(default_factory=IP)
+    hop_count: Stats = field(default_factory=Stats)
     max_as_path_length: int = 0
     traces: List[PathTrace] = field(default_factory=list)
     time: DateTime = DateTime.fromtimestamp(0, tz=timezone.utc)

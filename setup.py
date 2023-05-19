@@ -1,8 +1,8 @@
 # mypy: ignore-errors
+import logging
 import os
 import shutil
 import subprocess
-from distutils import log
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -14,11 +14,11 @@ HERE = Path(__file__).parent
 
 def run_cmd(cmd, reporter) -> None:
     """Run arbitrary command as subprocess"""
-    reporter("Run command: {}".format(str(cmd)), level=log.DEBUG)
+    reporter("Run command: {}".format(str(cmd)), level=logging.DEBUG)
     try:
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError as ex:
-        reporter(str(ex), level=log.ERROR)
+        reporter(str(ex), level=logging.ERROR)
         exit(1)
 
 
