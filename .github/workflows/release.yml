@@ -8,7 +8,7 @@ jobs:
   build-packages:
     uses: ./.github/workflows/build_packages.yml
     with:
-      python_versions: ${{ vars.RELEASE_PYTHON_VERSION }}
+      python_versions: "['${{ vars.RELEASE_PYTHON_VERSION }}']"
 
   # Publish packages to PyPi
   publish-packages:
