@@ -26,7 +26,7 @@ dependencies = [
         "typing-extensions==4.3.0",
         "urllib3==1.26.12",
         "protobuf==4.22.0",
-        "grpcio==1.51.3",
+        "grpcio==1.53.0",
         "googleapis-common-protos==1.58.0",
         "protoc-gen-openapiv2==0.0.1",
 ]
