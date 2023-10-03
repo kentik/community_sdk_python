@@ -24,7 +24,7 @@ dependencies = [
         "dacite==1.6.0",
         "requests[socks]>=2.28.1",
         "typing-extensions==4.3.0",
-        "urllib3==1.26.12",
+        "urllib3==1.26.17",
         "protobuf==4.22.0",
         "grpcio==1.51.3",
         "googleapis-common-protos==1.58.0",
