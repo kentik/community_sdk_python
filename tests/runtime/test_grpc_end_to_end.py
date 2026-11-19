@@ -14,6 +14,9 @@ from kentik_api.gen.device.pb import device_pb2, device_pb2_grpc
 from kentik_api.gen.device.services.device import DeviceServiceWrapper
 from kentik_api.transports.grpc_client import GrpcTransport
 
+_DEADLINE_SECONDS = 7.5
+_SERVER_CLOCK_TOLERANCE_SECONDS = 0.01
+
 
 class _DeviceService(device_pb2_grpc.DeviceServiceServicer):
     def __init__(self) -> None:
@@ -50,7 +53,11 @@ def served(monkeypatch):
     server.start()
     monkeypatch.setattr(grpc, "ssl_channel_credentials", grpc.local_channel_credentials)
     transport = GrpcTransport(
-        APIConfig(auth_email="dev@example.com", auth_token="token", grpc_deadline=7.5),
+        APIConfig(
+            auth_email="dev@example.com",
+            auth_token="token",
+            grpc_deadline=_DEADLINE_SECONDS,
+        ),
         target=f"localhost:{port}",
     )
     try:
@@ -68,7 +75,11 @@ def test_a_wrapper_call_sends_auth_a_deadline_and_the_path_argument(served):
     assert servicer.seen["id"] == "42"
     assert servicer.seen["metadata"]["x-ch-auth-email"] == "dev@example.com"
     assert servicer.seen["metadata"]["x-ch-auth-api-token"] == "token"
-    assert 0 < servicer.seen["time_remaining"] <= 7.5
+    assert (
+        0
+        < servicer.seen["time_remaining"]
+        <= (_DEADLINE_SECONDS + _SERVER_CLOCK_TOLERANCE_SECONDS)
+    )
 
 
 def test_a_populated_response_parses_into_the_rest_model(served):
