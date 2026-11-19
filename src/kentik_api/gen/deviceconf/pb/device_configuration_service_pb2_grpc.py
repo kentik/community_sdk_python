@@ -13,7 +13,7 @@ from . import (
     device_configuration_service_pb2 as kentik_dot_deviceconf_dot_v202511_dot_device__configuration__service__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

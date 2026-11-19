@@ -575,6 +575,7 @@ Mocked/offline layers (no network, safe to run anywhere, part of
   kwarg validation, full-option forwarding). This auto-discovery
   picks up new services and endpoints automatically. Only add logic
   here when the wrapper contract itself changes globally.
+
 - [`tests/generated/test_endpoint_schema_coverage.py`](tests/generated/test_endpoint_schema_coverage.py): for every
   discovered endpoint, drives the real `request_json` runtime and
   generated error classes (via `respx`-mocked HTTP) against every
@@ -586,15 +587,19 @@ Mocked/offline layers (no network, safe to run anywhere, part of
   too). The wrapper contract, schema coverage, path encoding, gRPC
   request mapping, retry eligibility, and auto-discovered e2e suites
   import these helpers. This keeps their discovery identical.
+
 - [`tests/generated/test_schema_operations.py`](tests/generated/test_schema_operations.py): holds the generated
   REST modules to `schema_operations.json`: the same operations, a
   `data` argument wherever the swagger has a body, an argument for
   each swagger parameter, and a declared success status. Runs
   without a schema checkout.
+
 - [`tests/runtime/test_rest_runtime.py`](tests/runtime/test_rest_runtime.py): shared request/auth/error
   behavior in `src/kentik_api/core`.
+
 - [`tests/smoke/test_client_mounts_and_calls.py`](tests/smoke/test_client_mounts_and_calls.py): lightweight
   client-wiring checks. Keep this suite small and fast.
+
 - `tests/generator/`: unit tests for `scripts/generation/*.py`
   (see "The generator's phase modules" above), for example
   `test_parity.py`, `test_error_package.py`,
@@ -603,8 +608,10 @@ Mocked/offline layers (no network, safe to run anywhere, part of
   the generator itself, not the SDK it produces. They build minimal
   swagger or fixture data with `tmp_path`, instead of needing a real
   or local schema checkout.
+
 - Prefer deterministic unit tests (monkeypatch/mocks) over live
   network calls for all five of the above.
+
 - If generation output changed, follow these steps before opening a
   PR:
   1. Regenerate: `uv run poe generate --local`.

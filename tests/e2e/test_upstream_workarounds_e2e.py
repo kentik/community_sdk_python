@@ -159,7 +159,7 @@ def test_grpc_call_with_a_deadline_succeeds(real_client: KentikAPI, method: str)
         try:
             call(b"", timeout=30)
         except grpc.RpcError as exc:
-            details = exc.details() or ""  # ty: ignore[unresolved-attribute]
+            details = exc.details() or ""  # ty: ignore[missing-attribute]
             if "name:RangeError" in details:
                 raise DeadlineCrashesServer(details) from exc
             raise

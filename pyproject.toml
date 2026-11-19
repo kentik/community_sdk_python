@@ -25,7 +25,7 @@ keywords = ["kentik", "api", "sdk", "networking", "observability"]
 dependencies = [
     "python-dotenv>=1.2.4",
     "googleapis-common-protos>=1.73.1",
-    "grpcio>=1.85.0",
+    "grpcio>=1.85.3",
     "protobuf>=7.35.1,<8",
     "httpx>=0.28.1,<1",
     "pydantic>=2.14.0",
@@ -55,7 +55,9 @@ source = "vcs"
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/kentik_api",
-    "/tests",
+    "/tests/runtime",
+    "/tests/analytics",
+    "/uv.lock",
     "/README.md",
     "/README.pypi.md",
     "/LICENSE",
@@ -70,13 +72,13 @@ packages = ["src/kentik_api"]
 dev = [
     {include-group = "test"},
     {include-group = "docs"},
-    "grpcio-tools==1.85.0",
+    "grpcio-tools==1.85.3",
     "types-protobuf>=6.30.0",
     "ty>=0.0.84",
-    "ruff==0.17.2",
+    "ruff==0.17.6",
     "openapi-python-generator==2.1.2",
     "packaging>=24",
-    "rumdl==0.3.0",
+    "rumdl==0.3.5",
     "markdown-it-py>=4.2.0",
     "poethepoet==0.49.0",
 ]
@@ -96,6 +98,10 @@ docs = [
     "sphinx>=9.1.0",
     "sphinx-book-theme>=1.1.0",
     "sphinxcontrib-mermaid>=1.0.0",
+]
+build = [
+    "hatch-vcs>=0.4.0",
+    "hatchling>=1.27.0",
 ]
 
 # Run tasks as `uv run poe <task>`; bare `uv run poe` lists them.
@@ -292,8 +298,8 @@ addopts = ["-m", "not e2e and not e2e_grpc and not e2e_mutating"]
 exclude = [".specify"]
 
 [tool.ty.environment]
-# scripts/ is on sys.path when generate_sdk.py runs as a direct script
-extra-paths = ["scripts"]
+# Direct scripts import generator phases and the live probes import the e2e ledger.
+extra-paths = ["scripts", "tests/e2e"]
 
 [[tool.ty.overrides]]
 include = ["src/kentik_api/gen/**/*.pyi"]

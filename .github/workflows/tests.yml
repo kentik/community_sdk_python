@@ -94,11 +94,8 @@ jobs:
       - name: Check FR/SC/task cross-references
         run: uv run poe check-specs
 
-  # `uv audit` is experimental, so a finding or a format change shows here
-  # without blocking the merge.
   audit:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 

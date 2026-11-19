@@ -11,7 +11,7 @@ import grpc
 
 from . import plan_pb2 as kentik_dot_plan_dot_v202501alpha1_dot_plan__pb2
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

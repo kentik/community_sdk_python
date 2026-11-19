@@ -13,7 +13,7 @@ from . import (
     notification_channel_pb2 as kentik_dot_notification__channel_dot_v202210_dot_notification__channel__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

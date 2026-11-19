@@ -89,6 +89,18 @@ def test_fetch_removes_duplicate_rows(tmp_path: Path):
     assert len(df) == 30
 
 
+def test_get_includes_file_ending_at_start(tmp_path: Path):
+    cache = DFCache(tmp_path)
+    end = START + timedelta(minutes=2)
+    frame = _frame(START, end)
+    cache.store(frame)
+
+    result = cache.get(end - timedelta(minutes=1), end)
+
+    assert result is not None
+    pd.testing.assert_frame_equal(result, frame.tail(1), check_freq=False)
+
+
 def test_get_removes_duplicate_rows(tmp_path: Path):
     cache = DFCache(tmp_path)
     cache.store(_frame(START, START + timedelta(minutes=30)))

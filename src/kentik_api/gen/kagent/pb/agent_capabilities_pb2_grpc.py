@@ -13,7 +13,7 @@ from . import (
     agent_capabilities_pb2 as kentik_dot_kagent_dot_v202401_dot_agent__capabilities__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

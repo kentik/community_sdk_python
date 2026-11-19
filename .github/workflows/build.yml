@@ -18,16 +18,35 @@ jobs:
           python-version: "3.12"
 
       - name: Build sdist and wheel
-        run: uv build
+        run: |
+          uv export --locked --only-group build --no-hashes --no-emit-project -o "$RUNNER_TEMP/build-constraints.txt"
+          uv build --build-constraints "$RUNNER_TEMP/build-constraints.txt"
+
+      - name: Test the unpacked source distribution
+        run: |
+          mkdir "$RUNNER_TEMP/sdist"
+          tar -xzf dist/*.tar.gz -C "$RUNNER_TEMP/sdist" --strip-components=1
+          cd "$RUNNER_TEMP/sdist"
+          uv run --locked --no-default-groups --group test pytest -q tests/
 
       # A clean venv, run from outside the checkout, so a module the wheel
       # leaves out cannot be found in the dev environment or in src/.
-      - name: Verify the wheel works on its own
+      - name: Install the wheel with locked runtime dependencies
+        run: |
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/wheel-locked" uv sync --locked --no-default-groups --no-install-project
+          uv pip install --python "$RUNNER_TEMP/wheel-locked/bin/python" --no-deps dist/*.whl
+          uv pip check --python "$RUNNER_TEMP/wheel-locked/bin/python"
+
+      - name: Install the wheel as a fresh consumer
         run: |
           uv venv "$RUNNER_TEMP/wheel-venv"
           uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" dist/*.whl
+
+      - name: Verify both wheel installations
+        run: |
           cd "$RUNNER_TEMP"
-          "$RUNNER_TEMP/wheel-venv/bin/python" - <<'EOF'
+          for wheel_env in wheel-locked wheel-venv; do
+            "$wheel_env/bin/python" -I - <<'EOF'
           import importlib
           import pkgutil
 
@@ -60,6 +79,7 @@ jobs:
               assert not dead, f"gRPC stubs failed to build: {dead}"
           print(f"built gRPC stubs for {len(wrappers)} services")
           EOF
+          done
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

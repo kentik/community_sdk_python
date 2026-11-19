@@ -11,7 +11,7 @@ import grpc
 
 from . import mkp_pb2 as kentik_dot_mkp_dot_v202407_dot_mkp__pb2
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

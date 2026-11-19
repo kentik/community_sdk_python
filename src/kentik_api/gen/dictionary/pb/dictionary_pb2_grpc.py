@@ -13,7 +13,7 @@ from . import (
     dictionary_pb2 as kentik_dot_dictionary_dot_v20260604alpha1_dot_dictionary__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

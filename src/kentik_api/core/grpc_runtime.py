@@ -58,7 +58,7 @@ def _rpc_status(exc: grpc.RpcError) -> dict[str, Any] | None:
     try:
         trailers = cast(
             Iterable[tuple[str, Any]],
-            exc.trailing_metadata() or (),  # ty: ignore[unresolved-attribute]
+            exc.trailing_metadata() or (),  # ty: ignore[missing-attribute]
         )
         raw = next((v for k, v in trailers if k == _STATUS_DETAILS_KEY), None)
         if not isinstance(raw, bytes):
@@ -85,8 +85,8 @@ def map_grpc_error(
 
     Pure function: no I/O, no side effects. Testable without a gRPC channel.
     """
-    code = exc.code()  # ty: ignore[unresolved-attribute]  # grpcio ships no stubs
-    details = exc.details() or ""  # ty: ignore[unresolved-attribute]
+    code = exc.code()  # ty: ignore[missing-attribute]  # grpcio ships no stubs
+    details = exc.details() or ""  # ty: ignore[missing-attribute]
     code_name = getattr(code, "name", repr(code))
 
     if code == grpc.StatusCode.UNAUTHENTICATED:

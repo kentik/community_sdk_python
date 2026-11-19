@@ -32,6 +32,7 @@ MyST-Parser 5.1.0, Sphinx 9.1.0, uv 0.13.0.
 
 - **Decision**: Fix every finding before CI enforces the rules, with one
   recorded rule change: disable MD036 in `.markdownlint-cli2.jsonc`.
+
 - **Rationale**: rumdl reports 133 findings on the committed tree (134 with
   the plan template, which this plan replaces):
 
@@ -50,12 +51,14 @@ MyST-Parser 5.1.0, Sphinx 9.1.0, uv 0.13.0.
     the configuration comment.
   - Wrapping lines changes no words. Spec 007 keeps specs 001 to 006 "as
     written" for their `make` commands, which wrapping does not touch.
+
 - **Found during implementation**: two `rumdl check --fix` fixes were
   wrong and were reverted. `MD040` turned the MyST fence ```` ```{toctree} ````
   into ```` ```text {toctree} ````, which Sphinx no longer reads as a directive;
   `docs/sphinx/index.md` now uses MyST's colon fence, `:::{toctree}`. `MD050`
   turned a bare `__init__.py` into `**init**.py`; the path is now a code span.
   Review the diff after each `rumdl check --fix`.
+
 - **Alternatives considered**:
   - Exclude `specs/` from the check: rejected, new specs would never be
     checked.
@@ -271,19 +274,23 @@ MyST-Parser 5.1.0, Sphinx 9.1.0, uv 0.13.0.
   `reports/upstream/upstream-openapi-python-generator-optional-formatters.md`. The
   maintainer files it, and the inventory row links the issue. The draft stays
   untracked, as `reports/.gitignore` keeps every report but the audit record.
+
 - **Rationale**: Filing an issue in a third-party repository is a public
   action, so a person does it. The draft gives the evidence:
   `--formatter none`, Black, isort, and orjson in the lock, and no import
   of them in project code.
+
 - **Upstream state on 2026-10-17**: one owner. The last release (2.1.2,
   2025-09-29) and the last merge (#121, 2025-09-28) are more than 12 months
   old, the longest gap in the project's history. Six pull requests are
   open, some since October 2025 with passing checks. Issues filed in 2026
   have no maintainer reply.
+
 - **Decision on a pull request or a fork**: neither, for this finding. The
   three packages are in the dev group only, so no SDK user installs them.
   Making Black optional is a breaking change upstream, and an inactive
   project is unlikely to merge it. Keep the exact pin.
+
 - **Fork when one of these is true** (the inventory row records them):
   - A needed generator fix is not possible in `scripts/openapi_templates/`
     or `fixup.py`, and upstream does not answer a pull request.
@@ -295,6 +302,7 @@ MyST-Parser 5.1.0, Sphinx 9.1.0, uv 0.13.0.
   `OPENAPI_GENERATOR_FROM` (`docs/sphinx/local_generation_workflow.md`). A
   git URL in a dependency group is safe to publish, because dependency
   groups are not in the package metadata.
+
 - **Alternatives considered**: An upstream pull request that moves Black and
   isort to an extra: rejected for now, see above. A fork now: rejected, it
   moves the generator's upkeep to this project for a dev-only saving.

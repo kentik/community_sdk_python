@@ -147,7 +147,7 @@ class DFCache:
             if contained:
                 if file_start >= start and file_end <= end:
                     yield path
-            elif file_start <= end and (file_end > start or start == end == file_end):
+            elif file_start <= end and file_end >= start:
                 yield path
 
     def covers(self, start: datetime, end: datetime) -> bool:

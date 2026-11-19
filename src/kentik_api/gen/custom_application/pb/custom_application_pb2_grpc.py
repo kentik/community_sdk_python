@@ -13,7 +13,7 @@ from . import (
     custom_application_pb2 as kentik_dot_custom__application_dot_v202501alpha1_dot_custom__application__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

@@ -13,7 +13,7 @@ from . import (
     cloud_export_pb2 as kentik_dot_cloud__export_dot_v202506_dot_cloud__export__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

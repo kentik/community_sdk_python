@@ -18,7 +18,9 @@ jobs:
           python-version: "3.12"
 
       - name: Build sdist and wheel
-        run: uv build
+        run: |
+          uv export --locked --only-group build --no-hashes --no-emit-project -o "$RUNNER_TEMP/build-constraints.txt"
+          uv build --build-constraints "$RUNNER_TEMP/build-constraints.txt"
 
       - name: Check the built version matches the tag
         env:

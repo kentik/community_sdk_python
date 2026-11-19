@@ -2,7 +2,7 @@
   "schema_version": 8,
   "requirements": {
     "googleapis-common-protos": "googleapis-common-protos>=1.73.1",
-    "grpcio": "grpcio>=1.85.0",
+    "grpcio": "grpcio>=1.85.3",
     "httpx": "httpx>=0.28.1,<1",
     "protobuf": "protobuf>=7.35.1,<8",
     "pydantic": "pydantic>=2.14.0",
@@ -11,7 +11,7 @@
   },
   "gencode": {
     "protobuf": "7.35.1",
-    "grpcio": "1.85.0"
+    "grpcio": "1.85.3"
   },
   "services": {
     "ai_advisor": {

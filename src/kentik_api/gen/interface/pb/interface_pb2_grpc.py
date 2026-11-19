@@ -11,7 +11,7 @@ import grpc
 
 from . import interface_pb2 as kentik_dot_interface_dot_v202108alpha1_dot_interface__pb2
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

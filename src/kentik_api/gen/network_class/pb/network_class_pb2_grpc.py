@@ -13,7 +13,7 @@ from . import (
     network_class_pb2 as kentik_dot_network__class_dot_v202109alpha1_dot_network__class__pb2,
 )
 
-GRPC_GENERATED_VERSION = "1.85.0"
+GRPC_GENERATED_VERSION = "1.85.3"
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

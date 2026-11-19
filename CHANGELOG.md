@@ -34,8 +34,10 @@ tables below, which compare against earlier development builds of this SDK.
   pool failures that occur before the request is sent. It is true for other
   transport failures, including gRPC failures. True means the server may have
   received the request, not that it processed it.
-- The SDK now requires `grpcio>=1.85.0`, because the generated gRPC code comes
-  from `grpcio-tools` 1.85.0. The locked `certifi` and `setuptools` versions
+- `DFCache.get()` includes the last stored row when its timestamp matches the requested start.
+- Dependency requirement narrowed, `grpcio>=1.85.0` to `grpcio>=1.85.3`.
+  The generated gRPC code requires the runtime that matches `grpcio-tools` 1.85.3.
+  The locked `certifi` and `setuptools` versions
   also change to fix known advisories.
 - Over REST, `client.as_group.update()` and `client.site.update_market()`
   now work. Kentik's REST API ignores the documented camelCase body key
