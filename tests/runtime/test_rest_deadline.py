@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import select
 import threading
 import time
 from collections.abc import Iterator
@@ -49,11 +50,16 @@ class _DripHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         try:
-            for byte in body:
+            for index, byte in enumerate(body, start=1):
                 self.wfile.write(bytes([byte]))
                 self.wfile.flush()
-                time.sleep(_DRIP_SECONDS)
-        except (BrokenPipeError, ConnectionResetError):
+                if index == len(body):
+                    return
+                readable, _, _ = select.select([self.connection], [], [], _DRIP_SECONDS)
+                if readable and not self.connection.recv(1):
+                    self.server.client_hung_up.set()
+                    return
+        except ConnectionError:
             self.server.client_hung_up.set()
 
     def log_message(self, format: str, *args: Any) -> None:
@@ -84,38 +90,31 @@ def _config(base_path: str, **timeouts: Any) -> APIConfig:
     )
 
 
-def _timed_call(config: APIConfig) -> float:
-    started = time.monotonic()
-    try:
-        request_json("GET", "/v1/test", api_config_override=config)
-    finally:
-        config.close()
-    return time.monotonic() - started
-
-
 def test_a_trickling_body_cannot_outlast_the_timeout(drip_server):
     config = _config(drip_server.url, timeout=1.0)
-
-    started = time.monotonic()
-    with pytest.raises(TransportError, match="ReadTimeout"):
-        _timed_call(config)
-
-    assert time.monotonic() - started < 1.0 + _DRIP_SECONDS + 0.5
-    assert drip_server.client_hung_up.wait(2.0)
+    with config.client:
+        started = time.monotonic()
+        with pytest.raises(TransportError, match="ReadTimeout"):
+            request_json("GET", "/v1/test", api_config_override=config)
+        assert time.monotonic() - started < 1.0 + _DRIP_SECONDS + 0.5
+        assert drip_server.client_hung_up.wait(2.0)
 
 
 def test_a_numeric_rest_timeout_is_the_deadline(drip_server):
-    with pytest.raises(TransportError):
-        _timed_call(_config(drip_server.url, timeout=60.0, rest_timeout=1.0))
-
-    assert drip_server.client_hung_up.wait(2.0)
+    config = _config(drip_server.url, timeout=60.0, rest_timeout=1.0)
+    with config.client:
+        with pytest.raises(TransportError, match="ReadTimeout"):
+            request_json("GET", "/v1/test", api_config_override=config)
+        assert drip_server.client_hung_up.wait(2.0)
 
 
 def test_a_per_phase_rest_timeout_bounds_each_read_only(drip_server):
-    elapsed = _timed_call(_config(drip_server.url, rest_timeout=httpx.Timeout(1.0)))
-
-    assert elapsed > 1.0
-    assert not drip_server.client_hung_up.is_set()
+    config = _config(drip_server.url, rest_timeout=httpx.Timeout(1.0))
+    with config.client:
+        started = time.monotonic()
+        request_json("GET", "/v1/test", api_config_override=config)
+        assert time.monotonic() - started > 1.0
+        assert not drip_server.client_hung_up.is_set()
 
 
 def test_with_timeout_keeps_the_deadline_it_does_not_change():
