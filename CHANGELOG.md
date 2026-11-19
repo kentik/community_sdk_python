@@ -67,7 +67,7 @@ tables below, which compare against earlier development builds of this SDK.
 
 ### Upstream API changes
 
-The SDK now uses schema commit `5d1d2fa`. Kentik replaced two API versions,
+The SDK now uses schema commit `9f58fdd`. Kentik replaced two API versions,
 so these changes can break a caller:
 
 - **`credential`** moves from `v202407alpha1` to `v20261020alpha1`.
@@ -94,6 +94,8 @@ so these changes can break a caller:
 - **Added:** `client.synthetics.bulk_update_tests()` and
   `get_bulk_update_tests_status()`, new `dictionary` and `kagent` fields, and
   the `kagent` installer types `INSTALLER_TYPE_DEB` and `INSTALLER_TYPE_RPM`.
+  `kagent` `InstallConfig` gains `bundleSource`, which uses the new
+  `BundleSource` enum.
 
 ### Breaking changes
 

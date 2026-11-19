@@ -10824,6 +10824,7 @@
         "AgentServiceUpdateAgentBody",
         "AuthorizeResponse",
         "BootstrapInfo",
+        "BundleSource",
         "Capability",
         "CapabilityAdminServiceUpdateCapabilityBody",
         "CapabilityDistro",
@@ -11385,6 +11386,10 @@
           "configSource": {
             "type": "Optional[ConfigSource]",
             "required": false
+          },
+          "bundleSource": {
+            "type": "Optional[BundleSource]",
+            "required": false
           }
         },
         "ListAgentCapabilitiesResponse": {
@@ -11613,6 +11618,11 @@
         }
       },
       "enums": {
+        "BundleSource": [
+          "BUNDLE_SOURCE_UNSPECIFIED",
+          "BUNDLE_SOURCE_MANAGED",
+          "BUNDLE_SOURCE_LOCAL"
+        ],
         "ConfigLayerLayerType": [
           "LAYER_TYPE_UNSPECIFIED",
           "LAYER_TYPE_SEED",

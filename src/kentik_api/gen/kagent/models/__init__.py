@@ -13,6 +13,7 @@ from .AgentServiceUpdateAgentBody import (
 )
 from .AuthorizeResponse import AuthorizeResponse as AuthorizeResponse
 from .BootstrapInfo import BootstrapInfo as BootstrapInfo
+from .BundleSource import BundleSource as BundleSource
 from .Capability import Capability as Capability
 from .CapabilityAdminServiceUpdateCapabilityBody import (
     CapabilityAdminServiceUpdateCapabilityBody as CapabilityAdminServiceUpdateCapabilityBody,

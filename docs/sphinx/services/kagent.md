@@ -2382,7 +2382,7 @@ response = client.kagent.revoke_provisioning_token(
 ## Data Models
 
 <details>
-<summary>Model relationships (30 of 62 models)</summary>
+<summary>Model relationships (30 of 63 models)</summary>
 
 Each arrow points from a model to a model that one of its fields holds. The label names the field.
 
@@ -2466,6 +2466,11 @@ classDiagram
 
 ```{eval-rst}
 .. autopydantic_model:: kentik_api.gen.kagent.models.BootstrapInfo
+```
+
+```{eval-rst}
+.. autoclass:: kentik_api.gen.kagent.models.BundleSource
+   :members:
 ```
 
 ```{eval-rst}

@@ -5,6 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from .BundleSource import BundleSource
 from .ConfigSource import ConfigSource
 from .HostMetadata import HostMetadata
 from .InstallerType import InstallerType
@@ -37,4 +38,8 @@ class InstallConfig(BaseModel):
 
     configSource: Optional[ConfigSource] = Field(
         validation_alias="configSource", default=None
+    )
+
+    bundleSource: Optional[BundleSource] = Field(
+        validation_alias="bundleSource", default=None
     )

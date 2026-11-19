@@ -37,6 +37,12 @@ class ConfigSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CONFIG_SOURCE_MANAGED: _ClassVar[ConfigSource]
     CONFIG_SOURCE_LOCAL: _ClassVar[ConfigSource]
 
+class BundleSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    BUNDLE_SOURCE_UNSPECIFIED: _ClassVar[BundleSource]
+    BUNDLE_SOURCE_MANAGED: _ClassVar[BundleSource]
+    BUNDLE_SOURCE_LOCAL: _ClassVar[BundleSource]
+
 INSTALLER_TYPE_UNSPECIFIED: InstallerType
 INSTALLER_TYPE_LINUX: InstallerType
 INSTALLER_TYPE_DOCKER: InstallerType
@@ -48,6 +54,9 @@ RELEASE_SOURCE_LOCAL: ReleaseSource
 CONFIG_SOURCE_UNSPECIFIED: ConfigSource
 CONFIG_SOURCE_MANAGED: ConfigSource
 CONFIG_SOURCE_LOCAL: ConfigSource
+BUNDLE_SOURCE_UNSPECIFIED: BundleSource
+BUNDLE_SOURCE_MANAGED: BundleSource
+BUNDLE_SOURCE_LOCAL: BundleSource
 
 class HostMetadata(_message.Message):
     __slots__ = ("hostname", "machine_id", "public_ip", "private_ip", "os", "arch")
@@ -74,17 +83,26 @@ class HostMetadata(_message.Message):
     ) -> None: ...
 
 class InstallConfig(_message.Message):
-    __slots__ = ("id", "type", "host_metadata", "release_source", "config_source")
+    __slots__ = (
+        "id",
+        "type",
+        "host_metadata",
+        "release_source",
+        "config_source",
+        "bundle_source",
+    )
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     HOST_METADATA_FIELD_NUMBER: _ClassVar[int]
     RELEASE_SOURCE_FIELD_NUMBER: _ClassVar[int]
     CONFIG_SOURCE_FIELD_NUMBER: _ClassVar[int]
+    BUNDLE_SOURCE_FIELD_NUMBER: _ClassVar[int]
     id: str
     type: InstallerType
     host_metadata: HostMetadata
     release_source: ReleaseSource
     config_source: ConfigSource
+    bundle_source: BundleSource
     def __init__(
         self,
         id: _Optional[str] = ...,
@@ -92,6 +110,7 @@ class InstallConfig(_message.Message):
         host_metadata: _Optional[_Union[HostMetadata, _Mapping]] = ...,
         release_source: _Optional[_Union[ReleaseSource, str]] = ...,
         config_source: _Optional[_Union[ConfigSource, str]] = ...,
+        bundle_source: _Optional[_Union[BundleSource, str]] = ...,
     ) -> None: ...
 
 class Agent(_message.Message):

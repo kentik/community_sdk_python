@@ -815,6 +815,7 @@
         "AgentServiceUpdateAgentBody": "AgentServiceUpdateAgentBody",
         "AuthorizeResponse": "AuthorizeResponse",
         "BootstrapInfo": "BootstrapInfo",
+        "BundleSource": "BundleSource",
         "Capability": "Capability",
         "CapabilityAdminServiceUpdateCapabilityBody": "CapabilityAdminServiceUpdateCapabilityBody",
         "CapabilityDistro": "CapabilityDistro",

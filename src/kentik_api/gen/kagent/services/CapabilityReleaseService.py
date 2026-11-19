@@ -20,6 +20,7 @@ from ..models import (  # noqa: F401
     AgentServiceUpdateAgentBody,
     AuthorizeResponse,
     BootstrapInfo,
+    BundleSource,
     Capability,
     CapabilityAdminServiceUpdateCapabilityBody,
     CapabilityDistro,
