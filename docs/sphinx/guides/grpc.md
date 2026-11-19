@@ -140,6 +140,8 @@ effects), so the tests cover the whole table without a live channel.
 [`call_grpc()`](https://github.com/kentik/community_sdk_python/blob/main/src/kentik_api/core/grpc_runtime.py)
 calls the stub and gives the classification to `map_grpc_error()`. For the
 full status table, see the [error handling guide](error_handling.md).
+Every gRPC `TransportError` has `may_have_reached_server=True`, because the
+status does not prove that Kentik did not receive the call.
 
 Every call has a deadline: 60 seconds unless `KentikAPI` gets `timeout` or
 `grpc_deadline`.

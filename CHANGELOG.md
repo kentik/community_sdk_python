@@ -30,6 +30,10 @@ tables below, which compare against earlier development builds of this SDK.
 
 ### Runtime fixes
 
+- `TransportError.may_have_reached_server` is false for REST connection and
+  pool failures that occur before the request is sent. It is true for other
+  transport failures, including gRPC failures. True means the server may have
+  received the request, not that it processed it.
 - The SDK now requires `grpcio>=1.85.0`, because the generated gRPC code comes
   from `grpcio-tools` 1.85.0. The locked `certifi` and `setuptools` versions
   also change to fix known advisories.

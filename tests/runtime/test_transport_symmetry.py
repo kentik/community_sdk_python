@@ -87,6 +87,42 @@ def test_same_failure_raises_same_type_on_both_transports(
     assert type(grpc_exc.value) is expected
 
 
+@pytest.mark.parametrize(
+    ("failure", "may_have_reached_server"),
+    [
+        (httpx.ConnectError("refused", request=_REQUEST), False),
+        (httpx.ConnectTimeout("timed out", request=_REQUEST), False),
+        (httpx.PoolTimeout("pool timed out", request=_REQUEST), False),
+        (httpx.ReadTimeout("timed out", request=_REQUEST), True),
+        (httpx.WriteTimeout("timed out", request=_REQUEST), True),
+    ],
+)
+def test_rest_transport_error_reports_server_reachability(
+    monkeypatch, failure, may_have_reached_server
+):
+    with pytest.raises(TransportError) as exc_info:
+        _rest_call(monkeypatch, failure)
+
+    assert exc_info.value.may_have_reached_server is may_have_reached_server
+
+
+@pytest.mark.parametrize(
+    "grpc_code",
+    [
+        grpc.StatusCode.CANCELLED,
+        grpc.StatusCode.DEADLINE_EXCEEDED,
+        grpc.StatusCode.UNAVAILABLE,
+    ],
+)
+def test_grpc_transport_error_conservatively_reports_server_reachability(
+    rpc_error, grpc_code
+):
+    with pytest.raises(TransportError) as exc_info:
+        _grpc_call(rpc_error, grpc_code)
+
+    assert exc_info.value.may_have_reached_server is True
+
+
 def test_api_fault_reaches_the_same_except_branch_on_both_transports(
     monkeypatch, rpc_error
 ):

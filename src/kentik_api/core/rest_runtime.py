@@ -259,9 +259,15 @@ def request_json(
             extensions=extensions,
         )
     except httpx.RequestError as exc:
-        raise TransportError(
+        error = TransportError(
             f"{operation_name} transport failed ({type(exc).__name__}).",
-        ) from exc
+        )
+        if isinstance(
+            exc,
+            (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout),
+        ):
+            error.may_have_reached_server = False
+        raise error from exc
 
     rate_limit = RateLimit.from_headers(response.headers)
     if rate_limit is not None:

@@ -17,7 +17,9 @@ classDiagram
     }
     class ConfigurationError
     class AuthenticationError
-    class TransportError
+    class TransportError {
+        +bool may_have_reached_server
+    }
     class HTTPException {
         +int status_code
         +str message
@@ -42,7 +44,7 @@ classDiagram
 | --- | --- |
 | `ConfigurationError` | `KentikAPI(...)` gets missing or empty credentials, an unknown region or protocol, or a timeout that is not a positive number. A gRPC call gets an unknown body key or enum name, or an `api_config_override` that `with_timeout()` did not build. A call runs after `close()`. |
 | `AuthenticationError` | The API rejects the credentials: a REST 401 or a gRPC `UNAUTHENTICATED` status |
-| `TransportError` | No response arrived: connection failure, timeout, or a gRPC `CANCELLED`, `DEADLINE_EXCEEDED`, or `UNAVAILABLE` status. A gRPC response larger than the receive limit also raises `TransportError`. |
+| `TransportError` | No valid response arrived. `may_have_reached_server` is false for REST connection or pool failures before send. It is true for other transport failures, including gRPC failures. True means the server may have received the request, not that it processed it. A gRPC response over the receive limit also raises this error. |
 | `HTTPException` | The API responded with a fault. Both transports raise the operation's generated class, such as `ListError` from `client.device.list`. A subclass exists for each status that the schema declares, such as `ListUnexpectedError` for the `default` response. gRPC sets `grpc_status_code` as well. A success status whose body the SDK cannot use (not JSON, JSON `null`, or the wrong shape) raises a plain `HTTPException` with status 502 |
 
 Every exception carries a `rate_limit` attribute with the quota the API
@@ -76,10 +78,16 @@ except HTTPException as exc:
     print(f"HTTP {exc.status_code} on {exc.method} {exc.path}: {exc.message}")
     print(f"Details: {exc.details}")
 except TransportError as exc:
-    print(f"Network error: {exc}")
+    if exc.may_have_reached_server:
+        print(f"The request may have reached the server: {exc}")
+    else:
+        print(f"The request was not sent: {exc}")
 except KentikError as exc:
     print(f"Other SDK error: {exc}")
 ```
+
+Check the result before you retry a write when `may_have_reached_server` is
+true. The attribute does not confirm that the API processed the request.
 
 If the server explains an error with a `google.rpc.Status`,
 `exc.details["rpc_status"]` holds it on either transport. An example is the

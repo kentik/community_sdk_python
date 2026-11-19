@@ -70,6 +70,8 @@ sequenceDiagram
   open a new TLS session each time. `KentikAPI.close()` releases it, and
   a call after that raises `ConfigurationError`.
 - Transport-failure wrapping into `TransportError`
+- Reachability metadata on `TransportError`: false only for REST connection or
+  pool failures before send; true otherwise
 - Quota capture into `RateLimit`, keyed by HTTP method and path template
 - Status-code checking against each operation's `expected_status`
 - JSON error-body parsing (`code`, `message`, `details`)
