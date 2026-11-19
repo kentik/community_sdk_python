@@ -109,7 +109,7 @@ docs/sphinx/dependencies.md            # new: inventory
 docs/sphinx/index.md                   # toctree entry
 tests/smoke/test_declared_dependencies.py  # new: imports and inventory
 tests/generator/test_generate_sdk.py   # formatting pass covers Markdown
-reports/upstream-openapi-python-generator-optional-formatters.md  # new: issue draft
+reports/upstream/upstream-openapi-python-generator-optional-formatters.md  # new: issue draft
 CHANGELOG.md                           # raised floors
 .specify/memory/constitution.md        # PATCH 1.4.3
 CLAUDE.md                              # make lint description

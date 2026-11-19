@@ -1,4 +1,4 @@
-"""Live evidence for reports/upstream-rest-update-body-merge.md.
+"""Live evidence for reports/upstream/upstream-rest-update-body-merge.md.
 
 MUTATING, on disposable objects only. Every object it creates is named
 `sdk-e2e-test-<hex>`, is recorded in the e2e ledger (tests/e2e/ledger.py)

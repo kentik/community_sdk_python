@@ -2,7 +2,10 @@
 # default. The pre-PR audit's written record is the one exception.
 *
 !.gitignore
-!README.md
+!kentik-api-team-findings.md
+!kentik-api-team-findings.html
+!upstream/
+!upstream/**
 !pre-pr-audit-2026-10-10/
 pre-pr-audit-2026-10-10/*
 !pre-pr-audit-2026-10-10/report.md
@@ -11,18 +14,6 @@ pre-pr-audit-2026-10-10/*
 !pre-pr-audit-2026-10-10/deferred-risks.md
 !pre-pr-audit-2026-10-10/manual-spot-checks.md
 !pre-pr-audit-2026-10-10/run_manual_spot_check.py
-!v5-feature-parity-audit.md
-!v5-feature-parity-audit.html
-!upstream-rest-update-body-merge.md
-!kentik-api-team-findings.md
-!upstream-openapi-python-generator-optional-formatters.md
-!upstream-kptr-missing-http-annotations.html
-!upstream-kptr-missing-http-annotations.md
-!upstream-ratelimit-scope-undocumented.html
-!upstream-ratelimit-scope-undocumented.md
-!upstream-service-visibility-exposure.html
-!upstream-service-visibility-exposure.md
-!report-theme.css
 !assets/
 !assets/*.svg
 !assets/*.js

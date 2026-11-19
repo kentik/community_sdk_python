@@ -43,9 +43,9 @@ There is no middle ground anywhere in the schema. A service either annotates eve
 them. That pattern is what makes us think these three were missed rather than excluded on purpose.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/kptr-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/kptr-light.svg">
-  <img alt="Proto RPCs remain in gRPC. Missing HTTP bindings leave no OpenAPI path or SDK REST wrapper." src="assets/kptr-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/kptr-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/kptr-light.svg">
+  <img alt="Proto RPCs remain in gRPC. Missing HTTP bindings leave no OpenAPI path or SDK REST wrapper." src="../assets/kptr-light.svg">
 </picture>
 
 Open the [interactive explorer](upstream-kptr-missing-http-annotations.html) to select each part and see its evidence.

@@ -267,7 +267,7 @@ svg text { font-family: var(--mono); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: var(--muted); }
 .legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
 </style>
-<link rel="stylesheet" href="assets/report-tabs.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
 </head>
 <body>
 <div class="wrap">
@@ -278,7 +278,7 @@ svg text { font-family: var(--mono); }
     <div class="meta"><span>Source <b><a href="#full-report">full report</a></b></span></div>
   </header>
 <!-- report-tabs:start -->
-<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive diagram</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="v5-feature-parity-audit.md">v5-feature-parity-audit.md</a></div>
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive report</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="v5-feature-parity-audit.md">v5-feature-parity-audit.md</a></div>
 <!-- report-tabs:end -->
 <div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
   <section id="diagram" aria-label="Interactive report diagram">
@@ -298,7 +298,7 @@ svg text { font-family: var(--mono); }
 <p>This report lists what the V5 SDK on <code>origin/main</code> (last release <code>v1.0.7</code>)
 gave users, and what the V6 SDK on <code>feat/v6-sdk</code> keeps, changes, or drops. It
 was written on 2026-10-16 from <code>git show origin/main:&lt;path&gt;</code> and the
-<code>feat/v6-sdk</code> working tree. <a href="../docs/sphinx/guides/migrating-from-1x.md">The migration guide</a>
+<code>feat/v6-sdk</code> working tree. <a href="../../docs/sphinx/guides/migrating-from-1x.md">The migration guide</a>
 already records some of these gaps for users.</p>
 <p>Status values:</p>
 <ul>
@@ -383,9 +383,9 @@ already records some of these gaps for users.</p>
 <p>V6 and V5 calls use separate transport paths. The V5 path supports the query
 and batch endpoints that have no V6 equivalent.</p>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/v5-routing-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/v5-routing-light.svg">
-  <img alt="V6 and V5 operations use separate paths from KentikAPI. V6 uses REST or gRPC. V5-only query and batch methods use a separate REST transport." src="assets/v5-routing-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/v5-routing-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/v5-routing-light.svg">
+  <img alt="V6 and V5 operations use separate paths from KentikAPI. V6 uses REST or gRPC. V5-only query and batch methods use a separate REST transport." src="../assets/v5-routing-light.svg">
 </picture>
 <p>Open the <a href="#interactive">interactive V5/V6 routing explorer</a> to
 select a transport path and inspect its role and evidence.</p>
@@ -426,10 +426,10 @@ work or a hand-written V5 query client outside the generator.</li>
 <li>If the YAML mapping is ported, remove the <code>@fixup:</code> mapping type. It runs
 <code>eval()</code> on text from the YAML file, which allows code injection.</li>
 </ul>
-<p>The <a href="../docs/sphinx/guides/rate_limiting.md">rate limiting guide</a> still quotes
+<p>The <a href="../../docs/sphinx/guides/rate_limiting.md">rate limiting guide</a> still quotes
 a separate Query API limit from the Kentik Knowledge Base.</p>
 <h2 id="md-live-check-of-the-v5-api-2026-10-16">Live check of the V5 API (2026-10-16)</h2>
-<p><a href="scripts/v5/live_probe.py"><code>scripts/v5/live_probe.py</code></a> sent read-only calls to
+<p><a href="../scripts/v5/live_probe.py"><code>scripts/v5/live_probe.py</code></a> sent read-only calls to
 <code>https://api.kentik.com</code> with the project credentials. It prints status codes,
 response shapes, and quota headers only. The
 <a href="https://kb.kentik.com/docs/admin-apis">Admin APIs</a> and
@@ -1126,6 +1126,84 @@ that have none.</li>
   for (const svg of document.querySelectorAll(".explorer svg[id]")) wire(svg);
 })();
 </script>
-<script src="assets/report-tabs.js" defer></script>
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
 </body>
 </html>

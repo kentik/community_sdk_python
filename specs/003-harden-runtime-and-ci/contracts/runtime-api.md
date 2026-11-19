@@ -224,7 +224,7 @@ documenting them is a requirement rather than a nicety.
 **Documented granularity conflicts with measured granularity.** Kentik documents
 these as **per-customer** limits; the advertised counter moves **per endpoint**.
 The SDK reports what it observes and records the conflict rather than resolving
-it. Filed upstream as `reports/upstream-ratelimit-scope-undocumented.html`.
+it. Filed upstream as `reports/upstream/upstream-ratelimit-scope-undocumented.html`.
 
 ---
 

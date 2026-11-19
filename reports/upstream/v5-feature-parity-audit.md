@@ -3,7 +3,7 @@
 This report lists what the V5 SDK on `origin/main` (last release `v1.0.7`)
 gave users, and what the V6 SDK on `feat/v6-sdk` keeps, changes, or drops. It
 was written on 2026-10-16 from `git show origin/main:<path>` and the
-`feat/v6-sdk` working tree. [The migration guide](../docs/sphinx/guides/migrating-from-1x.md)
+`feat/v6-sdk` working tree. [The migration guide](../../docs/sphinx/guides/migrating-from-1x.md)
 already records some of these gaps for users.
 
 Status values:
@@ -33,9 +33,9 @@ V6 and V5 calls use separate transport paths. The V5 path supports the query
 and batch endpoints that have no V6 equivalent.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/v5-routing-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/v5-routing-light.svg">
-  <img alt="V6 and V5 operations use separate paths from KentikAPI. V6 uses REST or gRPC. V5-only query and batch methods use a separate REST transport." src="assets/v5-routing-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/v5-routing-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/v5-routing-light.svg">
+  <img alt="V6 and V5 operations use separate paths from KentikAPI. V6 uses REST or gRPC. V5-only query and batch methods use a separate REST transport." src="../assets/v5-routing-light.svg">
 </picture>
 
 Open the [interactive V5/V6 routing explorer](v5-feature-parity-audit.html) to
@@ -83,12 +83,12 @@ What can be restored:
 - If the YAML mapping is ported, remove the `@fixup:` mapping type. It runs
   `eval()` on text from the YAML file, which allows code injection.
 
-The [rate limiting guide](../docs/sphinx/guides/rate_limiting.md) still quotes
+The [rate limiting guide](../../docs/sphinx/guides/rate_limiting.md) still quotes
 a separate Query API limit from the Kentik Knowledge Base.
 
 ## Live check of the V5 API (2026-10-16)
 
-[`scripts/v5/live_probe.py`](scripts/v5/live_probe.py) sent read-only calls to
+[`scripts/v5/live_probe.py`](../scripts/v5/live_probe.py) sent read-only calls to
 `https://api.kentik.com` with the project credentials. It prints status codes,
 response shapes, and quota headers only. The
 [Admin APIs](https://kb.kentik.com/docs/admin-apis) and

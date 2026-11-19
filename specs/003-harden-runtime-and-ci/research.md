@@ -342,7 +342,7 @@ include an Envoy per-route counter layered under a per-customer one, or
 documentation that predates the V6 gateway. The SDK reports what it observes and
 records the conflict (FR-035), rather than picking a side. Resolving it is an
 upstream question, filed as
-`reports/upstream-ratelimit-scope-undocumented.html`.
+`reports/upstream/upstream-ratelimit-scope-undocumented.html`.
 
 **Consequence for the design**: `RateLimit` models the minute window the headers
 actually carry. It MUST NOT synthesize an hourly figure, because nothing

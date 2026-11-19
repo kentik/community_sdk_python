@@ -48,9 +48,9 @@ entirely. The Kentik Community Python SDK generates its client surface from thos
 therefore mounts all three services without ever seeing the annotation.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/visibility-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/visibility-light.svg">
-  <img alt="Visibility metadata does not filter published REST paths. Public kptr RPCs without HTTP rules are omitted." src="assets/visibility-light.svg">
+   <source media="(prefers-color-scheme: dark)" srcset="../assets/visibility-dark.svg">
+   <source media="(prefers-color-scheme: light)" srcset="../assets/visibility-light.svg">
+   <img alt="Visibility metadata does not filter published REST paths. Public kptr RPCs without HTTP rules are omitted." src="../assets/visibility-light.svg">
 </picture>
 
 Open the [interactive explorer](upstream-service-visibility-exposure.html) to select each part and see its evidence.

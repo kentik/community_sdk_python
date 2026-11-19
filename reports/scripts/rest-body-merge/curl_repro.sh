@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reproduces reports/upstream-rest-update-body-merge.html with curl and grpcurl only, no SDK.
+# Reproduces reports/upstream/upstream-rest-update-body-merge.html with curl and grpcurl only, no SDK.
 #
 # MUTATING, on disposable objects only: it creates one AS group, one site market,
 # and one label named sdk-e2e-test-curl-<hex>, and deletes them on exit.

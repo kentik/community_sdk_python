@@ -274,7 +274,7 @@ test.
   R12; add a note that CI decides when rumdl and the editor disagree; add
   the page to the toctree in docs/sphinx/index.md (FR-012)
 - [X] T036 [P] [US5] Write the issue draft in
-  reports/upstream-openapi-python-generator-optional-formatters.md: the
+  reports/upstream/upstream-openapi-python-generator-optional-formatters.md: the
   `--formatter none` call, Black, isort, and orjson in the lock, no import
   of them in project code, and the ask to make them optional extras; the
   maintainer files it (research R12; FR-013)

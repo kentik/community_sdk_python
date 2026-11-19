@@ -28,12 +28,12 @@ The defect does not depend on the SDK. Plain `curl` gives the same results.
 | `PUT /site/v202509/site_markets/{siteMarket.id}` | 500 `internal error (name:TypeError)` | 200, updated | OK, updated |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/body-merge-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/body-merge-light.svg">
-  <img alt="Two REST updates fail with the documented camelCase body. The proto-name REST control and the gRPC controls succeed." src="assets/body-merge-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/body-merge-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/body-merge-light.svg">
+  <img alt="Two REST updates fail with the documented camelCase body. The proto-name REST control and the gRPC controls succeed." src="../assets/body-merge-light.svg">
 </picture>
 
-Open the [interactive request-path explorer](archive/upstream-rest-update-body-merge.html)
+Open the [interactive request-path explorer](../archive/upstream-rest-update-body-merge.html)
 to compare the documented REST body with the proto-name and gRPC controls.
 
 ## Follow-up validation, 2026-10-27
@@ -47,7 +47,7 @@ existing disposable tag. The test deleted that tag after the update. The separat
 separate API issue.
 
 Current finding status and next actions live only in
-[kentik-api-team-findings.md](kentik-api-team-findings.md). This report holds
+[kentik-api-team-findings.md](../kentik-api-team-findings.md). This report holds
 the detailed body-merge evidence.
 
 ## What the contract says
