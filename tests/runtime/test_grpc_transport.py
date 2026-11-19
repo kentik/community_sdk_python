@@ -316,7 +316,8 @@ def test_affected_services_are_sent_no_deadline_and_others_still_are():
     no_deadline = seen[AUDIT]
     assert no_deadline is not None and no_deadline > 1e9
     remaining = seen[LABEL]
-    assert remaining is not None and 0 < remaining <= 30.0
+    assert remaining is not None
+    assert remaining == pytest.approx(30.0, abs=1.0)
 
 
 def test_affected_service_still_fails_at_the_deadline_instead_of_hanging(

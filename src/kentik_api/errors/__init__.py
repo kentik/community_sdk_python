@@ -24,7 +24,13 @@ class AuthenticationError(KentikError):
 
 
 class TransportError(KentikError):
-    """Raised when the transport layer fails before receiving a valid response."""
+    """Raised when the transport fails before a valid response arrives.
+
+    `may_have_reached_server` is false only when the SDK knows it did not send
+    the request. True means the server may have received it, not that it did.
+    """
+
+    may_have_reached_server: bool = True
 
 
 class HTTPException(KentikError):

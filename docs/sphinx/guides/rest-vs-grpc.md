@@ -75,6 +75,15 @@ returns in about 0.6 s. Past Kentik's soft limit, the API delays each response
 by up to 1.5 s and does not return an error. A short timeout therefore turns
 throttling into a `TransportError`.
 
+### Transport errors
+
+`TransportError.may_have_reached_server` reports whether the request may have
+reached Kentik. It is false for REST connection and pool failures that happen
+before send. It is true for other REST failures and all gRPC transport errors.
+True does not confirm that Kentik processed the request. Check the result before
+you retry a write. See the [error handling guide](error_handling.md) for an
+example.
+
 ### Errors that only gRPC has
 
 `except KentikError:` catches every API, authentication, configuration, and

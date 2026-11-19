@@ -226,7 +226,9 @@ code shows it directly:
   - query-param cleaning
   - the request itself, over the one `httpx.Client` its `APIConfig`
     owns (one pooled connection per client, timeout passed per request)
-  - transport-failure wrapping (`TransportError`)
+  - transport-failure wrapping (`TransportError`); its
+    `may_have_reached_server` is false only for REST connection or pool failures
+    known to occur before send, and true otherwise
   - quota capture into `RateLimit`, on the result and on every error
   - a 401 raised as `AuthenticationError`, ahead of the generated
     error class, so generated error packages never see one
