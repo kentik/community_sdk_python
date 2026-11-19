@@ -7,7 +7,8 @@ account. Host: `grpc.api.kentik.com`. Schema: `api-schema-public` `9de9a68`,
 which is the same as upstream HEAD `8ec5847` for every service below.
 
 To run any curl or grpcurl step, first run the Step 0 setup from
-`upstream-rest-update-body-merge.md`. It defines `$BASE`, `AUTH`, and `GRPC`.
+[`upstream-rest-update-body-merge.md`](../upstream/upstream-rest-update-body-merge.md).
+It defines `$BASE`, `AUTH`, and `GRPC`.
 Every test object name starts with `sdk-e2e-test-`, and every test object was
 deleted after the test.
 
@@ -38,7 +39,7 @@ deleted after the test.
 - **Type:** Bug
 - **Components:** to confirm in CORE. Proto service scopes: `admin.as_group` (`ASGroupService`), `admin.site` (`SiteService`)
 - **Labels:** `api-v6`, `rest`, `community-sdk`
-- **Attachment:** `upstream-rest-update-body-merge.md` (full report with every request and response)
+- **Attachment:** [body-merge report](../upstream/upstream-rest-update-body-merge.md) (full report with every request and response)
 
 ### Description
 

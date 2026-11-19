@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="report-theme.css">
-<link rel="stylesheet" href="assets/report-tabs.css">
+<link rel="stylesheet" href="../assets/report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
 </head>
 <body>
 <div class="wrap">
@@ -435,9 +435,9 @@ universal:</p>
 <p>There is no middle ground anywhere in the schema. A service either annotates every RPC or none of
 them. That pattern is what makes us think these three were missed rather than excluded on purpose.</p>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/kptr-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/kptr-light.svg">
-  <img alt="Proto RPCs remain in gRPC. Missing HTTP bindings leave no OpenAPI path or SDK REST wrapper." src="assets/kptr-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/kptr-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/kptr-light.svg">
+  <img alt="Proto RPCs remain in gRPC. Missing HTTP bindings leave no OpenAPI path or SDK REST wrapper." src="../assets/kptr-light.svg">
 </picture>
 <p>Open the <a href="#interactive">interactive explorer</a> to select each part and see its evidence.</p>
 <h2 id="md-affected-services">Affected services</h2>
@@ -726,12 +726,90 @@ ASK
 <footer>
   <p>Evidence gathered from <code>kentik/api-schema-public</code> at <code>master</code> on
 <script type="application/json" id="diagram-data">{"kptr-architecture": {"caption": "Proto RPCs remain in gRPC. Missing HTTP bindings leave no OpenAPI path or SDK REST wrapper.", "select": "binding", "hint": "Select a route stage to see which surface remains and which one is absent.", "parts": {"rpc": {"role": "Fourteen RPCs are declared across kptr and deviceconf. One deviceconf method is method-private, leaving thirteen candidates.", "facts": ["kptr: 4 RPCs", "deviceconf: 10 RPCs", "13 eligible for HTTP bindings"], "stops": "The RPC definitions remain available to gRPC, but the SDK has no REST paths to generate for them.", "evidence": "Schema audit at commit 89684ba, revalidated 2026-09-24.", "title": "Proto RPCs"}, "grpc": {"role": "The proto still declares the RPC methods. The report does not claim that every server call succeeds.", "facts": ["gRPC method definitions remain", "HTTP exposure is a separate question"], "stops": "Removing these definitions would remove the gRPC contract for the affected methods.", "evidence": "The proto files contain the service and RPC declarations.", "title": "gRPC methods"}, "binding": {"role": "The thirteen candidate RPCs have no google.api.http binding.", "facts": ["13 candidate RPCs", "One private method is excluded", "Two diagnostic RPCs are out of scope"], "stops": "Without a binding, the generator cannot publish a corresponding REST path.", "evidence": "The schema annotation audit lists the exact RPCs.", "title": "Missing HTTP bindings"}, "openapi": {"role": "The OpenAPI generator emits REST paths from HTTP bindings. The absent bindings produce no paths.", "facts": ["No REST path for the 13 RPCs", "Visibility is not the reason for this gap"], "stops": "Downstream clients that consume the public OpenAPI output cannot generate REST operations for these RPCs.", "evidence": "The generated swagger contains no paths for the affected methods.", "title": "OpenAPI output"}, "sdk": {"role": "The community SDK builds its service surface from OpenAPI paths.", "facts": ["No generated REST operation", "No mounted REST wrapper"], "stops": "SDK users cannot call these operations through the REST client.", "evidence": "The SDK uses schema paths to generate REST wrappers.", "title": "Community SDK"}}, "paths": {"grpc": {"label": "gRPC definitions", "title": "The gRPC contract remains", "text": "The proto declares the methods even though the REST schema has no matching paths.", "links": ["rpc>grpc"], "family": "green"}, "rest_gap": {"label": "Missing REST surface", "title": "The REST path is absent", "text": "No HTTP binding means no OpenAPI path and no generated REST wrapper.", "links": ["rpc>binding", "binding>openapi", "openapi>sdk"], "family": "red"}}, "links": {"rpc>binding": "candidate RPC", "binding>openapi": "no path emitted", "openapi>sdk": "no wrapper"}}}</script>
-<script src="assets/explorer.js" defer></script>
+<script src="../assets/explorer.js" defer></script>
   2026-09-18, and revalidated at <code>89684ba</code> on 2026-09-24 with no change to the audit. Reproduce with <code>reports/scripts/schema/annotation_audit.py</code> in the
   <code>community_sdk_python</code> repo.</p>
 </footer>
 
 </div>
-<script src="assets/report-tabs.js" defer></script>
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
 </body>
 </html>

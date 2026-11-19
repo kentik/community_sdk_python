@@ -268,7 +268,7 @@ MyST-Parser 5.1.0, Sphinx 9.1.0, uv 0.13.0.
 ## R12. Upstream report for openapi-python-generator
 
 - **Decision**: Draft the issue text in
-  `reports/upstream-openapi-python-generator-optional-formatters.md`. The
+  `reports/upstream/upstream-openapi-python-generator-optional-formatters.md`. The
   maintainer files it, and the inventory row links the issue. The draft stays
   untracked, as `reports/.gitignore` keeps every report but the audit record.
 - **Rationale**: Filing an issue in a third-party repository is a public

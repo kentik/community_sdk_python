@@ -568,7 +568,7 @@ credentials, and renaming a referenced wrapper method causes a failure.
   - Recorded 2026-09-23: the full suite passes under pytest-socket with sockets
     disabled except localhost, and with `KENTIK_EMAIL` and `KENTIK_API_TOKEN`
     forced empty. `.github/workflows/` runs no e2e test.
-- [ ] T102 Send `reports/upstream-ratelimit-scope-undocumented.html` to the Kentik API team and record the response, particularly the answer to the per-customer versus per-endpoint question
+- [ ] T102 Send `reports/upstream/upstream-ratelimit-scope-undocumented.html` to the Kentik API team and record the response, particularly the answer to the per-customer versus per-endpoint question
   - **Maintainer's own task**: sending a report to Kentik is an outward-facing action.
   - 2026-09-24: ticket opened with the Kentik API team; awaiting the response. The kptr/deviceconf HTTP-bindings ticket is open too.
 

@@ -31,7 +31,7 @@ speeds.
 Kentik confirmed on 2026-10-16 that the V5 query and batch endpoints still
 answer, and that a V6 query service is planned but not yet published. The
 V6 public schema has no description of the V5 endpoints, so the generator
-cannot produce them today. [The V5 to V6 audit](../../reports/v5-feature-parity-audit.md)
+cannot produce them today. [The V5 to V6 audit](../../reports/upstream/v5-feature-parity-audit.md)
 lists these gaps.
 
 A live check on 2026-10-16 (see the audit's "Live check" section) showed:

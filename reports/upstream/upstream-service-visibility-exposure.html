@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="report-theme.css">
-<link rel="stylesheet" href="assets/report-tabs.css">
+<link rel="stylesheet" href="../assets/report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
 </head>
 <body>
 <div class="wrap">
@@ -431,9 +431,9 @@ not survive into the generated swagger. Downstream generators consume swagger, s
 entirely. The Kentik Community Python SDK generates its client surface from those swagger files and
 therefore mounts all three services without ever seeing the annotation.</p>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/visibility-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/visibility-light.svg">
-  <img alt="Visibility metadata does not filter published REST paths. Public kptr RPCs without HTTP rules are omitted." src="assets/visibility-light.svg">
+   <source media="(prefers-color-scheme: dark)" srcset="../assets/visibility-dark.svg">
+   <source media="(prefers-color-scheme: light)" srcset="../assets/visibility-light.svg">
+   <img alt="Visibility metadata does not filter published REST paths. Public kptr RPCs without HTTP rules are omitted." src="../assets/visibility-light.svg">
 </picture>
 <p>Open the <a href="#interactive">interactive explorer</a> to select each part and see its evidence.</p>
 <blockquote class="markdown-alert markdown-alert-warning">
@@ -755,7 +755,7 @@ deviceconf</a>.</p>
 <footer>
   <p>Evidence gathered from <code>kentik/api-schema-public</code> at <code>master</code> on
 <script type="application/json" id="diagram-data">{"visibility-path": {"caption": "Visibility metadata does not filter published REST paths. Public kptr RPCs without HTTP rules are omitted.", "select": "openapi", "hint": "Select a schema stage to inspect what is published. This report does not test server authorization.", "parts": {"protos": {"role": "Each proto service sets a custom visibility option. The option lives only in the proto layer.", "facts": ["ktbgp and vault: PRIVATE", "kptr: PUBLIC"], "stops": "Expected: no service, and no REST path, is defined.", "evidence": "The annotation table in the report, schema commit 89684ba.", "title": "Proto service definitions"}, "private": {"role": "Four services across three non-public or protected services publish REST operations in the public schema.", "facts": ["ktbgp, vault, and kagent", "10 private operations", "3 protected read paths are separate"], "stops": "The schema and SDK surface remain visible until upstream clarifies the visibility contract.", "evidence": "Schema commit 89684ba, revalidated 2026-09-24.", "title": "Non-public services"}, "http": {"role": "The affected private and protected operations have google.api.http bindings.", "facts": ["REST rules exist", "The proto visibility option is separate metadata"], "stops": "If bindings are removed, the OpenAPI generator emits no corresponding REST paths.", "evidence": "The audit compared proto options and generated OpenAPI paths.", "title": "HTTP bindings"}, "openapi": {"role": "The generator reads HTTP rules but does not carry the custom visibility option into swagger.", "facts": ["Visibility metadata is dropped", "Downstream tools consume swagger"], "stops": "Downstream code generation cannot filter on a visibility value that is absent from the schema output.", "evidence": "Schema annotation audit at commit 89684ba.", "title": "OpenAPI generator"}, "schema": {"role": "The public schema contains the ten REST paths from non-public or protected services.", "facts": ["10 PRIVATE operations", "3 PROTECTED paths listed separately"], "stops": "Consumers can generate wrappers unless they apply a separate policy.", "evidence": "The visibility report lists each published path.", "title": "Public schema"}, "sdk": {"role": "The community SDK generates operations from the public swagger paths.", "facts": ["Private routes produce SDK methods", "Authorization was not tested"], "stops": "The client exposes methods for those paths; this says nothing about whether a customer token is authorized.", "evidence": "The SDK wrapper inventory matches the public paths.", "title": "Community SDK"}, "public": {"role": "kptr is marked PUBLIC, but its four RPCs have no HTTP bindings.", "facts": ["Four public RPCs", "No REST surface"], "stops": "No REST operation is generated for these public methods.", "evidence": "The companion kptr report audits the missing bindings.", "title": "Public kptr RPCs"}, "missing": {"role": "No HTTP rule exists for the four kptr RPCs.", "facts": ["gRPC definitions exist", "REST paths are absent"], "stops": "The OpenAPI and SDK REST surfaces omit these methods.", "evidence": "See the exact proto locations in the companion report.", "title": "Missing HTTP binding"}, "no_path": {"role": "The public kptr methods do not produce REST paths or SDK REST wrappers.", "facts": ["Public visibility does not add a REST route", "The gRPC definitions remain"], "stops": "REST users cannot call these methods through the generated SDK surface.", "evidence": "The schema audit found zero REST paths for kptr.", "title": "No REST operation"}}, "paths": {"private_published": {"label": "Non-public paths published", "title": "HTTP bindings expose generated paths", "text": "Visibility is not carried into swagger, so the public schema and SDK receive these REST operations.", "links": ["private>http", "http>openapi", "openapi>schema", "schema>sdk"], "family": "orange"}, "public_omitted": {"label": "Public kptr omitted", "title": "Public RPCs still lack REST routes", "text": "kptr has PUBLIC visibility but no HTTP bindings, so no REST operation is emitted.", "links": ["public>missing", "missing>no_path"], "family": "blue"}}, "links": {"private>http": "published HTTP bindings", "http>openapi": "HTTP rules consumed", "openapi>schema": "REST paths published", "schema>sdk": "SDK methods generated", "public>missing": "kptr methods", "missing>no_path": "no REST route"}}}</script>
-<script src="assets/explorer.js" defer></script>
+<script src="../assets/explorer.js" defer></script>
   2026-09-18, and revalidated at <code>89684ba</code> on 2026-09-24 with no change. Reproduce with <code>reports/scripts/schema/annotation_audit.py</code> in the
   <code>community_sdk_python</code> repo. Companion report:
   <a href="upstream-kptr-missing-http-annotations.html">missing HTTP annotations on kptr and
@@ -763,6 +763,84 @@ deviceconf</a>.</p>
 </footer>
 
 </div>
-<script src="assets/report-tabs.js" defer></script>
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
 </body>
 </html>

@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="report-theme.css">
-<link rel="stylesheet" href="assets/report-tabs.css">
+<link rel="stylesheet" href="../assets/report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
 </head>
 <body>
 <div class="wrap">
@@ -474,9 +474,9 @@ backend.</p>
 </tbody>
 </table>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/rate-limit-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/rate-limit-light.svg">
-  <img alt="REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters." src="assets/rate-limit-light.svg">
+   <source media="(prefers-color-scheme: dark)" srcset="../assets/rate-limit-dark.svg">
+   <source media="(prefers-color-scheme: light)" srcset="../assets/rate-limit-light.svg">
+   <img alt="REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters." src="../assets/rate-limit-light.svg">
 </picture>
 <p>Open the <a href="#interactive">interactive explorer</a> to select each part and see its evidence.</p>
 <h2 id="md-evidence">Evidence</h2>
@@ -636,13 +636,91 @@ that would mean deliberately exhausting a production quota.
 <footer>
   <p>Documented limits rechecked against <code>kb.kentik.com/docs/apis-overview</code> on
 <script type="application/json" id="diagram-data">{"rate-limit-scope": {"caption": "REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters.", "select": "device_bucket", "hint": "Select an endpoint or counter to see the observed quota scope.", "parts": {"probe": {"role": "The read-only probe sent each request in turn and read the quota headers.", "facts": ["Read-only calls only", "Alternated REST and gRPC on the device list"], "stops": "No new quota readings.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "Read-only rate-limit probe"}, "rest_device": {"role": "A REST device-list request consumes the same observed endpoint budget as its gRPC counterpart.", "facts": ["GET /devices", "Read-only request"], "stops": "Only the device-list endpoint budget changes.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "REST device list"}, "grpc_device": {"role": "A gRPC device-list request consumes the same observed endpoint budget as REST.", "facts": ["device.ListDevices", "Read-only request"], "stops": "Only the device-list endpoint budget changes.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "gRPC device list"}, "device_bucket": {"role": "REST and gRPC share one observed counter for the device-list endpoint.", "facts": ["60 requests per 60 seconds advertised", "One shared counter"], "stops": "A client that treats this as account-wide can pause unrelated endpoint budgets.", "evidence": "Alternating calls returned remaining values 59, 58, 57, and 56.", "title": "Device-list counter"}, "rest_sites": {"role": "The site-list endpoint starts its own budget.", "facts": ["GET /site/v202509/sites", "Same service as site markets"], "stops": "The site-list counter does not consume the site-market counter.", "evidence": "Probe showed a fresh counter for site markets.", "title": "Site list"}, "sites_bucket": {"role": "The site-list endpoint has a counter separate from other endpoints.", "facts": ["Independent 60/60s counter observed"], "stops": "Other endpoint counters remain available.", "evidence": "The 2026-10-27 read-only probe did not approach the limit.", "title": "Site-list counter"}, "rest_markets": {"role": "The site-market list starts another counter within the site service.", "facts": ["GET /site/v202509/site_markets", "Distinct path"], "stops": "The site-market counter does not consume the site-list counter.", "evidence": "Probe showed an independent counter for site markets.", "title": "Site-market list"}, "markets_bucket": {"role": "The site-market endpoint has its own observed counter.", "facts": ["Independent 60/60s counter observed"], "stops": "Other endpoint counters remain available.", "evidence": "The 2026-10-27 read-only probe did not approach the limit.", "title": "Site-market counter"}}, "paths": {"shared_device": {"label": "Shared device budget", "title": "REST and gRPC share one endpoint budget", "text": "Transport changes do not create a second device-list counter.", "links": ["rest_device>device_bucket", "grpc_device>device_bucket"], "family": "blue"}, "endpoint_isolation": {"label": "Endpoint isolation", "title": "Different endpoints use separate counters", "text": "The site list and site-market list start independent counters.", "links": ["rest_sites>sites_bucket", "rest_markets>markets_bucket"], "family": "orange"}}, "links": {"rest_device>device_bucket": "same device-list counter", "grpc_device>device_bucket": "same device-list counter", "rest_sites>sites_bucket": "site-list counter", "rest_markets>markets_bucket": "site-market counter"}}}</script>
-<script src="assets/explorer.js" defer></script>
+<script src="../assets/explorer.js" defer></script>
   2026-09-24: unchanged, and the page still states no V6-specific limits.</p>
   <p>Measured against <code>grpc.api.kentik.com</code> on 2026-09-21 with read-only calls from the
   <code>community_sdk_python</code> SDK. No quota was deliberately exhausted.</p>
 </footer>
 
 </div>
-<script src="assets/report-tabs.js" defer></script>
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
 </body>
 </html>

@@ -92,9 +92,9 @@ backend.
 | Behavior on exceed | **Not observed** | Confirming it would mean deliberately exhausting a production quota |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/rate-limit-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/rate-limit-light.svg">
-  <img alt="REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters." src="assets/rate-limit-light.svg">
+   <source media="(prefers-color-scheme: dark)" srcset="../assets/rate-limit-dark.svg">
+   <source media="(prefers-color-scheme: light)" srcset="../assets/rate-limit-light.svg">
+   <img alt="REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters." src="../assets/rate-limit-light.svg">
 </picture>
 
 Open the [interactive explorer](upstream-ratelimit-scope-undocumented.html) to select each part and see its evidence.

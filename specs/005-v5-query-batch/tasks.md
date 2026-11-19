@@ -247,7 +247,7 @@ examples.
 
 - [X] T034 [P] [US4] Write the V5 to 2.x map in
   docs/sphinx/guides/migrating-from-1x.md: every V5 call from
-  reports/v5-feature-parity-audit.md (including the endpoints that already have
+  reports/upstream/v5-feature-parity-audit.md (including the endpoints that already have
   a V6 equivalent), old and new field names, and a reason for each call with no
   equivalent, such as the retired SQL endpoint; list `analytics_example_sql.py`
   as "No port: the SQL endpoint was retired on 2025-05-01. See
@@ -348,7 +348,7 @@ schema, regenerates, and sees both services with no public name change.
   scripts/generation/README.md; add the term "Local schema base" to CONTEXT.md;
   and describe the new tests/analytics/ layer and `make test-analytics` in
   tests/README.md (FR-007)
-- [X] T052 [P] Mark follow-up item 1 and the query and batch rows as done in reports/v5-feature-parity-audit.md
+- [X] T052 [P] Mark follow-up item 1 and the query and batch rows as done in reports/upstream/v5-feature-parity-audit.md
 - [X] T053 Check that the mocked suites still catch a regression: break the V5
   host in src/kentik_api/client.py, confirm that `make test` fails, restore it,
   and record the result for the pull request (Principle IV; FR-027)
