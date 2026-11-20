@@ -5,6 +5,7 @@ from kentik_api.client import KentikAPI
 
 
 def main() -> None:
+    """List account users over REST."""
     client = KentikAPI(protocol="rest")
     response = client.user.list()
     users = [user for user in (response.users or []) if user is not None]

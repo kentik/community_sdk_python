@@ -1,12 +1,10 @@
 # HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly.
-"""Find flat outbound traffic on external links (port of 1.x analytics_example_topx.py).
+"""Find flat outbound traffic on external links.
 
 Needs the analytics extra: pip install "kentik-api[analytics]". Read-only.
 """
 
 from datetime import UTC, datetime, timedelta
-
-from pandas import DataFrame
 
 from kentik_api.analytics import (
     DataQueryDefinition,
@@ -15,7 +13,9 @@ from kentik_api.analytics import (
 )
 from kentik_api.client import KentikAPI
 from kentik_api.devices import DeviceLookup
+from pandas import DataFrame
 
+BOUNDARY_FIELD = "i_dst_network_bndry_name"
 QUERY_DEFINITION = {
     "query": {
         "queries": [
@@ -33,7 +33,7 @@ QUERY_DEFINITION = {
                             "raw": True,
                         }
                     ],
-                    # The API needs device names even when all devices are wanted.
+                    # The API needs device names even for an account-wide query.
                     "device_name": "{devices}",
                     "dimension": ["i_device_id", "InterfaceID_dst"],
                     "fastData": "Full",
@@ -44,7 +44,7 @@ QUERY_DEFINITION = {
                                 "connector": "All",
                                 "filters": [
                                     {
-                                        "filterField": "i_dst_network_bndry_name",
+                                        "filterField": BOUNDARY_FIELD,
                                         "filterValue": "external",
                                         "operator": "=",
                                     },
@@ -68,9 +68,15 @@ QUERY_DEFINITION = {
     "mappings": {
         "all": {
             "link": {"source": "{i_device_name}:{output_port}"},
-            "bps_out": {"source": "@TS.both_bits_per_sec.value", "type": "float64"},
+            "bps_out": {
+                "source": "@TS.both_bits_per_sec.value",
+                "type": "float64",
+            },
             "avg_bps_out": {"source": "{avg_bits_per_sec}", "type": "float64"},
-            "period": {"source": "@TS.both_bits_per_sec.period", "type": "int64"},
+            "period": {
+                "source": "@TS.both_bits_per_sec.period",
+                "type": "int64",
+            },
             "ts": {"source": "@TS.both_bits_per_sec.timestamp", "index": True},
         }
     },
@@ -78,6 +84,7 @@ QUERY_DEFINITION = {
 
 
 def main() -> None:
+    """Query outbound traffic and report links with flat traffic."""
     client = KentikAPI()  # loads KENTIK_EMAIL / KENTIK_API_TOKEN from .env
     devices = DeviceLookup.from_api(client)
     if devices.count < 1:
@@ -98,7 +105,9 @@ def main() -> None:
     df["link"] = df["link"].str.split(" : ").str[0]
     # topXdata can return duplicate time series entries.
     df = dedup_data_frame(df, ["ts", "link"])
-    print(f"Got {df.shape[0]} entries, time resolution {df.period.max()} seconds")
+    print(
+        f"Got {df.shape[0]} entries, time resolution {df.period.max()} seconds"
+    )
 
     flatness_limit = 0.5
     results = flatness_analysis(

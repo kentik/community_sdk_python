@@ -2,8 +2,8 @@
 
 # Quick-start examples for the Kentik Community Python SDK
 
-These scripts demonstrate the v6 SDK against the live Kentik API.
-Each script is self-contained and safe to run read-only.
+These examples use the Kentik Community Python SDK to call the live Kentik API.
+The V5 batch example previews changes by default. With `--send`, it writes to your account.
 
 > [!NOTE]
 > The [`examples/`](README.md) directory is hand-written. [`uv run poe generate`](../pyproject.toml) and
@@ -12,20 +12,15 @@ Each script is self-contained and safe to run read-only.
 
 ## Setup
 
-1. Create `.env` in the repository root:
+Use your secret manager to supply `KENTIK_EMAIL` and `KENTIK_API_TOKEN` to the example process.
 
-    ```bash
-    KENTIK_EMAIL=you@example.com
-    KENTIK_API_TOKEN=your_api_token
-    ```
+From the repository root, run an example as a module.
+This prevents Python from importing the example named `grpc.py` instead of the `grpc` package.
 
-2. Run any example with `python -m` from the repository root (the `-m` flag
-   prevents `grpc.py` from shadowing the `grpc` package):
-
-    ```bash
-    uv run python -m examples.device.rest
-    uv run python -m examples.device.grpc
-    ```
+```bash
+uv run python -m examples.device.rest
+uv run python -m examples.device.grpc
+```
 
 ## Layout
 

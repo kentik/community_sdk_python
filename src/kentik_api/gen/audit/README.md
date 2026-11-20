@@ -4,4 +4,7 @@
 
 The generator builds this module from the Kentik OpenAPI v3 schema.
 
-The Sphinx page [`docs/sphinx/services/audit.md`](../../../../docs/sphinx/services/audit.md) gives the parameters, responses, and a usage example for each operation, and documents each data model.
+See the [service reference][reference] for the data models.
+For each operation, it lists parameters, responses, and a usage example.
+
+[reference]: ../../../../docs/sphinx/services/audit.md

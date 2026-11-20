@@ -1,5 +1,5 @@
 # HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly.
-"""Run the V5 top-X data, URL, and chart queries (port of 1.x queries_example.py).
+"""Run the V5 top-X data, URL, and chart queries.
 
 `client.v5` always uses REST, also on a client created with protocol="grpc".
 """
@@ -42,16 +42,21 @@ def _query_item(device_names: str) -> QueryItem:
                 fn="percentile",
                 rank=95,
             ),
-            Aggregate(name="max_bits_per_sec", column="f_sum_both_bytes", fn="max"),
+            Aggregate(
+                name="max_bits_per_sec", column="f_sum_both_bytes", fn="max"
+            ),
         ],
     )
     return QueryItem(query=query, bucket="Left +Y Axis")
 
 
 def main() -> None:
+    """Request top-X data, a Data Explorer URL, and a chart."""
     client = KentikAPI()  # loads KENTIK_EMAIL / KENTIK_API_TOKEN from .env
     devices = client.device.list().devices or []
-    names = ",".join(d.deviceName for d in devices if d is not None and d.deviceName)
+    names = ",".join(
+        d.deviceName for d in devices if d is not None and d.deviceName
+    )
     item = _query_item(names)
 
     data = client.v5.top_x_data(data=QueryRequest(queries=[item]))

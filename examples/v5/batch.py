@@ -16,6 +16,11 @@ from kentik_api.v5_tools import send_batch, split_batch, wait_for_batch
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Preview a flow tag batch or send it when requested.
+
+    Args:
+        argv: Command arguments, or None to read the command line.
+    """
     send = "--send" in (sys.argv[1:] if argv is None else argv)
     upserts = [
         BatchUpsert(
@@ -25,12 +30,15 @@ def main(argv: list[str] | None = None) -> None:
     ]
     deletes = [BatchDelete(value="example_tag_to_delete")]
     parts = split_batch(upserts, deletes, replace_all=False)
-    print(f"{len(parts)} part(s), {len(upserts)} upsert(s), {len(deletes)} delete(s).")
+    print(
+        f"{len(parts)} part(s), {len(upserts)} upsert(s), "
+        f"{len(deletes)} delete(s)."
+    )
     if not send:
         print("Dry run. Pass --send to send the batch.")
         return
 
-    client = KentikAPI()  # loads KENTIK_EMAIL / KENTIK_API_TOKEN from .env
+    client = KentikAPI()
     guid = send_batch(client.v5.batch_tags, parts)
     status = wait_for_batch(client, guid, timeout=300, interval=5)
     print(f"Batch {guid}: complete={status.is_complete}")

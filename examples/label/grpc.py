@@ -6,10 +6,13 @@ from kentik_api.errors import KentikError
 
 
 def main() -> None:
+    """List device labels over gRPC."""
     client = KentikAPI(protocol="grpc")
     try:
         response = client.label.list()
-        labels = [label for label in (response.labels or []) if label is not None]
+        labels = [
+            label for label in (response.labels or []) if label is not None
+        ]
         print(f"Found {len(labels)} label(s).")
         for label in labels:
             print(f"  {label.id}: {label.name} (color: {label.color})")

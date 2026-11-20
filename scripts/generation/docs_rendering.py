@@ -142,7 +142,7 @@ def _generate_gen_root_readme() -> None:
     write_text_lf(SDK_OUTPUT_DIR / "README.md", _GEN_ROOT_README)
 
 
-def _generate_service_readmes(rest_only: frozenset[str] = frozenset()):
+def _generate_service_readmes(rest_only: frozenset[str] = frozenset()) -> None:
     """Generates README.md files inside each service directory."""
     print("Generating module READMEs...")
     for service_dir in iter_service_dirs():
@@ -160,12 +160,10 @@ def _generate_service_readmes(rest_only: frozenset[str] = frozenset()):
             "",
             f"The generator builds this module from {source}",
             "",
-            (
-                "The Sphinx page "
-                f"[`docs/sphinx/services/{service_name}.md`](../../../../docs/sphinx/services/{service_name}.md) "
-                "gives the parameters, responses, and a usage example for each operation, "
-                "and documents each data model."
-            ),
+            "See the [service reference][reference] for the data models.",
+            "For each operation, it lists parameters, responses, and a usage example.",
+            "",
+            f"[reference]: ../../../../docs/sphinx/services/{service_name}.md",
         ]
 
         doc_content = "\n".join(lines) + "\n"
@@ -1001,7 +999,7 @@ def _module_group(module_name: str, source_file: Path | None = None) -> str | No
         if ".services." in module_name:
             if source_file is not None and source_file.name[:1].islower():
                 return "Generated Service Wrappers"
-            tail = module_name.split(".")[-1]
+            tail = module_name.rsplit(".", maxsplit=1)[-1]
             if tail and tail[0].islower():
                 return "Generated Service Wrappers"
             return "Generated REST Services"

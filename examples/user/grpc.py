@@ -6,6 +6,7 @@ from kentik_api.errors import KentikError
 
 
 def main() -> None:
+    """List account users over gRPC."""
     client = KentikAPI(protocol="grpc")
     try:
         response = client.user.list()

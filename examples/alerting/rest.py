@@ -17,6 +17,7 @@ from kentik_api.gen.alerting.models import (
 
 
 def main() -> None:
+    """List alerts over REST using a start-time filter."""
     client = KentikAPI(protocol="rest")
 
     now = datetime.now(UTC)
@@ -24,7 +25,9 @@ def main() -> None:
         start=(now - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ"),
         end=now.strftime("%Y-%m-%dT%H:%M:%SZ"),
     )
-    request = AlertServiceListRequest(filters=AlertFilters(startedAt=started_at))
+    request = AlertServiceListRequest(
+        filters=AlertFilters(startedAt=started_at)
+    )
     response = client.alerting.list(data=request)
     alerts = [alert for alert in (response.alerts or []) if alert is not None]
     print(f"Found {len(alerts)} alert(s) in the last 30 days.")

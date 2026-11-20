@@ -6,6 +6,7 @@ from kentik_api.errors import KentikError
 
 
 def main() -> None:
+    """List sites and markets over gRPC."""
     client = KentikAPI(protocol="grpc")
     try:
         sites_resp = client.site.list()
@@ -16,7 +17,9 @@ def main() -> None:
 
         markets_resp = client.site.list_markets()
         markets = [
-            market for market in (markets_resp.siteMarkets or []) if market is not None
+            market
+            for market in (markets_resp.siteMarkets or [])
+            if market is not None
         ]
         print(f"\nFound {len(markets)} site market(s).")
         for market in markets[:5]:

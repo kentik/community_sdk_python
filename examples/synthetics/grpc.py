@@ -6,6 +6,7 @@ from kentik_api.errors import KentikError
 
 
 def main() -> None:
+    """List synthetic tests and agents over gRPC."""
     client = KentikAPI(protocol="grpc")
     try:
         tests_resp = client.synthetics.list_tests()
@@ -15,10 +16,14 @@ def main() -> None:
             print(f"  {test.id}: {test.name} (status={test.status})")
 
         agents_resp = client.synthetics.list_agents()
-        agents = [agent for agent in (agents_resp.agents or []) if agent is not None]
+        agents = [
+            agent for agent in (agents_resp.agents or []) if agent is not None
+        ]
         print(f"\nFound {len(agents)} synthetic agent(s).")
         for agent in agents[:5]:
-            print(f"  {agent.id}: {agent.alias} ({agent.city}, {agent.country})")
+            print(
+                f"  {agent.id}: {agent.alias} ({agent.city}, {agent.country})"
+            )
     except KentikError as exc:
         print(f"API error over gRPC: {exc}")
 

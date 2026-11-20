@@ -198,6 +198,7 @@ def fragment(
         *mermaid_fallback(markup),
         "",
         GITHUB_ONLY[1],
+        "<!-- markdownlint-disable MD013 -->",
         SPHINX_ONLY[0],
         "```{raw} html",
         '<div class="kx">',
@@ -212,4 +213,5 @@ def fragment(
         "</div>",
         "```",
         SPHINX_ONLY[1],
+        "<!-- markdownlint-enable MD013 -->",
     ]

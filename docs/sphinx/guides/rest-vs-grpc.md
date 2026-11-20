@@ -130,6 +130,7 @@ flowchart TD
 ```
 
 <!-- /github-only -->
+<!-- markdownlint-disable MD013 -->
 <!-- sphinx-only
 ```{raw} html
 <div class="kx">
@@ -144,6 +145,7 @@ flowchart TD
 </div>
 ```
 -->
+<!-- markdownlint-enable MD013 -->
 <!-- /kentik-gen:transport-paths-explorer -->
 
 The two transports therefore share one quota. Kentik allows 60 requests per

@@ -10,7 +10,10 @@
 
 ## Context
 
-The audit report at [reports/pre-pr-audit-2026-10-10/report.md](../../reports/pre-pr-audit-2026-10-10/report.md) lists blockers and lower-severity defects across runtime, generator, tests, release tooling, packaging, and docs.
+The [audit report][audit] lists blockers and lower-severity defects.
+It covers the runtime, generator, tests, release tools, packaging, and documentation.
+
+[audit]: ../../reports/pre-pr-audit-2026-10-10/report.md
 
 Validation in this session executed the evidence corpus and produced a finding ledger at [reports/pre-pr-audit-2026-10-10/validation.md](../../reports/pre-pr-audit-2026-10-10/validation.md).
 

@@ -205,7 +205,8 @@ def _md_cell(value: str) -> str:
 
 def _normalize_path_for_matching(path: str) -> str:
     """Strips dots from path-parameter placeholders (`{device.id}` -> `{deviceid}`)
-    so a raw-schema path and its generated-code path template compare equal."""
+    so a raw-schema path and its generated-code path template compare equal.
+    """
     return re.sub(r"\{([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\}", r"{\1\2}", path)
 
 
