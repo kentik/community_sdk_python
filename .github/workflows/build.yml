@@ -29,18 +29,25 @@ jobs:
           cd "$RUNNER_TEMP/sdist"
           uv run --locked --no-default-groups --group test pytest -q tests/
 
+      # Both installs read the built wheel from a hash-pinned requirements
+      # file, so they fail if the file changes after this step.
+      - name: Pin the built wheel by hash
+        run: |
+          wheel=$(realpath dist/*.whl)
+          echo "kentik-api @ file://$wheel --hash=sha256:$(sha256sum "$wheel" | cut -d' ' -f1)" > "$RUNNER_TEMP/wheel-requirements.txt"
+
       # A clean venv, run from outside the checkout, so a module the wheel
       # leaves out cannot be found in the dev environment or in src/.
       - name: Install the wheel with locked runtime dependencies
         run: |
           UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/wheel-locked" uv sync --locked --no-default-groups --no-install-project
-          uv pip install --python "$RUNNER_TEMP/wheel-locked/bin/python" --no-deps dist/*.whl
+          uv pip install --python "$RUNNER_TEMP/wheel-locked/bin/python" --no-deps -r "$RUNNER_TEMP/wheel-requirements.txt"
           uv pip check --python "$RUNNER_TEMP/wheel-locked/bin/python"
 
       - name: Install the wheel as a fresh consumer
         run: |
           uv venv "$RUNNER_TEMP/wheel-venv"
-          uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" dist/*.whl
+          uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" -r "$RUNNER_TEMP/wheel-requirements.txt"
 
       - name: Verify both wheel installations
         run: |

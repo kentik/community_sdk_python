@@ -551,6 +551,9 @@ until you do). A task must not set `envfile`: `.env` holds real credentials.
 - `uv run poe check-specs`: FR/SC/task cross-references in `specs/`
 - `uv run poe check-drift`: fails when the working tree differs from the
   commit. CI runs it after `generate`
+- `uv run poe export-requirements`: rewrites `requirements.txt` from `uv.lock` (runtime
+  dependencies with hashes, no project). `uv run poe check-requirements` fails when the file
+  is stale, and CI runs it. Commit the file with every `uv.lock` change.
 - `uv run poe audit`: `uv audit` of the locked dependencies
 - `uv run poe clean`: removes `src/kentik_api/gen/`, `docs/build/`,
   generated `docs/sphinx/services/*.md`, and every `__pycache__` outside

@@ -249,6 +249,14 @@ script = "scripts.tasks:check_drift"
 help = "Audit locked dependencies for known vulnerabilities (uv preview feature)"
 cmd = "uv audit --preview-features audit-command"
 
+[tool.poe.tasks.export-requirements]
+help = "Write requirements.txt: the locked runtime dependencies with hashes"
+cmd = "uv export --locked --no-dev --no-emit-project --hashes --output-file requirements.txt"
+
+[tool.poe.tasks.check-requirements]
+help = "Fail when requirements.txt does not match uv.lock"
+sequence = ["export-requirements", { cmd = "git diff --exit-code -- requirements.txt" }]
+
 [tool.ruff]
 # Spec Kit owns these paths and rewrites them on every upgrade.
 extend-exclude = [".specify", ".claude/skills", ".github/skills"]

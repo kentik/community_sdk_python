@@ -21,6 +21,14 @@ In a uv project, use this command instead:
 uv add kentik-api
 ```
 
+From a source checkout, `requirements.txt` pins every runtime dependency by version and hash.
+Install the dependencies first. Then install the SDK without dependencies:
+
+```bash
+pip install --require-hashes -r requirements.txt
+pip install --no-deps .
+```
+
 ## Configure credentials
 
 Create `.env` at your project root:
