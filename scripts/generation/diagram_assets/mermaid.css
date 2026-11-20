@@ -1,0 +1,27 @@
+/* Mermaid parts painted with the page-theme tokens, so a diagram follows the
+   dark mode. :is(svg, #kx-mermaid) lifts each rule above the id-scoped rules
+   that Mermaid writes, and inline styles from sequence-steps.js still win. */
+/* The Sphinx theme inverts Mermaid diagrams in dark mode; the tokens already do that job. */
+html[data-theme="dark"] .mermaid > svg:is(svg, #kx-mermaid) { filter: none; }
+.mermaid svg:is(svg, #kx-mermaid) .messageText,
+.mermaid svg:is(svg, #kx-mermaid) .labelText,
+.mermaid svg:is(svg, #kx-mermaid) text.actor { fill: var(--neu-text); stroke: none; }
+.mermaid svg:is(svg, #kx-mermaid) text.actor > tspan { fill: inherit; }
+.mermaid svg:is(svg, #kx-mermaid) .loopText,
+.mermaid svg:is(svg, #kx-mermaid) .sectionTitle { fill: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) rect.actor,
+.mermaid svg:is(svg, #kx-mermaid) .labelBox { fill: var(--neu-fill); stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-man :is(circle, rect) { fill: var(--neu-fill); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-man :is(circle, rect, line, path) { stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-line { stroke: var(--line-strong); }
+.mermaid svg:is(svg, #kx-mermaid) :is(.messageLine0, .messageLine1) { stroke: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) [id$="arrowhead"] path { fill: var(--muted); stroke: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) .loopLine { stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) rect.note { fill: var(--yellow-pale); stroke: var(--yellow-border); }
+.mermaid svg:is(svg, #kx-mermaid) .noteText,
+.mermaid svg:is(svg, #kx-mermaid) .noteText > tspan { fill: var(--yellow-text); }
+.mermaid svg:is(svg, #kx-mermaid) .node :is(rect, path, polygon) { fill: var(--neu-fill); stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .node :is(.nodeLabel, .nodeLabel p, text) { color: var(--neu-text); fill: var(--neu-text); }
+.mermaid svg:is(svg, #kx-mermaid) .relation { stroke: var(--wire); }
+.mermaid svg:is(svg, #kx-mermaid) :is(.edgeLabel, .edgeLabel p, .labelBkg) { color: var(--muted); background-color: var(--surface); }
+.mermaid svg:is(svg, #kx-mermaid) .edgeLabel rect { fill: var(--surface); }

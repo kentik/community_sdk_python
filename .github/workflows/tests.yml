@@ -1,38 +1,195 @@
 name: tests
 
-# Run only when called from another workflow
 on:
-  workflow_call:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: [main]
+
+# Each check runs a poe task, the same command a contributor runs. The only
+# other steps are `uv sync` and checkout setup.
+# No job here runs tests/e2e/: those need real credentials and stay opt-in
+# (`uv run poe test-e2e`, `uv run poe test-e2e-grpc`). pytest's default `-m` excludes them.
 
 jobs:
-  # Static Analysis of the SDK and its code
-  # Stuff like linters, etc.
-  code-tests:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
-
+        os: [ubuntu-latest]
+        python-version: ["3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.12"
     steps:
-      - name: (HELPER) Checkout Code
-        uses: actions/checkout@v3
-      - name: Prepare python env
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
-          python-version: ${{ matrix.version }}
-          architecture: x64
+          python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          set -xe
-          python3 -VV
-          python3 -m site
-          python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade -r requirements.txt
-          python3 -m pip install --upgrade -r requirements-dev.txt
-          python3 setup.py grpc_stubs
-      - name: Check formatting
-        run: python3 setup.py format
-      - name: Run mypy
-        run: python3 setup.py mypy
-      - name: Run unit tests
-        run: python3 setup.py pytest
+        run: uv sync --locked
+
+      - name: Run tests
+        run: uv run poe test
+
+  typecheck:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Type-check
+        run: uv run poe typecheck
+
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Ruff lint and format, rumdl Markdown rules
+        run: uv run poe lint-check
+
+  spec-references:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Check FR/SC/task cross-references
+        run: uv run poe check-specs
+
+  requirements:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Check requirements.txt matches uv.lock
+        run: uv run poe check-requirements
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Audit locked dependencies for known vulnerabilities
+        run: uv run poe audit
+
+  # A pull request that can break callers must say so in CHANGELOG.md. The
+  # baseline is the merge base, so only this pull request's changes count.
+  changelog:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Fail if CHANGELOG.md misses a breaking API surface change
+        shell: bash
+        run: uv run poe check-changelog --since "$(git merge-base HEAD origin/${{ github.base_ref }})"
+
+  # Regenerates at the schema commit in schema.lock, so upstream drift cannot
+  # fail it. The scheduled schema-sync workflow moves that pin. It runs on all
+  # three OSs: a path, line ending, or encoding difference shows up as drift.
+  generated-output-matches-schema-pin:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Regenerate the SDK at the pinned schema commit
+        run: uv run poe generate
+
+      # Uses git status --porcelain, so a newly generated untracked file counts too.
+      - name: Fail if generated output differs from what is committed
+        run: uv run poe check-drift
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      # Builds from the committed tree, so a docs failure is never masked by
+      # regeneration; the generated-output-matches-schema-pin job already covers
+      # stale generated pages.
+      - name: Build Sphinx docs, failing on any warning
+        run: uv run poe docs-build

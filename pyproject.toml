@@ -1,136 +1,326 @@
-[build-system]
-requires = ["setuptools>=42", "wheel", "setuptools-git-versioning"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "kentik-api"
-description ="Kentik API SDK"
-authors = [
-    {name = "Martin Machacek", email = "martin.machacek@kentik.com"},
-]
-readme = "README.md"
-requires-python = ">=3.8,<4"
-classifiers = [
-    "License :: OSI Approved :: Apache Software License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-]
 dynamic = ["version"]
+description = "The modern Python SDK for the Kentik API v6"
+readme = "README.pypi.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Alex DeAraujo", email = "adearaujo@kentik.com" }
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+
+keywords = ["kentik", "api", "sdk", "networking", "observability"]
+
 dependencies = [
-        "dacite==1.6.0",
-        "requests[socks]>=2.28.1",
-        "typing-extensions==4.3.0",
-        "urllib3==1.26.12",
-        "protobuf==4.22.0",
-        "grpcio==1.51.3",
-        "googleapis-common-protos==1.58.0",
-        "protoc-gen-openapiv2==0.0.1",
+    "python-dotenv>=1.2.4",
+    "googleapis-common-protos>=1.73.1",
+    "grpcio>=1.85.3",
+    "protobuf>=7.35.1,<8",
+    "httpx>=0.28.1,<1",
+    "pydantic>=2.14.0",
 ]
 
 [project.optional-dependencies]
 analytics = [
-    "pandas>=1.5.0",
-    "pyyaml>=6.0",
-    "fastparquet>=0.8.3"
+    "pandas>=2.3",
+    "pyarrow>=21",
+    "pyyaml>=6.0.2",
 ]
+
+[project.urls]
+Homepage = "https://github.com/kentik/community_sdk_python"
+Documentation = "https://github.com/kentik/community_sdk_python/tree/main/docs"
+Repository = "https://github.com/kentik/community_sdk_python"
+"Issue Tracker" = "https://github.com/kentik/community_sdk_python/issues"
+"Changelog" = "https://github.com/kentik/community_sdk_python/releases"
+
+[build-system]
+requires = ["hatchling>=1.27.0", "hatch-vcs>=0.4.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/kentik_api",
+    "/tests/runtime",
+    "/tests/analytics",
+    "/uv.lock",
+    "/README.md",
+    "/README.pypi.md",
+    "/LICENSE",
+    "/CHANGELOG.md",
+    "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kentik_api"]
+
+[dependency-groups]
 dev = [
-    "black==22.8.0",
-    "isort==5.10.1",
-    "flake8==5.0.4",
-    "GitPython==3.1.27",
-    "grpcio-tools==1.51.3",
-    "mypy==0.971",
-    "mypy-extensions==0.4.3",
-    "pylint==2.15.3",
-    "types-protobuf==4.22.0",
-    "types-PyYAML==6.0.0",
-    "types-requests==2.28.1",
+    {include-group = "test"},
+    {include-group = "docs"},
+    "grpcio-tools==1.85.3",
+    "types-protobuf>=6.30.0",
+    "ty>=0.0.84",
+    "ruff==0.17.6",
+    "openapi-python-generator==2.1.2",
+    "packaging>=24",
+    "rumdl==0.3.5",
+    "markdown-it-py>=4.2.0",
+    "poethepoet==0.49.0",
 ]
+
 test = [
-    "httpretty==1.1.4",
-    "pytest==7.1.3",
+    "pytest>=9.0.2",
+    "respx>=0.22.0",
+    "jinja2>=3.1.6",
+    "httpcore>=1.0.9",
+    # tests/analytics/ needs the extra, and must never skip for lack of it.
+    "kentik-api[analytics]",
 ]
 
-[tool.setuptools.packages.find]
-exclude = [
-    "examples*",
-    "tests*",
-    "docs*",
+docs = [
+    "autodoc-pydantic>=2.2.0",
+    "myst-parser>=5.1.0",
+    "sphinx>=9.1.0",
+    "sphinx-book-theme>=1.1.0",
+    "sphinxcontrib-mermaid>=1.0.0",
+]
+build = [
+    "hatch-vcs>=0.4.0",
+    "hatchling>=1.27.0",
 ]
 
-[tool.setuptools-git-versioning]
-enabled = true
+# Run tasks as `uv run poe <task>`; bare `uv run poe` lists them.
+# No task may set `envfile`: .env holds real credentials (tests/smoke/test_task_runner.py).
+[tool.poe.env]
+# The generator prints emoji, which a redirected Windows console cannot encode otherwise.
+PYTHONUTF8 = "1"
 
-[tool.black]
-line-length = 120
-exclude = "generated"
-target-version = ['py39']
+[tool.poe.tasks.all]
+help = "Generate the SDK, then run the mocked test suite (docs are opt-in: poe docs)"
+sequence = ["generate", "test"]
 
-[tool.isort]
-line_length = 120
-skip = "generated"
-profile = "black"
-
-[tool.mypy]
-python_version = "3.10"
-ignore_missing_imports = true
-exclude = "(generated|build)/"
-follow_imports = 'skip'
-
-[tool.pytest.ini_options]
-testpaths = ["tests/integration", "tests/unit"]
-
-[tool.pylint.master]
-fail-under=8.5
-
-# allow single-letter names
-variable-rgx="[a-z_][a-z0-9_]{0,30}$"
-argument-rgx="[a-z_][a-z0-9_]{0,30}$"
-attr-rgx="[a-z_][a-z0-9_]{0,30}$"
-class-attribute-rgx="([A-Za-z_][A-Za-z0-9_]{0,30}|(__.*__))$"
-
-# don't consider import sections nor method signatures as duplicates
-ignore-imports=true
-ignore-signatures=true
-
-# SDK provides dataclasses with multiple attributes and multiple constructor arguments and this should not be reported
-max-attributes = 30
-max-args = 30
-
-# disable typecheck for protobuf dynamic classes (no-member errors)
-[tool.pylint.typecheck]
-ignored-classes="Test"
-
-[tool.pylint.message_control]
-max-line-length = 120
-disable = [
-    "missing-module-docstring",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "raw-checker-failed",
-    "bad-inline-option",
-    "locally-disabled",
-    "file-ignored",
-    "suppressed-message",
-    "useless-suppression",
-    "deprecated-pragma",
-    "use-symbolic-message-instead",
+[tool.poe.tasks.generate]
+help = "Generate the SDK, its docs pages, and the API records"
+# Each option is quoted inside its expansion, so a path with a space stays one argument.
+cmd = """python scripts/generate_sdk.py
+  ${local:+--local-repo ../api-schema-public/}
+  ${local_repo:+--local-repo "${local_repo}"}
+  ${schema_ref:+--schema-ref "${schema_ref}"}"""
+args = [
+    { name = "local", type = "boolean", help = "Read the schema from the sibling ../api-schema-public/ checkout" },
+    { name = "local_repo", options = ["--local-repo"], help = "Read the schema from this local checkout" },
+    { name = "schema_ref", options = ["--schema-ref"], help = "Fetch the schema at this git ref instead of the schema.lock pin" },
 ]
 
-[flake8]
-max-line-length = 120
-extend-ignore = """
-    E203,
-    E402,
-    E501,
-    E712,
-    E741,
-    F401,
-    F403,
-    F405,
-    F541,
-"""
+[tool.poe.tasks.sync-schema]
+help = "Regenerate from upstream schema HEAD and move the pin in schema.lock"
+cmd = "python scripts/generate_sdk.py --schema-ref HEAD"
+
+[tool.poe.tasks.docs]
+help = "Regenerate the SDK, then build the HTML docs"
+sequence = ["generate", "docs-build"]
+
+[tool.poe.tasks.docs-build]
+help = "Build the HTML docs from the committed tree, failing on any warning"
+cmd = "sphinx-build -W --keep-going -b html docs/sphinx docs/build/html"
+
+[tool.poe.tasks.test]
+help = "Run the mocked test suite"
+cmd = "pytest -vv -s -rA tests/"
+
+[tool.poe.tasks.test-generated]
+help = "Run the generated wrapper contract tests only"
+cmd = "pytest -vv -s -rA tests/generated/"
+
+[tool.poe.tasks.test-runtime]
+help = "Run the shared runtime tests only"
+cmd = "pytest -vv -s -rA tests/runtime/"
+
+[tool.poe.tasks.test-smoke]
+help = "Run the smoke tests only"
+cmd = "pytest -vv -s -rA tests/smoke/"
+
+[tool.poe.tasks.test-generator]
+help = "Run the generator (scripts/generation/) unit tests only"
+cmd = "pytest -vv -s -rA tests/generator/"
+
+[tool.poe.tasks.test-analytics]
+help = "Run the analytics extra tests only"
+cmd = "pytest -vv -s -rA tests/analytics/"
+
+[tool.poe.tasks.test-e2e]
+help = "Run end-to-end tests against the REAL Kentik API (opt-in, needs .env)"
+cmd = "pytest -vv -s -rA -m e2e --run-live-e2e tests/e2e/"
+
+[tool.poe.tasks.test-e2e-grpc]
+help = "Run end-to-end gRPC-transport tests against the REAL Kentik API (opt-in, needs .env)"
+cmd = "pytest -vv -s -rA -m e2e_grpc --run-live-e2e tests/e2e/"
+
+[tool.poe.tasks.test-e2e-mutating]
+help = "Create, update, and delete disposable TEST objects in the REAL Kentik account (opt-in, needs .env)"
+cmd = "pytest -vv -s -rA -m e2e_mutating --run-live-e2e tests/e2e/"
+
+[tool.poe.tasks.e2e-cleanup]
+help = "List the e2e TEST objects still in the real account; --delete removes them"
+cmd = "python tests/e2e/ledger.py ${delete:+--delete}"
+args = [{ name = "delete", type = "boolean", help = "Delete the listed objects" }]
+
+[tool.poe.tasks.lint]
+help = "Fix and format Python with Ruff, and Markdown with rumdl"
+sequence = [
+    { cmd = "ruff check --fix ." },
+    { cmd = "ruff format ." },
+    { cmd = "rumdl check --fix ." },
+]
+
+[tool.poe.tasks.lint-check]
+help = "Check Python and Markdown without changing files (the CI form of lint)"
+sequence = [
+    { cmd = "ruff check --output-format github ." },
+    { cmd = "ruff format --check --output-format github ." },
+    { cmd = "rumdl check --output-format github ." },
+]
+ignore_fail = "return_non_zero"
+
+[tool.poe.tasks.typecheck]
+help = "Type-check the SDK (generated code included), scripts, and tests with ty"
+cmd = "ty check"
+
+[tool.poe.tasks.check-specs]
+help = "Validate FR/SC/task cross-references in specs/"
+cmd = "python scripts/check_spec_refs.py"
+
+[tool.poe.tasks.release-notes]
+help = "Render release notes from api_surface.json (default since: the previous release tag)"
+cmd = """python scripts/release_notes.py
+  ${since:+--since "${since}"}
+  ${out:+-o "${out}"}"""
+args = [
+    { name = "since", help = "Compare against this git ref" },
+    { name = "out", help = "Write to this file instead of standard output" },
+]
+
+[tool.poe.tasks.check-changelog]
+help = "Fail if CHANGELOG.md misses a breaking surface change (default since: the previous release tag)"
+cmd = """python scripts/release_notes.py --check-changelog
+  ${since:+--since "${since}"}"""
+args = [{ name = "since", help = "Compare against this git ref" }]
+
+[tool.poe.tasks.impact-report]
+help = "Report what the last regeneration changed (default since: HEAD)"
+cmd = """python scripts/impact_report.py
+  ${since:+--since "${since}"}
+  ${no_checks:+--no-checks}
+  ${out:+-o "${out}"}"""
+args = [
+    { name = "since", help = "Compare against this git ref" },
+    { name = "no_checks", options = ["--no-checks"], type = "boolean", help = "Skip running the checks" },
+    { name = "out", help = "Write the report to this file" },
+]
+
+[tool.poe.tasks.clean]
+help = "Remove the generated SDK, the docs build, and every __pycache__"
+script = "scripts.tasks:clean"
+
+[tool.poe.tasks.deep-clean]
+help = "Run clean, then remove .venv and the pytest and Ruff caches (uv.lock is kept)"
+script = "scripts.tasks:deep_clean"
+
+[tool.poe.tasks.check-drift]
+help = "Fail when the working tree differs from the commit, naming each path"
+script = "scripts.tasks:check_drift"
+
+[tool.poe.tasks.audit]
+help = "Audit locked dependencies for known vulnerabilities (uv preview feature)"
+cmd = "uv audit --preview-features audit-command"
+
+[tool.poe.tasks.export-requirements]
+help = "Write requirements.txt: the locked runtime dependencies with hashes"
+cmd = "uv export --locked --no-dev --no-emit-project --hashes --output-file requirements.txt"
+
+[tool.poe.tasks.check-requirements]
+help = "Fail when requirements.txt does not match uv.lock"
+sequence = ["export-requirements", { cmd = "git diff --exit-code -- requirements.txt" }]
+
+[tool.ruff]
+# Spec Kit owns these paths and rewrites them on every upgrade.
+extend-exclude = [".specify", ".claude/skills", ".github/skills"]
+
+[tool.ruff.format]
+# Windows writes CRLF by default; the drift check compares bytes.
+line-ending = "lf"
+
+[tool.ruff.lint]
+# The 0.17 default set keeps only E722 and E902 of these; the rest stay enforced.
+extend-select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+# Generated code keeps the E and F rules only; fixes belong in the generator, not here.
+# "I" stays on for gen/: the generator sorts its imports with `ruff check --select F,I`.
+"src/kentik_api/gen/**" = [
+    "ASYNC", "B", "BLE", "C4", "D", "DTZ", "EXE", "FA", "FLY", "FURB", "G",
+    "INT", "ISC", "LOG", "N", "PERF", "PGH", "PIE", "PL", "PT", "PTH", "PYI",
+    "RET", "RUF", "S", "SIM", "T10", "T20", "TC", "TRY", "UP", "W", "YTT",
+]
+"src/kentik_api/client_mixin.py" = [
+    "ASYNC", "B", "BLE", "C4", "D", "DTZ", "EXE", "FA", "FLY", "FURB", "G", "I",
+    "INT", "ISC", "LOG", "N", "PERF", "PGH", "PIE", "PL", "PT", "PTH", "PYI",
+    "RET", "RUF", "S", "SIM", "T10", "T20", "TC", "TRY", "UP", "W", "YTT",
+]
+# protoc emits dependency imports that look unused but register those protos in
+# the descriptor pool. Deleting them breaks AddSerializedFile at import time.
+# They also sit below module-level statements, which is protoc's layout, not ours.
+"src/kentik_api/gen/*/pb/*.py" = ["F401", "E402"]
+"src/kentik_api/gen/pb_companions/**/*.py" = ["F401", "E402"]
+# Records whatever a live call raises as audit evidence, so it catches everything on purpose.
+"reports/pre-pr-audit-2026-10-10/run_manual_spot_check.py" = ["BLE001"]
+
+[tool.pytest]
+pythonpath = ["."]
+strict = true
+markers = [
+    "e2e: end-to-end tests against the real Kentik API (REST transport). Opt-in only: excluded by default, run with `uv run poe test-e2e` or `-m e2e --run-live-e2e`. Requires real KENTIK_EMAIL/KENTIK_API_TOKEN in a project-root .env.",
+    "e2e_grpc: end-to-end tests against the real Kentik API (gRPC transport). Opt-in only: excluded by default, run with `uv run poe test-e2e-grpc` or `-m e2e_grpc --run-live-e2e`. Requires real KENTIK_EMAIL/KENTIK_API_TOKEN in a project-root .env.",
+    "e2e_mutating: end-to-end tests that WRITE to the real Kentik account, on disposable data with cleanup. Never part of `uv run poe test-e2e`: run with `-m e2e_mutating --run-live-e2e`.",
+]
+addopts = ["-m", "not e2e and not e2e_grpc and not e2e_mutating"]
+
+[tool.ty.src]
+# Spec Kit's vendored scripts: upstream code that `specify` rewrites on upgrade.
+exclude = [".specify"]
+
+[tool.ty.environment]
+# Direct scripts import generator phases and the live probes import the e2e ledger.
+extra-paths = ["scripts", "tests/e2e"]
+
+[[tool.ty.overrides]]
+include = ["src/kentik_api/gen/**/*.pyi"]
+
+[tool.ty.overrides.rules]
+conflicting-metaclass = "ignore"
+# protoc declares extension fields as module-level ClassVar.
+invalid-type-form = "ignore"
+
+[[tool.ty.overrides]]
+# protoc's EXPERIMENTAL static helpers use grpc.experimental without importing
+# it. The SDK calls stubs through channels and never uses those helpers.
+include = ["src/kentik_api/gen/**/*_pb2_grpc.py"]
+
+[tool.ty.overrides.rules]
+possibly-missing-submodule = "ignore"

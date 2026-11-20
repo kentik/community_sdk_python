@@ -1,0 +1,14 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class v202505AlertAcknowledgement(str, Enum):
+    ALERT_ACKNOWLEDGEMENT_UNSPECIFIED = "ALERT_ACKNOWLEDGEMENT_UNSPECIFIED"
+
+    ALERT_ACKNOWLEDGEMENT_REQUIRED = "ALERT_ACKNOWLEDGEMENT_REQUIRED"
+
+    ALERT_ACKNOWLEDGEMENT_DONE = "ALERT_ACKNOWLEDGEMENT_DONE"
+
+    ALERT_ACKNOWLEDGEMENT_NOT_ACKED = "ALERT_ACKNOWLEDGEMENT_NOT_ACKED"

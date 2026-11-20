@@ -1,0 +1,40 @@
+# A 1.x DataQueryDefinition. The query strings hold {start} and {end}.
+query:
+  queries:
+    - bucket: Left +Y Axis
+      query:
+        metric: bytes
+        dimension: [Proto]
+        device_name: router1
+        topx: 8
+        depth: 25
+        lookback_seconds: 0
+        starting_time: "{start:%Y-%m-%d %H:%M}"
+        ending_time: "{end:%Y-%m-%d %H:%M}"
+    - bucket: Top
+      query:
+        metric: bytes
+        dimension: [Proto]
+        device_name: router1
+        topx: 8
+        depth: 25
+        lookback_seconds: 0
+        starting_time: "{start:%Y-%m-%d %H:%M}"
+        ending_time: "{end:%Y-%m-%d %H:%M}"
+mappings:
+  Left +Y Axis:
+    ts:
+      source: "@TS.both_bits_per_sec.timestamp"
+      index: true
+    protocol:
+      source: "{i_protocol_name}"
+    bps:
+      source: "@TS.both_bits_per_sec.value"
+      type: float64
+  Top:
+    protocol:
+      source: "{i_protocol_name}"
+      index: true
+    avg_bps:
+      source: "{avg_bits_per_sec}"
+      type: float64

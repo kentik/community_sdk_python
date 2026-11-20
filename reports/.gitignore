@@ -1,0 +1,28 @@
+# Reports describe one working tree at one moment, so nothing is tracked by
+# default. The pre-PR audit's written record is the one exception.
+*
+!.gitignore
+!kentik-api-team-findings.md
+!kentik-api-team-findings.html
+!upstream/
+!upstream/**
+!pre-pr-audit-2026-10-10/
+pre-pr-audit-2026-10-10/*
+!pre-pr-audit-2026-10-10/report.md
+!pre-pr-audit-2026-10-10/report.html
+!pre-pr-audit-2026-10-10/validation.md
+!pre-pr-audit-2026-10-10/deferred-risks.md
+!pre-pr-audit-2026-10-10/manual-spot-checks.md
+!pre-pr-audit-2026-10-10/run_manual_spot_check.py
+!assets/
+!assets/*.svg
+!assets/*.js
+!assets/*.css
+!scripts/
+!scripts/**
+!archive/
+archive/*
+!archive/upstream-jira-drafts.md
+!archive/upstream-rest-update-body-merge.html
+!archive/upstream-alert-list-requirements.html
+!archive/upstream-alert-list-requirements.md

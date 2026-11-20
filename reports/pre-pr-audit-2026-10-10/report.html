@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* House page theme. This file is the single source of every color token:
+   diagram_kit.py reads the hex values from it for static SVG files. The
+   dark block appears twice so that an explicit data-theme beats the OS. */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --sunk: #e9edf2; --fg: #1c222a; --muted: #57616d;
+  --line: #d4dae1; --line-strong: #a9b3be; --accent: #5f3dc4; --accent-soft: #efeaff;
+  --ok: #2b8a3e; --ok-soft: #e3f6e7; --warn: #b35900; --warn-soft: #fff1dc; --crit: #c92a2a; --crit-soft: #ffe7e7;
+  --wire: #77818c; --wire-hi: #1c222a;
+  --blue-strong: #a5d8ff; --blue-pale: #e7f5ff; --blue-border: #1971c2; --blue-text: #1864ab;
+  --violet-strong: #d0bfff; --violet-pale: #f3f0ff; --violet-border: #7048e8; --violet-text: #5f3dc4;
+  --green-strong: #b2f2bb; --green-pale: #ebfbee; --green-border: #2f9e44; --green-text: #2b8a3e;
+  --orange-strong: #ffd8a8; --orange-pale: #fff4e6; --orange-border: #e8590c; --orange-text: #d9480f;
+  --red-strong: #ffc9c9; --red-pale: #fff5f5; --red-border: #e03131; --red-text: #c92a2a;
+  --cyan-strong: #99e9f2; --cyan-pale: #e3fafc; --cyan-border: #1098ad; --cyan-text: #0b7285;
+  --yellow-strong: #ffec99; --yellow-pale: #fff9db; --yellow-border: #f08c00; --yellow-text: #a35a00;
+  --neu-fill: #f8f9fa; --neu-border: #495057; --neu-text: #212529; --cont-fill: #fafbfc;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151a; --surface: #181d24; --sunk: #1f262e; --fg: #e5e9ee; --muted: #9ba5b1;
+    --line: #2b333d; --line-strong: #4a5562; --accent: #b197fc; --accent-soft: #261f42;
+    --ok: #69db7c; --ok-soft: #15301c; --warn: #ffa94d; --warn-soft: #3a2610; --crit: #ff8787; --crit-soft: #3a1818;
+    --wire: #8792a0; --wire-hi: #f1f3f5;
+    --blue-strong: #1b4a73; --blue-pale: #102a40; --blue-border: #4dabf7; --blue-text: #d0ebff;
+    --violet-strong: #43307f; --violet-pale: #251c45; --violet-border: #9775fa; --violet-text: #e5dbff;
+    --green-strong: #1e5a2c; --green-pale: #12301a; --green-border: #51cf66; --green-text: #d3f9d8;
+    --orange-strong: #6a3a14; --orange-pale: #3b220e; --orange-border: #ff922b; --orange-text: #ffe8cc;
+    --red-strong: #6b2222; --red-pale: #3a1616; --red-border: #ff6b6b; --red-text: #ffe3e3;
+    --cyan-strong: #0d5560; --cyan-pale: #0a3036; --cyan-border: #22b8cf; --cyan-text: #c5f6fa;
+    --yellow-strong: #5c4600; --yellow-pale: #332800; --yellow-border: #fcc419; --yellow-text: #fff3bf;
+    --neu-fill: #222a33; --neu-border: #adb5bd; --neu-text: #e9ecef; --cont-fill: #151a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151a; --surface: #181d24; --sunk: #1f262e; --fg: #e5e9ee; --muted: #9ba5b1;
+  --line: #2b333d; --line-strong: #4a5562; --accent: #b197fc; --accent-soft: #261f42;
+  --ok: #69db7c; --ok-soft: #15301c; --warn: #ffa94d; --warn-soft: #3a2610; --crit: #ff8787; --crit-soft: #3a1818;
+  --wire: #8792a0; --wire-hi: #f1f3f5;
+  --blue-strong: #1b4a73; --blue-pale: #102a40; --blue-border: #4dabf7; --blue-text: #d0ebff;
+  --violet-strong: #43307f; --violet-pale: #251c45; --violet-border: #9775fa; --violet-text: #e5dbff;
+  --green-strong: #1e5a2c; --green-pale: #12301a; --green-border: #51cf66; --green-text: #d3f9d8;
+  --orange-strong: #6a3a14; --orange-pale: #3b220e; --orange-border: #ff922b; --orange-text: #ffe8cc;
+  --red-strong: #6b2222; --red-pale: #3a1616; --red-border: #ff6b6b; --red-text: #ffe3e3;
+  --cyan-strong: #0d5560; --cyan-pale: #0a3036; --cyan-border: #22b8cf; --cyan-text: #c5f6fa;
+  --yellow-strong: #5c4600; --yellow-pale: #332800; --yellow-border: #fcc419; --yellow-text: #fff3bf;
+  --neu-fill: #222a33; --neu-border: #adb5bd; --neu-text: #e9ecef; --cont-fill: #151a20;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 400 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1240px; margin: 0 auto; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--sunk); padding: 0.1em 0.35em; border-radius: 5px; overflow-wrap: anywhere; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 750; font-stretch: 88%; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+h4 { margin: 0 0 6px; font: 600 0.72rem/1.3 var(--body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+p { margin: 0; max-width: 68ch; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* masthead */
+.masthead { padding-block: 40px 28px; display: grid; gap: 18px; }
+.eyebrow { font: 600 0.78rem/1.4 var(--mono); letter-spacing: 0.04em; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.2rem, 5.6vw, 4rem); font-weight: 800; font-stretch: 78%; line-height: 1.02; letter-spacing: -0.02em; }
+.masthead h1 span { color: var(--accent); }
+.lede { font-size: 1.12rem; color: var(--fg); max-width: 70ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 500 0.82rem/1.4 var(--mono); color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 700; }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.figures div { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px; }
+.figures strong { font: 750 1.7rem/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.figures span { font-size: 0.84rem; color: var(--muted); }
+
+/* progress per phase */
+.phases { display: grid; gap: 6px; margin-top: 4px; }
+.phase { display: grid; grid-template-columns: minmax(0, 15rem) 1fr 4.5rem; gap: 12px; align-items: center; font-size: 0.88rem; }
+.phase .name { min-width: 0; overflow-wrap: anywhere; }
+.track { height: 10px; border-radius: 6px; background: var(--sunk); overflow: hidden; display: flex; }
+.track i { display: block; height: 100%; background: var(--fg); }
+.track i.open { background: var(--warn); }
+.phase .n { font: 600 0.8rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* sticky section nav */
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 10px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
+nav.toc a { display: block; white-space: nowrap; padding: 6px 12px; border-radius: 999px; color: var(--fg); text-decoration: none; font: 500 0.86rem var(--body); }
+nav.toc a:hover { background: var(--sunk); }
+
+section { padding-block: 36px 8px; display: grid; gap: 16px; scroll-margin-top: 64px; }
+.intro { display: grid; gap: 8px; }
+.intro p { color: var(--muted); }
+
+/* chips: toggles and filters, pressed state in aria-pressed */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 0.84rem/1 var(--body); border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 13px; background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip:hover { border-color: var(--fg); }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+
+/* a diagram scrolls inside its own box, so the page never scrolls sideways */
+figure { margin: 0; display: grid; gap: 10px; }
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.diagram svg { display: block; width: 100%; height: auto; min-width: 960px; }
+.diagram.narrow svg { min-width: 720px; }
+figcaption { font-size: 0.88rem; color: var(--muted); max-width: 80ch; }
+
+/* detail card under an explorer diagram */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; display: grid; gap: 14px; }
+.detail .head { display: grid; gap: 2px; }
+.detail .role { color: var(--muted); }
+.detail .cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px 28px; }
+.detail ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.detail .rel { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.rel button { font: 500 0.82rem/1.2 var(--body); border: 1px solid var(--line-strong); background: var(--sunk); color: var(--fg); border-radius: 8px; padding: 5px 9px; cursor: pointer; text-align: left; }
+.rel button span { display: block; font: 400 0.74rem var(--mono); color: var(--muted); }
+.none { font-size: 0.86rem; color: var(--muted); }
+.stops { border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 10px 14px; border-radius: 0 10px 10px 0; }
+.stops p { max-width: none; }
+.evidence { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); max-width: none; overflow-wrap: anywhere; }
+.evidence b { color: var(--fg); }
+.setting { font: 400 0.84rem/1.5 var(--mono); background: var(--sunk); padding: 10px 12px; border-radius: 10px; overflow-wrap: anywhere; }
+
+/* tile board: select a tile, read its detail in the box under it */
+.board { display: grid; gap: 10px; }
+.band { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.band > .label { font: 600 0.84rem/1.3 var(--body); color: var(--muted); padding-top: 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+.tile { text-align: left; font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: grid; gap: 6px; }
+.tile:hover { border-color: var(--line-strong); }
+.tile[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.tile b { font-weight: 600; font-size: 0.92rem; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font: 600 0.7rem/1 var(--mono); padding: 4px 6px; border-radius: 6px; background: var(--sunk); color: var(--muted); }
+.tag.blue { background: var(--blue-pale); color: var(--blue-text); border: 1px solid var(--blue-border); }
+.tag.violet { background: var(--violet-pale); color: var(--violet-text); border: 1px solid var(--violet-border); }
+.tag.green { background: var(--green-pale); color: var(--green-text); border: 1px solid var(--green-border); }
+.tag.orange { background: var(--orange-pale); color: var(--orange-text); border: 1px solid var(--orange-border); }
+.tag.red { background: var(--red-pale); color: var(--red-text); border: 1px solid var(--red-border); }
+.tag.cyan { background: var(--cyan-pale); color: var(--cyan-text); border: 1px solid var(--cyan-border); }
+.tag.yellow { background: var(--yellow-pale); color: var(--yellow-text); border: 1px solid var(--yellow-border); }
+.tag.neutral { background: var(--neu-fill); color: var(--neu-text); border: 1px solid var(--line-strong); }
+.query { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; }
+.query pre { margin: 0; font: 400 0.84rem/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; background: var(--sunk); padding: 10px 12px; border-radius: 10px; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.notes div { background: var(--sunk); border-radius: 12px; padding: 12px 14px; font-size: 0.9rem; }
+.notes b { display: block; font-family: var(--display); font-size: 1rem; margin-bottom: 2px; }
+
+/* tables and badges */
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+table { border-collapse: collapse; width: 100%; min-width: 820px; font-size: 0.9rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 0.72rem var(--body); text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); background: var(--sunk); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.badge { font: 700 0.7rem/1 var(--mono); padding: 4px 7px; border-radius: 6px; white-space: nowrap; background: var(--sunk); color: var(--muted); }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.crit { background: var(--crit-soft); color: var(--crit); }
+.badge.info { background: var(--blue-pale); color: var(--blue-text); border: 1px solid var(--blue-border); }
+.badge.outline { background: none; border: 1px solid var(--line-strong); font-weight: 600; }
+.examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+.example { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; }
+.example pre { margin: 0; font: 400 0.8rem/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* expandable cards with filter chips above them */
+.filters { display: grid; gap: 8px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.card summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; gap: 8px; }
+.card summary::-webkit-details-marker { display: none; }
+.card summary .name { font: 700 0.95rem var(--mono); overflow-wrap: anywhere; }
+.card .body { margin: 0; padding: 0 14px 14px; display: grid; gap: 6px; font-size: 0.86rem; }
+.card .body dt { font: 600 0.7rem var(--body); text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.card .body dd { margin: 0 0 4px; overflow-wrap: anywhere; }
+.card[open] { border-color: var(--line-strong); }
+.count { font-size: 0.86rem; color: var(--muted); }
+
+/* lessons, open tasks, lists */
+.lessons { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+.lesson .when { font: 600 0.74rem var(--mono); color: var(--muted); }
+.lesson .src { font: 400 0.76rem var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.tasks { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.task { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.task .id { font: 700 0.8rem var(--mono); color: var(--accent); }
+.task .due { font: 600 0.78rem var(--mono); color: var(--warn); }
+.lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.lists > div { background: var(--sunk); border-radius: 14px; padding: 14px 16px; }
+.lists ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 0.92rem; }
+
+/* idea box: something noted for later, not built */
+.idea { border: 2px dashed var(--accent); border-radius: 18px; padding: 22px; display: grid; gap: 16px; background: var(--accent-soft); }
+.idea .quote { font: 500 1.05rem/1.5 var(--body); border-left: 4px solid var(--accent); padding-left: 14px; max-width: 70ch; }
+.idea .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.idea .grid2 > div { background: var(--surface); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; }
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 0.84rem; color: var(--muted); }
+
+@media (max-width: 760px) {
+  .detail .cols { grid-template-columns: minmax(0, 1fr); }
+  .band { grid-template-columns: minmax(0, 1fr); }
+  .band > .label { padding-top: 0; }
+  .phase { grid-template-columns: minmax(0, 1fr) 4rem; }
+  .phase .track { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* House diagram style: the SVG parts and the explorer states. It reads the
+   color tokens of page-theme/assets/theme.css, so load that file first. */
+svg text { font-family: var(--mono); }
+.node rect { stroke-width: 2; transition: stroke-width .15s; }
+.node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.node .ft { font-size: 12px; text-anchor: middle; }
+.fam-blue.src rect { fill: var(--blue-strong); stroke: var(--blue-border); } .fam-blue.proc rect { fill: var(--blue-pale); stroke: var(--blue-border); } .fam-blue text { fill: var(--blue-text); }
+.fam-violet.src rect { fill: var(--violet-strong); stroke: var(--violet-border); } .fam-violet.proc rect { fill: var(--violet-pale); stroke: var(--violet-border); } .fam-violet text { fill: var(--violet-text); }
+.fam-green.src rect { fill: var(--green-strong); stroke: var(--green-border); } .fam-green.proc rect { fill: var(--green-pale); stroke: var(--green-border); } .fam-green text { fill: var(--green-text); }
+.fam-orange.src rect { fill: var(--orange-strong); stroke: var(--orange-border); } .fam-orange.proc rect { fill: var(--orange-pale); stroke: var(--orange-border); } .fam-orange text { fill: var(--orange-text); }
+.fam-red.src rect { fill: var(--red-strong); stroke: var(--red-border); } .fam-red.proc rect { fill: var(--red-pale); stroke: var(--red-border); } .fam-red text { fill: var(--red-text); }
+.fam-cyan.src rect { fill: var(--cyan-strong); stroke: var(--cyan-border); } .fam-cyan.proc rect { fill: var(--cyan-pale); stroke: var(--cyan-border); } .fam-cyan text { fill: var(--cyan-text); }
+.fam-yellow.src rect { fill: var(--yellow-strong); stroke: var(--yellow-border); } .fam-yellow.proc rect { fill: var(--yellow-pale); stroke: var(--yellow-border); } .fam-yellow text { fill: var(--yellow-text); }
+.fam-neutral rect { fill: var(--neu-fill); stroke: var(--neu-border); } .fam-neutral text { fill: var(--neu-text); }
+.planned rect { stroke-dasharray: 7 6; }
+.container rect { fill: var(--cont-fill); stroke: var(--line-strong); stroke-width: 1.5; }
+.clabel { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.wire { fill: none; stroke: var(--wire); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.elabel { font-size: 12px; fill: var(--muted); }
+.ah { fill: var(--wire); } .ah-hi { fill: var(--wire-hi); }
+.note { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.note.warn { fill: var(--warn); }
+.note.fam-blue { fill: var(--blue-border); } .note.fam-violet { fill: var(--violet-border); } .note.fam-green { fill: var(--green-border); }
+.note.fam-orange { fill: var(--orange-border); } .note.fam-red { fill: var(--red-border); } .note.fam-cyan { fill: var(--cyan-border); }
+.note.fam-yellow { fill: var(--yellow-border); } .note.fam-neutral { fill: var(--neu-border); }
+
+.explorer .node { cursor: pointer; }
+.explorer .node:focus { outline: none; }
+.explorer .node:focus-visible rect, .explorer .node.sel rect { stroke: var(--accent); stroke-width: 4; }
+.explorer .node, .explorer .edge { transition: opacity .2s; }
+.explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.edge.hi .wire, .edge.flow .wire { stroke: var(--wire-hi); stroke-width: 3; }
+.edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.edge.flow.access .wire, .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .edge.flow .wire { animation: none; stroke-dasharray: none; } * { transition: none !important; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: var(--muted); }
+.legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
+</style>
+<link rel="stylesheet" href="../assets/report-tabs.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Pre-PR audit · V6 SDK</div>
+    <h1>Validation gates and <span>blind spots</span></h1>
+    <p class="lede">The audit traced how gaps across generation, tests, and release checks could produce a false green result.</p>
+    <div class="meta"><span>Source <b><a href="#full-report">full report</a></b></span></div>
+  </header>
+<!-- report-tabs:start -->
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive diagram</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="report.md">report.md</a></div>
+<!-- report-tabs:end -->
+<div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
+  <section id="diagram" aria-label="Interactive report diagram">
+    <div class="intro"><h2>Explore the report</h2><p>Select a part to inspect its evidence and impact. Use the path controls to focus on one claim.</p></div>
+    <div class="chips" data-paths-for="audit-pipeline" aria-label="Diagram paths"></div>
+<figure>
+  <div class="diagram explorer"><svg id="audit-pipeline" viewBox="0 0 2150 280" role="group" aria-label="The pre-PR audit showed how weak generator, test, and changelog gates could produce a false green CI result." xmlns="http://www.w3.org/2000/svg"><defs><marker id="audit-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="audit-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="schema_generator" data-links="schema>generator"><path d="M200,136 H330" class="wire arrow" marker-end="url(#audit-ah)"/><text x="265.0" y="128" class="elabel" text-anchor="middle">schema input</text></g><g class="edge data" data-seg="generator_mock" data-links="generator>mock"><path d="M520,136 H650" class="wire arrow" marker-end="url(#audit-ah)"/><text x="585.0" y="128" class="elabel" text-anchor="middle">generated code</text></g><g class="edge data" data-seg="mock_e2e" data-links="mock>e2e"><path d="M840,136 H970" class="wire arrow" marker-end="url(#audit-ah)"/><text x="905.0" y="128" class="elabel" text-anchor="middle">test fixtures</text></g><g class="edge data" data-seg="e2e_surface" data-links="e2e>surface"><path d="M1160,136 H1290" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1225.0" y="128" class="elabel" text-anchor="middle">API record</text></g><g class="edge data" data-seg="surface_changelog" data-links="surface>changelog"><path d="M1490,136 H1620" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1555.0" y="128" class="elabel" text-anchor="middle">breaking changes</text></g><g class="edge data" data-seg="changelog_ci" data-links="changelog>ci"><path d="M1820,136 H1950" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1885.0" y="128" class="elabel" text-anchor="middle">gate result</text></g><g class="node fam-blue src " data-id="schema" tabindex="0" role="button" aria-label="Select Upstream schema"><rect x="10" y="100" width="190" height="72" rx="14"/><text x="105.0" y="132.5" class="nm">Upstream schema</text><text x="105.0" y="149.5" class="ft">pinned input</text></g><g class="node fam-blue proc " data-id="generator" tabindex="0" role="button" aria-label="Select Generator"><rect x="330" y="100" width="190" height="72" rx="14"/><text x="425.0" y="124.0" class="nm">Generator</text><text x="425.0" y="141.0" class="ft">protoc failures</text><text x="425.0" y="158.0" class="ft">must stop</text></g><g class="node fam-green proc " data-id="mock" tabindex="0" role="button" aria-label="Select Mocked tests"><rect x="650" y="100" width="190" height="72" rx="14"/><text x="745.0" y="124.0" class="nm">Mocked tests</text><text x="745.0" y="141.0" class="ft">model-shaped</text><text x="745.0" y="158.0" class="ft">fixtures</text></g><g class="node fam-green proc " data-id="e2e" tabindex="0" role="button" aria-label="Select Live e2e tests"><rect x="970" y="100" width="190" height="72" rx="14"/><text x="1065.0" y="124.0" class="nm">Live e2e</text><text x="1065.0" y="141.0" class="ft">wrong host</text><text x="1065.0" y="158.0" class="ft">false pass</text></g><g class="node fam-orange proc " data-id="surface" tabindex="0" role="button" aria-label="Select API surface record"><rect x="1290" y="100" width="200" height="72" rx="14"/><text x="1390.0" y="124.0" class="nm">API surface</text><text x="1390.0" y="141.0" class="ft">missing names</text><text x="1390.0" y="158.0" class="ft">and types</text></g><g class="node fam-orange proc " data-id="changelog" tabindex="0" role="button" aria-label="Select Changelog gate"><rect x="1620" y="100" width="200" height="72" rx="14"/><text x="1720.0" y="124.0" class="nm">Changelog gate</text><text x="1720.0" y="141.0" class="ft">substring</text><text x="1720.0" y="158.0" class="ft">match</text></g><g class="node fam-neutral hub " data-id="ci" tabindex="0" role="button" aria-label="Select CI result"><rect x="1950" y="100" width="180" height="72" rx="14"/><text x="2040.0" y="132.5" class="nm">CI</text><text x="2040.0" y="149.5" class="ft">false green</text></g></svg></div>
+  <figcaption>Historical audit chain from schema input through generation, tests, release checks, and CI.</figcaption>
+</figure>
+<div class="detail" data-detail-for="audit-pipeline" aria-live="polite"></div>
+  </section>
+  </div>
+<!-- report-markdown:start -->
+<div class="tabpanel" id="full-report" role="tabpanel" aria-labelledby="tab-full-report">
+<article class="markdown-body">
+<h1 id="md-pre-pr-audit-of-the-v6-sdk-branch">Pre-PR audit of the V6 SDK branch</h1>
+<p>This report lists the defects that an audit found on branch
+<code>FA-2-Update-the-python-SDK-from-V5-to-V6</code> at commit <code>6e76b43</code>, on
+2026-10-10. Nine parallel audits covered the hand-written runtime, the gRPC
+bridge, the generator, the generated code, the tests, packaging, CI, the
+release tooling, and the docs. The main session reproduced the most severe
+findings a second time.</p>
+<p>The audit made no call to the real Kentik API. It ran no e2e test (an
+end-to-end test against the real API) and did not read <code>.env</code>. It changed no
+tracked file and pushed nothing. The reproduction scripts are in
+<a href="evidence/"><code>evidence/</code></a>. Some of them expect the scratch layout that they ran
+in, so read them as records, not as ready tests.</p>
+<h2 id="md-summary">Summary</h2>
+<p>The baseline is green:</p>
+<ul>
+<li><code>uv run poe test</code> gave 2948 passed, 145 skipped, and 468 e2e deselected.</li>
+<li>Ruff lint, Ruff format, <code>ty</code>, <code>uv run poe check-specs</code>, and the Sphinx <code>-W</code> build passed.</li>
+<li>A fresh regeneration at api-schema-public <code>9de9a68</code> is byte-identical to the
+committed tree. That commit is the upstream HEAD on 2026-10-10.</li>
+<li>The regeneration gives the same bytes across hash seeds, working
+directories, and a fresh Python 3.12 toolchain.</li>
+</ul>
+<p>The green suite hides real defects. The mocked tests build their sample
+responses from the generated models, so they cannot see a model that disagrees
+with the schema. The REST e2e layer never reaches Kentik, and both e2e layers
+pass on any SDK error. Two model bugs and a lost gRPC service passed all 2948
+tests. The diagram shows the gap in each gate.</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/audit-pipeline-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/audit-pipeline-light.svg">
+  <img alt="Audit flow: schema, generator, mocked tests, live tests, API surface, changelog gate, and CI. Weak checks can produce a false green result." src="../assets/audit-pipeline-light.svg">
+</picture>
+<p>Open the <a href="#interactive">interactive audit explorer</a> to select each gate and see
+its recorded failure and evidence.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Count</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#md-blockers">Blockers</a></td>
+<td>13</td>
+<td>Fix before the PR, or name each deferred item in the PR description.</td>
+</tr>
+<tr>
+<td><a href="#md-generation-pipeline">Generation pipeline</a></td>
+<td>7, plus 13 latent hazards</td>
+<td>Fix before the next schema sync.</td>
+</tr>
+<tr>
+<td><a href="#md-test-gaps">Test gaps</a></td>
+<td>10</td>
+<td>Add the tests that can catch the blockers.</td>
+</tr>
+<tr>
+<td><a href="#md-lower-severity-runtime-defects">Runtime defects</a></td>
+<td>16</td>
+<td>Fix in the hand-written runtime.</td>
+</tr>
+<tr>
+<td><a href="#md-release-and-packaging">Release and packaging</a></td>
+<td>12</td>
+<td>Fix before the first 2.0.0 release.</td>
+</tr>
+<tr>
+<td><a href="#md-documentation">Documentation</a></td>
+<td>12</td>
+<td>Fix in the generator templates or the hand-written pages.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-remediation-batch-tracker">Remediation batch tracker</h2>
+<table>
+<thead>
+<tr>
+<th>Batch</th>
+<th>Phase</th>
+<th>Target findings</th>
+<th>Verification gates</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>Phase 1 setup</td>
+<td>Tracking scaffolding for all finding sections</td>
+<td>Validation ledger header + quickstart workflow review</td>
+<td>Complete</td>
+<td>Establishes execution header, batch tracker, and deferred-risk template.</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Phase 2 foundational</td>
+<td>Finding-state governance for B1-B13, P1-P7, L1-L13, T1-T10, R1-R16, K1-K12, D1-D12</td>
+<td>Spot-check runner state hooks + policy checks</td>
+<td>Complete</td>
+<td>Enables per-finding state recording before story implementation work starts.</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>US1 blockers</td>
+<td>B1-B13</td>
+<td>Runtime regressions + C1-C5 replay + evidence scripts</td>
+<td>Complete</td>
+<td>Fixed B1, B5, B6, B7, B10, B13. Deferred B2, B3, B4, B8, B9, B11, B12.</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>US2 generator and release</td>
+<td>P1, P4 to P7, L1-L13</td>
+<td>Generator tests, <code>uv run poe generate --local</code></td>
+<td>Complete</td>
+<td>P1, P5, P7 fixed. P4, P6 partial. L1-L13 deferred.</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>US3 runtime</td>
+<td>R1-R16</td>
+<td>Runtime suites</td>
+<td>Complete</td>
+<td>R1, R3, R8 fixed. R2, R12 partial. The rest deferred.</td>
+</tr>
+<tr>
+<td>E1</td>
+<td>US4 test gaps</td>
+<td>T1-T10</td>
+<td>Smoke and generated suites</td>
+<td>Complete</td>
+<td>T5, T6, T8, T10 fixed. T2 partial. T1, T3, T4, T7, T9 deferred.</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>US5 packaging and docs</td>
+<td>K1-K12, D1-D12</td>
+<td>Packaging tests, <code>uv build</code>, Sphinx</td>
+<td>Complete</td>
+<td>K4-K7, K9-K12, D7-D10 fixed. The rest deferred.</td>
+</tr>
+</tbody>
+</table>
+<p>Each finding names the place for the fix: the runtime, the generator, a
+template, the tests, CI, the docs, or upstream. No fix belongs in a generated
+file. &quot;Reproduced&quot; means that a script showed the failure. &quot;Traced&quot; means that
+the audit followed the code path but did not run it.</p>
+<h2 id="md-blockers">Blockers</h2>
+<h3 id="md-b1-a-new-enum-value-from-the-server-breaks-the-whole-call">B1. A new enum value from the server breaks the whole call</h3>
+<p>Where: the 97 generated <code>(str, Enum)</code> classes, and
+<a href="../../scripts/openapi_templates/httpx.jinja2#L33"><code>httpx.jinja2:33</code></a>, which
+builds the response model with no guard.</p>
+<p>The generated enums reject any value that they do not list. When Kentik adds a
+value, every installed SDK version fails on each response that contains it.
+The error is a <code>pydantic.ValidationError</code>. It is not a <code>KentikError</code>, but
+<a href="../../docs/sphinx/guides/error_handling.md#L48"><code>error_handling.md:48</code></a> says
+that <code>except KentikError</code> catches everything.</p>
+<p>This happens in practice. Upstream commit <code>8eb47aa</code> (2026-08-18) added
+<code>LANDING_TYPE_AI_ADVISOR</code>. One user with that landing page makes
+<code>client.user.list_users()</code> fail for the whole account. 99 of 234 operations
+return a model that reaches one of 79 enums. The gRPC audit found that 96 of
+the 228 gRPC-covered operations fail on both transports.</p>
+<p>Evidence: Reproduced. A mocked <code>list_users</code> response with an unknown
+<code>defaultLandingPageType</code> raised a <code>ValidationError</code> of type <code>enum</code>.</p>
+<p>Fix in: a template. Override the enum template of the generator and add a
+<code>_missing_</code> hook that returns a pseudo-member for unknown names and numbers.
+The generated-code audit tested this approach with pydantic. Also wrap a
+response parse failure in a <code>KentikError</code> subclass that keeps the raw body and
+<code>rate_limit</code>.</p>
+<h3 id="md-b2-alertacknowledgement-has-the-wrong-type">B2. <code>Alert.acknowledgement</code> has the wrong type</h3>
+<p>Where: <a href="../../scripts/generate_sdk.py#L193-L197"><code>generate_sdk.py:193-197</code></a>, in
+<code>clean_schema_names</code>.</p>
+<p>The alert swagger defines an object <code>AlertAcknowledgement</code> (<code>state</code>,
+<code>ackedByUser</code>, <code>autoAckId</code>, <code>ackedAt</code>) and an enum
+<code>v202505AlertAcknowledgement</code>. When the generator strips the version prefix,
+the enum overwrites the object with no warning.
+<a href="../../src/kentik_api/gen/alerting/models/Alert.py#L42"><code>Alert.py:42</code></a> then
+types the field as the enum.</p>
+<p>Any alert that carries an acknowledgement makes <code>alert_list</code>, <code>alert_get</code>,
+<code>ack</code>, and <code>un_ack</code> raise <code>ValidationError</code>, on REST and on gRPC. For <code>ack</code>, the
+server performs the action and then the SDK raises, which invites a retry. This
+is the only such collision in the 89 swagger files.</p>
+<p>Evidence: Reproduced by four audits. The main session read both schemas in
+<code>alert.swagger.json</code>.</p>
+<p>Fix in: the generator. When the short name already exists, keep the prefix or
+fail the run. Add the same guard for model files that two swagger files write.
+43 model names repeat across files today, and all of them are identical.</p>
+<h3 id="md-b3-externalcontext-requires-both-members-of-a-oneof">B3. <code>ExternalContext</code> requires both members of a oneof</h3>
+<p>Where:
+<a href="../../src/kentik_api/gen/alerting/models/ExternalContext.py#L17-L19"><code>ExternalContext.py:17-19</code></a>.
+Upstream <code>alert.proto:484-498</code> marks <code>servicenow</code> and <code>jira_cloud</code> as REQUIRED.
+Both sit inside <code>oneof context</code>, a proto group where at most one field is set.</p>
+<p>Any alert linked to an external ticket fails with <code>jiraCloud Field required</code>.
+<code>set_external_context</code> cannot work. The model needs both members, and the
+server rejects a body with both.</p>
+<p>Evidence: Reproduced on both transports. This is the only oneof with more than
+one REQUIRED member.</p>
+<p>Fix in: the generator, and upstream. Drop oneof members from <code>required</code>, with
+the oneof index from the compiled descriptors. Report the annotation upstream.</p>
+<h3 id="md-b4-grpc-lost-mitigationsservice-to-a-file-name-collision">B4. gRPC lost <code>MitigationsService</code> to a file-name collision</h3>
+<p>Where: <a href="../../scripts/generate_sdk.py#L496-L497"><code>generate_sdk.py:496-497</code></a>
+copies every compiled proto into one flat <code>pb/</code> directory by file name.</p>
+<p><code>alerting/public/v202505/mitigation.proto</code> declares <code>MitigationsService</code> with 6
+RPCs. <code>alerting/types/v202506/mitigation.proto</code> compiles to the same file name
+and overwrites it. The generator prints no warning. These 6 methods raise
+<code>NotImplementedError</code> on gRPC:</p>
+<ul>
+<li><code>mitigations_list</code>, <code>mitigations_create</code>, and <code>mitigations_get</code></li>
+<li><code>act</code></li>
+<li><code>available_actions</code> and <code>available_actions_for_mitigation</code></li>
+</ul>
+<p>The docs blame upstream.
+<a href="../../docs/sphinx/guides/rest-vs-grpc.md#L129"><code>rest-vs-grpc.md:129</code></a>,
+<a href="../../CHANGELOG.md#L95"><code>CHANGELOG.md:95</code></a>, and the alerting service page say
+that no proto declares the service.
+<a href="../../tests/generator/test_wrapper_generation.py#L258"><code>test_wrapper_generation.py:258</code></a>
+asserts the bug as the expected result.</p>
+<p>Evidence: Reproduced. The committed <code>mitigation_pb2.py</code> names the
+<code>types/v202506</code> source, and no alerting pb file contains <code>MitigationsService</code>.</p>
+<p>Fix in: the generator. Keep the proto package tree under <code>pb/</code>. Fail on a
+duplicate file name. Relink imports by package, not by file stem. The fix gives
+gRPC 234 of 234 operations. Then correct the test, the docs, and the CHANGELOG.</p>
+<h3 id="md-b5-a-malformed-credential-leaks-the-api-token-into-the-error-text">B5. A malformed credential leaks the API token into the error text</h3>
+<p>Where:
+<a href="../../src/kentik_api/core/rest_runtime.py#L91-L94"><code>rest_runtime.py:91-94</code></a>
+copies the httpx error text into <code>TransportError</code>.</p>
+<p>A token from a password manager CLI often ends in a newline. The HTTP library
+rejects the header, and the message becomes
+<code>ListUsers transport failed: Illegal header value b'&lt;token&gt;\n'</code>. The full token
+then reaches logs, CI output, and error trackers. An email with a trailing
+space leaks the same way. A non-ASCII value raises a bare <code>UnicodeEncodeError</code>.</p>
+<p>Evidence: Reproduced against a local socket.</p>
+<p>Fix in: the runtime. Strip the email and token once, in <code>KentikAPI</code> and
+<code>APIConfig</code>. Reject control and non-ASCII characters with a
+<code>ConfigurationError</code> that names the field, never the value. Do not copy
+<code>httpx.LocalProtocolError</code> text into an exception.</p>
+<h3 id="md-b6-a-grpc-call-after-close-crashes-the-interpreter">B6. A gRPC call after <code>close()</code> crashes the interpreter</h3>
+<p>Where:
+<a href="../../src/kentik_api/transports/grpc_client.py#L98-L99"><code>grpc_client.py:98-99</code></a>
+closes the channel. The deadline interceptor at
+<a href="../../src/kentik_api/transports/grpc_client.py#L40-L53"><code>grpc_client.py:40-53</code></a>
+still calls into it.</p>
+<p>A wrapper call after <code>close()</code>, or a call that races shutdown, kills the
+process with a segmentation fault (exit 139). There is no traceback and nothing
+to catch. The root bug is in grpcio 1.84.0, but only the SDK can stop it. REST
+raises <code>ConfigurationError</code> in the same case.</p>
+<p>Evidence: Reproduced 3 of 3 times, with a localhost target. Another call path
+raises the builtin <code>ValueError</code> instead.</p>
+<p>Fix in: the runtime. Keep a closed flag on <code>GrpcTransport</code>. Make the
+interceptor raise <code>ConfigurationError</code> before it calls the channel.</p>
+<h3 id="md-b7-grpc-ignores-the-credentials-and-host-of-an-override">B7. gRPC ignores the credentials and host of an override</h3>
+<p>Where:
+<a href="../../src/kentik_api/core/grpc_runtime.py#L125-L136"><code>grpc_runtime.py:125-136</code></a>
+takes only <code>grpc_deadline</code> from <code>api_config_override</code>. The channel binds the
+credentials and target at
+<a href="../../src/kentik_api/transports/grpc_client.py#L83-L91"><code>grpc_client.py:83-91</code></a>.</p>
+<p>A script that serves several accounts passes an override with tenant B
+credentials to a tenant A client. REST acts as tenant B. gRPC acts as tenant A,
+for writes too. An override with no credentials raises on REST but runs on
+gRPC. The CHANGELOG mentions the limit. The quickstart says that an override
+carries its own credentials, with no gRPC exception.</p>
+<p>Evidence: Reproduced with an in-process gRPC server, which saw the tenant A
+credentials.</p>
+<p>Fix in: the runtime. When the override credentials, <code>base_path</code>, or <code>verify</code>
+differ from the transport values, raise <code>ConfigurationError</code>. As an
+alternative, build the auth metadata per call in the interceptor.</p>
+<h3 id="md-b8-httpx-10-will-break-import-kentik_api">B8. httpx 1.0 will break <code>import kentik_api</code></h3>
+<p>Where: <a href="../../pyproject.toml#L30"><code>pyproject.toml:30</code></a> declares <code>httpx&gt;=0.28.1</code>
+with no upper bound.
+<a href="../../src/kentik_api/core/api_config.py#L9"><code>api_config.py:9</code></a> imports the
+private <code>httpx._utils</code>.</p>
+<p>httpx <code>1.0.dev4</code> to <code>1.0.dev6</code> are on PyPI, and they have no <code>httpx._utils</code>.
+When 1.0 final ships, every fresh install resolves to it. The import then fails
+with <code>ModuleNotFoundError</code>.</p>
+<p>Evidence: Reproduced in a throwaway venv with <code>httpx==1.0.dev6</code>.</p>
+<p>Fix in: packaging and the runtime. Cap <code>httpx&lt;1</code> now. Replace the private
+import with <code>urllib.request.getproxies()</code> and <code>proxy_bypass</code>. The surface alert
+treats a changed requirement as breaking, so add a CHANGELOG line.</p>
+<h3 id="md-b9-grpc-responses-over-4-mib-fail-and-look-like-a-quota-error">B9. gRPC responses over 4 MiB fail and look like a quota error</h3>
+<p>Where:
+<a href="../../src/kentik_api/transports/grpc_client.py#L88-L91"><code>grpc_client.py:88-91</code></a>
+passes no channel options, so grpcio keeps its 4 MiB receive limit. Version
+1.0.7 set 40 MB.
+<a href="../../src/kentik_api/core/grpc_runtime.py#L28"><code>grpc_runtime.py:28</code></a> maps
+<code>RESOURCE_EXHAUSTED</code> to 429.</p>
+<p>A large account calls <code>list_devices()</code>, and the response exceeds 4 MiB. REST
+returns the data. gRPC raises <code>HTTPException(429)</code> with a <code>rate_limit</code> that is
+not exhausted. The rate-limiting guide tells callers to back off on 429, so the
+retries fail forever.</p>
+<p>Evidence: Reproduced with a local server that returns 5 MB. Real Kentik
+responses over 4 MiB are likely, but nobody measured one.</p>
+<p>Fix in: the runtime. Set <code>grpc.max_receive_message_length</code> on the channel, and
+expose channel options. Classify the client-side size error apart from quota.
+Add the change to
+<a href="../../docs/sphinx/guides/migrating-from-1x.md"><code>migrating-from-1x.md</code></a>.</p>
+<h3 id="md-b10-enum-members-in-a-path-or-query-go-out-as-classnamemember">B10. Enum members in a path or query go out as <code>ClassName.MEMBER</code></h3>
+<p>Where: <a href="../../src/kentik_api/core/rest_runtime.py#L33"><code>rest_runtime.py:33</code></a>
+formats path values with <code>format()</code>. Query values at
+<a href="../../src/kentik_api/core/rest_runtime.py#L77-L79"><code>rest_runtime.py:77-79</code></a>
+reach httpx unchanged, and httpx calls <code>str()</code>.</p>
+<p><code>client.device.list_devices(view=DeviceView.DEVICE_VIEW_FULL)</code> sends
+<code>view=DeviceView.DEVICE_VIEW_FULL</code>. A <code>policy_get</code> call with
+<code>PolicyType.POLICY_TYPE_AGENT</code> builds
+<code>/v202505/policies/PolicyType.POLICY_TYPE_AGENT/1</code>. The parameters are typed
+<code>str</code>, and the generated enums subclass <code>str</code>, so type checkers accept the
+call. gRPC sends the correct value. At least 12 parameters across 9 operations
+take enum values.</p>
+<p>Evidence: Reproduced on Python 3.12 and 3.14.</p>
+<p>Fix in: the runtime. Unwrap <code>Enum</code> to <code>.value</code> in <code>path_segment</code> and in query
+cleaning, list items included.</p>
+<h3 id="md-b11-public-names-are-not-stable-and-200-will-freeze-them">B11. Public names are not stable, and 2.0.0 will freeze them</h3>
+<p>Three naming rules make user code break on a routine schema update:</p>
+<ol>
+<li><a href="../../scripts/generation/wrapper_generation.py#L312-L325"><code>wrapper_generation.py:312-325</code></a>
+gives a bare method name to the module that sorts first. Today
+<code>client.alerting.list</code>, <code>get</code>, <code>create</code>, <code>delete</code>, and <code>replace</code> act on
+auto-ack rules, and the alert list is <code>alert_list</code>. A new upstream module
+that sorts earlier points these five methods at other endpoints. A
+regeneration experiment showed this, and the surface record reported no
+breaking change.</li>
+<li>12 method names carry a service prefix from upstream operationIds, joined
+with <code>__</code>, for example <code>route_service__announce</code>. They are in kagent (8),
+ktbgp (3), and nms (1).</li>
+<li>50 model class names keep a version string, for example
+<code>labelv202210Label</code>, <code>devicev202504beta2Label</code>, and
+<code>typesv202506PaginationConfig</code>. A version bump renames them.
+<a href="../../README.md#L13"><code>README.md:13</code></a> says that the pipeline removes these
+prefixes.</li>
+</ol>
+<p>Evidence: Reproduced.</p>
+<p>Fix in: the generator, before the first 2.0.0 release. Prefix every operation
+name that is not unique in its service. Strip service prefixes from
+operationIds. Strip version tokens in all positions, and fail on a resulting
+collision. Record each <code>client.&lt;service&gt;.&lt;method&gt;</code> in
+<a href="../../api_surface.json"><code>api_surface.json</code></a>.</p>
+<h3 id="md-b12-the-per-operation-error-class-is-never-raised">B12. The per-operation error class is never raised</h3>
+<p>Where:
+<a href="../../scripts/generation/error_package.py#L266"><code>error_package.py:266</code></a> makes
+each leaf class, for example <code>ListDevicesUnexpectedError</code>, a subclass of the
+service error. The operation class from
+<a href="../../scripts/generation/error_package.py#L276"><code>error_package.py:276</code></a> is not
+its parent.</p>
+<p><code>except ListDevicesError:</code> catches nothing. REST raises
+<code>ListDevicesUnexpectedError</code>, and gRPC raises the base <code>HTTPException</code>. The
+error guide documents the gRPC difference. CLAUDE.md says that both transports
+raise the same type.</p>
+<p>Evidence: Reproduced with a mocked 404.</p>
+<p>Fix in: the generator and the runtime. Make each leaf class a subclass of its
+operation class. Pass the operation error class to <code>call_grpc</code>, so that gRPC
+raises the same type.</p>
+<h3 id="md-b13-the-e2e-layer-proves-nothing">B13. The e2e layer proves nothing</h3>
+<p>Four defects stack up:</p>
+<ol>
+<li>The REST e2e never reaches Kentik.
+<a href="../../tests/_discovery.py#L199-L206"><code>tests/_discovery.py:199-206</code></a> gives
+<code>api_config_override</code> a sample <code>APIConfig</code> for <code>https://api.example.com</code>.
+<a href="../../tests/e2e/test_endpoints_e2e.py#L61"><code>test_endpoints_e2e.py:61</code></a>
+fills every parameter. All 100 REST calls go to that host and raise
+<code>TransportError</code>.</li>
+<li>The pass rule accepts any <code>KentikError</code>, in
+<a href="../../tests/e2e/test_endpoints_e2e.py#L65-L77"><code>test_endpoints_e2e.py:65-77</code></a>
+and
+<a href="../../tests/e2e/test_endpoints_e2e_grpc.py#L63-L81"><code>test_endpoints_e2e_grpc.py:63-81</code></a>.
+A revoked token or a network outage stays green. No test asserts the
+response type.</li>
+<li>Without credentials, the fixtures error instead of skipping.
+<a href="../../tests/e2e/conftest.py#L23"><code>conftest.py:23</code></a> and
+<a href="../../tests/e2e/conftest.py#L40"><code>conftest.py:40</code></a> catch <code>ValueError</code>, but
+<code>KentikAPI</code> raises <code>ConfigurationError</code>.</li>
+<li>Any <code>-m</code> expression replaces the default marker filter at
+<a href="../../pyproject.toml#L92"><code>pyproject.toml:92</code></a>. The command
+<code>pytest tests/ -m &quot;not slow&quot;</code> collects all 468 live tests, which use the
+credentials in <code>.env</code>. The live tests issue only GET calls.</li>
+</ol>
+<p>Evidence: Reproduced with mocked replays of the e2e calls and with
+<code>--collect-only</code>.</p>
+<p>Fix in: the tests.</p>
+<ol>
+<li>Pass no override in e2e.</li>
+<li>Accept only <code>HTTPException</code>, plus <code>NotImplementedError</code> for a listed
+unrouted operation.</li>
+<li>Assert the return type.</li>
+<li>Get real IDs with a list call before each get call.</li>
+<li>Catch <code>ConfigurationError</code> in the fixtures.</li>
+<li>Gate the live layer behind an explicit flag in
+<a href="../../tests/e2e/conftest.py"><code>tests/e2e/conftest.py</code></a>, and add
+<code>--strict-markers</code>.</li>
+</ol>
+<h2 id="md-generation-pipeline">Generation pipeline</h2>
+<p>These defects decide whether a schema sync stays cheap.</p>
+<h3 id="md-p1-protoc-failures-do-not-fail-generation">P1. protoc failures do not fail generation</h3>
+<p>Where:
+<a href="../../scripts/generate_sdk.py#L504-L515"><code>generate_sdk.py:504-515</code></a> and
+<a href="../../scripts/generate_sdk.py#L346-L347"><code>generate_sdk.py:346-347</code></a> only print
+a protoc error.</p>
+<p>In a scratch copy, one syntax error in <code>vault.proto</code> gave exit 0 and
+&quot;Generation Complete&quot;. The vault and credential services lost all their pb
+files, and their wrappers became REST-only. The surface record reported no
+change, and <code>check-changelog</code> passed. B4 passed every gate the same way.</p>
+<p>Fix in: the generator. Exit non-zero on any protoc failure. Record the gRPC
+route of each operation in <code>api_surface.json</code>, and treat a lost route as
+breaking.</p>
+<h3 id="md-p2-the-generator-toolchain-is-not-pinned">P2. The generator toolchain is not pinned</h3>
+<p>Where: <a href="../../scripts/generate_sdk.py#L52-L66"><code>generate_sdk.py:52-66</code></a> runs
+<code>uvx openapi-python-generator</code> with no version. The tool is not in
+<a href="../../pyproject.toml"><code>pyproject.toml</code></a> or <code>uv.lock</code>.</p>
+<p>CI resolves the newest generator on every run, but the fixups match the exact
+output of version 2.1.2. A new generator release can fail the determinism job
+on unrelated PRs, and a local run cannot reproduce that failure. Also, a run
+from outside the project directory resolves grpcio-tools fresh through
+<code>uv run --with grpcio-tools</code>, and grpcio-tools <code>1.85.0rc1</code> shipped on
+2026-10-09.</p>
+<p>Fix in: the generator. Add <code>openapi-python-generator==2.1.2</code> to the dev group
+and call it with <code>uv run</code>. Drop <code>--with grpcio-tools</code>. Pass <code>--project</code> to
+every inner <code>uv</code> call. Add a pin test.</p>
+<h3 id="md-p3-ci-follows-a-moving-schema-and-nothing-syncs-the-repo">P3. CI follows a moving schema, and nothing syncs the repo</h3>
+<p>Where: the <code>generated-output-matches-schema-head</code> job at
+<a href="../../.github/workflows/tests.yml#L101-L132"><code>tests.yml:101-132</code></a>.</p>
+<p>The job regenerates from upstream HEAD on every PR and fails on any
+difference. Upstream changed generator inputs 17 times in the last 90 days, so
+every open PR and <code>main</code> turn red until someone regenerates. No file records
+the schema commit, so nobody can rebuild an old tree without the commit
+messages. There is no scheduled sync job, and there is no Dependabot or
+Renovate configuration. The actions use old major versions without SHA pins.</p>
+<p>Fix in: CI.</p>
+<ol>
+<li>Commit the schema commit hash, for example in <code>api_surface.json</code>.</li>
+<li>Make the PR job regenerate at that pinned commit.</li>
+<li>Add a scheduled job that moves the pin to upstream HEAD, regenerates, and
+opens a PR with the surface alert.</li>
+<li>Add <code>dependabot.yml</code> for <code>github-actions</code> and <code>uv</code>.</li>
+<li>Pin the actions by SHA.</li>
+</ol>
+<h3 id="md-p4-generation-is-not-atomic">P4. Generation is not atomic</h3>
+<p>Where: <a href="../../scripts/generate_sdk.py#L376-L393"><code>generate_sdk.py:376-393</code></a>
+wipes <code>gen/</code> before most of the work. The parity check runs later, at
+<a href="../../scripts/generate_sdk.py#L528"><code>generate_sdk.py:528</code></a>.</p>
+<p>If upstream renames its files so that no file matches, the pre-wipe test
+passes on an empty list. The run wipes <code>gen/</code> and then fails. <code>client_mixin.py</code>
+still imports the deleted wrappers, so <code>import kentik_api</code> fails until a
+<code>git checkout</code>. Any abort after the wipe has the same result.</p>
+<p>Fix in: the generator. Before the wipe, compare the schema directories with
+the selected services, and require at least one file. Build into a staging
+directory and swap it in only on success.</p>
+<h3 id="md-p5-version-selection-compares-strings">P5. Version selection compares strings</h3>
+<p>Where: <a href="../../scripts/generation/parity.py#L54"><code>parity.py:54</code></a>.</p>
+<p><code>v202504beta2</code> wins over GA <code>v202504</code>, <code>beta9</code> wins over <code>beta10</code>, and
+<code>v20260515beta1</code> wins over <code>v202605</code>. No current service triggers this.</p>
+<p>Fix in: the generator. Compare a parsed tuple of date, stage rank, and stage
+number. Fail on a version name that does not parse.</p>
+<h3 id="md-p6-the-surface-record-and-the-changelog-gate-miss-breaking-changes">P6. The surface record and the changelog gate miss breaking changes</h3>
+<p>Where:
+<a href="../../scripts/generation/api_surface.py#L133-L152"><code>api_surface.py:133-152</code></a>
+and <a href="../../scripts/release_notes.py"><code>release_notes.py</code></a>.</p>
+<ul>
+<li>The record keeps only the operation id, the status, and the required
+parameter names. It does not keep wrapper names, optional parameters, types,
+return models, or error classes. A removed <code>view</code> parameter, a retyped
+parameter, or a <code>list</code> that calls another endpoint all pass.</li>
+<li><a href="../../scripts/release_notes.py#L82"><code>release_notes.py:82</code></a> accepts any
+substring. &quot;Service removed: <code>client.nms</code>&quot; passed, because the word nms is in
+the Added section.</li>
+<li>An unresolvable <code>--since</code> ref exits 0, at
+<a href="../../scripts/release_notes.py#L127-L135"><code>release_notes.py:127-135</code></a>. For
+this PR, the merge base has no <code>api_surface.json</code>, so the CI <code>changelog</code> job
+tests nothing.</li>
+<li>A version bump reports every operation as removed, because the key is the
+literal path.</li>
+<li>The default baseline is the newest tag by date, not an ancestor tag, at
+<a href="../../scripts/release_notes.py#L47-L68"><code>release_notes.py:47-68</code></a>. A hotfix
+after a newer minor release, or a final release after an rc, compares
+against the wrong tag.</li>
+<li>The dependency diff calls any spec change a raised floor. It ignores
+<code>python-dotenv</code>, <code>googleapis-common-protos</code>, and <code>requires-python</code>.</li>
+</ul>
+<p>Fix in: the release tooling.</p>
+<ol>
+<li>Record each wrapper method with its path, parameters, types, return type,
+error class, and gRPC route.</li>
+<li>Require an exact token from each breaking change, in lines that the PR
+added.</li>
+<li>Fail on a ref that does not resolve.</li>
+<li>Use ancestor tags, sorted by version.</li>
+<li>Parse requirements with <code>packaging</code>.</li>
+</ol>
+<h3 id="md-p7-the-generator-writes-into-the-schema-checkout">P7. The generator writes into the schema checkout</h3>
+<p>Where: <a href="../../scripts/generate_sdk.py#L248-L254"><code>generate_sdk.py:248-254</code></a>
+writes <code>tmp*.json</code> next to each swagger file.</p>
+<p>A read-only checkout fails, and a killed run leaves files behind. No swagger
+file has an external <code>$ref</code>, so the location has no purpose.</p>
+<p>Fix in: the generator. Use a <code>TemporaryDirectory</code>.</p>
+<h3 id="md-latent-generator-hazards">Latent generator hazards</h3>
+<p>Today's schema does not trigger these. A routine upstream change can.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Hazard</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>Two selected swagger files with the same tag write the same module. After a file rename, an old beta can win.</td>
+<td><a href="../../scripts/generation/parity.py#L48-L55"><code>parity.py:48-55</code></a>, <a href="../../scripts/generate_sdk.py#L412-L428"><code>generate_sdk.py:412-428</code></a></td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Proto import relinking ignores versions. A new <code>user</code> proto version breaks gRPC for 4 services. A core <code>annotations.proto</code> bump touches 59 protos in 39 services.</td>
+<td><a href="../../scripts/generate_sdk.py#L156-L162"><code>generate_sdk.py:156-162</code></a></td>
+</tr>
+<tr>
+<td>L3</td>
+<td>An RPC with <code>google.protobuf.Empty</code> as input or output fails generation or emits broken code.</td>
+<td><a href="../../scripts/generation/wrapper_generation.py#L97-L102"><code>wrapper_generation.py:97-102</code></a>, <a href="../../scripts/generate_sdk.py#L118-L123"><code>generate_sdk.py:118-123</code></a></td>
+</tr>
+<tr>
+<td>L4</td>
+<td>An operationId such as <code>Import</code> or <code>Return</code> produces <code>def import(...)</code>.</td>
+<td><a href="../../scripts/generation/wrapper_generation.py#L307"><code>wrapper_generation.py:307</code></a></td>
+</tr>
+<tr>
+<td>L5</td>
+<td>A path placeholder such as <code>{from}</code> produces <code>path_segment(from)</code>.</td>
+<td><a href="../../scripts/generation/fixup.py#L178-L184"><code>fixup.py:178-184</code></a></td>
+</tr>
+<tr>
+<td>L6</td>
+<td><code>_inject_data_body</code> matches <code>data:</code> inside names like <code>includeMetadata</code> and drops a comma. Its test matches a substring, and the test output does not parse.</td>
+<td><a href="../../scripts/generation/fixup.py#L210-L222"><code>fixup.py:210-222</code></a>, <a href="../../tests/generator/test_fixup.py#L364-L378"><code>test_fixup.py:364-378</code></a></td>
+</tr>
+<tr>
+<td>L7</td>
+<td>Error class names use raw operationIds, so <code>Get-Thing</code> gives invalid Python.</td>
+<td><a href="../../scripts/generation/error_package.py#L70-L72"><code>error_package.py:70-72</code></a></td>
+</tr>
+<tr>
+<td>L8</td>
+<td>A model or operation named <code>List</code>, <code>Optional</code>, or <code>Set</code> shadows a typing import.</td>
+<td><a href="../../scripts/generation/fixup.py#L281-L291"><code>fixup.py:281-291</code></a></td>
+</tr>
+<tr>
+<td>L9</td>
+<td>Model names that differ only by case overwrite each other on macOS, but not on Linux.</td>
+<td>Model output step</td>
+</tr>
+<tr>
+<td>L10</td>
+<td>Raw schema descriptions go into docstrings. <code>\u</code> gives a SyntaxError, and <code>\b</code> becomes a backspace.</td>
+<td>Models template</td>
+</tr>
+<tr>
+<td>L11</td>
+<td>fixup tests <code>pb</code> and <code>error</code> against absolute path parts, so a parent directory with that name skips every fixup.</td>
+<td><a href="../../scripts/generation/fixup.py#L65"><code>fixup.py:65</code></a></td>
+</tr>
+<tr>
+<td>L12</td>
+<td>Streaming RPCs and <code>response_body</code> rules are not rejected. <code>diagnostic.Chat</code> is bidirectional.</td>
+<td><a href="../../scripts/generation/wrapper_generation.py#L96-L120"><code>wrapper_generation.py:96-120</code></a></td>
+</tr>
+<tr>
+<td>L13</td>
+<td>43 model names repeat across swagger files. Nothing stops a future divergence.</td>
+<td>Model output step</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-test-gaps">Test gaps</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Gap</th>
+<th>Where</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>Mocked success bodies come from the models themselves. 232 of 234 have no non-null value, so B2 and B3 pass.</td>
+<td><a href="../../tests/generated/test_endpoint_schema_coverage.py#L155-L163"><code>test_endpoint_schema_coverage.py:155-163</code></a></td>
+<td>Build fixtures from the swagger and the descriptors, with one unknown-enum fixture.</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>The gRPC success path and the auth wiring have no test. A generator that drops the call credentials passes.</td>
+<td><a href="../../src/kentik_api/core/grpc_runtime.py#L133-L135"><code>grpc_runtime.py:133-135</code></a>, <a href="../../tests/runtime/test_grpc_transport.py#L129-L166"><code>test_grpc_transport.py:129-166</code></a></td>
+<td>Add an in-process <code>grpc.server</code> test for auth metadata, deadline, and a populated response.</td>
+</tr>
+<tr>
+<td>T3</td>
+<td><code>NotImplementedError</code> passes everywhere. Broken gRPC routing for 34 services still gives a green suite.</td>
+<td><a href="../../tests/generated/test_wrapper_contracts.py#L187-L200"><code>test_wrapper_contracts.py:187-200</code></a>, <a href="../../tests/generated/test_grpc_request_mapping.py#L58-L79"><code>test_grpc_request_mapping.py:58-79</code></a></td>
+<td>Record routed operations in <code>api_surface.json</code>. When a service has pb stubs, fail instead of skip.</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>The mapping test replaces <code>build_grpc_request</code> and asserts only that a body exists. Broken body nesting sends empty requests for 14 operations and passes.</td>
+<td><a href="../../tests/generated/test_grpc_request_mapping.py#L66-L105"><code>test_grpc_request_mapping.py:66-105</code></a></td>
+<td>Run the real function on populated bodies with a strict <code>ParseDict</code>.</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>No test shows that the per-call gRPC deadline reaches the stub.</td>
+<td><a href="../../src/kentik_api/core/grpc_runtime.py#L130"><code>grpc_runtime.py:130</code></a></td>
+<td>Assert <code>timeout</code> on a fake <code>UnaryUnaryMultiCallable</code>.</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Credential precedence and region have no real test. Env vars that beat arguments, or <code>region=&quot;eu&quot;</code> on US hosts, pass.</td>
+<td><a href="../../tests/smoke/test_client_mounts_and_calls.py#L13-L22"><code>test_client_mounts_and_calls.py:13-22</code></a></td>
+<td>Set the argument and the env var for one field. Assert the EU hosts.</td>
+</tr>
+<tr>
+<td>T7</td>
+<td>No CI test compares the generated operations with the swagger. The one schema-aware test always skips in CI. It also passes on a missing function.</td>
+<td><a href="../../tests/generator/test_generate_sdk.py#L251-L312"><code>test_generate_sdk.py:251-312</code></a></td>
+<td>Commit a swagger-derived record and test against it. Match respx routes on method, path, and query.</td>
+</tr>
+<tr>
+<td>T8</td>
+<td>Hardcoded counts force a manual edit on every schema addition.</td>
+<td><a href="../../tests/generated/test_retry_eligibility.py#L49-L51"><code>test_retry_eligibility.py:49-51</code></a></td>
+<td>Derive the counts from the swagger record.</td>
+</tr>
+<tr>
+<td>T9</td>
+<td>Only 91 of 316 top-level request-body fields get a value.</td>
+<td><a href="../../tests/_discovery.py#L157-L178"><code>tests/_discovery.py:157-178</code></a></td>
+<td>Add a sampler that fills every field.</td>
+</tr>
+<tr>
+<td>T10</td>
+<td>The stub-wiring regex misses wrapped imports and skips 7 of 36 services.</td>
+<td><a href="../../tests/generated/test_grpc_stub_wiring.py#L27"><code>test_grpc_stub_wiring.py:27</code></a></td>
+<td>Parse the mixin with <code>ast</code>, and assert the count.</td>
+</tr>
+</tbody>
+</table>
+<p>Three tests assert wrong behavior and will fail after the fixes:
+<a href="../../tests/generator/test_wrapper_generation.py#L258"><code>test_wrapper_generation.py:258</code></a>
+for B4,
+<a href="../../tests/generator/test_endpoint_docs.py#L480"><code>test_endpoint_docs.py:480</code></a>
+for D1, and
+<a href="../../tests/generator/test_docs_rendering.py#L120"><code>test_docs_rendering.py:120</code></a>
+for D5.</p>
+<p><a href="../../tests/generated/test_wrapper_contracts.py#L175-L200"><code>test_wrapper_contracts.py:175-200</code></a>
+patches <code>MessageToDict</code> after the wrapper imported it, so the patch does
+nothing. Two runtime tests depend on the ambient proxy. No test imports
+<code>from kentik_api import KentikAPI</code>.</p>
+<p>Line coverage of the hand-written runtime is 96%. The uncovered lines that
+matter are the non-JSON branches of <code>request_json</code> and the gRPC <code>with_call</code>
+success line. <code>generate_sdk.py</code> has 34% line coverage, and <code>release_notes.py</code>
+has 37%.</p>
+<h2 id="md-lower-severity-runtime-defects">Lower-severity runtime defects</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Defect</th>
+<th>Where</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>A non-UTF-8 body raises a bare <code>UnicodeDecodeError</code>, not a <code>KentikError</code>.</td>
+<td><a href="../../src/kentik_api/core/rest_runtime.py#L166-L169"><code>rest_runtime.py:166-169</code></a>, <a href="../../src/kentik_api/core/rest_runtime.py#L192-L194"><code>rest_runtime.py:192-194</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>A non-JSON 200 reports &quot;failed with status code: 200&quot;. A JSON list gives <code>TypeError</code>. A JSON <code>null</code> returns an empty model that nothing parsed.</td>
+<td><a href="../../src/kentik_api/core/rest_runtime.py#L192-L208"><code>rest_runtime.py:192-208</code></a>, <a href="../../scripts/openapi_templates/httpx.jinja2#L33"><code>httpx.jinja2:33</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R3</td>
+<td><code>HTTPException</code> and its subclasses do not unpickle, so a <code>ProcessPoolExecutor</code> breaks on a 404.</td>
+<td><a href="../../src/kentik_api/errors/__init__.py#L31-L48"><code>errors/__init__.py:31-48</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>REST quota keys are concrete paths without the HTTP method. The map grows by one entry per ID. The guide reads the private <code>client._transport</code>.</td>
+<td><a href="../../src/kentik_api/core/rest_runtime.py#L98"><code>rest_runtime.py:98</code></a>, <a href="../../docs/sphinx/guides/rate_limiting.md#L67"><code>rate_limiting.md:67</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>The REST timeout restarts on each chunk. A slow server with <code>timeout=1.0</code> returned after 11.3 s.</td>
+<td><a href="../../src/kentik_api/core/api_config.py#L56-L68"><code>api_config.py:56-68</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>After <code>os.fork</code>, the child reuses the pooled connection of the parent.</td>
+<td><a href="../../src/kentik_api/core/api_config.py#L126-L147"><code>api_config.py:126-147</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>An explicit empty-string credential falls back to the environment or <code>.env</code>.</td>
+<td><a href="../../src/kentik_api/client.py#L29-L30"><code>client.py:29-30</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R8</td>
+<td><code>timeout=math.inf</code> passes, and then every call raises <code>OverflowError</code>. <code>region=None</code> raises <code>AttributeError</code>.</td>
+<td><a href="../../src/kentik_api/core/api_config.py#L21-L26"><code>api_config.py:21-26</code></a>, <a href="../../src/kentik_api/client.py#L78"><code>client.py:78</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R9</td>
+<td><code>APIConfig</code> and <code>KentikCredentials</code> accept changes that apply only sometimes, or never.</td>
+<td><a href="../../src/kentik_api/core/api_config.py#L48-L50"><code>api_config.py:48-50</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R10</td>
+<td>Spaces in query values go out as <code>+</code>. Envoy does not decode <code>+</code> by default, so the journeys <code>prompt</code> can differ between transports.</td>
+<td><a href="../../src/kentik_api/core/rest_runtime.py#L86"><code>rest_runtime.py:86</code></a></td>
+<td>Traced. One live call settles it.</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>On gRPC, free-form <code>Dict</code> bodies drop unknown keys and misspelled enum values. A typo in a full-replace update blanks fields.</td>
+<td><a href="../../src/kentik_api/core/grpc_runtime.py#L90"><code>grpc_runtime.py:90</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R12</td>
+<td>On gRPC, a bad argument raises <code>json_format.ParseError</code>, not a <code>KentikError</code>. <code>UpdateCapabilityRequest.update_mask</code> has no argument.</td>
+<td><a href="../../src/kentik_api/core/grpc_runtime.py#L79-L101"><code>grpc_runtime.py:79-101</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R13</td>
+<td>gRPC drops the <code>google.rpc</code> error details, and it reads quota only from initial metadata.</td>
+<td><a href="../../src/kentik_api/core/grpc_runtime.py#L56-L76"><code>grpc_runtime.py:56-76</code></a>, <a href="../../src/kentik_api/core/rate_limit.py#L119-L123"><code>rate_limit.py:119-123</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R14</td>
+<td>A descriptor-pool conflict (a duplicate entry in the global protobuf registry) shows &quot;proto dependencies not installed&quot; for every service and hides the cause.</td>
+<td><a href="../../scripts/generation/wrapper_generation.py#L254"><code>wrapper_generation.py:254</code></a></td>
+<td>Reproduced</td>
+</tr>
+<tr>
+<td>R15</td>
+<td>Response models enforce REQUIRED on message fields that the server can leave unset, for example <code>FlowPolicySettings.baseline</code>.</td>
+<td>Model output step</td>
+<td>Traced</td>
+</tr>
+<tr>
+<td>R16</td>
+<td>24 create and update payloads are untyped <code>Dict[str, Any]</code>, because the generator does not hoist inline objects.</td>
+<td><a href="../../scripts/generate_sdk.py#L238"><code>generate_sdk.py:238</code></a></td>
+<td>Reproduced</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-release-and-packaging">Release and packaging</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Defect</th>
+<th>Where</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K1</td>
+<td><code>dist/</code> holds stale <code>kentik_api-2.0.0</code> files with an MIT license and fork URLs. A manual <code>twine upload dist/*</code> uses up version 2.0.0 for good.</td>
+<td><code>dist/</code></td>
+<td>Delete <code>dist/</code>.</td>
+</tr>
+<tr>
+<td>K2</td>
+<td>The release <code>notes</code> job does not wait for <code>publish</code>. Publishing uses a long-lived token. Nothing tests that the built version equals the tag. A GitHub pre-release with a final-style tag publishes as final.</td>
+<td><a href="../../.github/workflows/release.yml"><code>release.yml</code></a></td>
+<td>Add <code>needs: publish</code>, trusted publishing, a version gate, and a pre-release rule.</td>
+</tr>
+<tr>
+<td>K3</td>
+<td>The PyPI page renders <code>README.md</code>, which has 22 relative links that fail there. No docs site exists.</td>
+<td><a href="../../pyproject.toml#L5"><code>pyproject.toml:5</code></a></td>
+<td>Use absolute links or a short PyPI README. Publish the Sphinx build.</td>
+</tr>
+<tr>
+<td>K4</td>
+<td><code>python-dotenv&gt;=1.1.1</code> cannot read a FIFO, so the documented sops recipe fails on 1.1.x.</td>
+<td><a href="../../pyproject.toml#L26"><code>pyproject.toml:26</code></a></td>
+<td>Require <code>&gt;=1.2.1</code>, and add a FIFO test.</td>
+</tr>
+<tr>
+<td>K5</td>
+<td><code>hatchling&gt;=1.20.0</code> cannot build <code>license-files</code>. Versions before 1.27 fail or write old metadata.</td>
+<td><a href="../../pyproject.toml#L42"><code>pyproject.toml:42</code></a></td>
+<td>Require <code>hatchling&gt;=1.27.0</code>.</td>
+</tr>
+<tr>
+<td>K6</td>
+<td><code>googleapis-common-protos&gt;=1.63.0</code> cannot install with <code>protobuf&gt;=7.35.1</code>.</td>
+<td><a href="../../pyproject.toml#L27"><code>pyproject.toml:27</code></a></td>
+<td>Raise the floor to 1.73.1.</td>
+</tr>
+<tr>
+<td>K7</td>
+<td>CI runs <code>uv sync</code>, which rewrites a stale lock instead of failing.</td>
+<td><a href="../../.github/workflows/tests.yml"><code>tests.yml</code></a></td>
+<td>Use <code>uv sync --locked</code>.</td>
+</tr>
+<tr>
+<td>K8</td>
+<td>The wheel import step runs in the full dev environment and imports no pb module.</td>
+<td><a href="../../.github/workflows/build.yml"><code>build.yml</code></a></td>
+<td>Install the wheel in a clean venv, import every module, and build a gRPC client.</td>
+</tr>
+<tr>
+<td>K9</td>
+<td>The sdist ships <code>.claude/</code>, <code>.github/</code>, <code>.specify/</code>, and <code>specs/</code>. A local sdist also picks up ignored folders.</td>
+<td><a href="../../pyproject.toml"><code>pyproject.toml</code></a></td>
+<td>Add a <code>[tool.hatch.build.targets.sdist]</code> include list.</td>
+</tr>
+<tr>
+<td>K10</td>
+<td>On Python 3.11, <code>pip install kentik-api</code> installs 1.0.7. Users with 1.x keep it.</td>
+<td><a href="../../README.md"><code>README.md</code></a>, <a href="../../docs/sphinx/guides/quickstart.md"><code>quickstart.md</code></a></td>
+<td>Document <code>pip install -U &quot;kentik-api&gt;=2&quot;</code>.</td>
+</tr>
+<tr>
+<td>K11</td>
+<td>A markdownlint comment sits in the Apache-2.0 title line of <code>LICENSE</code>. markdownlint does not read that file.</td>
+<td><a href="../../LICENSE"><code>LICENSE</code></a></td>
+<td>Restore the original line.</td>
+</tr>
+<tr>
+<td>K12</td>
+<td>The old <code>make deep-clean</code> task deleted the tracked <code>uv.lock</code>.</td>
+<td><a href="../../scripts/tasks.py"><code>scripts/tasks.py</code></a></td>
+<td>Fixed in feature 007. The current task preserves the lock.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-documentation">Documentation</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Defect</th>
+<th>Where</th>
+<th>Fix in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>The service pages come from the raw swagger. None of the 234 response model names exists in the SDK. 10 required bodies show as optional. 24 model diagrams are almost empty.</td>
+<td><a href="../../scripts/generate_sdk.py#L434"><code>generate_sdk.py:434</code></a></td>
+<td>Generator: run <code>extract()</code> on the patched swagger.</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>101 of 234 examples use model names that they do not import. 4 examples emit <code>Dict[str, Any](...)</code>.</td>
+<td><a href="../../scripts/generation/endpoint_docs.py#L381-L429"><code>endpoint_docs.py:381-429</code></a></td>
+<td>Generator</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>CLAUDE.md is wrong on seven points. The schema source has no clone fallback. <code>make all</code> builds no docs, and <code>make docs</code> regenerates from GitHub. The &quot;guarded coupling&quot; section is stale, and <code>api_surface.py</code> is missing. The cited commits exist only on the local <code>refactor</code> branch. The pre-PR steps omit five CI gates.</td>
+<td><a href="../../CLAUDE.md"><code>CLAUDE.md</code></a></td>
+<td>Docs</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>The Spec Kit constitution prescribes <code>load_dotenv</code>, which leaks secrets to subprocesses. A Spec Kit run can bring the leak back.</td>
+<td><a href="../../.specify/memory/constitution.md#L113-L115"><code>constitution.md:113-115</code></a></td>
+<td>Docs</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>The <code>gen/</code> README and the constitution say that gRPC routing matches by name. It matches by HTTP rule.</td>
+<td><a href="../../scripts/generation/docs_rendering.py#L72-L75"><code>docs_rendering.py:72-75</code></a></td>
+<td>Generator</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Three pages say that no proto declares <code>MitigationsService</code>. See B4.</td>
+<td><a href="../../docs/sphinx/guides/rest-vs-grpc.md#L129"><code>rest-vs-grpc.md:129</code></a></td>
+<td>Docs, after B4</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>The CHANGELOG command <code>make release-notes SINCE=v1.0.7</code> exits 1.</td>
+<td><a href="../../CHANGELOG.md#L12"><code>CHANGELOG.md:12</code></a></td>
+<td>Docs</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>Four small errors. <a href="../../docs/sphinx/authentication.md#L5"><code>authentication.md:5</code></a> has a literal <code>\n</code>. <a href="../../docs/sphinx/guides/migrating-from-1x.md#L17"><code>migrating-from-1x.md:17</code></a> says that 1.x declared no Python version, but 1.0.7 declared <code>&gt;=3.8</code>. <a href="../../docs/README.md#L12"><code>docs/README.md:12</code></a> promises pagination. The generated <code>services/README.md</code> has a broken link.</td>
+<td>Several files</td>
+<td>Docs and generator</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>The old <code>make help</code> hid e2e targets, because its regex excluded digits. Two help texts named the wrong defaults.</td>
+<td><a href="../../pyproject.toml"><code>pyproject.toml</code></a></td>
+<td>Poe tasks replaced the Makefile in feature 007.</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>The agent file puts HTML comments before its front matter, so tools can ignore its name and tool list.</td>
+<td><a href="../../.github/agents/kentik-sdk-autogen.agent.md"><code>kentik-sdk-autogen.agent.md</code></a></td>
+<td>Docs</td>
+</tr>
+<tr>
+<td>D11</td>
+<td>The specs/001 quickstart has commands that truncate two device swagger files in zsh.</td>
+<td><code>specs/001-validate-schema-checkout/quickstart.md:30-31</code></td>
+<td>Docs</td>
+</tr>
+<tr>
+<td>D12</td>
+<td>No wrapper method has a docstring, and no model field carries its schema description. 5 docstrings show <code>&amp;#34;</code>.</td>
+<td>Generator templates</td>
+<td>Generator</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-for-the-owner-to-decide">For the owner to decide</h2>
+<p>The PR and the sdist carry these process files:</p>
+<ul>
+<li><code>.specify/</code>: 74 files, 675 KB, with committed caches</li>
+<li><code>specs/</code>: 21 files</li>
+<li><code>.claude/skills/</code>: 24 files</li>
+<li><code>.github/skills/</code> (10 files) and <code>.github/agents/</code></li>
+<li><code>CLAUDE.md</code> with its <code>AGENTS.md</code> symlink, and <code>CONTEXT.md</code></li>
+<li><code>pyrightconfig.json</code>, although the configured type checker is <code>ty</code></li>
+</ul>
+<p><code>.python-version</code> says 3.14, but CI uses 3.12. <code>api_surface.json</code> (407 KB)
+stays, because the release tooling reads it.</p>
+<h2 id="md-what-works">What works</h2>
+<ul>
+<li>Regeneration is deterministic, and it matches upstream HEAD byte for byte.</li>
+<li>All 234 swagger operations line up with 234 REST functions and 234 wrapper
+methods. The query, path, body, and status declarations match.</li>
+<li>gRPC response parity holds for all 228 routed operations. Request round
+trips match for 227.</li>
+<li>The wheel installs and imports all 1316 modules on Python 3.12, 3.13, and
+3.14. The lowest allowed dependency set passes the smoke, runtime, and
+generated suites.</li>
+<li>The protobuf and grpcio floors match the generated code.</li>
+<li><code>path_segment</code> encodes reserved characters and refuses dot segments. The
+client does not follow redirects, so auth headers cannot reach another host.</li>
+<li>Proxies, <code>NO_PROXY</code>, <code>.env</code> parsing, and <code>with_timeout</code> connection sharing
+work as documented.</li>
+<li>The suite has no order dependence and no hidden network use.</li>
+</ul>
+<h2 id="md-recommended-order-of-work">Recommended order of work</h2>
+<ol>
+<li>Make the quick release fixes: B8, K1, K4 to K7, and item 3 of B13.</li>
+<li>Fix the runtime blockers: B5, B6, B7, B9, B10, and R1 to R3.</li>
+<li>Fix the generator blockers, and then regenerate: B2, B3, B4, P1, P4, and
+B1.</li>
+<li>Settle the public names before 2.0.0: B11 and B12.</li>
+<li>Add the tests that can catch these defects: T1 to T4, and the rest of B13.</li>
+<li>Automate the schema sync: P2, P3, and P6.</li>
+<li>Correct the docs: D1 to D12.</li>
+</ol>
+<h2 id="md-current-workflow">Current workflow</h2>
+<p>This audit's original push and pull request steps are obsolete. Follow the
+branch, remote, and pull request rules in <a href="../../AGENTS.md">AGENTS.md</a>. Use
+current commands from <a href="../../pyproject.toml">pyproject.toml</a>.</p>
+<h2 id="md-post-merge-automation-setup-ledger-entry-p3a">Post-merge automation setup (ledger entry P3a)</h2>
+<p>After the V6 branch merges into <code>main</code>, complete these steps:</p>
+<ol>
+<li>Turn on <strong>Settings &gt; Actions &gt; General &gt; Allow GitHub Actions to create
+and approve pull requests</strong>. The weekly <code>schema-sync</code> job fails without it.</li>
+<li>Run <code>schema-sync</code> once by hand from the Actions tab. Confirm that it ends
+with &quot;already matches schema HEAD&quot; or opens a pull request.</li>
+<li>Expect Dependabot pull requests for the action SHA pins and <code>uv.lock</code>.</li>
+<li>Close and reopen each <code>schema-sync</code> pull request to start its CI. The
+steps are in &quot;Automated update pull requests&quot; in
+<a href="../../docs/sphinx/guides/generation.md">the generation guide</a>.</li>
+</ol>
+<h2 id="md-audit-snapshot-risks-open-on-2026-10-12">Audit snapshot: risks open on 2026-10-12</h2>
+<p>This list records the risks that remained open at the audit date. The current
+status and revisit triggers are in <a href="deferred-risks.md"><code>deferred-risks.md</code></a>.</p>
+<ul>
+<li><strong>Blockers:</strong>
+<ul>
+<li>B2: <code>Alert.acknowledgement</code> has the wrong type.</li>
+<li>B3: <code>ExternalContext</code> requires both members of a oneof.</li>
+<li>B4: gRPC loses <code>MitigationsService</code> to a file-name collision.</li>
+<li>B8: httpx 1.0 will break <code>import kentik_api</code>.</li>
+<li>B9: gRPC responses over 4 MiB fail and look like a quota error.</li>
+<li>B11: public names are not stable.</li>
+<li>B12: the per-operation error class is never raised.</li>
+</ul>
+</li>
+<li><strong>Generation:</strong> P2, P3, P4 (atomic swap), P6 (ancestor tags, unresolved <code>--since</code>, requirement parsing), L1-L13.</li>
+<li><strong>Runtime:</strong> R2, R4 to R7, R9 to R16.</li>
+<li><strong>Tests:</strong> T1 to T4, T7, T9.</li>
+<li><strong>Release and docs:</strong> K1 to K3, K8, D1 to D6, D11, D12.</li>
+</ul>
+<p>The audit flagged stale <code>dist/</code> output as K1. The owner deleted it before any upload.</p>
+</article>
+</div>
+<!-- report-markdown:end -->
+<footer>Diagram companion for the full report in the second tab. The diagram does not replace the source findings or evidence.</footer>
+</div>
+<script type="application/json" id="diagram-data">{"audit-pipeline": {"caption": "Historical audit chain from schema input through generation, tests, release checks, and CI.", "select": "e2e", "hint": "Select a validation stage to inspect the historical audit finding and its consequence.", "parts": {"schema": {"role": "The audit regenerated from a pinned schema and compared the output.", "facts": ["Input: api-schema-public 9de9a68", "Deterministic output"], "stops": "A schema change can introduce new operations that need tests and surface checks.", "evidence": "Audit baseline dated 2026-10-10.", "title": "Upstream schema"}, "generator": {"role": "The audit found protoc failures could print an error without failing generation.", "facts": ["P1: failure did not stop the run", "Generated services could lose protobuf files"], "stops": "A broken or incomplete generated SDK can still reach later test gates.", "evidence": "Finding P1 in the pre-PR audit.", "title": "Generator"}, "mock": {"role": "Mocked success bodies were generated from the same models they tested.", "facts": ["T1: weak schema independence", "232 of 234 response samples held only nulls"], "stops": "Model/schema mismatches can pass mocked tests.", "evidence": "Finding T1 in the pre-PR audit.", "title": "Mocked tests"}, "e2e": {"role": "The original e2e tests used a placeholder API host and accepted any KentikError as a pass.", "facts": ["B13: wrong host", "B13: false-pass rule"], "stops": "Live API defects can remain hidden behind a green e2e result.", "evidence": "Finding B13 in the pre-PR audit.", "title": "Live e2e tests"}, "surface": {"role": "The API surface record omitted wrapper names and types.", "facts": ["P6: breaking changes can be missed", "Release notes rely on this record"], "stops": "A public API change may not trigger a changelog review.", "evidence": "Finding P6 in the pre-PR audit.", "title": "API surface record"}, "changelog": {"role": "The old changelog gate accepted substring matches.", "facts": ["P6: a word elsewhere could satisfy a required entry"], "stops": "A missing breaking-change note can pass CI.", "evidence": "Finding P6 in the pre-PR audit.", "title": "Changelog gate"}, "ci": {"role": "The audit traced how several weak gates could produce a false green result.", "facts": ["Historical audit view", "Findings and remediation status are dated"], "stops": "A green gate is only useful when each upstream check proves the contract it claims to check.", "evidence": "See the full audit report and validation ledger.", "title": "CI result"}}, "paths": {"test_blind_spots": {"label": "Test blind spots", "title": "Mocked and e2e checks miss behavior", "text": "Model-shaped fixtures and a wrong live target let real mismatches pass.", "links": ["generator>mock", "mock>e2e"], "family": "green"}, "release_gate": {"label": "Release gate", "title": "Incomplete surface data weakens the changelog check", "text": "The recorded API surface and gate both had gaps in this audit snapshot.", "links": ["surface>changelog", "changelog>ci"], "family": "orange"}, "full_chain": {"label": "Full gate chain", "title": "Follow the schema to the CI result", "text": "Each stage depends on the evidence produced by the previous stage.", "links": ["schema>generator", "generator>mock", "mock>e2e", "e2e>surface", "surface>changelog", "changelog>ci"], "family": "blue"}}, "links": {"schema>generator": "schema input", "generator>mock": "generated code", "mock>e2e": "test fixtures", "e2e>surface": "API record", "surface>changelog": "breaking changes", "changelog>ci": "gate result"}}}</script>
+<script>
+/* Explorer for house-style diagrams. It wires each svg inside an .explorer
+   box to its entry in the JSON block #diagram-data, keyed by the svg id. */
+(() => {
+  "use strict";
+  const DATA = JSON.parse(document.getElementById("diagram-data")?.textContent || "{}");
+
+  function el(tag, attrs = {}, children = []) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "text") e.textContent = v;
+      else e.setAttribute(k, v);
+    }
+    for (const c of children) if (c) e.append(c);
+    return e;
+  }
+
+  // Selection follows data edges only. A request edge lights up when it
+  // touches the selected part, but stays out of the closure: otherwise the
+  // call half of a two-way exchange makes every caller "need" the others.
+  // Requests are access paths that a person opens, and calls.
+  function explorer(svg, onSelect) {
+    const nodes = [...svg.querySelectorAll(".node[data-id]")];
+    const segs = [...svg.querySelectorAll(".edge[data-links]")];
+    const hiMarker = svg.querySelector('marker[id$="-ah-hi"]');
+    const links = {};
+    for (const s of segs) {
+      const label = s.querySelector(".elabel")?.textContent || "";
+      const request = s.classList.contains("access") || s.classList.contains("call");
+      for (const k of s.dataset.links.split(",")) {
+        const [from, to] = k.split(">");
+        links[k] ??= { from, to, request, label: "" };
+        if (!links[k].label) links[k].label = label;
+      }
+      const path = s.querySelector("path[marker-end]");
+      if (path) path.dataset.marker = path.getAttribute("marker-end");
+    }
+
+    function closure(start, dir) {
+      const seen = {};
+      const stack = [start];
+      while (stack.length) {
+        const n = stack.pop();
+        for (const l of Object.values(links)) {
+          if (l.request) continue;
+          const [a, b] = dir === "up" ? [l.to, l.from] : [l.from, l.to];
+          if (a === n && !seen[b] && b !== start) { seen[b] = true; stack.push(b); }
+        }
+      }
+      return seen;
+    }
+
+    // A marker cannot inherit the stroke of its path, so a lit wire swaps
+    // to the second marker that the kit puts in every svg.
+    function paintMarkers() {
+      for (const s of segs) {
+        const p = s.querySelector("path[data-marker]");
+        if (!p || !hiMarker) continue;
+        const lit = s.classList.contains("hi") || s.classList.contains("flow");
+        p.setAttribute("marker-end", lit ? `url(#${hiMarker.id})` : p.dataset.marker);
+      }
+    }
+
+    function clear() {
+      svg.classList.remove("dimming");
+      for (const n of nodes) n.classList.remove("sel", "lit");
+      for (const s of segs) s.classList.remove("hi", "flow");
+      paintMarkers();
+    }
+
+    function select(id) {
+      const up = closure(id, "up");
+      const down = closure(id, "down");
+      const lit = { [id]: true, ...up, ...down };
+      svg.classList.add("dimming");
+      for (const s of segs) {
+        let hi = false;
+        let flow = false;
+        for (const k of s.dataset.links.split(",")) {
+          const l = links[k];
+          if (l.request) {
+            if (l.from === id || l.to === id) { flow = true; lit[l.from] = true; lit[l.to] = true; }
+            continue;
+          }
+          if (up[l.from] && (up[l.to] || l.to === id)) hi = true;
+          if ((down[l.from] || l.from === id) && down[l.to]) flow = true;
+        }
+        s.classList.toggle("hi", hi);
+        s.classList.toggle("flow", flow && !hi);
+      }
+      for (const n of nodes) {
+        n.classList.toggle("sel", n.dataset.id === id);
+        n.classList.toggle("lit", !!lit[n.dataset.id]);
+      }
+      paintMarkers();
+      onSelect(id);
+    }
+
+    function showPath(keys) {
+      clear();
+      svg.classList.add("dimming");
+      const set = new Set(keys);
+      const lit = {};
+      for (const s of segs) {
+        const on = s.dataset.links.split(",").filter((k) => set.has(k));
+        s.classList.toggle("hi", on.length > 0);
+        for (const k of on) { lit[links[k].from] = true; lit[links[k].to] = true; }
+      }
+      for (const n of nodes) n.classList.toggle("lit", !!lit[n.dataset.id]);
+      paintMarkers();
+    }
+
+    for (const n of nodes) {
+      n.addEventListener("click", () => select(n.dataset.id));
+      n.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.dataset.id); }
+      });
+    }
+    return { select, clear, showPath, links };
+  }
+
+  function wire(svg) {
+    const d = DATA[svg.id] || {};
+    const parts = d.parts || {};
+    const card = document.querySelector(`[data-detail-for="${svg.id}"]`);
+    const chipBox = document.querySelector(`[data-paths-for="${svg.id}"]`);
+    const chips = [];
+    const title = (id) => parts[id]?.title || id;
+    const hint = d.hint || "Select a part to see what it needs and where its data goes.";
+
+    function press(key) {
+      for (const c of chips) c.setAttribute("aria-pressed", String(key !== null && c.dataset.path === key));
+    }
+
+    function heading(h, text) {
+      card.replaceChildren(el("div", { class: "head" }, [el("h3", { text: h }), el("p", { class: "role", text })]));
+    }
+
+    function rel(list) {
+      if (!list.length) return el("p", { class: "none", text: "Nothing in this diagram." });
+      return el("div", { class: "rel" }, list.map((r) => {
+        const b = el("button", { type: "button" }, [title(r.id), el("span", { text: r.label })]);
+        b.addEventListener("click", () => { press(null); ex.select(r.id); });
+        return b;
+      }));
+    }
+
+    function render(id) {
+      if (!card) return;
+      const p = parts[id] || {};
+      const ups = [];
+      const downs = [];
+      const requests = [];
+      for (const l of Object.values(ex.links)) {
+        if (l.request) { if (l.from === id || l.to === id) requests.push(l); continue; }
+        if (l.to === id) ups.push({ id: l.from, label: l.label });
+        if (l.from === id) downs.push({ id: l.to, label: l.label });
+      }
+      const head = el("div", { class: "head" }, [el("h3", { text: title(id) })]);
+      if (p.role) head.append(el("p", { class: "role", text: p.role }));
+      if (p.badge) head.append(el("p", {}, [el("span", { class: `badge ${p.badge.tone || ""}`, text: p.badge.text })]));
+      const left = el("div");
+      if (p.facts?.length) left.append(el("h4", { text: "Facts" }), el("ul", {}, p.facts.map((f) => el("li", { text: f }))));
+      if (p.setting) left.append(el("h4", { text: "Setting" }), el("div", { class: "setting", text: p.setting }));
+      if (p.text) left.append(el("p", { text: p.text }));
+      const right = el("div", {}, [el("h4", { text: "Gets data from" }), rel(ups), el("h4", { text: "Sends data to" }), rel(downs)]);
+      if (requests.length) {
+        const text = requests.map((l) => `${title(l.from)} to ${title(l.to)}: ${l.label}`).join(". ");
+        right.append(el("h4", { text: "Requests" }), el("p", { class: "none", text: `${text}.` }));
+      }
+      card.replaceChildren(head, el("div", { class: "cols" }, [left, right]));
+      if (p.stops) card.append(el("div", { class: "stops" }, [el("h4", { text: "If it stops" }), el("p", { text: p.stops })]));
+      if (p.evidence) card.append(el("p", { class: "evidence" }, [el("b", { text: "Evidence  " }), p.evidence]));
+    }
+
+    const ex = explorer(svg, (id) => { press(null); render(id); });
+    for (const [k, label] of Object.entries(d.links || {})) if (ex.links[k]) ex.links[k].label = label;
+
+    if (chipBox && d.paths) {
+      const all = el("button", { class: "chip", type: "button", "aria-pressed": "false", "data-path": "", text: "All paths" });
+      all.addEventListener("click", () => { press(""); ex.clear(); if (card) heading("All paths", hint); });
+      chips.push(all);
+      for (const [key, path] of Object.entries(d.paths)) {
+        const fam = path.family === "neutral" ? "neu" : path.family || "neu";
+        const b = el("button", { class: "chip", type: "button", "aria-pressed": "false", "data-path": key }, [
+          el("span", { class: "dot", style: `background:var(--${fam}-border)` }), path.label || key,
+        ]);
+        b.addEventListener("click", () => {
+          press(key);
+          ex.showPath(path.links || []);
+          if (card) heading(path.title || path.label || key, path.text || "");
+        });
+        chips.push(b);
+      }
+      chipBox.replaceChildren(...chips);
+    }
+
+    if (d.select) ex.select(d.select);
+    else if (card) heading("Select a part", hint);
+  }
+
+  for (const svg of document.querySelectorAll(".explorer svg[id]")) wire(svg);
+})();
+</script>
+<script src="../assets/report-tabs.js" defer></script>
+</body>
+</html>

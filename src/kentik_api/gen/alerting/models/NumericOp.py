@@ -1,0 +1,20 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class NumericOp(str, Enum):
+    NUMERIC_OP_UNSPECIFIED = "NUMERIC_OP_UNSPECIFIED"
+
+    NUMERIC_OP_EQUALS = "NUMERIC_OP_EQUALS"
+
+    NUMERIC_OP_NOT_EQUALS = "NUMERIC_OP_NOT_EQUALS"
+
+    NUMERIC_OP_LESS_THAN = "NUMERIC_OP_LESS_THAN"
+
+    NUMERIC_OP_GREATER_THAN = "NUMERIC_OP_GREATER_THAN"
+
+    NUMERIC_OP_LESS_THAN_OR_EQUALS = "NUMERIC_OP_LESS_THAN_OR_EQUALS"
+
+    NUMERIC_OP_GREATER_THAN_OR_EQUALS = "NUMERIC_OP_GREATER_THAN_OR_EQUALS"

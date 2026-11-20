@@ -1,0 +1,40 @@
+{
+  // Markdown rules for this repo. rumdl reads this file in `uv run poe lint` and CI;
+  // the markdownlint editor extension reads it too. When the two disagree,
+  // the CI result decides.
+  "config": {
+    "MD013": {
+      "line_length": 200,
+      "code_blocks": false,
+      "tables": false
+    },
+    "MD024": {
+      "siblings_only": true
+    },
+    // scripts/check_spec_refs.py reads a bold `**Out of scope**` line as a
+    // marker, so specs use emphasis where this rule wants a heading.
+    "MD036": false,
+    "MD033": {
+      "allowed_elements": ["details", "summary", "picture", "source", "img"]
+    }
+  },
+  "globs": ["**/*.md"],
+  // Spec Kit vendors these paths (specify init/upgrade rewrites them
+  // wholesale), so they aren't ours to hand-fix for markdownlint compliance.
+  // Any fix here would just get overwritten by the next `specify upgrade` /
+  // `specify init --force`.
+  "ignores": [
+    // Exactly `@AGENTS.md`, a Claude Code import, so it can have no heading.
+    "CLAUDE.md",
+    ".venv/**",
+    "dist/**",
+    "docs/sphinx/services/**",
+    ".github/skills/**",
+    ".claude/skills/speckit-*/**",
+    // Written by `uv run poe _install_skill .claude/skills`; never hand-edited.
+    ".claude/skills/poethepoet/**",
+    ".specify/templates/**",
+    ".specify/extensions/**",
+    "reports/**"
+  ]
+}

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerting: undocumented startedAt requirement and gRPC 500 on every RPC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
+</head>
+<body>
+<div class="wrap">
+<header class="masthead">
+  <p class="sub">Report for the Kentik API team</p>
+  <h1>Alerting: the backend needs <code>startedAt</code>, and every <span>gRPC</span> RPC returns 500</h1>
+  <p class="sub">Observed 2026-10-13 against the live V6 API with the Kentik community Python SDK.
+    Schema checked: <code>api-schema-public</code> commit <code>9de9a68</code>.</p>
+</header>
+<!-- report-tabs:start -->
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive report</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="upstream-alert-list-requirements.md">upstream-alert-list-requirements.md</a></div>
+<!-- report-tabs:end -->
+<div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
+
+<div class="callout">
+  <strong>Current status, 2026-10-27:</strong> the alert-list requirement no
+  longer reproduces. Seven read-only request bodies returned HTTP 200, including
+  an empty body. The broad gRPC claim below was narrowed by later tests. Calls
+  without deadlines worked. A deadline caused `RangeError` on six services. See
+  <a href="../kentik-api-team-findings.md">the current findings tracker</a> for the
+  current ticket list.
+</div>
+
+<nav class="toc" aria-label="Sections"><ul>
+  <li><a href="#rest-alerts">REST alert list</a></li>
+  <li><a href="#grpc-deadlines">gRPC deadline result</a></li>
+  <li><a href="#related">Related finding</a></li>
+</ul></nav>
+
+<h2 id="rest-alerts">Issue 1: REST <code>POST /v202505/alerts</code> rejects a request with no <code>startedAt</code></h2>
+<p>The proto marks every field of <code>AlertServiceListRequest</code> and <code>AlertFilters</code>
+  as <code>OPTIONAL</code>. <code>started_at</code> has the default <code>{}</code>. The operation
+  description does not mention a required time range. The live API returns
+  <code>400 backend request error</code> for every request that has no <code>filters.startedAt</code>.</p>
+<div class="tablebox"><table>
+  <thead><tr><th>Request body</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td><code>{}</code></td><td>400</td></tr>
+    <tr><td><code>{"pagination":{"limit":5}}</code></td><td>400</td></tr>
+    <tr><td><code>{"sorting":{"field":"startedAt"}}</code></td><td>400</td></tr>
+    <tr><td><code>{"filters":{"states":["ALERT_STATE_ACTIVE"]}}</code></td><td>400</td></tr>
+    <tr><td><code>{"filters":{"activeAt":{"start":"...","end":"..."}}}</code></td><td>400</td></tr>
+    <tr><td><code>{"filters":{"startedAt":{"start":"now-30d","end":"now"}}}</code></td><td>200, 122 alerts</td></tr>
+  </tbody>
+</table></div>
+<p>Other <code>v202505</code> list routes (silence, auto-ack) accept an empty body.</p>
+<div class="callout">
+  <strong>Ask:</strong> either accept a request without <code>startedAt</code> (the documented default),
+  or mark the field <code>REQUIRED</code> in the proto and describe the rule in the operation text.
+  Please also return a message that names the missing field instead of <code>backend request error</code>.
+</div>
+
+<h2 id="grpc-deadlines">Issue 2: every alerting gRPC RPC returns 500 <code>RangeError</code></h2>
+<p>All alerting RPCs we tried fail over gRPC with the same error. The same calls work over REST, and
+  other gRPC services work on the same account (for example device list, and the <code>mkp</code> lists).</p>
+<div class="tablebox"><table>
+  <thead><tr><th>Operation</th><th>REST</th><th>gRPC</th></tr></thead>
+  <tbody>
+    <tr><td>Alert <code>Get</code> with id <code>does-not-exist</code></td><td>404</td><td>500 RangeError</td></tr>
+    <tr><td>Alert <code>List</code> (empty request, and with <code>startedAt</code>)</td><td>200 with <code>startedAt</code></td><td>500 RangeError</td></tr>
+    <tr><td>Silence, mitigation method, mitigation platform, policy, suppression <code>List</code></td><td>200 (silence checked)</td><td>500 RangeError</td></tr>
+    <tr><td>Mitigation <code>List</code>, <code>AvailableActions</code></td><td>200</td><td>500 RangeError</td></tr>
+    <tr><td>Mitigation <code>Get</code>, <code>AvailableActionsForMitigation</code> with id <code>999999999</code></td><td>404</td><td>500 RangeError</td></tr>
+    <tr><td>Mitigation <code>Create</code>, then <code>Get</code>, <code>Act</code> STOP and DELETE on it</td><td>200, all succeed</td><td>500 RangeError</td></tr>
+  </tbody>
+</table></div>
+<p>The failure does not depend on the request content: a Get with one string id fails the same way as a List
+  with a hand-built proto message. The 500 carries no status details. The response comes from the gateway
+  with <code>x-envoy-upstream-service-time: 29</code> (ms), so an upstream service received the call and failed.
+  Write RPCs fail the same way: a gRPC mitigation <code>Create</code> and <code>Act</code> both returned the error
+  on a lab account, while the same calls over REST succeeded.</p>
+<pre><code>code    : StatusCode.INTERNAL
+details : internal error (name:RangeError type:object) (errxid db77tw34km2g0gtxpkgg)
+server  : envoy   x-envoy-upstream-service-time: 29</code></pre>
+<div class="callout">
+  <strong>Ask:</strong> check the alerting service behind the gRPC route. A <code>RangeError</code> is a
+  JavaScript error, so it looks like an unhandled exception in that service for every gRPC request.
+</div>
+
+<div class="chips" data-paths-for="alert-history" aria-label="Diagram paths"></div>
+<figure>
+  <div class="diagram explorer"><svg id="alert-history" viewBox="0 0 1370 460" role="group" aria-label="Historical REST alert-list probes and the later gRPC deadline result." xmlns="http://www.w3.org/2000/svg"><defs><marker id="alert-history-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="alert-history-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="probes_stem" data-links="probes>rest_empty,probes>rest_started,probes>grpc_open,probes>grpc_deadline"><path d="M200,226 H230" class="wire"/></g><g class="edge data" data-seg="probes_rest_empty" data-links="probes>rest_empty"><path d="M230,226 V76 H260" class="wire arrow" marker-end="url(#alert-history-ah)"/></g><g class="edge data" data-seg="probes_rest_started" data-links="probes>rest_started"><path d="M230,226 V166 H260" class="wire arrow" marker-end="url(#alert-history-ah)"/></g><g class="edge data" data-seg="probes_grpc_open" data-links="probes>grpc_open"><path d="M230,226 V286 H260" class="wire arrow" marker-end="url(#alert-history-ah)"/></g><g class="edge data" data-seg="probes_grpc_deadline" data-links="probes>grpc_deadline"><path d="M230,226 V376 H260" class="wire arrow" marker-end="url(#alert-history-ah)"/></g><g class="edge data" data-seg="rest_empty" data-links="rest_empty>rest_api"><path d="M480,76 H600 V116 H710" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="535" y="68" class="elabel" text-anchor="middle">REST request</text></g><g class="edge data" data-seg="rest_started" data-links="rest_started>rest_api"><path d="M480,166 H600 V116 H710" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="535" y="158" class="elabel" text-anchor="middle">REST request</text></g><g class="edge data" data-seg="rest_400" data-links="rest_api>rest_missing"><path d="M910,116 H1000 V76 H1120" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="1060" y="68" class="elabel" text-anchor="middle">historical 400</text></g><g class="edge data" data-seg="rest_200" data-links="rest_api>rest_success"><path d="M910,116 H1000 V166 H1120" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="1060" y="158" class="elabel" text-anchor="middle">historical 200</text></g><g class="edge data" data-seg="grpc_open" data-links="grpc_open>grpc_ok"><path d="M480,286 H710" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="595" y="278" class="elabel" text-anchor="middle">no deadline</text></g><g class="edge data" data-seg="grpc_deadline" data-links="grpc_deadline>grpc_error"><path d="M480,376 H710" class="wire arrow" marker-end="url(#alert-history-ah)"/><text x="595" y="368" class="elabel" text-anchor="middle">deadline set</text></g><g class="node fam-blue proc " data-id="rest_empty" tabindex="0" role="button" aria-label="Select REST request without startedAt"><rect x="260" y="40" width="220" height="72" rx="14"/><text x="370" y="64.0" class="nm">REST AlertList</text><text x="370" y="81.0" class="ft">no startedAt</text><text x="370" y="98.0" class="ft">2026-10-13</text></g><g class="node fam-green proc " data-id="rest_started" tabindex="0" role="button" aria-label="Select REST request with startedAt"><rect x="260" y="130" width="220" height="72" rx="14"/><text x="370" y="154.0" class="nm">REST AlertList</text><text x="370" y="171.0" class="ft">with startedAt</text><text x="370" y="188.0" class="ft">2026-10-13</text></g><g class="node fam-neutral hub " data-id="rest_api" tabindex="0" role="button" aria-label="Select REST alert-list endpoint"><rect x="710" y="80" width="200" height="72" rx="14"/><text x="810" y="112.5" class="nm">REST API</text><text x="810" y="129.5" class="ft">alert list</text></g><g class="node fam-red proc " data-id="rest_missing" tabindex="0" role="button" aria-label="Select Historical HTTP 400"><rect x="1120" y="40" width="220" height="72" rx="14"/><text x="1230" y="64.0" class="nm">HTTP 400</text><text x="1230" y="81.0" class="ft">missing time filter</text><text x="1230" y="98.0" class="ft">historical</text></g><g class="node fam-green proc " data-id="rest_success" tabindex="0" role="button" aria-label="Select Historical HTTP 200"><rect x="1120" y="130" width="220" height="72" rx="14"/><text x="1230" y="154.0" class="nm">HTTP 200</text><text x="1230" y="171.0" class="ft">122 alerts</text><text x="1230" y="188.0" class="ft">historical</text></g><g class="node fam-blue proc " data-id="grpc_open" tabindex="0" role="button" aria-label="Select gRPC call without deadline"><rect x="260" y="250" width="220" height="72" rx="14"/><text x="370" y="274.0" class="nm">gRPC call</text><text x="370" y="291.0" class="ft">no deadline</text><text x="370" y="308.0" class="ft">2026-10-27</text></g><g class="node fam-orange proc " data-id="grpc_deadline" tabindex="0" role="button" aria-label="Select gRPC call with deadline"><rect x="260" y="340" width="220" height="72" rx="14"/><text x="370" y="364.0" class="nm">gRPC call</text><text x="370" y="381.0" class="ft">deadline set</text><text x="370" y="398.0" class="ft">six services</text></g><g class="node fam-green proc " data-id="grpc_ok" tabindex="0" role="button" aria-label="Select gRPC success control"><rect x="710" y="250" width="220" height="72" rx="14"/><text x="820" y="282.5" class="nm">Call succeeds</text><text x="820" y="299.5" class="ft">no deadline</text></g><g class="node fam-red proc " data-id="grpc_error" tabindex="0" role="button" aria-label="Select gRPC deadline failure"><rect x="710" y="340" width="260" height="72" rx="14"/><text x="840" y="364.0" class="nm">RangeError</text><text x="840" y="381.0" class="ft">six services</text><text x="840" y="398.0" class="ft">historical repro</text></g><g class="node fam-neutral hub " data-id="probes" tabindex="0" role="button" aria-label="Select Read-only probe runs"><rect x="20" y="190" width="180" height="72" rx="14"/><text x="110.0" y="214.0" class="nm">Read-only probes</text><text x="110.0" y="231.0" class="ft">REST 2026-10-13</text><text x="110.0" y="248.0" class="ft">gRPC 2026-10-27</text></g></svg></div>
+  <figcaption>The old REST startedAt finding no longer reproduces. A later probe confirmed deadline-specific gRPC failures on six services.</figcaption>
+</figure>
+<div class="detail" data-detail-for="alert-history" aria-live="polite"></div>
+
+<h2 id="related">Related: <code>ktbgp</code> <code>RouteService.List</code> returns 501</h2>
+<p><code>/kentik.ktbgp.v202501.RouteService/List</code> is declared in the proto, but the server answers
+  <code>501: The server does not implement the method</code>.</p>
+
+</div>
+<!-- report-markdown:start -->
+<div class="tabpanel" id="full-report" role="tabpanel" aria-labelledby="tab-full-report">
+<article class="markdown-body">
+<h1 id="md-alerting-the-backend-needs-startedat-and-every-grpc-rpc-returns-500">Alerting: the backend needs <code>startedAt</code>, and every gRPC RPC returns 500</h1>
+<p>Report for the Kentik API team</p>
+<p>Observed 2026-10-13 against the live V6 API with the Kentik community Python SDK. Schema checked: <code>api-schema-public</code> commit <code>9de9a68</code>.</p>
+<blockquote class="markdown-alert markdown-alert-note">
+<p><span class="markdown-alert-title">Note</span><strong>Current status, 2026-10-27:</strong> the alert-list requirement no
+longer reproduces. Seven read-only request bodies returned HTTP 200, including
+an empty body. The broad gRPC claim below was narrowed by later tests. Calls
+without deadlines worked. A deadline caused <code>RangeError</code> on six services. See
+<a href="../kentik-api-team-findings.md">the current findings tracker</a> for the
+current ticket list.</p>
+</blockquote>
+<h2 id="md-issue-1-rest-post-v202505alerts-rejects-a-request-with-no-startedat">Issue 1: REST <code>POST /v202505/alerts</code> rejects a request with no <code>startedAt</code></h2>
+<p>The proto marks every field of <code>AlertServiceListRequest</code> and <code>AlertFilters</code>
+as <code>OPTIONAL</code>. <code>started_at</code> has the default <code>{}</code>. The operation
+description does not mention a required time range. The live API returns
+<code>400 backend request error</code> for every request that has no <code>filters.startedAt</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Request body</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{}</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>{&quot;pagination&quot;:{&quot;limit&quot;:5}}</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>{&quot;sorting&quot;:{&quot;field&quot;:&quot;startedAt&quot;}}</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>{&quot;filters&quot;:{&quot;states&quot;:[&quot;ALERT_STATE_ACTIVE&quot;]}}</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>{&quot;filters&quot;:{&quot;activeAt&quot;:{&quot;start&quot;:&quot;...&quot;,&quot;end&quot;:&quot;...&quot;}}}</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>{&quot;filters&quot;:{&quot;startedAt&quot;:{&quot;start&quot;:&quot;now-30d&quot;,&quot;end&quot;:&quot;now&quot;}}}</code></td>
+<td>200, 122 alerts</td>
+</tr>
+</tbody>
+</table>
+<p>Other <code>v202505</code> list routes (silence, auto-ack) accept an empty body.</p>
+<blockquote class="markdown-alert markdown-alert-note">
+<p><span class="markdown-alert-title">Note</span><strong>Ask:</strong> either accept a request without <code>startedAt</code> (the documented default),
+or mark the field <code>REQUIRED</code> in the proto and describe the rule in the operation text.
+Please also return a message that names the missing field instead of <code>backend request error</code>.</p>
+</blockquote>
+<h2 id="md-issue-2-every-alerting-grpc-rpc-returns-500-rangeerror">Issue 2: every alerting gRPC RPC returns 500 <code>RangeError</code></h2>
+<p>All alerting RPCs we tried fail over gRPC with the same error. The same calls work over REST, and
+other gRPC services work on the same account (for example device list, and the <code>mkp</code> lists).</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>REST</th>
+<th>gRPC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alert <code>Get</code> with id <code>does-not-exist</code></td>
+<td>404</td>
+<td>500 RangeError</td>
+</tr>
+<tr>
+<td>Alert <code>List</code> (empty request, and with <code>startedAt</code>)</td>
+<td>200 with <code>startedAt</code></td>
+<td>500 RangeError</td>
+</tr>
+<tr>
+<td>Silence, mitigation method, mitigation platform, policy, suppression <code>List</code></td>
+<td>200 (silence checked)</td>
+<td>500 RangeError</td>
+</tr>
+<tr>
+<td>Mitigation <code>List</code>, <code>AvailableActions</code></td>
+<td>200</td>
+<td>500 RangeError</td>
+</tr>
+<tr>
+<td>Mitigation <code>Get</code>, <code>AvailableActionsForMitigation</code> with id <code>999999999</code></td>
+<td>404</td>
+<td>500 RangeError</td>
+</tr>
+<tr>
+<td>Mitigation <code>Create</code>, then <code>Get</code>, <code>Act</code> STOP and DELETE on it</td>
+<td>200, all succeed</td>
+<td>500 RangeError</td>
+</tr>
+</tbody>
+</table>
+<p>The failure does not depend on the request content: a Get with one string id fails the same way as a List
+with a hand-built proto message. The 500 carries no status details. The response comes from the gateway
+with <code>x-envoy-upstream-service-time: 29</code> (ms), so an upstream service received the call and failed.
+Write RPCs fail the same way: a gRPC mitigation <code>Create</code> and <code>Act</code> both returned the error
+on a lab account, while the same calls over REST succeeded.</p>
+<pre class="highlight"><code class="language-text">code    : StatusCode.INTERNAL
+details : internal error (name:RangeError type:object) (errxid db77tw34km2g0gtxpkgg)
+server  : envoy   x-envoy-upstream-service-time: 29
+</code></pre>
+<blockquote class="markdown-alert markdown-alert-note">
+<p><span class="markdown-alert-title">Note</span><strong>Ask:</strong> check the alerting service behind the gRPC route. A <code>RangeError</code> is a
+JavaScript error, so it looks like an unhandled exception in that service for every gRPC request.</p>
+</blockquote>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/alert-history-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/alert-history-light.svg">
+  <img alt="The old REST startedAt finding no longer reproduces. A later probe confirmed deadline-specific gRPC failures on six services." src="../assets/alert-history-light.svg">
+</picture>
+<p>Open the <a href="#interactive">interactive explorer</a> to select each part and see its evidence.</p>
+<h2 id="md-related-ktbgp-routeservicelist-returns-501">Related: <code>ktbgp</code> <code>RouteService.List</code> returns 501</h2>
+<p><code>/kentik.ktbgp.v202501.RouteService/List</code> is declared in the proto, but the server answers
+<code>501: The server does not implement the method</code>.</p>
+<p>Request ids: REST 400 <code>db77aqa4km2g0tk1g020</code>; gRPC 500 <code>db77tw34km2g0gtxpkgg</code>.</p>
+<p>Request ids: REST 400 <code>db77aqa4km2g0tk1g020</code>; gRPC 500 <code>db77tw34km2g0gtxpkgg</code>.</p>
+</article>
+</div>
+<!-- report-markdown:end -->
+<footer>Request ids: REST 400 <code>db77aqa4km2g0tk1g020</code>; gRPC 500 <code>db77tw34km2g0gtxpkgg</code>.</footer>
+</div>
+<script type="application/json" id="diagram-data">{"alert-history": {"caption": "The old REST startedAt finding no longer reproduces. A later probe confirmed deadline-specific gRPC failures on six services.", "select": "rest_empty", "hint": "This is a historical report. Select a probe to see the observed result and the later recheck.", "parts": {"probes": {"role": "The probe runs behind this report: two REST requests on 2026-10-13, and two gRPC calls on 2026-10-27.", "facts": ["Read-only requests", "No object was changed"], "stops": "No new observations.", "evidence": "Current recheck is summarized in the findings tracker.", "title": "Read-only probe runs"}, "rest_empty": {"role": "The 2026-10-13 probe sent an AlertList request without a startedAt filter.", "facts": ["Historical response: HTTP 400", "Request body variants were tested"], "stops": "The finding no longer reproduces. Seven read-only variants returned HTTP 200 on 2026-10-27.", "evidence": "Current recheck is summarized in the findings tracker.", "title": "REST request without startedAt"}, "rest_started": {"role": "The 2026-10-13 probe added a startedAt range to the request.", "facts": ["Historical response: HTTP 200", "122 alerts returned"], "stops": "This result shows the older behavior, not a current requirement.", "evidence": "Current recheck on 2026-10-27 returned HTTP 200 for seven body variants.", "title": "REST request with startedAt"}, "rest_api": {"role": "The REST endpoint returned different historical results for the tested request bodies.", "facts": ["No startedAt: HTTP 400 in 2026-10-13 probe", "startedAt: HTTP 200 in 2026-10-13 probe"], "stops": "The follow-up probe no longer showed a required time range.", "evidence": "Seven read-only request bodies returned HTTP 200 on 2026-10-27.", "title": "REST alert-list endpoint"}, "rest_missing": {"role": "The old probe returned HTTP 400 when startedAt was absent.", "facts": ["Message: backend request error", "Historical result only"], "stops": "Do not treat this as the current API contract; the 2026-10-27 recheck passed without the filter.", "evidence": "Original observation 2026-10-13; recheck 2026-10-27.", "title": "Historical HTTP 400"}, "rest_success": {"role": "The old probe returned HTTP 200 with a startedAt range.", "facts": ["122 alerts", "Historical result only"], "stops": "The newer recheck also returned HTTP 200 for requests without startedAt.", "evidence": "Original observation 2026-10-13; seven-body recheck 2026-10-27.", "title": "Historical HTTP 200"}, "grpc_open": {"role": "Calls without deadlines worked in the historical gRPC test.", "facts": ["The request did not carry grpc-timeout", "Read-only test"], "stops": "This control isolates the deadline as the condition for the six-service failure.", "evidence": "Deadline tests summarized in the current findings tracker.", "title": "gRPC call without deadline"}, "grpc_deadline": {"role": "A gRPC deadline caused a RangeError on six services in the later test.", "facts": ["Deadline set", "Six services affected"], "stops": "Calls to those services can fail when the client sends a deadline.", "evidence": "Reproduced on 2026-10-27; see current findings tracker.", "title": "gRPC call with deadline"}, "grpc_ok": {"role": "The call succeeded without a deadline.", "facts": ["Historical control", "Same service path"], "stops": "The control does not trigger the deadline failure.", "evidence": "See the deadline test in the current findings tracker.", "title": "gRPC success control"}, "grpc_error": {"role": "The server returned a RangeError when a deadline was set.", "facts": ["Six services reproduced", "Different from the older all-alerting claim"], "stops": "The finding is limited to the deadline behavior and six named services.", "evidence": "Reproduced on 2026-10-27; current status is in the findings tracker.", "title": "gRPC deadline failure"}}, "paths": {"rest_filter": {"label": "REST filter probe", "title": "The earlier startedAt claim changed", "text": "The old probe saw a 400 without startedAt, but the later seven-body recheck returned 200 for every body.", "links": ["rest_empty>rest_api", "rest_started>rest_api", "rest_api>rest_missing", "rest_api>rest_success"], "family": "blue"}, "grpc_deadline": {"label": "gRPC deadline probe", "title": "The current gRPC finding is deadline-specific", "text": "Calls without deadlines worked. Deadlines reproduced RangeError on six services.", "links": ["grpc_open>grpc_ok", "grpc_deadline>grpc_error"], "family": "orange"}}, "links": {"rest_empty>rest_api": "request without startedAt", "rest_started>rest_api": "request with startedAt", "rest_api>rest_missing": "old 400 result", "rest_api>rest_success": "old 200 result", "grpc_open>grpc_ok": "no deadline control", "grpc_deadline>grpc_error": "deadline failure"}}}</script>
+<script src="../assets/explorer.js" defer></script>
+<script src="../assets/report-tabs.js" defer></script>
+</body>
+</html>

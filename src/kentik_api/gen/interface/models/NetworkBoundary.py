@@ -1,0 +1,16 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class NetworkBoundary(str, Enum):
+    NETWORK_BOUNDARY_UNSPECIFIED = "NETWORK_BOUNDARY_UNSPECIFIED"
+
+    NETWORK_BOUNDARY_AUTO = "NETWORK_BOUNDARY_AUTO"
+
+    NETWORK_BOUNDARY_INTERNAL = "NETWORK_BOUNDARY_INTERNAL"
+
+    NETWORK_BOUNDARY_EXTERNAL = "NETWORK_BOUNDARY_EXTERNAL"
+
+    NETWORK_BOUNDARY_NONE = "NETWORK_BOUNDARY_NONE"

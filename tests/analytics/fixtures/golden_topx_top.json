@@ -1,0 +1,32 @@
+{
+  "schema":{
+    "fields":[
+      {
+        "name":"protocol",
+        "type":"string"
+      },
+      {
+        "name":"avg_bps",
+        "type":"number"
+      }
+    ],
+    "primaryKey":[
+      "protocol"
+    ],
+    "pandas_version":"1.4.0"
+  },
+  "data":[
+    {
+      "protocol":"ICMP",
+      "avg_bps":1.0
+    },
+    {
+      "protocol":"TCP",
+      "avg_bps":1500.5
+    },
+    {
+      "protocol":"UDP",
+      "avg_bps":250.25
+    }
+  ]
+}

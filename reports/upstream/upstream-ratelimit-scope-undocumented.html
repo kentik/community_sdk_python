@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rate limiting: scope is not discoverable from the headers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
+</head>
+<body>
+<div class="wrap">
+<header class="masthead">
+  <p class="sub">Report for the Kentik API team</p>
+  <h1>Documented rate limits say per-customer; the advertised counter behaves <span>per-endpoint</span></h1>
+  <p class="sub">The KB documents per-customer limits. The <code>x-ratelimit-*</code> headers on V6
+    responses advertise a counter that resets independently per endpoint. Separately, three documented
+    enforcement mechanisms are invisible in the headers entirely.</p>
+  <div class="meta-grid">
+    <div><span>Filed by</span>Kentik Community Python SDK</div>
+    <div><span>Date</span>2026-09-21</div>
+    <div><span>Surface</span><code>grpc.api.kentik.com</code> (REST and gRPC)</div>
+    <div><span>Observed limit</span><code>60, 60;w=60</code></div>
+    <div><span>Scope observed</span>Per endpoint</div>
+    <div><span>Severity</span>Doc/behavior conflict, not a defect</div>
+  </div>
+</header>
+<!-- report-tabs:start -->
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive report</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="upstream-ratelimit-scope-undocumented.md">upstream-ratelimit-scope-undocumented.md</a></div>
+<!-- report-tabs:end -->
+<div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
+<nav class="toc" aria-label="Sections"><ul>
+  <li><a href="#ask">Ask</a></li><li><a href="#summary">Summary</a></li>
+  <li><a href="#observed">Observed scope</a></li><li><a href="#evidence">Evidence</a></li>
+  <li><a href="#questions">Questions</a></li>
+</ul></nav>
+
+<h2 id="ask">The ask</h2>
+<div class="callout ask">
+  <h3>Confirm which is authoritative for V6: the documented per-customer limits, or the
+  per-endpoint counter the headers advertise. We are not asking you to change the limit.</h3>
+  <p>Per-endpoint rate limiting is a reasonable design and we are not claiming it is wrong. The
+  problem is that the published documentation and the observed behavior describe different things,
+  and a client cannot tell which to build against.</p>
+</div>
+
+<h2 id="summary">Summary</h2>
+<p>While adding rate-limit support to the community Python SDK we needed to know what
+<code>x-ratelimit-remaining</code> is counting down. The headers follow
+<a href="https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-05.html">draft-polli-ratelimit-headers</a>,
+which specifies the limit, the remaining count, the reset interval, and the window length. It does
+not carry a scope or partition key, and neither do Kentik's responses.</p>
+
+<p>We measured the scope empirically. It is <strong>per endpoint</strong>, and REST and gRPC draw on
+the same per-endpoint budget. That is a more generous design than a single account-wide bucket, but a
+client that assumes account-wide will back off globally the moment one endpoint saturates, needlessly
+idling the other 59 budgets it still holds.</p>
+
+<h2 id="conflict">The conflict</h2>
+<p>The KB publishes these under the heading <strong>Per-customer limit</strong>, framed around the V5
+Query and V5 Admin APIs (which were discontinued in January 2025):</p>
+<div class="tablebox"><table>
+  <tr><th>Per-customer limit</th><th>Non-query APIs</th><th>Query API</th></tr>
+  <tr><td>Maximum concurrent requests</td><td><strong>1</strong></td><td>4</td></tr>
+  <tr><td>Soft limit (per minute)</td><td>20</td><td>30</td></tr>
+  <tr><td>Server response delay past soft limit</td><td>1.5s</td><td>1s</td></tr>
+  <tr><td>Hard limit (per minute)</td><td><strong>60</strong></td><td>100</td></tr>
+  <tr><td>Hourly limit</td><td>3750</td><td>1500</td></tr>
+</table></div>
+
+<p>Measuring V6 at <code>grpc.api.kentik.com</code>, the advertised value is
+<code>x-ratelimit-limit: 60, 60;w=60</code>. The <strong>60 matches the documented non-query hard
+limit exactly</strong>, which suggests the same regime governs V6. But the counter does not behave
+per customer. It resets independently per endpoint (Evidence 2).</p>
+
+<div class="callout warn">
+  <h3>Two readings, and we cannot tell which is right</h3>
+  <p>Either an Envoy per-route counter sits underneath a separate per-customer budget, and the
+  headers advertise only the former, or the documentation predates the V6 gateway. A client
+  implementing backoff has to guess, and guessing wrong in the conservative direction idles budget
+  it actually holds.</p>
+</div>
+
+<h2 id="hidden-limits">Three limits that no header reveals</h2>
+<p>Independent of the scope question, the documentation describes enforcement that a header-driven
+client cannot see at all:</p>
+<div class="tablebox"><table>
+  <tr><th>Mechanism</th><th>Documented</th><th>In headers?</th><th>What a client experiences</th></tr>
+  <tr><td>Concurrency cap</td><td>1 concurrent request (non-query)</td><td>No</td>
+      <td>Nothing announces it; a threaded or async client trips it silently</td></tr>
+  <tr><td>Soft limit plus response delay</td><td>20/min, then +1.5s</td><td>No</td>
+      <td>Latency, not an error. Easily misread as a slow network or a hung call</td></tr>
+  <tr><td>Hourly limit</td><td>3750/hour</td><td>No, headers carry only <code>w=60</code></td>
+      <td>An unexplained <code>429</code> from a budget it never saw counting down</td></tr>
+</table></div>
+<p>The soft-limit delay is the most surprising of the three. A well-behaved client that ramps up
+gradually gets slower rather than throttled, with no signal distinguishing that from a degraded
+backend.</p>
+
+<h2 id="observed">What we observed</h2>
+<div class="tablebox"><table>
+  <tr><th>Property</th><th>Observed</th><th>How</th></tr>
+  <tr><td>Headers present</td>
+      <td><code>x-ratelimit-limit</code>, <code>x-ratelimit-remaining</code>,
+          <code>x-ratelimit-reset</code></td>
+      <td>Every response, REST and gRPC</td></tr>
+  <tr><td>Limit value</td><td><code>60, 60;w=60</code> (60 per 60s, one window)</td>
+      <td>Uniform across every endpoint tested</td></tr>
+  <tr><td><code>Retry-After</code></td><td>Absent</td>
+      <td><code>x-ratelimit-reset</code> appears to serve that role</td></tr>
+  <tr><td>Scope</td><td><strong>Per endpoint</strong></td><td>Measured, see Evidence 2</td></tr>
+  <tr><td>REST vs gRPC</td><td>One shared budget</td><td>Measured, see Evidence 1</td></tr>
+  <tr><td>gRPC delivery</td><td>Initial metadata (trailing metadata empty)</td><td>Measured</td></tr>
+  <tr><td>Behavior on exceed</td><td><strong>Not observed</strong></td>
+      <td>Confirming it would mean deliberately exhausting a production quota</td></tr>
+</table></div>
+
+<div class="chips" data-paths-for="rate-limit-scope" aria-label="Diagram paths"></div>
+<figure>
+  <div class="diagram explorer"><svg id="rate-limit-scope" viewBox="0 0 1040 430" role="group" aria-label="REST and gRPC share the device-list counter; different endpoints have separate counters." xmlns="http://www.w3.org/2000/svg"><defs><marker id="limits-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="limits-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="probe_stem" data-links="probe>rest_device,probe>grpc_device,probe>rest_sites,probe>rest_markets"><path d="M200,216 H230" class="wire"/></g><g class="edge data" data-seg="probe_rest_device" data-links="probe>rest_device"><path d="M230,216 V76 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_grpc_device" data-links="probe>grpc_device"><path d="M230,216 V166 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_rest_sites" data-links="probe>rest_sites"><path d="M230,216 V266 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_rest_markets" data-links="probe>rest_markets"><path d="M230,216 V356 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="rest_device" data-links="rest_device>device_bucket"><path d="M500,76 H620 V116 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="560" y="68" class="elabel" text-anchor="middle">same endpoint</text></g><g class="edge data" data-seg="grpc_device" data-links="grpc_device>device_bucket"><path d="M500,166 H620 V116 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="560" y="158" class="elabel" text-anchor="middle">same endpoint</text></g><g class="edge data" data-seg="rest_sites" data-links="rest_sites>sites_bucket"><path d="M500,266 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="640" y="258" class="elabel" text-anchor="middle">separate endpoint</text></g><g class="edge data" data-seg="rest_markets" data-links="rest_markets>markets_bucket"><path d="M500,356 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="640" y="348" class="elabel" text-anchor="middle">separate endpoint</text></g><g class="node fam-blue proc " data-id="rest_device" tabindex="0" role="button" aria-label="Select REST device list"><rect x="280" y="40" width="220" height="72" rx="14"/><text x="390" y="64.0" class="nm">REST request</text><text x="390" y="81.0" class="ft">device.ListDevices</text><text x="390" y="98.0" class="ft">endpoint</text></g><g class="node fam-green proc " data-id="grpc_device" tabindex="0" role="button" aria-label="Select gRPC device list"><rect x="280" y="130" width="220" height="72" rx="14"/><text x="390" y="154.0" class="nm">gRPC request</text><text x="390" y="171.0" class="ft">device.ListDevices</text><text x="390" y="188.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="device_bucket" tabindex="0" role="button" aria-label="Select Device-list counter"><rect x="780" y="80" width="240" height="72" rx="14"/><text x="900" y="104.0" class="nm">Shared counter</text><text x="900" y="121.0" class="ft">device list</text><text x="900" y="138.0" class="ft">REST + gRPC</text></g><g class="node fam-orange proc " data-id="rest_sites" tabindex="0" role="button" aria-label="Select Site list"><rect x="280" y="230" width="220" height="72" rx="14"/><text x="390" y="254.0" class="nm">REST request</text><text x="390" y="271.0" class="ft">site.ListSites</text><text x="390" y="288.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="sites_bucket" tabindex="0" role="button" aria-label="Select Site-list counter"><rect x="780" y="230" width="240" height="72" rx="14"/><text x="900" y="254.0" class="nm">Separate counter</text><text x="900" y="271.0" class="ft">site list</text><text x="900" y="288.0" class="ft">own budget</text></g><g class="node fam-red proc " data-id="rest_markets" tabindex="0" role="button" aria-label="Select Site-market list"><rect x="280" y="320" width="220" height="72" rx="14"/><text x="390" y="344.0" class="nm">REST request</text><text x="390" y="361.0" class="ft">site.ListSiteMarkets</text><text x="390" y="378.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="markets_bucket" tabindex="0" role="button" aria-label="Select Site-market counter"><rect x="780" y="320" width="240" height="72" rx="14"/><text x="900" y="344.0" class="nm">Separate counter</text><text x="900" y="361.0" class="ft">site markets</text><text x="900" y="378.0" class="ft">own budget</text></g><g class="node fam-neutral hub " data-id="probe" tabindex="0" role="button" aria-label="Select Read-only rate-limit probe"><rect x="20" y="180" width="180" height="72" rx="14"/><text x="110.0" y="204.0" class="nm">Rate-limit probe</text><text x="110.0" y="221.0" class="ft">read-only calls</text><text x="110.0" y="238.0" class="ft">2026-10-27</text></g></svg></div>
+  <figcaption>REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters.</figcaption>
+</figure>
+<div class="detail" data-detail-for="rate-limit-scope" aria-live="polite"></div>
+
+<h2 id="evidence">Evidence</h2>
+
+<h3>1. REST and gRPC share one budget</h3>
+<p>Alternating REST and gRPC calls to <code>device.ListDevices</code> produces a single unbroken sequence:</p>
+<pre>REST call -> remaining=59
+gRPC call -> remaining=58
+REST call -> remaining=57
+gRPC call -> remaining=56
+REST call -> remaining=55
+gRPC call -> remaining=54</pre>
+
+<h3>2. The budget is per endpoint, not per service or per account</h3>
+<p>Two different endpoints inside the same service keep independent counters:</p>
+<pre>/site/v202509/sites           remaining= 58
+/site/v202509/sites           remaining= 57
+/site/v202509/site_markets    remaining= 59   &lt;- its own fresh budget
+/site/v202509/sites           remaining= 56</pre>
+<p>A separate run across three services (<code>device</code>, <code>site</code>,
+<code>label</code>) showed the same: each endpoint starts from its own 60.</p>
+
+<h3>3. Nothing in the response indicates the scope, and the hourly window is absent</h3>
+<p>A client receiving <code>x-ratelimit-remaining: 59</code> has no way to know whether that number
+applies to the endpoint it just called, the service, the token, or the account. The draft the headers
+follow has no field for it. The successor draft,
+<a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/">draft-ietf-httpapi-ratelimit-headers</a>,
+adds a quota-policy and partition concept for exactly this reason.</p>
+<p>The headers also advertise only one window, <code>w=60</code>. The documented rolling-hour budget
+of 3750 is enforced but never transmitted, so a client cannot track it even in principle.</p>
+
+<h3>4. Reproducing this</h3>
+<p class="note">Any two read-only calls to different endpoints, inspecting response headers, will
+show it. We used <code>device.ListDevices</code>, <code>site.ListSites</code>,
+<code>site.ListSiteMarkets</code>, and <code>label.ListLabels</code>. Read-only throughout; we did
+not deliberately exhaust any quota.</p>
+
+<h2 id="consumer-impact">Why this matters to SDK consumers</h2>
+<p>An SDK that surfaces quota has to tell callers what the number means. With the scope
+undocumented, we can only report what we measured, and record that it is unconfirmed. If the scope
+ever changes, or differs by plan or by endpoint cost, every client that inferred it silently
+becomes wrong with no signal.</p>
+<p>The practical failure mode is not over-consumption. It is <em>under</em>-consumption: a client
+that assumes an account-wide bucket will stop issuing all requests when one endpoint saturates.</p>
+
+<h2 id="questions">Questions for the API team</h2>
+<ol>
+  <li>For V6, is the authoritative budget per customer (as documented) or per endpoint (as the
+      headers behave)? If both exist, which one do the headers describe?</li>
+  <li>Does the V5-framed table still apply to V6 at all? V5 was discontinued in January 2025, yet
+      the documented non-query hard limit of 60 matches what V6 advertises exactly.</li>
+  <li>Is the concurrency cap of 1 for non-query APIs still accurate for V6? It materially constrains
+      any concurrent or async client, and nothing in the protocol surfaces it.</li>
+  <li>Can the hourly budget be advertised as a second window in <code>x-ratelimit-limit</code>? The
+      draft the headers follow supports multiple windows, and clients currently cannot track it.</li>
+  <li>Is the soft-limit response delay still applied, and is there any way for a client to detect it
+      rather than inferring it from latency?</li>
+  <li>Is the omission of <code>Retry-After</code> deliberate, with <code>x-ratelimit-reset</code> as
+      the intended substitute?</li>
+  <li>Do the limits vary by endpoint cost, plan, or account? We sampled four endpoints and saw one
+      value.</li>
+</ol>
+
+<h2 id="suggested-fix">Suggested fix</h2>
+<p>Mostly documentation. One optional protocol improvement:</p>
+<ol>
+  <li>State whether the V6 budget is per customer or per endpoint, and update the rate-limiting
+      section so it is not framed around discontinued V5 API categories.</li>
+  <li>State that REST and gRPC share the budget. Clients cannot assume this.</li>
+  <li>Keep the concurrency cap, soft-limit delay, and hourly limit documented prominently, since no
+      header reveals them.</li>
+  <li><em>Optional:</em> advertise the hourly budget as a second window in
+      <code>x-ratelimit-limit</code> (for example <code>60, 60;w=60, 3750;w=3600</code>). The draft
+      already supports this, and it would let clients track the limit that currently blindsides
+      them.</li>
+</ol>
+<p>Optionally, and only if it is already on a roadmap, emitting the standardized
+<code>RateLimit-Policy</code> field would make the scope machine-readable rather than documented
+prose.</p>
+
+<h2 id="ticket">Copy-paste ticket body</h2>
+<div class="ticket">
+<pre>TITLE
+V6 rate limiting: docs say per-customer, headers behave per-endpoint; three
+documented limits are invisible in the protocol
+
+CONTEXT
+While adding rate-limit support to the community Python SDK we compared the
+published limits against measured V6 behavior. They do not agree.
+
+DOCUMENTED (kb.kentik.com/docs/apis-overview#api-rate-limiting)
+Headed "Per-customer limit", framed around V5 Query / V5 Admin APIs, which
+were discontinued in January 2025:
+  Max concurrent requests   non-query 1      query 4
+  Soft limit (per minute)   non-query 20     query 30
+  Response delay past soft  non-query 1.5s   query 1s
+  Hard limit (per minute)   non-query 60     query 100
+  Hourly limit              non-query 3750   query 1500
+
+MEASURED (grpc.api.kentik.com, V6, read-only calls, 2026-09-21)
+  x-ratelimit-limit: 60, 60;w=60
+  x-ratelimit-remaining / x-ratelimit-reset present on every response
+  No Retry-After
+
+The 60 matches the documented non-query hard limit exactly. But the counter
+does not behave per customer.
+
+1. REST and gRPC share one budget. Alternating transports on one endpoint:
+   59, 58, 57, 56, 55, 54 (unbroken sequence)
+
+2. The budget resets per endpoint, not per service or per customer:
+   /site/v202509/sites         remaining=58, 57, 56
+   /site/v202509/site_markets  remaining=59  (independent counter)
+
+3. gRPC delivers the same headers as initial metadata; trailing metadata is
+   empty.
+
+THREE LIMITS NO HEADER REVEALS
+  - Concurrency cap of 1 (non-query). Nothing announces it. A threaded or
+    async client trips it silently.
+  - Soft limit at 20/min, then +1.5s server-side response delay. The client
+    sees latency, not an error, indistinguishable from a degraded backend.
+  - Hourly limit of 3750. Headers carry only w=60, so a client cannot track
+    it even in principle, then gets a 429 it could not anticipate.
+
+WHY IT MATTERS
+A client cannot tell which model to build against. Assuming per-customer means
+backing off globally when one endpoint saturates, idling budget it still holds.
+Assuming per-endpoint risks the reverse if a per-customer ceiling also exists.
+The soft-limit delay is the subtlest: well-behaved clients get slower with no
+signal explaining why.
+
+ASK
+1. For V6, is the authoritative budget per customer or per endpoint? If both
+   exist, which do the headers describe?
+2. Does the V5-framed table still apply to V6? Please reframe it if so, since
+   V5 was discontinued in January 2025.
+3. Is the concurrency cap of 1 still accurate for V6?
+4. Can the hourly budget be advertised as a second window, e.g.
+   "60, 60;w=60, 3750;w=3600"? The draft the headers follow supports multiple
+   windows.
+5. Is the soft-limit response delay still applied, and can a client detect it
+   other than by inferring from latency?
+6. Is Retry-After intentionally omitted in favor of x-ratelimit-reset?
+7. Do limits vary by endpoint cost, plan, or account? We sampled four
+   endpoints and saw one value.
+
+NOT A DEFECT REPORT
+Per-endpoint rate limiting is a reasonable design, and more generous than a
+single shared bucket. The gap is that documentation and observed behavior
+describe different things, and three enforcement mechanisms are invisible to
+clients.
+
+All probing was read-only. We did not confirm the behavior on exceed, because
+that would mean deliberately exhausting a production quota.</pre>
+</div>
+
+</div>
+<!-- report-markdown:start -->
+<div class="tabpanel" id="full-report" role="tabpanel" aria-labelledby="tab-full-report">
+<article class="markdown-body">
+<h1 id="md-documented-rate-limits-say-per-customer-the-advertised-counter-behaves-per-endpoint">Documented rate limits say per-customer; the advertised counter behaves per-endpoint</h1>
+<p>Report for the Kentik API team</p>
+<p>The KB documents per-customer limits. The <code>x-ratelimit-*</code> headers on V6
+responses advertise a counter that resets independently per endpoint.
+Separately, three documented enforcement mechanisms are invisible in the
+headers entirely.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Filed by</td>
+<td>Kentik Community Python SDK</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>2026-09-21</td>
+</tr>
+<tr>
+<td>Surface</td>
+<td><code>grpc.api.kentik.com</code> (REST and gRPC)</td>
+</tr>
+<tr>
+<td>Observed limit</td>
+<td><code>60, 60;w=60</code></td>
+</tr>
+<tr>
+<td>Scope observed</td>
+<td>Per endpoint</td>
+</tr>
+<tr>
+<td>Severity</td>
+<td>Doc/behavior conflict, not a defect</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-the-ask">The ask</h2>
+<blockquote class="markdown-alert markdown-alert-important">
+<p><span class="markdown-alert-title">Important</span><strong>Confirm which is authoritative for V6: the documented per-customer limits, or the per-endpoint counter the headers advertise. We are not asking you to change the limit.</strong></p>
+<p>Per-endpoint rate limiting is a reasonable design and we are not claiming it is wrong. The
+problem is that the published documentation and the observed behavior describe different things,
+and a client cannot tell which to build against.</p>
+</blockquote>
+<h2 id="md-summary">Summary</h2>
+<p>While adding rate-limit support to the community Python SDK we needed to know what
+<code>x-ratelimit-remaining</code> is counting down. The headers follow
+<a href="https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-05.html">draft-polli-ratelimit-headers</a>,
+which specifies the limit, the remaining count, the reset interval, and the window length. It does
+not carry a scope or partition key, and neither do Kentik's responses.</p>
+<p>We measured the scope empirically. It is <strong>per endpoint</strong>, and REST and gRPC draw on
+the same per-endpoint budget. That is a more generous design than a single account-wide bucket, but a
+client that assumes account-wide will back off globally the moment one endpoint saturates, needlessly
+idling the other 59 budgets it still holds.</p>
+<h2 id="md-the-conflict">The conflict</h2>
+<p>The KB publishes these under the heading <strong>Per-customer limit</strong>, framed around the V5
+Query and V5 Admin APIs (which were discontinued in January 2025):</p>
+<table>
+<thead>
+<tr>
+<th>Per-customer limit</th>
+<th>Non-query APIs</th>
+<th>Query API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maximum concurrent requests</td>
+<td><strong>1</strong></td>
+<td>4</td>
+</tr>
+<tr>
+<td>Soft limit (per minute)</td>
+<td>20</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Server response delay past soft limit</td>
+<td>1.5s</td>
+<td>1s</td>
+</tr>
+<tr>
+<td>Hard limit (per minute)</td>
+<td><strong>60</strong></td>
+<td>100</td>
+</tr>
+<tr>
+<td>Hourly limit</td>
+<td>3750</td>
+<td>1500</td>
+</tr>
+</tbody>
+</table>
+<p>Measuring V6 at <code>grpc.api.kentik.com</code>, the advertised value is
+<code>x-ratelimit-limit: 60, 60;w=60</code>. The <strong>60 matches the documented non-query hard
+limit exactly</strong>, which suggests the same regime governs V6. But the counter does not behave
+per customer. It resets independently per endpoint (Evidence 2).</p>
+<blockquote class="markdown-alert markdown-alert-warning">
+<p><span class="markdown-alert-title">Warning</span><strong>Two readings, and we cannot tell which is right</strong></p>
+<p>Either an Envoy per-route counter sits underneath a separate per-customer budget, and the
+headers advertise only the former, or the documentation predates the V6 gateway. A client
+implementing backoff has to guess, and guessing wrong in the conservative direction idles budget
+it actually holds.</p>
+</blockquote>
+<h2 id="md-three-limits-that-no-header-reveals">Three limits that no header reveals</h2>
+<p>Independent of the scope question, the documentation describes enforcement that a header-driven
+client cannot see at all:</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Documented</th>
+<th>In headers?</th>
+<th>What a client experiences</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Concurrency cap</td>
+<td>1 concurrent request (non-query)</td>
+<td>No</td>
+<td>Nothing announces it; a threaded or async client trips it silently</td>
+</tr>
+<tr>
+<td>Soft limit plus response delay</td>
+<td>20/min, then +1.5s</td>
+<td>No</td>
+<td>Latency, not an error. Easily misread as a slow network or a hung call</td>
+</tr>
+<tr>
+<td>Hourly limit</td>
+<td>3750/hour</td>
+<td>No, headers carry only <code>w=60</code></td>
+<td>An unexplained <code>429</code> from a budget it never saw counting down</td>
+</tr>
+</tbody>
+</table>
+<p>The soft-limit delay is the most surprising of the three. A well-behaved client that ramps up
+gradually gets slower rather than throttled, with no signal distinguishing that from a degraded
+backend.</p>
+<h2 id="md-what-we-observed">What we observed</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Observed</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Headers present</td>
+<td><code>x-ratelimit-limit</code>, <code>x-ratelimit-remaining</code>, <code>x-ratelimit-reset</code></td>
+<td>Every response, REST and gRPC</td>
+</tr>
+<tr>
+<td>Limit value</td>
+<td><code>60, 60;w=60</code> (60 per 60s, one window)</td>
+<td>Uniform across every endpoint tested</td>
+</tr>
+<tr>
+<td><code>Retry-After</code></td>
+<td>Absent</td>
+<td><code>x-ratelimit-reset</code> appears to serve that role</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td><strong>Per endpoint</strong></td>
+<td>Measured, see Evidence 2</td>
+</tr>
+<tr>
+<td>REST vs gRPC</td>
+<td>One shared budget</td>
+<td>Measured, see Evidence 1</td>
+</tr>
+<tr>
+<td>gRPC delivery</td>
+<td>Initial metadata (trailing metadata empty)</td>
+<td>Measured</td>
+</tr>
+<tr>
+<td>Behavior on exceed</td>
+<td><strong>Not observed</strong></td>
+<td>Confirming it would mean deliberately exhausting a production quota</td>
+</tr>
+</tbody>
+</table>
+<picture>
+   <source media="(prefers-color-scheme: dark)" srcset="../assets/rate-limit-dark.svg">
+   <source media="(prefers-color-scheme: light)" srcset="../assets/rate-limit-light.svg">
+   <img alt="REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters." src="../assets/rate-limit-light.svg">
+</picture>
+<p>Open the <a href="#interactive">interactive explorer</a> to select each part and see its evidence.</p>
+<h2 id="md-evidence">Evidence</h2>
+<h3 id="md-1-rest-and-grpc-share-one-budget">1. REST and gRPC share one budget</h3>
+<p>Alternating REST and gRPC calls to <code>device.ListDevices</code> produces a single unbroken sequence:</p>
+<pre class="highlight"><code class="language-text">REST call -&gt; remaining=59
+gRPC call -&gt; remaining=58
+REST call -&gt; remaining=57
+gRPC call -&gt; remaining=56
+REST call -&gt; remaining=55
+gRPC call -&gt; remaining=54
+</code></pre>
+<h3 id="md-2-the-budget-is-per-endpoint-not-per-service-or-per-account">2. The budget is per endpoint, not per service or per account</h3>
+<p>Two different endpoints inside the same service keep independent counters:</p>
+<pre class="highlight"><code class="language-text">/site/v202509/sites           remaining= 58
+/site/v202509/sites           remaining= 57
+/site/v202509/site_markets    remaining= 59   &lt;- its own fresh budget
+/site/v202509/sites           remaining= 56
+</code></pre>
+<p>A separate run across three services (<code>device</code>, <code>site</code>,
+<code>label</code>) showed the same: each endpoint starts from its own 60.</p>
+<h3 id="md-3-nothing-in-the-response-indicates-the-scope-and-the-hourly-window-is-absent">3. Nothing in the response indicates the scope, and the hourly window is absent</h3>
+<p>A client receiving <code>x-ratelimit-remaining: 59</code> has no way to know whether that number
+applies to the endpoint it just called, the service, the token, or the account. The draft the headers
+follow has no field for it. The successor draft,
+<a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/">draft-ietf-httpapi-ratelimit-headers</a>,
+adds a quota-policy and partition concept for exactly this reason.</p>
+<p>The headers also advertise only one window, <code>w=60</code>. The documented rolling-hour budget
+of 3750 is enforced but never transmitted, so a client cannot track it even in principle.</p>
+<h3 id="md-4-reproducing-this">4. Reproducing this</h3>
+<p>Any two read-only calls to different endpoints, inspecting response headers, will
+show it. We used <code>device.ListDevices</code>, <code>site.ListSites</code>,
+<code>site.ListSiteMarkets</code>, and <code>label.ListLabels</code>. Read-only throughout; we did
+not deliberately exhaust any quota.</p>
+<h2 id="md-why-this-matters-to-sdk-consumers">Why this matters to SDK consumers</h2>
+<p>An SDK that surfaces quota has to tell callers what the number means. With the scope
+undocumented, we can only report what we measured, and record that it is unconfirmed. If the scope
+ever changes, or differs by plan or by endpoint cost, every client that inferred it silently
+becomes wrong with no signal.</p>
+<p>The practical failure mode is not over-consumption. It is <em>under</em>-consumption: a client
+that assumes an account-wide bucket will stop issuing all requests when one endpoint saturates.</p>
+<h2 id="md-questions-for-the-api-team">Questions for the API team</h2>
+<ol>
+<li>For V6, is the authoritative budget per customer (as documented) or per endpoint (as the
+headers behave)? If both exist, which one do the headers describe?</li>
+<li>Does the V5-framed table still apply to V6 at all? V5 was discontinued in January 2025, yet
+the documented non-query hard limit of 60 matches what V6 advertises exactly.</li>
+<li>Is the concurrency cap of 1 for non-query APIs still accurate for V6? It materially constrains
+any concurrent or async client, and nothing in the protocol surfaces it.</li>
+<li>Can the hourly budget be advertised as a second window in <code>x-ratelimit-limit</code>? The
+draft the headers follow supports multiple windows, and clients currently cannot track it.</li>
+<li>Is the soft-limit response delay still applied, and is there any way for a client to detect it
+rather than inferring it from latency?</li>
+<li>Is the omission of <code>Retry-After</code> deliberate, with <code>x-ratelimit-reset</code> as
+the intended substitute?</li>
+<li>Do the limits vary by endpoint cost, plan, or account? We sampled four endpoints and saw one
+value.</li>
+</ol>
+<h2 id="md-suggested-fix">Suggested fix</h2>
+<p>Mostly documentation. One optional protocol improvement:</p>
+<ol>
+<li>State whether the V6 budget is per customer or per endpoint, and update the rate-limiting
+section so it is not framed around discontinued V5 API categories.</li>
+<li>State that REST and gRPC share the budget. Clients cannot assume this.</li>
+<li>Keep the concurrency cap, soft-limit delay, and hourly limit documented prominently, since no
+header reveals them.</li>
+<li><em>Optional:</em> advertise the hourly budget as a second window in
+<code>x-ratelimit-limit</code> (for example <code>60, 60;w=60, 3750;w=3600</code>). The draft
+already supports this, and it would let clients track the limit that currently blindsides
+them.</li>
+</ol>
+<p>Optionally, and only if it is already on a roadmap, emitting the standardized
+<code>RateLimit-Policy</code> field would make the scope machine-readable rather than documented
+prose.</p>
+<h2 id="md-copy-paste-ticket-body">Copy-paste ticket body</h2>
+<pre class="highlight"><code class="language-text">TITLE
+V6 rate limiting: docs say per-customer, headers behave per-endpoint; three
+documented limits are invisible in the protocol
+
+CONTEXT
+While adding rate-limit support to the community Python SDK we compared the
+published limits against measured V6 behavior. They do not agree.
+
+DOCUMENTED (kb.kentik.com/docs/apis-overview#api-rate-limiting)
+Headed "Per-customer limit", framed around V5 Query / V5 Admin APIs, which
+were discontinued in January 2025:
+  Max concurrent requests   non-query 1      query 4
+  Soft limit (per minute)   non-query 20     query 30
+  Response delay past soft  non-query 1.5s   query 1s
+  Hard limit (per minute)   non-query 60     query 100
+  Hourly limit              non-query 3750   query 1500
+
+MEASURED (grpc.api.kentik.com, V6, read-only calls, 2026-09-21)
+  x-ratelimit-limit: 60, 60;w=60
+  x-ratelimit-remaining / x-ratelimit-reset present on every response
+  No Retry-After
+
+The 60 matches the documented non-query hard limit exactly. But the counter
+does not behave per customer.
+
+1. REST and gRPC share one budget. Alternating transports on one endpoint:
+   59, 58, 57, 56, 55, 54 (unbroken sequence)
+
+2. The budget resets per endpoint, not per service or per customer:
+   /site/v202509/sites         remaining=58, 57, 56
+   /site/v202509/site_markets  remaining=59  (independent counter)
+
+3. gRPC delivers the same headers as initial metadata; trailing metadata is
+   empty.
+
+THREE LIMITS NO HEADER REVEALS
+  - Concurrency cap of 1 (non-query). Nothing announces it. A threaded or
+    async client trips it silently.
+  - Soft limit at 20/min, then +1.5s server-side response delay. The client
+    sees latency, not an error, indistinguishable from a degraded backend.
+  - Hourly limit of 3750. Headers carry only w=60, so a client cannot track
+    it even in principle, then gets a 429 it could not anticipate.
+
+WHY IT MATTERS
+A client cannot tell which model to build against. Assuming per-customer means
+backing off globally when one endpoint saturates, idling budget it still holds.
+Assuming per-endpoint risks the reverse if a per-customer ceiling also exists.
+The soft-limit delay is the subtlest: well-behaved clients get slower with no
+signal explaining why.
+
+ASK
+1. For V6, is the authoritative budget per customer or per endpoint? If both
+   exist, which do the headers describe?
+2. Does the V5-framed table still apply to V6? Please reframe it if so, since
+   V5 was discontinued in January 2025.
+3. Is the concurrency cap of 1 still accurate for V6?
+4. Can the hourly budget be advertised as a second window, e.g.
+   "60, 60;w=60, 3750;w=3600"? The draft the headers follow supports multiple
+   windows.
+5. Is the soft-limit response delay still applied, and can a client detect it
+   other than by inferring from latency?
+6. Is Retry-After intentionally omitted in favor of x-ratelimit-reset?
+7. Do limits vary by endpoint cost, plan, or account? We sampled four
+   endpoints and saw one value.
+
+NOT A DEFECT REPORT
+Per-endpoint rate limiting is a reasonable design, and more generous than a
+single shared bucket. The gap is that documentation and observed behavior
+describe different things, and three enforcement mechanisms are invisible to
+clients.
+
+All probing was read-only. We did not confirm the behavior on exceed, because
+that would mean deliberately exhausting a production quota.
+</code></pre>
+<p>Documented limits rechecked against <code>kb.kentik.com/docs/apis-overview</code> on
+2026-09-24: unchanged, and the page still states no V6-specific limits.</p>
+<p>Measured against <code>grpc.api.kentik.com</code> on 2026-09-21 with read-only calls from the
+<code>community_sdk_python</code> SDK. No quota was deliberately exhausted.</p>
+</article>
+</div>
+<!-- report-markdown:end -->
+<footer>
+  <p>Documented limits rechecked against <code>kb.kentik.com/docs/apis-overview</code> on
+<script type="application/json" id="diagram-data">{"rate-limit-scope": {"caption": "REST and gRPC share the device-list counter. Site and site-market endpoints use separate counters.", "select": "device_bucket", "hint": "Select an endpoint or counter to see the observed quota scope.", "parts": {"probe": {"role": "The read-only probe sent each request in turn and read the quota headers.", "facts": ["Read-only calls only", "Alternated REST and gRPC on the device list"], "stops": "No new quota readings.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "Read-only rate-limit probe"}, "rest_device": {"role": "A REST device-list request consumes the same observed endpoint budget as its gRPC counterpart.", "facts": ["GET /devices", "Read-only request"], "stops": "Only the device-list endpoint budget changes.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "REST device list"}, "grpc_device": {"role": "A gRPC device-list request consumes the same observed endpoint budget as REST.", "facts": ["device.ListDevices", "Read-only request"], "stops": "Only the device-list endpoint budget changes.", "evidence": "The read-only rate-limit probe alternated REST and gRPC calls.", "title": "gRPC device list"}, "device_bucket": {"role": "REST and gRPC share one observed counter for the device-list endpoint.", "facts": ["60 requests per 60 seconds advertised", "One shared counter"], "stops": "A client that treats this as account-wide can pause unrelated endpoint budgets.", "evidence": "Alternating calls returned remaining values 59, 58, 57, and 56.", "title": "Device-list counter"}, "rest_sites": {"role": "The site-list endpoint starts its own budget.", "facts": ["GET /site/v202509/sites", "Same service as site markets"], "stops": "The site-list counter does not consume the site-market counter.", "evidence": "Probe showed a fresh counter for site markets.", "title": "Site list"}, "sites_bucket": {"role": "The site-list endpoint has a counter separate from other endpoints.", "facts": ["Independent 60/60s counter observed"], "stops": "Other endpoint counters remain available.", "evidence": "The 2026-10-27 read-only probe did not approach the limit.", "title": "Site-list counter"}, "rest_markets": {"role": "The site-market list starts another counter within the site service.", "facts": ["GET /site/v202509/site_markets", "Distinct path"], "stops": "The site-market counter does not consume the site-list counter.", "evidence": "Probe showed an independent counter for site markets.", "title": "Site-market list"}, "markets_bucket": {"role": "The site-market endpoint has its own observed counter.", "facts": ["Independent 60/60s counter observed"], "stops": "Other endpoint counters remain available.", "evidence": "The 2026-10-27 read-only probe did not approach the limit.", "title": "Site-market counter"}}, "paths": {"shared_device": {"label": "Shared device budget", "title": "REST and gRPC share one endpoint budget", "text": "Transport changes do not create a second device-list counter.", "links": ["rest_device>device_bucket", "grpc_device>device_bucket"], "family": "blue"}, "endpoint_isolation": {"label": "Endpoint isolation", "title": "Different endpoints use separate counters", "text": "The site list and site-market list start independent counters.", "links": ["rest_sites>sites_bucket", "rest_markets>markets_bucket"], "family": "orange"}}, "links": {"rest_device>device_bucket": "same device-list counter", "grpc_device>device_bucket": "same device-list counter", "rest_sites>sites_bucket": "site-list counter", "rest_markets>markets_bucket": "site-market counter"}}}</script>
+<script src="../assets/explorer.js" defer></script>
+  2026-09-24: unchanged, and the page still states no V6-specific limits.</p>
+  <p>Measured against <code>grpc.api.kentik.com</code> on 2026-09-21 with read-only calls from the
+  <code>community_sdk_python</code> SDK. No quota was deliberately exhausted.</p>
+</footer>
+
+</div>
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
+</body>
+</html>

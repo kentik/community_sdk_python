@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Also moves the SHA pins and their version comments in .github/workflows/.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly

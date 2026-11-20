@@ -1,0 +1,27 @@
+{# HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly. #}
+{# Overrides the built-in model template to keep the schema text: an unescaped docstring and a description per field. #}
+{% from "_macros.jinja2" import docstring, string %}
+from typing import *
+from pydantic import BaseModel, Field
+{% for property in properties %}
+{% if property.type.import_types is not none %}
+{% for import_type in property.type.import_types %}
+{{ import_type }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+class {{ schema_name }}(BaseModel):
+    {{ docstring([schema.title, schema.description] | select | join("\n\n") or schema_name ~ " model", "    ") }}
+    model_config = {
+        "populate_by_name": True,
+        "validate_assignment": True{% if schema.additionalProperties is sameas true %},
+        "extra": "allow"{% endif %}
+
+    }
+    {% for property in properties %}
+    {% set field = (schema.properties or {}).get(property.name) %}
+    {% set text = [field.title, field.description] | select | join("\n\n") if field else "" %}
+
+    {{ property.name | normalize_symbol }} : {{ property.type.converted_type | safe }} = Field(validation_alias="{{ property.name }}" {% if not property.required %}, default = {{ property.default }} {% endif %}{% if text %}, description={{ string(text) }}{% endif %})
+    {% endfor %}

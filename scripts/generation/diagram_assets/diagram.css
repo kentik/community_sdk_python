@@ -1,0 +1,41 @@
+/* House diagram style: the SVG parts and the explorer states. It reads the
+   color tokens of page-theme/assets/theme.css, so load that file first. */
+svg text { font-family: var(--mono); }
+.node rect { stroke-width: 2; transition: stroke-width .15s; }
+.node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.node .ft { font-size: 12px; text-anchor: middle; }
+.fam-blue.src rect { fill: var(--blue-strong); stroke: var(--blue-border); } .fam-blue.proc rect { fill: var(--blue-pale); stroke: var(--blue-border); } .fam-blue text { fill: var(--blue-text); }
+.fam-violet.src rect { fill: var(--violet-strong); stroke: var(--violet-border); } .fam-violet.proc rect { fill: var(--violet-pale); stroke: var(--violet-border); } .fam-violet text { fill: var(--violet-text); }
+.fam-green.src rect { fill: var(--green-strong); stroke: var(--green-border); } .fam-green.proc rect { fill: var(--green-pale); stroke: var(--green-border); } .fam-green text { fill: var(--green-text); }
+.fam-orange.src rect { fill: var(--orange-strong); stroke: var(--orange-border); } .fam-orange.proc rect { fill: var(--orange-pale); stroke: var(--orange-border); } .fam-orange text { fill: var(--orange-text); }
+.fam-red.src rect { fill: var(--red-strong); stroke: var(--red-border); } .fam-red.proc rect { fill: var(--red-pale); stroke: var(--red-border); } .fam-red text { fill: var(--red-text); }
+.fam-cyan.src rect { fill: var(--cyan-strong); stroke: var(--cyan-border); } .fam-cyan.proc rect { fill: var(--cyan-pale); stroke: var(--cyan-border); } .fam-cyan text { fill: var(--cyan-text); }
+.fam-yellow.src rect { fill: var(--yellow-strong); stroke: var(--yellow-border); } .fam-yellow.proc rect { fill: var(--yellow-pale); stroke: var(--yellow-border); } .fam-yellow text { fill: var(--yellow-text); }
+.fam-neutral rect { fill: var(--neu-fill); stroke: var(--neu-border); } .fam-neutral text { fill: var(--neu-text); }
+.planned rect { stroke-dasharray: 7 6; }
+.container rect { fill: var(--cont-fill); stroke: var(--line-strong); stroke-width: 1.5; }
+.clabel { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.wire { fill: none; stroke: var(--wire); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.elabel { font-size: 12px; fill: var(--muted); }
+.ah { fill: var(--wire); } .ah-hi { fill: var(--wire-hi); }
+.note { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.note.warn { fill: var(--warn); }
+.note.fam-blue { fill: var(--blue-border); } .note.fam-violet { fill: var(--violet-border); } .note.fam-green { fill: var(--green-border); }
+.note.fam-orange { fill: var(--orange-border); } .note.fam-red { fill: var(--red-border); } .note.fam-cyan { fill: var(--cyan-border); }
+.note.fam-yellow { fill: var(--yellow-border); } .note.fam-neutral { fill: var(--neu-border); }
+
+.explorer .node { cursor: pointer; }
+.explorer .node:focus { outline: none; }
+.explorer .node:focus-visible rect, .explorer .node.sel rect { stroke: var(--accent); stroke-width: 4; }
+.explorer .node, .explorer .edge { transition: opacity .2s; }
+.explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.edge.hi .wire, .edge.flow .wire { stroke: var(--wire-hi); stroke-width: 3; }
+.edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.edge.flow.access .wire, .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .edge.flow .wire { animation: none; stroke-dasharray: none; } * { transition: none !important; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: var(--muted); }
+.legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }

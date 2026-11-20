@@ -1,110 +1,72 @@
-# community_sdk_python - developer
+<!-- HAND-WRITTEN: not modified by [`uv run poe generate`](../pyproject.toml). Edit directly. -->
 
-## Getting started
+# Kentik Community Python SDK Documentation
 
-Precondition: python3 and pip3 are already installed.
+All documentation for the SDK is in or linked from this directory.
 
-### Recommended steps
+## Where to start
 
-1. Create dedicated virtual environment  
-`python -m venv .venv`
+| Document | What it covers |
+| --- | --- |
+| [Quick start](sphinx/guides/quickstart.md) | Install, configure credentials, make your first call |
+| [REST transport guide](sphinx/guides/rest.md) | HTTP/REST usage, pagination, and tips |
+| [gRPC transport guide](sphinx/guides/grpc.md) | gRPC usage, sequence diagrams, and transport comparison |
+| [Authentication](sphinx/authentication.md) | Credential sources, and keeping them encrypted |
+| [Error handling guide](sphinx/guides/error_handling.md) | Exception hierarchy and how to catch each type |
+| [Rate limiting guide](sphinx/guides/rate_limiting.md) | Quota headers and the limits no header shows |
+| [REST vs gRPC](sphinx/guides/rest-vs-grpc.md) | How the transports differ, and how to choose one |
+| [Migrating from 1.x](sphinx/guides/migrating-from-1x.md) | Moving from kentik-api 1.x |
+| [SDK generation workflow](sphinx/guides/generation.md) | How to regenerate the SDK from the OpenAPI schema |
 
-1. Activate virtualenv  
-`source .venv/bin/activate`
+## Examples
 
-1. Clone the library repository  
-`git clone https://github.com/kentik/community_sdk_python.git`
+Runnable scripts are in [examples/](../examples/README.md). Each V6 service has
+a REST and a gRPC variant. The V5 endpoints are REST only:
 
-1. `cd community_sdk_python/kentik_api_library/`
-
-1. Install Python dependencies  
-`pip install -r requirements.txt`  
-`pip install -r requirements-dev.txt`  
-
-1. Generate grpc client code  
-`python setup.py grpc_stubs`
-
-1. Install the library from repository  
-`pip install -e .`
-
-1. Run unit tests  
-`python setup.py pytest`
-
-1. Run mypy  
-`python setup.py mypy`
-
-1. Run black and isort checks  
-`python setup.py format --check`
-
-## Example
-
-The example below illustrates how to create a new device using the library:
-
-```python
-# library-specific imports
-from kentik_api.public.types import ID
-from kentik_api import (
-    KentikAPI,
-    Device,
-    DeviceSubtype,
-    CDNAttribute,
-)
-
-# initialize Kentik API client
-api_client = KentikAPI("<API_EMAIL_STRING>", "<API_TOKEN_STRING>")
-
-# prepare device object
-device = Device.new_dns(
-    device_name="example-device-1",
-    device_subtype=DeviceSubtype.aws_subnet,
-    cdn_attr=CDNAttribute.yes,
-    device_sample_rate=100,
-    plan_id=ID(11466),
-    site_id=ID(8483),
-    device_bgp_flowspec=True,
-)
-
-# create the device
-created = api_client.devices.create(device)
-
-# print returned device's attributes
-print(created.__dict__)
+```text
+examples/
+├── common/
+│   └── error_handling.py
+├── device/
+│   ├── rest.py
+│   └── grpc.py
+├── user/
+│   ├── rest.py
+│   └── grpc.py
+├── label/
+│   ├── rest.py
+│   └── grpc.py
+├── site/
+│   ├── rest.py
+│   └── grpc.py
+├── alerting/
+│   ├── rest.py
+│   └── grpc.py
+├── synthetics/
+│   ├── rest.py
+│   └── grpc.py
+└── v5/
+    ├── analytics_topx.py
+    ├── batch.py
+    └── query.py
 ```
 
-## Example explained
+## Sphinx HTML documentation
 
-### Structure
+Run [`uv run poe docs`](../pyproject.toml) to build the full HTML reference from
+[docs/sphinx/](sphinx/README.md). The HTML output includes per-endpoint
+parameter tables, response tables, model schemas, and interactive Mermaid
+diagrams.
 
-- `kentik_api` package is the root package of the library
-- `api_resources` package contains implementations of all the KentikAPI resource manipulation classes
-- `public` package contains classes representing all KentikAPI resources
-- `request_payloads` package contains serialization/deserialization structures for each KentikAPI resource
-- `api_calls` package contains definitions of all requests that enable interaction with each KentikAPI resource
+## Source code documentation
 
-Main components taking part in creating a device:  
-![Create Device - Component Diagram](./diagrams/device_create_component.png)
+Each package directory has a README that explains its role:
 
-### Behaviour
-
-A sequence of interactions that leads to creating a new device:  
-![Create Device - Sequence Diagram](./diagrams/device_create_sequence.png)
-
-## Error handling
-
-For error handling there is an exception hierarchy that allows to handle:
-- validation errors - when library user tries to create an incomplete/invalid resource
-- deserialization erors - when invalid or incomplete resource json representation is received from KentikAPI
-- protocol errors - errors covering selected HTTP error codes, in particular:
-  - `IntermittentError` - request can be reattempted and succeed after a delay
-  - `RateLimitExceededError` - effect of throttling on KentikAPI side
-
-![Exception Hierarchy - Class Diagram](./diagrams/error_hierarchy_class.png)
-
-## Release
-
-The release process for the kentik-api library is based on Git repository tags. Every tag with format `v[0-9].[0-9].[0-9]` will trigger an automatic build of the package and publish it in the PyPi repository.
-
-To build and release package:
-1. Make sure that all code that you want to release is in the _main_ branch
-1. Create a tag with format `v[0-9].[0-9].[0-9]` in GitHub. [Releases](https://github.com/kentik/community_sdk_python/releases) -> Draft a new release -> Put tag version, name and description
-1. Go to [GitHub Actions](https://github.com/kentik/community_sdk_python/actions)
+- [src/kentik_api/](../src/kentik_api/README.md): package overview and request flow
+- [src/kentik_api/auth/](../src/kentik_api/auth/README.md): credential loading
+- [src/kentik_api/core/](../src/kentik_api/core/README.md): shared REST/gRPC runtime
+- [src/kentik_api/errors/](../src/kentik_api/errors/README.md): exception hierarchy
+- [src/kentik_api/transports/](../src/kentik_api/transports/README.md): transport layer
+- [src/kentik_api/gen/](../src/kentik_api/gen/README.md): generated services
+- [scripts/](../scripts/README.md): SDK generator and tooling
+- [tests/](../tests/README.md): test suite structure

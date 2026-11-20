@@ -1,0 +1,1209 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Kentik V5 API (query and batch)",
+    "description": "Hand-maintained description of the Kentik V5 endpoints that have no V6 equivalent. Sources: the Kentik Knowledge Base Query API and Customization API pages, the V5 SDK (kentik-api 1.x), and a live check on 2026-10-16. Paths are relative to the V5 base URL: https://api.kentik.com/api/v5 (US) or https://api.kentik.eu/api/v5 (EU). V5 sends no rate limit headers.",
+    "version": "v5",
+    "contact": {
+      "name": "Kentik Community Python SDK",
+      "url": "https://github.com/kentik/community_sdk_python"
+    }
+  },
+  "tags": [
+    {
+      "name": "QueryService"
+    },
+    {
+      "name": "BatchService"
+    }
+  ],
+  "security": [
+    {
+      "email": [],
+      "token": []
+    }
+  ],
+  "externalDocs": {
+    "description": "Kentik V5 Query API",
+    "url": "https://kb.kentik.com/docs/query-api"
+  },
+  "paths": {
+    "/query/topXdata": {
+      "post": {
+        "summary": "Top-X data query",
+        "description": "Runs one or more queries on the Kentik Data Engine and returns the result rows of each bucket, with time series for the top-X rows.",
+        "operationId": "QueryService_TopXData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result rows of each bucket.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopXDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "QueryService"
+        ]
+      }
+    },
+    "/query/topXchart": {
+      "post": {
+        "summary": "Top-X chart query",
+        "description": "Runs one or more queries and returns a chart image as a base64 data URI. Not verified: in a live check on 2026-10-16 this endpoint gave no response within 180 seconds. Decode the result with kentik_api.v5_tools.decode_chart().",
+        "operationId": "QueryService_TopXChart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The chart image as a data URI.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "QueryService"
+        ]
+      }
+    },
+    "/query/url": {
+      "post": {
+        "summary": "Data Explorer URL",
+        "description": "Returns a link that opens Data Explorer in the Kentik portal with the sidebar set to the query.",
+        "operationId": "QueryService_Url",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Data Explorer link.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "QueryService"
+        ]
+      }
+    },
+    "/batch/tags": {
+      "post": {
+        "summary": "Batch flow tags",
+        "description": "Creates, updates, or deletes flow tags in bulk. Sends one part of a batch. The API applies upserts as parts arrive and deletes only after the part with complete=true. Each part is at most 4 MB. Every part after the first carries the guid from the first response. kentik_api.v5_tools.split_batch() and send_batch() do this. The SDK never resends a part.",
+        "operationId": "BatchService_Tags",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchPart"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The part is queued. Its guid identifies the batch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "BatchService"
+        ]
+      }
+    },
+    "/batch/customdimensions/{dimensionName}/populators": {
+      "post": {
+        "summary": "Batch populators",
+        "description": "Creates, updates, or deletes the populators of one custom dimension in bulk. Sends one part of a batch. The API applies upserts as parts arrive and deletes only after the part with complete=true. Each part is at most 4 MB. Every part after the first carries the guid from the first response. kentik_api.v5_tools.split_batch() and send_batch() do this. The SDK never resends a part.",
+        "operationId": "BatchService_Populators",
+        "parameters": [
+          {
+            "name": "dimensionName",
+            "in": "path",
+            "required": true,
+            "description": "The custom dimension name, for example c_my_dimension.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchPart"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The part is queued. Its guid identifies the batch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "BatchService"
+        ]
+      }
+    },
+    "/batch/{guid}/status": {
+      "get": {
+        "summary": "Batch status",
+        "description": "Returns the progress of a batch. kentik_api.v5_tools.wait_for_batch() polls it until is_complete is true.",
+        "operationId": "BatchService_Status",
+        "parameters": [
+          {
+            "name": "guid",
+            "in": "path",
+            "required": true,
+            "description": "The guid from the first part's response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The batch progress.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is not valid, for example a query without device_name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials are missing or wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The user may not call this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The resource does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The rate limit is exceeded. V5 sends no rate limit headers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The API failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V5Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "BatchService"
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "email": {
+        "type": "apiKey",
+        "name": "X-CH-Auth-Email",
+        "in": "header"
+      },
+      "token": {
+        "type": "apiKey",
+        "name": "X-CH-Auth-API-Token",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "V5Error": {
+        "type": "object",
+        "description": "The error body of a V5 call.",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "The error message."
+          },
+          "errorxid": {
+            "type": "string",
+            "description": "The error ID to give Kentik support."
+          }
+        }
+      },
+      "QueryRequest": {
+        "type": "object",
+        "description": "The body of a top-X data or URL query.",
+        "required": [
+          "queries"
+        ],
+        "properties": {
+          "queries": {
+            "type": "array",
+            "description": "One item for each series. Usually one.",
+            "items": {
+              "$ref": "#/components/schemas/QueryItem"
+            }
+          }
+        }
+      },
+      "ChartRequest": {
+        "type": "object",
+        "description": "The body of a top-X chart query.",
+        "required": [
+          "queries",
+          "imageType"
+        ],
+        "properties": {
+          "queries": {
+            "type": "array",
+            "description": "One item for each series. Usually one.",
+            "items": {
+              "$ref": "#/components/schemas/QueryItem"
+            }
+          },
+          "imageType": {
+            "type": "string",
+            "description": "The image format: svg, png, jpg, or pdf."
+          }
+        }
+      },
+      "QueryItem": {
+        "type": "object",
+        "description": "One query and its series options. Keeps every field it gets, so JSON copied from Data Explorer reaches the API unchanged.",
+        "additionalProperties": true,
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "$ref": "#/components/schemas/Query"
+          },
+          "bucket": {
+            "type": "string",
+            "description": "The series name. The response groups rows by it."
+          },
+          "bucketIndex": {
+            "type": "integer",
+            "description": "The index of the query in its bucket, 0 or more."
+          },
+          "isOverlay": {
+            "type": "boolean",
+            "description": "Treats the query as an overlay. Chart and URL only."
+          }
+        }
+      },
+      "Query": {
+        "type": "object",
+        "description": "A query on the Kentik Data Engine. Types the fields that the Kentik Query API documentation lists, and keeps every other field it gets, so every V5 SDK field and JSON copied from Data Explorer reaches the API unchanged.",
+        "additionalProperties": true,
+        "required": [
+          "metric",
+          "dimension"
+        ],
+        "properties": {
+          "metric": {
+            "description": "The unit of measure, as a string or a list of strings (the V5 SDK sent a list): bytes, in_bytes, out_bytes, packets, in_packets, out_packets, tcp_retransmit, perc_retransmit, retransmits_in, perc_retransmits_in, out_of_order_in, perc_out_of_order_in, fragments, perc_fragments, client_latency, server_latency, appl_latency, fps, unique_src_ip, or unique_dst_ip."
+          },
+          "dimension": {
+            "type": "array",
+            "description": "The group-by dimensions, for example Proto, AS_src, IP_dst, Traffic, or a custom dimension.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "device_name": {
+            "description": "The devices to query, as a comma-separated string or a list of names (the V5 SDK sent a list). Required in practice: the API returns 400 without it, even when all_selected is true."
+          },
+          "all_selected": {
+            "type": "boolean",
+            "description": "Queries all devices."
+          },
+          "device_labels": {
+            "description": "Device label IDs, as a list or a comma-separated string. Label names are not accepted."
+          },
+          "lookback_seconds": {
+            "type": "integer",
+            "description": "The time range, in seconds back from now. Overrides starting_time and ending_time unless it is 0."
+          },
+          "starting_time": {
+            "type": "string",
+            "description": "The fixed start, as YYYY-MM-DD HH:mm:00. Used when lookback_seconds is 0."
+          },
+          "ending_time": {
+            "type": "string",
+            "description": "The fixed end, as YYYY-MM-DD HH:mm:00. Used when lookback_seconds is 0."
+          },
+          "time_format": {
+            "type": "string",
+            "description": "UTC or Local. URL only."
+          },
+          "topx": {
+            "type": "integer",
+            "description": "The number of top rows that get time series, 1 to 40."
+          },
+          "depth": {
+            "type": "integer",
+            "description": "The number of result rows from which topx is chosen, 25 to 250."
+          },
+          "outsort": {
+            "type": "string",
+            "description": "The aggregate name to sort by, for example avg_bits_per_sec."
+          },
+          "fastData": {
+            "type": "string",
+            "description": "The dataset: Auto, Fast, or Full."
+          },
+          "hostname_lookup": {
+            "type": "boolean",
+            "description": "Resolves IP addresses to host names. Set to false for faster IP queries."
+          },
+          "cidr": {
+            "type": "integer",
+            "description": "The IPv4 prefix length for IP dimensions, 0 to 32."
+          },
+          "cidr6": {
+            "type": "integer",
+            "description": "The IPv6 prefix length for IP dimensions, 0 to 128."
+          },
+          "pps_threshold": {
+            "type": "integer",
+            "description": "The minimum packets per second for a flow to count."
+          },
+          "filters_obj": {
+            "$ref": "#/components/schemas/QueryFilters"
+          },
+          "saved_filters": {
+            "type": "array",
+            "description": "Saved filters to apply.",
+            "items": {
+              "$ref": "#/components/schemas/SavedFilterRef"
+            }
+          },
+          "aggregates": {
+            "type": "array",
+            "description": "The aggregate columns. Kentik makes them from the metric when this is empty.",
+            "items": {
+              "$ref": "#/components/schemas/Aggregate"
+            }
+          },
+          "matrixBy": {
+            "type": "array",
+            "description": "The matrix dimensions for a matrix chart.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minsPolling": {
+            "type": "integer",
+            "description": "The flow aggregation window in minutes: 1, 5, 10, or 20."
+          },
+          "forceMinsPolling": {
+            "type": "boolean",
+            "description": "Uses minsPolling instead of the automatic window."
+          },
+          "reAggInterval": {
+            "type": "integer",
+            "description": "The re-aggregation interval in seconds."
+          },
+          "reAggFn": {
+            "type": "string",
+            "description": "The re-aggregation function: avg, max, min, or none."
+          },
+          "viz_type": {
+            "type": "string",
+            "description": "The chart type: stackedArea, line, stackedBar, bar, pie, sankey, table, or matrix. Chart and URL only."
+          },
+          "show_overlay": {
+            "type": "boolean",
+            "description": "Shows the historical overlay. Chart and URL only."
+          },
+          "overlay_day": {
+            "type": "integer",
+            "description": "The number of days back for the overlay. Chart and URL only."
+          },
+          "sync_axes": {
+            "type": "boolean",
+            "description": "Syncs the left and right axis scales. Chart and URL only."
+          },
+          "query_title": {
+            "type": "string",
+            "description": "The title shown on the chart."
+          },
+          "descriptor": {
+            "type": "string",
+            "description": "The series label when queries has more than one item."
+          }
+        }
+      },
+      "QueryFilters": {
+        "type": "object",
+        "description": "The ad hoc filters of a query.",
+        "properties": {
+          "connector": {
+            "type": "string",
+            "description": "How the filter groups combine: All (and) or Any (or)."
+          },
+          "filterGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterGroup"
+            }
+          }
+        }
+      },
+      "FilterGroup": {
+        "type": "object",
+        "description": "A group of filters.",
+        "properties": {
+          "connector": {
+            "type": "string",
+            "description": "How the filters combine: All (and) or Any (or)."
+          },
+          "not": {
+            "type": "boolean",
+            "description": "Excludes the matching traffic instead of including it."
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          }
+        }
+      },
+      "Filter": {
+        "type": "object",
+        "description": "One filter.",
+        "properties": {
+          "filterField": {
+            "type": "string",
+            "description": "The KDE name of the dimension to filter on."
+          },
+          "operator": {
+            "type": "string",
+            "description": "The operator, for example =, <>, ILIKE, NOT ILIKE, ~, !~, >, <, or &."
+          },
+          "filterValue": {
+            "type": "string",
+            "description": "The value to match."
+          }
+        }
+      },
+      "SavedFilterRef": {
+        "type": "object",
+        "description": "A saved filter to apply.",
+        "properties": {
+          "filter_id": {
+            "type": "integer",
+            "description": "The saved filter ID."
+          },
+          "is_not": {
+            "type": "boolean",
+            "description": "Excludes the matching traffic instead of including it."
+          }
+        }
+      },
+      "Aggregate": {
+        "type": "object",
+        "description": "One aggregate column.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The column name, for example avg_bits_per_sec."
+          },
+          "column": {
+            "type": "string",
+            "description": "The KDE column to aggregate, for example f_sum_both_bytes."
+          },
+          "fn": {
+            "type": "string",
+            "description": "The function: sum, average, percentile, max, composite, exponent, modulus, greaterThan, greaterThanEquals, lessThan, lessThanEquals, equals, or notEquals."
+          },
+          "rank": {
+            "type": "integer",
+            "description": "The percentile, 5 to 99, when fn is percentile."
+          },
+          "sample_rate": {
+            "type": "number",
+            "description": "A factor applied to every value."
+          },
+          "raw": {
+            "type": "boolean",
+            "description": "Returns the raw values."
+          }
+        }
+      },
+      "TopXDataResponse": {
+        "type": "object",
+        "description": "The result of a top-X data query.",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResultBucket"
+            }
+          }
+        }
+      },
+      "ResultBucket": {
+        "type": "object",
+        "description": "The rows of one bucket.",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "The bucket name from the request."
+          },
+          "data": {
+            "type": "array",
+            "description": "One row per result. The keys depend on the query: the dimension columns, key, the aggregate columns, and timeSeries for the top-X rows.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ChartResponse": {
+        "type": "object",
+        "description": "The result of a top-X chart query.",
+        "properties": {
+          "dataUri": {
+            "type": "string",
+            "description": "The image as data:<mime>;base64,<data>."
+          }
+        }
+      },
+      "BatchPart": {
+        "type": "object",
+        "description": "One part of a batch of flow tags or populators.",
+        "required": [
+          "replace_all",
+          "complete"
+        ],
+        "properties": {
+          "replace_all": {
+            "type": "boolean",
+            "description": "If true, the API deletes every tag or populator that the batch does not upsert. Send the same value in every part."
+          },
+          "complete": {
+            "type": "boolean",
+            "description": "True on the last part only."
+          },
+          "upserts": {
+            "type": "array",
+            "description": "The values to create or update.",
+            "items": {
+              "$ref": "#/components/schemas/BatchUpsert"
+            }
+          },
+          "deletes": {
+            "type": "array",
+            "description": "The values to delete.",
+            "items": {
+              "$ref": "#/components/schemas/BatchDelete"
+            }
+          },
+          "guid": {
+            "type": "string",
+            "description": "Empty on the first part. The guid from the first response on every later part."
+          }
+        }
+      },
+      "BatchUpsert": {
+        "type": "object",
+        "description": "A value and the criteria that set it.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The tag name, or the populator value."
+          },
+          "criteria": {
+            "type": "array",
+            "description": "Each criterion defines one tag or populator with this value.",
+            "items": {
+              "$ref": "#/components/schemas/BatchCriterion"
+            }
+          }
+        }
+      },
+      "BatchCriterion": {
+        "type": "object",
+        "description": "The flow fields to match. Keeps every field it gets. Known match fields, each a list of strings: port, protocol, tcp_flags, asn, lasthop_as_name, nexthop_asn, nexthop_as_name, nexthop, bgp_aspath, bgp_community, mac, country, vlans, device_name, device_type, site, interface_name.",
+        "additionalProperties": true,
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "src, dst, or either (the default). Populators only; the API ignores it for tags."
+          },
+          "addr": {
+            "type": "array",
+            "description": "IP addresses or CIDRs to match.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BatchDelete": {
+        "type": "object",
+        "description": "A value to delete.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The tag name, or the populator value."
+          }
+        }
+      },
+      "BatchResponse": {
+        "type": "object",
+        "description": "The answer to one batch part.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "A status message."
+          },
+          "guid": {
+            "type": "string",
+            "description": "The batch ID. Send it in every later part, and use it for batch_status."
+          }
+        }
+      },
+      "BatchStatus": {
+        "type": "object",
+        "description": "The progress of a batch.",
+        "properties": {
+          "guid": {
+            "type": "string",
+            "description": "The batch ID."
+          },
+          "custom_dimension": {
+            "$ref": "#/components/schemas/BatchStatusCustomDimension"
+          },
+          "is_multipart": {
+            "type": "boolean",
+            "description": "The batch has more than one part."
+          },
+          "is_pending": {
+            "type": "boolean",
+            "description": "The batch waits to be processed."
+          },
+          "is_complete": {
+            "type": "boolean",
+            "description": "Every part arrived and was processed."
+          },
+          "number_of_parts": {
+            "type": "integer",
+            "description": "The parts received so far."
+          },
+          "user": {
+            "$ref": "#/components/schemas/BatchStatusUser"
+          },
+          "upserts": {
+            "$ref": "#/components/schemas/BatchUpsertCounts"
+          },
+          "deletes": {
+            "$ref": "#/components/schemas/BatchDeleteCounts"
+          },
+          "replace_all": {
+            "$ref": "#/components/schemas/BatchReplaceAll"
+          },
+          "batch_date": {
+            "type": "string",
+            "description": "When the first part arrived."
+          }
+        }
+      },
+      "BatchStatusCustomDimension": {
+        "type": "object",
+        "description": "The custom dimension of a populator batch. Absent for a tag batch.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The custom dimension ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "The custom dimension name."
+          }
+        }
+      },
+      "BatchStatusUser": {
+        "type": "object",
+        "description": "The user who sent the batch.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The user ID."
+          },
+          "email": {
+            "type": "string",
+            "description": "The user email."
+          }
+        }
+      },
+      "BatchUpsertCounts": {
+        "type": "object",
+        "description": "Upsert counts so far.",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The sum of the other counts."
+          },
+          "applied": {
+            "type": "integer",
+            "description": "Values applied."
+          },
+          "invalid": {
+            "type": "integer",
+            "description": "Values not valid."
+          },
+          "unchanged": {
+            "type": "integer",
+            "description": "Values that changed nothing."
+          },
+          "over_limit": {
+            "type": "integer",
+            "description": "Values ignored because they exceed the contract limit."
+          }
+        }
+      },
+      "BatchDeleteCounts": {
+        "type": "object",
+        "description": "Delete counts so far.",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The sum of the other counts."
+          },
+          "applied": {
+            "type": "integer",
+            "description": "Values deleted."
+          },
+          "unchanged": {
+            "type": "integer",
+            "description": "Values that deleted nothing."
+          },
+          "invalid": {
+            "type": "integer",
+            "description": "Values not valid."
+          }
+        }
+      },
+      "BatchReplaceAll": {
+        "type": "object",
+        "description": "The result of replace_all.",
+        "properties": {
+          "requested": {
+            "type": "boolean",
+            "description": "replace_all was set."
+          },
+          "deletes_performed": {
+            "type": "integer",
+            "description": "Values deleted because the batch did not upsert them."
+          },
+          "successful": {
+            "type": "boolean",
+            "description": "False when something stopped those deletes."
+          }
+        }
+      }
+    }
+  }
+}

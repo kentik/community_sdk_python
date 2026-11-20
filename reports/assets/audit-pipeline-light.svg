@@ -1,0 +1,42 @@
+<svg width="2150" height="280" id="audit-pipeline" viewBox="0 0 2150 280" role="group" aria-label="The pre-PR audit showed how weak generator, test, and changelog gates could produce a false green CI result." xmlns="http://www.w3.org/2000/svg"><style>/* House diagram style: the SVG parts and the explorer states. It reads the
+   color tokens of page-theme/assets/theme.css, so load that file first. */
+svg text { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.node rect { stroke-width: 2; transition: stroke-width .15s; }
+.node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.node .ft { font-size: 12px; text-anchor: middle; }
+.fam-blue.src rect { fill: #a5d8ff; stroke: #1971c2; } .fam-blue.proc rect { fill: #e7f5ff; stroke: #1971c2; } .fam-blue text { fill: #1864ab; }
+.fam-violet.src rect { fill: #d0bfff; stroke: #7048e8; } .fam-violet.proc rect { fill: #f3f0ff; stroke: #7048e8; } .fam-violet text { fill: #5f3dc4; }
+.fam-green.src rect { fill: #b2f2bb; stroke: #2f9e44; } .fam-green.proc rect { fill: #ebfbee; stroke: #2f9e44; } .fam-green text { fill: #2b8a3e; }
+.fam-orange.src rect { fill: #ffd8a8; stroke: #e8590c; } .fam-orange.proc rect { fill: #fff4e6; stroke: #e8590c; } .fam-orange text { fill: #d9480f; }
+.fam-red.src rect { fill: #ffc9c9; stroke: #e03131; } .fam-red.proc rect { fill: #fff5f5; stroke: #e03131; } .fam-red text { fill: #c92a2a; }
+.fam-cyan.src rect { fill: #99e9f2; stroke: #1098ad; } .fam-cyan.proc rect { fill: #e3fafc; stroke: #1098ad; } .fam-cyan text { fill: #0b7285; }
+.fam-yellow.src rect { fill: #ffec99; stroke: #f08c00; } .fam-yellow.proc rect { fill: #fff9db; stroke: #f08c00; } .fam-yellow text { fill: #a35a00; }
+.fam-neutral rect { fill: #f8f9fa; stroke: #495057; } .fam-neutral text { fill: #212529; }
+.planned rect { stroke-dasharray: 7 6; }
+.container rect { fill: #fafbfc; stroke: #a9b3be; stroke-width: 1.5; }
+.clabel { font-size: 12px; font-weight: 600; fill: #57616d; }
+.wire { fill: none; stroke: #77818c; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.elabel { font-size: 12px; fill: #57616d; }
+.ah { fill: #77818c; } .ah-hi { fill: #1c222a; }
+.note { font-size: 12px; font-weight: 600; fill: #57616d; }
+.note.warn { fill: #b35900; }
+.note.fam-blue { fill: #1971c2; } .note.fam-violet { fill: #7048e8; } .note.fam-green { fill: #2f9e44; }
+.note.fam-orange { fill: #e8590c; } .note.fam-red { fill: #e03131; } .note.fam-cyan { fill: #1098ad; }
+.note.fam-yellow { fill: #f08c00; } .note.fam-neutral { fill: #495057; }
+
+.explorer .node { cursor: pointer; }
+.explorer .node:focus { outline: none; }
+.explorer .node:focus-visible rect, .explorer .node.sel rect { stroke: #5f3dc4; stroke-width: 4; }
+.explorer .node, .explorer .edge { transition: opacity .2s; }
+.explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.edge.hi .wire, .edge.flow .wire { stroke: #1c222a; stroke-width: 3; }
+.edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.edge.flow.access .wire, .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .edge.flow .wire { animation: none; stroke-dasharray: none; } * { transition: none !important; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: #57616d; }
+.legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
+</style><rect width="100%" height="100%" fill="#ffffff"/><defs><marker id="audit-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="audit-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="schema_generator" data-links="schema>generator"><path d="M200,136 H330" class="wire arrow" marker-end="url(#audit-ah)"/><text x="265.0" y="128" class="elabel" text-anchor="middle">schema input</text></g><g class="edge data" data-seg="generator_mock" data-links="generator>mock"><path d="M520,136 H650" class="wire arrow" marker-end="url(#audit-ah)"/><text x="585.0" y="128" class="elabel" text-anchor="middle">generated code</text></g><g class="edge data" data-seg="mock_e2e" data-links="mock>e2e"><path d="M840,136 H970" class="wire arrow" marker-end="url(#audit-ah)"/><text x="905.0" y="128" class="elabel" text-anchor="middle">test fixtures</text></g><g class="edge data" data-seg="e2e_surface" data-links="e2e>surface"><path d="M1160,136 H1290" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1225.0" y="128" class="elabel" text-anchor="middle">API record</text></g><g class="edge data" data-seg="surface_changelog" data-links="surface>changelog"><path d="M1490,136 H1620" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1555.0" y="128" class="elabel" text-anchor="middle">breaking changes</text></g><g class="edge data" data-seg="changelog_ci" data-links="changelog>ci"><path d="M1820,136 H1950" class="wire arrow" marker-end="url(#audit-ah)"/><text x="1885.0" y="128" class="elabel" text-anchor="middle">gate result</text></g><g class="node fam-blue src " data-id="schema"><rect x="10" y="100" width="190" height="72" rx="14"/><text x="105.0" y="132.5" class="nm">Upstream schema</text><text x="105.0" y="149.5" class="ft">pinned input</text></g><g class="node fam-blue proc " data-id="generator"><rect x="330" y="100" width="190" height="72" rx="14"/><text x="425.0" y="124.0" class="nm">Generator</text><text x="425.0" y="141.0" class="ft">protoc failures</text><text x="425.0" y="158.0" class="ft">must stop</text></g><g class="node fam-green proc " data-id="mock"><rect x="650" y="100" width="190" height="72" rx="14"/><text x="745.0" y="124.0" class="nm">Mocked tests</text><text x="745.0" y="141.0" class="ft">model-shaped</text><text x="745.0" y="158.0" class="ft">fixtures</text></g><g class="node fam-green proc " data-id="e2e"><rect x="970" y="100" width="190" height="72" rx="14"/><text x="1065.0" y="124.0" class="nm">Live e2e</text><text x="1065.0" y="141.0" class="ft">wrong host</text><text x="1065.0" y="158.0" class="ft">false pass</text></g><g class="node fam-orange proc " data-id="surface"><rect x="1290" y="100" width="200" height="72" rx="14"/><text x="1390.0" y="124.0" class="nm">API surface</text><text x="1390.0" y="141.0" class="ft">missing names</text><text x="1390.0" y="158.0" class="ft">and types</text></g><g class="node fam-orange proc " data-id="changelog"><rect x="1620" y="100" width="200" height="72" rx="14"/><text x="1720.0" y="124.0" class="nm">Changelog gate</text><text x="1720.0" y="141.0" class="ft">substring</text><text x="1720.0" y="158.0" class="ft">match</text></g><g class="node fam-neutral hub " data-id="ci"><rect x="1950" y="100" width="180" height="72" rx="14"/><text x="2040.0" y="132.5" class="nm">CI</text><text x="2040.0" y="149.5" class="ft">false green</text></g></svg>

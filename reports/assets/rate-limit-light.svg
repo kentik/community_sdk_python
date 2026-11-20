@@ -1,0 +1,42 @@
+<svg width="1040" height="430" id="rate-limit-scope" viewBox="0 0 1040 430" role="group" aria-label="REST and gRPC share the device-list counter; different endpoints have separate counters." xmlns="http://www.w3.org/2000/svg"><style>/* House diagram style: the SVG parts and the explorer states. It reads the
+   color tokens of page-theme/assets/theme.css, so load that file first. */
+svg text { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.node rect { stroke-width: 2; transition: stroke-width .15s; }
+.node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.node .ft { font-size: 12px; text-anchor: middle; }
+.fam-blue.src rect { fill: #a5d8ff; stroke: #1971c2; } .fam-blue.proc rect { fill: #e7f5ff; stroke: #1971c2; } .fam-blue text { fill: #1864ab; }
+.fam-violet.src rect { fill: #d0bfff; stroke: #7048e8; } .fam-violet.proc rect { fill: #f3f0ff; stroke: #7048e8; } .fam-violet text { fill: #5f3dc4; }
+.fam-green.src rect { fill: #b2f2bb; stroke: #2f9e44; } .fam-green.proc rect { fill: #ebfbee; stroke: #2f9e44; } .fam-green text { fill: #2b8a3e; }
+.fam-orange.src rect { fill: #ffd8a8; stroke: #e8590c; } .fam-orange.proc rect { fill: #fff4e6; stroke: #e8590c; } .fam-orange text { fill: #d9480f; }
+.fam-red.src rect { fill: #ffc9c9; stroke: #e03131; } .fam-red.proc rect { fill: #fff5f5; stroke: #e03131; } .fam-red text { fill: #c92a2a; }
+.fam-cyan.src rect { fill: #99e9f2; stroke: #1098ad; } .fam-cyan.proc rect { fill: #e3fafc; stroke: #1098ad; } .fam-cyan text { fill: #0b7285; }
+.fam-yellow.src rect { fill: #ffec99; stroke: #f08c00; } .fam-yellow.proc rect { fill: #fff9db; stroke: #f08c00; } .fam-yellow text { fill: #a35a00; }
+.fam-neutral rect { fill: #f8f9fa; stroke: #495057; } .fam-neutral text { fill: #212529; }
+.planned rect { stroke-dasharray: 7 6; }
+.container rect { fill: #fafbfc; stroke: #a9b3be; stroke-width: 1.5; }
+.clabel { font-size: 12px; font-weight: 600; fill: #57616d; }
+.wire { fill: none; stroke: #77818c; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.elabel { font-size: 12px; fill: #57616d; }
+.ah { fill: #77818c; } .ah-hi { fill: #1c222a; }
+.note { font-size: 12px; font-weight: 600; fill: #57616d; }
+.note.warn { fill: #b35900; }
+.note.fam-blue { fill: #1971c2; } .note.fam-violet { fill: #7048e8; } .note.fam-green { fill: #2f9e44; }
+.note.fam-orange { fill: #e8590c; } .note.fam-red { fill: #e03131; } .note.fam-cyan { fill: #1098ad; }
+.note.fam-yellow { fill: #f08c00; } .note.fam-neutral { fill: #495057; }
+
+.explorer .node { cursor: pointer; }
+.explorer .node:focus { outline: none; }
+.explorer .node:focus-visible rect, .explorer .node.sel rect { stroke: #5f3dc4; stroke-width: 4; }
+.explorer .node, .explorer .edge { transition: opacity .2s; }
+.explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.edge.hi .wire, .edge.flow .wire { stroke: #1c222a; stroke-width: 3; }
+.edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.edge.flow.access .wire, .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .edge.flow .wire { animation: none; stroke-dasharray: none; } * { transition: none !important; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: #57616d; }
+.legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
+</style><rect width="100%" height="100%" fill="#ffffff"/><defs><marker id="limits-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="limits-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="probe_stem" data-links="probe>rest_device,probe>grpc_device,probe>rest_sites,probe>rest_markets"><path d="M200,216 H230" class="wire"/></g><g class="edge data" data-seg="probe_rest_device" data-links="probe>rest_device"><path d="M230,216 V76 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_grpc_device" data-links="probe>grpc_device"><path d="M230,216 V166 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_rest_sites" data-links="probe>rest_sites"><path d="M230,216 V266 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="probe_rest_markets" data-links="probe>rest_markets"><path d="M230,216 V356 H280" class="wire arrow" marker-end="url(#limits-ah)"/></g><g class="edge data" data-seg="rest_device" data-links="rest_device>device_bucket"><path d="M500,76 H620 V116 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="560" y="68" class="elabel" text-anchor="middle">same endpoint</text></g><g class="edge data" data-seg="grpc_device" data-links="grpc_device>device_bucket"><path d="M500,166 H620 V116 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="560" y="158" class="elabel" text-anchor="middle">same endpoint</text></g><g class="edge data" data-seg="rest_sites" data-links="rest_sites>sites_bucket"><path d="M500,266 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="640" y="258" class="elabel" text-anchor="middle">separate endpoint</text></g><g class="edge data" data-seg="rest_markets" data-links="rest_markets>markets_bucket"><path d="M500,356 H780" class="wire arrow" marker-end="url(#limits-ah)"/><text x="640" y="348" class="elabel" text-anchor="middle">separate endpoint</text></g><g class="node fam-blue proc " data-id="rest_device"><rect x="280" y="40" width="220" height="72" rx="14"/><text x="390" y="64.0" class="nm">REST request</text><text x="390" y="81.0" class="ft">device.ListDevices</text><text x="390" y="98.0" class="ft">endpoint</text></g><g class="node fam-green proc " data-id="grpc_device"><rect x="280" y="130" width="220" height="72" rx="14"/><text x="390" y="154.0" class="nm">gRPC request</text><text x="390" y="171.0" class="ft">device.ListDevices</text><text x="390" y="188.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="device_bucket"><rect x="780" y="80" width="240" height="72" rx="14"/><text x="900" y="104.0" class="nm">Shared counter</text><text x="900" y="121.0" class="ft">device list</text><text x="900" y="138.0" class="ft">REST + gRPC</text></g><g class="node fam-orange proc " data-id="rest_sites"><rect x="280" y="230" width="220" height="72" rx="14"/><text x="390" y="254.0" class="nm">REST request</text><text x="390" y="271.0" class="ft">site.ListSites</text><text x="390" y="288.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="sites_bucket"><rect x="780" y="230" width="240" height="72" rx="14"/><text x="900" y="254.0" class="nm">Separate counter</text><text x="900" y="271.0" class="ft">site list</text><text x="900" y="288.0" class="ft">own budget</text></g><g class="node fam-red proc " data-id="rest_markets"><rect x="280" y="320" width="220" height="72" rx="14"/><text x="390" y="344.0" class="nm">REST request</text><text x="390" y="361.0" class="ft">site.ListSiteMarkets</text><text x="390" y="378.0" class="ft">endpoint</text></g><g class="node fam-neutral hub " data-id="markets_bucket"><rect x="780" y="320" width="240" height="72" rx="14"/><text x="900" y="344.0" class="nm">Separate counter</text><text x="900" y="361.0" class="ft">site markets</text><text x="900" y="378.0" class="ft">own budget</text></g><g class="node fam-neutral hub " data-id="probe"><rect x="20" y="180" width="180" height="72" rx="14"/><text x="110.0" y="204.0" class="nm">Rate-limit probe</text><text x="110.0" y="221.0" class="ft">read-only calls</text><text x="110.0" y="238.0" class="ft">2026-10-27</text></g></svg>

@@ -1,0 +1,10 @@
+{
+  "extraPaths": ["src", "scripts", "tests", "tests/e2e"],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "docs/build",
+    "reports/pre-pr-audit-2026-10-10/evidence"
+  ]
+}

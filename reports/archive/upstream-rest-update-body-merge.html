@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REST update drops the documented camelCase body when the URL sets a nested field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../report-theme.css">
+<link rel="stylesheet" href="../assets/report-tabs.css">
+</head>
+<body>
+<div class="wrap">
+<header class="masthead">
+  <p class="sub">Report for the Kentik API team</p>
+  <h1><span>REST</span> update ignores the documented <code>asGroup</code> / <code>siteMarket</code> body when the URL sets a nested field</h1>
+  <p class="sub">Observed 2026-10-21 against the live V6 API on a lab account, with plain <code>curl</code> and <code>grpcurl</code>,
+    and again with the Kentik community Python SDK. Schema checked: <code>api-schema-public</code> commit <code>9de9a68</code>.
+    Evidence scripts: <code>reports/scripts/rest-body-merge/curl_repro.sh</code> (live, no SDK),
+    <code>reports/scripts/rest-body-merge/live_probe.py</code> (live, SDK), and
+    <code>reports/scripts/rest-body-merge/audit.py</code> (offline).</p>
+</header>
+<!-- report-tabs:start -->
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive report</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="../upstream/upstream-rest-update-body-merge.md">upstream-rest-update-body-merge.md</a></div>
+<!-- report-tabs:end -->
+<div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
+
+<div class="callout">
+  <strong>Current status, 2026-10-27:</strong> use
+  <a href="../kentik-api-team-findings.md">the current findings tracker</a> for current
+  findings. The FlowTag update accepted the documented body. AutoAck body parsing
+  reached the same validation for both spellings in a missing-ID control. The
+  real-record AutoAck <code>SyntaxError</code> remains a separate issue.
+</div>
+
+<nav class="toc" aria-label="Sections"><ul>
+  <li><a href="#summary">Summary</a></li><li><a href="#contract">Contract</a></li>
+  <li><a href="#live-evidence">Live evidence</a></li>
+  <li><a href="#scope">Schema scope</a></li><li><a href="#reproduce">Reproduce</a></li>
+</ul></nav>
+
+<h2 id="summary">Summary</h2>
+<p>Two REST update operations reject the request body that the published OpenAPI document describes:
+  <code>ASGroupService.UpdateASGroup</code> and <code>SiteService.UpdateSiteMarket</code>.
+  The body wraps the object in its camelCase JSON name (<code>asGroup</code>, <code>siteMarket</code>).
+  The server reads the object only under its proto name (<code>as_group</code>, <code>site_market</code>),
+  which is the name the URL template uses for the ID. The same request works over gRPC.
+  A client that follows the OpenAPI document cannot update an AS group or a site market over REST.</p>
+<p>The defect does not depend on the SDK. Plain <code>curl</code> requests give the same results as the SDK, and
+  <code>grpcurl</code> with the same camelCase JSON succeeds over gRPC. The section
+  <a href="#reproduce">Reproduce without the SDK</a> lists every request and the real response.</p>
+
+<div class="tablebox"><table>
+  <thead><tr><th>Operation</th><th>REST, body as documented</th><th>REST, proto-name body key</th><th>gRPC</th><th>Client</th></tr></thead>
+  <tbody>
+    <tr><td><code>PUT /as_group/v202212/as_group/{asGroup.id}</code></td>
+      <td class="fail">400 <code>request.as_group.name</code> "received: undefined"</td>
+      <td class="ok">200, updated</td><td class="ok">OK, updated</td><td>curl / grpcurl, and the SDK</td></tr>
+    <tr><td><code>PUT /site/v202509/site_markets/{siteMarket.id}</code></td>
+      <td class="fail">500 <code>internal error (name:TypeError)</code></td>
+      <td class="ok">200, updated</td><td class="ok">OK, updated</td><td>curl / grpcurl, and the SDK</td></tr>
+  </tbody>
+</table></div>
+
+<div class="chips" data-paths-for="body-merge-flow" aria-label="Diagram paths"></div>
+<figure>
+  <div class="diagram explorer"><svg id="body-merge-flow" viewBox="0 0 880 380" role="group" aria-label="Documented REST bodies fail on two update routes while proto-name REST and gRPC controls succeed." xmlns="http://www.w3.org/2000/svg"><defs><marker id="body-merge-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="body-merge-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="update_stem" data-links="update>camel,update>proto,update>grpc"><path d="M190,186 H220" class="wire"/></g><g class="edge data" data-seg="update_camel" data-links="update>camel"><path d="M220,186 V76 H250" class="wire arrow" marker-end="url(#body-merge-ah)"/></g><g class="edge data" data-seg="update_proto" data-links="update>proto"><path d="M220,186 H250" class="wire arrow" marker-end="url(#body-merge-ah)"/></g><g class="edge data" data-seg="update_grpc" data-links="update>grpc"><path d="M220,186 V296 H250" class="wire arrow" marker-end="url(#body-merge-ah)"/></g><g class="edge data" data-seg="rest_camel" data-links="camel>rest_error"><path d="M470,76 H600" class="wire arrow" marker-end="url(#body-merge-ah)"/><text x="535" y="68" class="elabel" text-anchor="middle">documented JSON</text></g><g class="edge data" data-seg="rest_proto" data-links="proto>rest_ok"><path d="M470,186 H600" class="wire arrow" marker-end="url(#body-merge-ah)"/><text x="535" y="178" class="elabel" text-anchor="middle">proto-name key</text></g><g class="edge data" data-seg="grpc_camel" data-links="grpc>grpc_ok"><path d="M470,296 H600" class="wire arrow" marker-end="url(#body-merge-ah)"/><text x="535" y="288" class="elabel" text-anchor="middle">ProtoJSON</text></g><g class="node fam-blue proc " data-id="camel" tabindex="0" role="button" aria-label="Select Documented REST body"><rect x="250" y="40" width="220" height="72" rx="14"/><text x="360" y="64.0" class="nm">REST body</text><text x="360" y="81.0" class="ft">asGroup / siteMarket</text><text x="360" y="98.0" class="ft">documented key</text></g><g class="node fam-orange proc " data-id="proto" tabindex="0" role="button" aria-label="Select Proto-name REST control"><rect x="250" y="150" width="220" height="72" rx="14"/><text x="360" y="174.0" class="nm">REST body</text><text x="360" y="191.0" class="ft">as_group / site_market</text><text x="360" y="208.0" class="ft">control key</text></g><g class="node fam-green proc " data-id="grpc" tabindex="0" role="button" aria-label="Select gRPC camelCase control"><rect x="250" y="260" width="220" height="72" rx="14"/><text x="360" y="284.0" class="nm">gRPC body</text><text x="360" y="301.0" class="ft">camelCase JSON</text><text x="360" y="318.0" class="ft">control</text></g><g class="node fam-red proc " data-id="rest_error" tabindex="0" role="button" aria-label="Select REST documented-body failure"><rect x="600" y="40" width="250" height="72" rx="14"/><text x="725" y="64.0" class="nm">REST update</text><text x="725" y="81.0" class="ft">HTTP 400 / 500</text><text x="725" y="98.0" class="ft">two operations</text></g><g class="node fam-neutral hub " data-id="rest_ok" tabindex="0" role="button" aria-label="Select REST proto-key success"><rect x="600" y="150" width="250" height="72" rx="14"/><text x="725" y="174.0" class="nm">REST update</text><text x="725" y="191.0" class="ft">HTTP 200</text><text x="725" y="208.0" class="ft">updated</text></g><g class="node fam-neutral hub " data-id="grpc_ok" tabindex="0" role="button" aria-label="Select gRPC success"><rect x="600" y="260" width="250" height="72" rx="14"/><text x="725" y="284.0" class="nm">gRPC update</text><text x="725" y="301.0" class="ft">OK</text><text x="725" y="318.0" class="ft">updated</text></g><g class="node fam-neutral hub " data-id="update" tabindex="0" role="button" aria-label="Select Update request"><rect x="10" y="150" width="180" height="72" rx="14"/><text x="100.0" y="174.0" class="nm">Update request</text><text x="100.0" y="191.0" class="ft">UpdateASGroup</text><text x="100.0" y="208.0" class="ft">UpdateSiteMarket</text></g></svg></div>
+  <figcaption>The documented REST body failed on two update routes. Proto-name REST and camelCase gRPC controls succeeded.</figcaption>
+</figure>
+<div class="detail" data-detail-for="body-merge-flow" aria-live="polite"></div>
+
+<h2 id="contract">What the contract says</h2>
+<p>The proto declares the rule with the proto field name in the path and <code>body: "*"</code>:</p>
+<pre><code>// proto/kentik/as_group/v202212/as_group.proto, line 271
+rpc UpdateASGroup(UpdateASGroupRequest) returns (UpdateASGroupResponse) {
+  option (google.api.http) = {
+    put: "/as_group/v202212/as_group/{as_group.id}"
+    body: "*"
+  };
+}</code></pre>
+<p>The generated OpenAPI document (<code>gen/openapiv2/kentik/as_group/v202212/as_group.swagger.json</code>)
+  publishes the path parameter as <code>asGroup.id</code> and the body as
+  <code>ASGroupServiceUpdateASGroupBody</code>, whose only property is <code>asGroup</code>:</p>
+<pre><code>"parameters": [
+  { "name": "asGroup.id", "in": "path", "required": true, "type": "string" },
+  { "name": "body", "in": "body", "required": true,
+    "schema": { "$ref": "#/definitions/ASGroupServiceUpdateASGroupBody" } }
+]
+"ASGroupServiceUpdateASGroupBody": {
+  "type": "object",
+  "properties": { "asGroup": { "type": "object", "properties": { "name": ..., "asn": ... } } }
+}</code></pre>
+<p>The SDK sends exactly that body: <code>{"asGroup": {"name": "...", "asn": ["..."]}}</code>.
+  <code>UpdateSiteMarket</code> has the same shape (<code>{site_market.id}</code>, <code>body: "*"</code>,
+  body property <code>siteMarket</code>).</p>
+
+<h2 id="live-evidence">Live evidence</h2>
+<p>The tables in this section come from the SDK run. The <a href="#reproduce">curl run</a> gives the same result for every step.
+  Each test object was created for this test with a name that starts with <code>sdk-e2e-test-</code>,
+  and deleted at the end. No existing account data was changed.</p>
+
+<h3>AS group (object <code>9719201908</code>)</h3>
+<div class="tablebox"><table>
+  <thead><tr><th>#</th><th>Transport</th><th>Request</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>REST</td><td><code>POST /as_group/v202212/as_group</code>, body <code>{"asGroup": {...}}</code></td>
+      <td class="ok">200, created. CamelCase is read here.</td></tr>
+    <tr><td>2</td><td>REST</td><td><code>PUT .../as_group/9719201908</code>, body <code>{"asGroup": {"name": "...", "asn": ["36459"]}}</code> (as documented)</td>
+      <td class="fail">400 <code>At path: request.as_group.name -- Expected a string, but received: undefined</code></td></tr>
+    <tr><td>3</td><td>REST</td><td>Same, body <code>{"as_group": {...}}</code></td><td class="ok">200, updated</td></tr>
+    <tr><td>4</td><td>REST</td><td>Same, body <code>{"asGroup": {"name": "X-a"}, "as_group": {"name": "X-b"}}</code></td>
+      <td class="warn">200, and a GET shows name <code>X-b</code>. The <code>as_group</code> object wins and <code>asGroup</code> is dropped.</td></tr>
+    <tr><td>5</td><td>gRPC</td><td><code>UpdateASGroup</code>, <code>as_group.id</code> set and the same name and ASNs</td><td class="ok">OK, updated. A REST GET shows the change.</td></tr>
+    <tr><td>6</td><td>REST</td><td><code>DELETE .../as_group/9719201908</code> (no body)</td><td class="ok">200, deleted</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Site market (object <code>1992</code>)</h3>
+<div class="tablebox"><table>
+  <thead><tr><th>#</th><th>Transport</th><th>Request</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>REST</td><td><code>POST /site/v202509/site_markets</code>, body <code>{"siteMarket": {...}}</code></td><td class="ok">200, created</td></tr>
+    <tr><td>2</td><td>REST</td><td><code>PUT .../site_markets/1992</code>, body <code>{"siteMarket": {"name": "...", "description": "camel"}}</code> (as documented)</td>
+      <td class="fail">500 <code>internal error (name:TypeError type:object)</code></td></tr>
+    <tr><td>3</td><td>REST</td><td>Same, body <code>{"site_market": {..., "description": "snake"}}</code></td><td class="ok">200, description <code>snake</code></td></tr>
+    <tr><td>4</td><td>REST</td><td>Same, both keys, descriptions <code>camel</code> and <code>snake</code></td>
+      <td class="warn">200, and a GET shows <code>snake</code></td></tr>
+    <tr><td>5</td><td>gRPC</td><td><code>UpdateSiteMarket</code>, description <code>grpc</code></td><td class="ok">OK. A REST GET shows <code>grpc</code>.</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Controls</h3>
+<div class="tablebox"><table>
+  <thead><tr><th>Operation</th><th>Rule shape</th><th>REST with the documented body</th></tr></thead>
+  <tbody>
+    <tr><td><code>LabelService.UpdateLabel</code></td><td><code>{label.id}</code>, <code>body: "*"</code>. Proto and JSON name are both <code>label</code>.</td><td class="ok">200, updated</td></tr>
+    <tr><td><code>SiteService.UpdateSite</code></td><td><code>{site.id}</code>, <code>body: "*"</code>. Both names are <code>site</code>.</td><td class="ok">200, updated</td></tr>
+    <tr><td><code>CustomApplicationService.UpdateCustomApplication</code></td><td><code>{custom_application_id}</code> (not nested), <code>body: "application"</code></td><td class="ok">200, updated</td></tr>
+    <tr><td><code>AlertAutoAckService.Replace</code></td><td><code>{auto_ack.id}</code>, <code>body: "*"</code>, <code>auto_ack</code> / <code>autoAck</code>. The same shape as the failing routes.</td>
+      <td class="ok">Body read. With ID <code>999999999</code>, <code>{"autoAck": {"startTimeAt": ...}}</code>
+        gets past the <code>startTime</code> check and fails later on <code>rule_id must not be an empty string</code>,
+        the same as the proto-name body. The alerting REST layer merges correctly.</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Why we think the defect is in the API, not in the client</h2>
+<ol>
+  <li>The client sends the body that the published OpenAPI document defines, key for key.</li>
+  <li>The proto3 JSON mapping requires every parser to accept both the lowerCamelCase JSON name and the proto field name
+    (<a href="https://protobuf.dev/programming-guides/json/">protobuf.dev, ProtoJSON format</a>).
+    <code>asGroup</code> and <code>as_group</code> are two spellings of one field, so a correct merge cannot lose either one.</li>
+  <li>The 400 message names <code>request.as_group.name</code>. The server built <code>request.as_group</code> from the URL
+    (<code>{as_group.id}</code>), and the body never reached that object.</li>
+  <li>Test 4 sends both spellings. A correct parser treats them as one field. The server keeps the URL-side
+    <code>as_group</code> object and drops <code>asGroup</code> without an error.</li>
+  <li>The same service accepts camelCase on create (test 1), where the URL sets no field. The failure appears only when the URL sets a field inside the body object.</li>
+  <li>The same update over gRPC succeeds with the same data, so the service logic behind the route works.</li>
+  <li>Routes where the two names are the same (<code>label</code>, <code>site</code>) work, and the alerting route with the same shape works.
+    So the cause is in how the <code>as_group</code> and <code>site</code> REST layers merge path and body, not in the shared gateway.</li>
+</ol>
+<p>A likely cause: the REST layer turns <code>{as_group.id}</code> into <code>{"as_group": {"id": "..."}}</code>, merges that object
+  with the JSON body as plain objects keyed by spelling, and then reads <code>as_group</code>.
+  The fix is to normalize the body to one spelling (or to decode it with a ProtoJSON parser) before the path value is set.</p>
+
+<h2 id="scope">Scope across the schema</h2>
+<p><code>reports/scripts/rest-body-merge/audit.py</code> reads the <code>google.api.http</code> rules from the compiled descriptors
+  of commit <code>9de9a68</code>. 101 rules carry a body. 4 have the shape that fails here: <code>body: "*"</code> and a path
+  variable nested in a top-level field whose proto name differs from its JSON name.</p>
+<div class="tablebox"><table>
+  <thead><tr><th>Rule</th><th>Path</th><th>Live result</th></tr></thead>
+  <tbody>
+    <tr><td><code>ASGroupService.UpdateASGroup</code></td><td><code>PUT /as_group/v202212/as_group/{as_group.id}</code></td><td class="fail">Affected</td></tr>
+    <tr><td><code>SiteService.UpdateSiteMarket</code></td><td><code>PUT /site/v202509/site_markets/{site_market.id}</code></td><td class="fail">Affected</td></tr>
+    <tr><td><code>AlertAutoAckService.Replace</code></td><td><code>PATCH /v202505/alerts/ack/auto/{auto_ack.id}</code></td><td class="ok">Not affected (control above)</td></tr>
+    <tr><td><code>FlowTagService.UpdateFlowTag</code></td><td><code>PUT /flow_tag/v202404alpha1/tag/{flow_tag.id}</code></td>
+      <td class="warn">Unknown. Every flow tag write returns 500 <code>StatusCodeError</code> (see below), so this route cannot be checked.</td></tr>
+  </tbody>
+</table></div>
+<p>The other 97 body-carrying rules cannot hit this defect. Each rule is counted once, in its first matching group:</p>
+<div class="tablebox"><table>
+  <thead><tr><th>Group</th><th>Rules</th><th>Why the merge cannot drop the body</th></tr></thead>
+  <tbody>
+    <tr><td>No path variable</td><td>55, including 31 of the 34 creates</td><td>The URL sets no field. Live creates with camelCase keys work (as group, site market, label, site, custom application, mitigation).</td></tr>
+    <tr><td>Flat path variable, <code>body: "*"</code></td><td>15</td><td>The URL sets a top-level scalar, not a field inside a body object.</td></tr>
+    <tr><td>Body is one field</td><td>11, including <code>CreatePopulator</code> and <code>CreateServiceNowConfig</code></td><td>The body is the object itself, with no wrapper key.</td></tr>
+    <tr><td>Same name in both spellings</td><td>14</td><td>For example <code>label</code>, <code>site</code>, <code>device</code>, <code>user</code>.</td></tr>
+    <tr><td>Only a nested leaf is renamed</td><td>2</td><td><code>mkp</code> <code>CreateTenantUser</code> and <code>UpdateTenantUser</code>,
+      <code>{user.tenant_id}</code>. The wrapper key is the same in both spellings. Not checked live, because it needs an MKP tenant.</td></tr>
+  </tbody>
+</table></div>
+
+<div class="callout">
+  <strong>Ask:</strong> make the <code>as_group</code> and <code>site</code> REST layers accept the body that the OpenAPI document
+  publishes. A body key in either spelling must reach the same field, and a value from the URL must be merged into it,
+  not replace it. Please also check <code>FlowTagService.UpdateFlowTag</code> after the flow tag fix below, because it has the same shape.
+  Until this is fixed, the community SDK marks the two REST updates as known failures and cannot update these objects over REST.
+</div>
+
+<h2>Related: every flow tag write returns 500</h2>
+<p>This blocks the check of the fourth route. <code>CreateFlowTag</code> and <code>UpdateFlowTag</code> return
+  <code>500 internal error (name:StatusCodeError type:object)</code> over REST and gRPC, with either body spelling,
+  and with only a name in the body. A GET for a missing ID returns a correct 404 (<code>Flow tag id 999999999 does not exist</code>).
+  V5 batch flow tag upserts work on the same account.</p>
+
+<h2 id="reproduce">Reproduce without the SDK</h2>
+<p>These steps use only <code>curl</code> (8.3 or later), <code>jq</code>, and <code>grpcurl</code>. The responses below are the
+  real responses from the run on 2026-10-21 at 22:02 UTC. Your IDs and timestamps will differ.
+  <code>reports/scripts/rest-body-merge/curl_repro.sh</code> runs the same steps and deletes the objects on exit.</p>
+
+<h3>Step 0: set up the session</h3>
+<p>Set the credentials of a test account in the environment. The two helpers below read them from the environment,
+  so the token never appears on a command line.</p>
+<pre><code>export KENTIK_EMAIL='you@example.com'
+export KENTIK_API_TOKEN='...'
+BASE=https://grpc.api.kentik.com
+NAME=sdk-e2e-test-curl-e8d1082c
+
+AUTH=(--variable %KENTIK_EMAIL --variable %KENTIK_API_TOKEN
+      --expand-header 'X-CH-Auth-Email: {{KENTIK_EMAIL}}'
+      --expand-header 'X-CH-Auth-API-Token: {{KENTIK_API_TOKEN}}'
+      -H 'Content-Type: application/json' -sS -w '\nHTTP %{http_code}\n')
+
+# Run from a directory next to an api-schema-public checkout.
+GRPC=(grpcurl -expand-headers
+      -H 'X-CH-Auth-Email: ${KENTIK_EMAIL}' -H 'X-CH-Auth-API-Token: ${KENTIK_API_TOKEN}'
+      -import-path ../api-schema-public/proto
+      -import-path ../api-schema-public/protovendor/github.com/googleapis/googleapis
+      -import-path ../api-schema-public/protovendor/github.com/grpc-ecosystem/grpc-gateway)</code></pre>
+
+<h3>AS group</h3>
+<p>Step A1: create a test AS group over REST, with the camelCase key. The create reads the camelCase body.</p>
+<pre><code>curl -X POST "$BASE/as_group/v202212/as_group" "${AUTH[@]}" \
+  -d '{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c","asn":["36459"]}}'
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c","asn":[{"asn":36459,"name":"Microsoft (GitHub),US"}],"createdDate":"2026-10-21T22:02:49.157Z","updatedDate":"2026-10-21T22:02:49.157Z"}}
+HTTP 200</code></pre>
+<p>Step A2: update it with the body that the OpenAPI document describes. <span class="fail">This fails.</span></p>
+<pre><code>curl -X PUT "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}" \
+  -d '{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c-camel","asn":["36459"]}}'
+
+{"code":3,"message":"At path: request.as_group.name -- Expected a string, but received: undefined (errxid dbckd2czked00d9jjnq0)","details":[]}
+HTTP 400</code></pre>
+<p>Step A3: send the same update with the proto-name key <code>as_group</code>. <span class="ok">This works.</span></p>
+<pre><code>curl -X PUT "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}" \
+  -d '{"as_group":{"name":"sdk-e2e-test-curl-e8d1082c-snake","asn":["36459"]}}'
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-snake",...,"updatedDate":"2026-10-21T22:02:49.819Z"}}
+HTTP 200</code></pre>
+<p>Step A4: send both spellings with different names. A ProtoJSON parser treats them as one field.
+  <span class="warn">The server keeps <code>as_group</code> (<code>-b</code>) and drops <code>asGroup</code> (<code>-a</code>) without an error.</span></p>
+<pre><code>curl -X PUT "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}" \
+  -d '{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c-a","asn":["36459"]},
+       "as_group":{"name":"sdk-e2e-test-curl-e8d1082c-b","asn":["36459"]}}'
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-b",...}}
+HTTP 200
+
+curl -X GET "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}"
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-b",...,"updatedDate":"2026-10-21T22:02:50.233Z"}}
+HTTP 200</code></pre>
+<p>Step A5: send the camelCase update over gRPC. <code>grpcurl</code> reads the JSON with a ProtoJSON parser.
+  <span class="ok">This works</span>, and a REST GET shows the change.</p>
+<pre><code>"${GRPC[@]}" -proto kentik/as_group/v202212/as_group.proto \
+  -d '{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-grpc","asn":["36459","46489"]}}' \
+  grpc.api.kentik.com:443 kentik.as_group.v202212.ASGroupService/UpdateASGroup
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-grpc","asn":[{"asn":36459,...},{"asn":46489,"name":"Twitch.tv (Amazon),US"}],...,"updatedDate":"2026-10-21T22:02:51.061Z"}}
+
+curl -X GET "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}"
+
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-grpc","asn":[{"asn":36459,...},{"asn":46489,...}],...}}
+HTTP 200</code></pre>
+
+<h3>Site market</h3>
+<p>Step B1: create a test site market over REST, with the camelCase key.</p>
+<pre><code>curl -X POST "$BASE/site/v202509/site_markets" "${AUTH[@]}" \
+  -d '{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c"}}'
+
+{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"","numberOfSites":0,"cdate":"2026-10-21T22:02:51.684Z","edate":"2026-10-21T22:02:51.684Z"}}
+HTTP 200</code></pre>
+<p>Step B2: update it with the documented body. <span class="fail">This fails.</span></p>
+<pre><code>curl -X PUT "$BASE/site/v202509/site_markets/1994" "${AUTH[@]}" \
+  -d '{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c","description":"camel"}}'
+
+{"code":13,"message":"internal error (name:TypeError type:object) (errxid dbckd2wsmfx00gt3td1g)","details":[]}
+HTTP 500</code></pre>
+<p>Step B3: send the same update with <code>site_market</code>. <span class="ok">This works.</span></p>
+<pre><code>curl -X PUT "$BASE/site/v202509/site_markets/1994" "${AUTH[@]}" \
+  -d '{"site_market":{"name":"sdk-e2e-test-curl-e8d1082c","description":"snake"}}'
+
+{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"snake",...}}
+HTTP 200</code></pre>
+<p>Step B4: send both spellings. <span class="warn">The server keeps <code>snake</code>.</span></p>
+<pre><code>curl -X PUT "$BASE/site/v202509/site_markets/1994" "${AUTH[@]}" \
+  -d '{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c","description":"camel"},
+       "site_market":{"name":"sdk-e2e-test-curl-e8d1082c","description":"snake"}}'
+
+{"siteMarket":{"id":"1994",...,"description":"snake",...}}
+HTTP 200</code></pre>
+<p>Step B5: send the camelCase update over gRPC. <span class="ok">This works</span>, and a REST GET shows the change.</p>
+<pre><code>"${GRPC[@]}" -proto kentik/site/v202509/site.proto \
+  -d '{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"grpc"}}' \
+  grpc.api.kentik.com:443 kentik.site.v202509.SiteService/UpdateSiteMarket
+
+{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"grpc",...,"edate":"2026-10-21T22:02:53.237Z"}}
+
+curl -X GET "$BASE/site/v202509/site_markets/1994" "${AUTH[@]}"
+
+{"siteMarket":{"id":"1994",...,"description":"grpc",...}}
+HTTP 200</code></pre>
+
+<h3>Control: label</h3>
+<p>Step C1 and C2: the label body key is <code>label</code> in both spellings, and the update path sets <code>{label.id}</code>.
+  <span class="ok">The documented body works.</span></p>
+<pre><code>curl -X POST "$BASE/label/v202210/labels" "${AUTH[@]}" \
+  -d '{"label":{"name":"sdk-e2e-test-curl-e8d1082c","color":"#5289D9"}}'
+
+{"label":{"id":"42057","name":"sdk-e2e-test-curl-e8d1082c",...}}
+HTTP 200
+
+curl -X POST "$BASE/label/v202210/labels/42057" "${AUTH[@]}" \
+  -d '{"label":{"name":"sdk-e2e-test-curl-e8d1082c-updated","color":"#E35B5B"}}'
+
+{"label":{"id":"42057","name":"sdk-e2e-test-curl-e8d1082c-updated","description":"","color":"#E35B5B",...}}
+HTTP 200</code></pre>
+
+<h3>Clean up</h3>
+<pre><code>curl -X DELETE "$BASE/as_group/v202212/as_group/9719305276" "${AUTH[@]}"   # HTTP 200
+curl -X DELETE "$BASE/site/v202509/site_markets/1994" "${AUTH[@]}"          # HTTP 200
+curl -X DELETE "$BASE/label/v202210/labels/42057" "${AUTH[@]}"              # HTTP 200</code></pre>
+
+<h3>With the SDK, and the schema audit</h3>
+<p>From the community SDK repository, with test-account credentials in <code>.env</code>:</p>
+<pre><code>uv run python reports/scripts/rest-body-merge/live_probe.py   # live: the same checks through the SDK, with cleanup
+uv run python reports/scripts/rest-body-merge/audit.py   # offline: lists the 101 rules and their shape</code></pre>
+<p>The SDK run gives the same status and message at every step as the curl run, so the SDK adds nothing to the failure.</p>
+
+</div>
+<!-- report-markdown:start -->
+<div class="tabpanel" id="full-report" role="tabpanel" aria-labelledby="tab-full-report">
+<article class="markdown-body">
+<h1 id="md-rest-update-ignores-the-documented-camelcase-body-when-the-url-sets-a-nested-field">REST update ignores the documented camelCase body when the URL sets a nested field</h1>
+<p>Report for the Kentik API team. Observed on 2026-10-21 against the live V6
+API on a lab account. We used plain <code>curl</code> and <code>grpcurl</code>, and then the Kentik
+community Python SDK. Schema: <code>api-schema-public</code> commit <code>9de9a68</code>, which
+matches upstream HEAD <code>8ec5847</code> for these services.</p>
+<blockquote class="markdown-alert markdown-alert-warning">
+<p><span class="markdown-alert-title">Warning</span>This report contains lab resource IDs and API request IDs. Keep this branch
+local. Do not merge it into <code>main</code> or share it beyond the API team without
+removing those details.</p>
+</blockquote>
+<h2 id="md-summary">Summary</h2>
+<p>Two REST update operations reject the request body that the published
+OpenAPI document describes: <code>ASGroupService.UpdateASGroup</code> and
+<code>SiteService.UpdateSiteMarket</code>. The body wraps the object in its camelCase
+JSON name (<code>asGroup</code>, <code>siteMarket</code>). The server reads the object only under
+its proto name (<code>as_group</code>, <code>site_market</code>). That is the name the URL template
+uses for the ID. The same request works over gRPC. A client that follows the
+OpenAPI document cannot update an AS group or a site market over REST.</p>
+<p>The defect does not depend on the SDK. Plain <code>curl</code> gives the same results.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>REST, documented body</th>
+<th>REST, proto-name key</th>
+<th>gRPC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PUT /as_group/v202212/as_group/{asGroup.id}</code></td>
+<td>400 <code>request.as_group.name ... received: undefined</code></td>
+<td>200, updated</td>
+<td>OK, updated</td>
+</tr>
+<tr>
+<td><code>PUT /site/v202509/site_markets/{siteMarket.id}</code></td>
+<td>500 <code>internal error (name:TypeError)</code></td>
+<td>200, updated</td>
+<td>OK, updated</td>
+</tr>
+</tbody>
+</table>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/body-merge-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="../assets/body-merge-light.svg">
+  <img alt="Two REST updates fail with the documented camelCase body. The proto-name REST control and the gRPC controls succeed." src="../assets/body-merge-light.svg">
+</picture>
+<p>Open the <a href="#interactive">interactive request-path explorer</a>
+to compare the documented REST body with the proto-name and gRPC controls.</p>
+<h2 id="md-follow-up-validation-2026-10-27">Follow-up validation, 2026-10-27</h2>
+<p>Direct REST tests reproduced both failures above. They returned the documented
+missing-field error for AS groups and the <code>TypeError</code> response for site markets.</p>
+<p>The documented camelCase body succeeded for <code>FlowTagService.UpdateFlowTag</code> on an
+existing disposable tag. The test deleted that tag after the update. The separate
+<code>CreateFlowTag</code> operation still returned HTTP 500. That create failure is a
+separate API issue.</p>
+<p>Current finding status and next actions live only in
+<a href="../kentik-api-team-findings.md">kentik-api-team-findings.md</a>. This report holds
+the detailed body-merge evidence.</p>
+<h2 id="md-what-the-contract-says">What the contract says</h2>
+<p>The proto declares the rule with the proto field name in the path and
+<code>body: &quot;*&quot;</code>:</p>
+<pre class="highlight"><code class="language-protobuf"><span class="c1">// proto/kentik/as_group/v202212/as_group.proto, line 271</span>
+<span class="k">rpc</span><span class="w"> </span><span class="n">UpdateASGroup</span><span class="p">(</span><span class="n">UpdateASGroupRequest</span><span class="p">)</span><span class="w"> </span><span class="k">returns</span><span class="w"> </span><span class="p">(</span><span class="n">UpdateASGroupResponse</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">option</span><span class="w"> </span><span class="p">(</span><span class="n">google.api.http</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">put</span><span class="o">:</span><span class="w"> </span><span class="s">"/as_group/v202212/as_group/{as_group.id}"</span>
+<span class="w">    </span><span class="n">body</span><span class="o">:</span><span class="w"> </span><span class="s">"*"</span>
+<span class="w">  </span><span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+<p>The generated OpenAPI document
+(<code>gen/openapiv2/kentik/as_group/v202212/as_group.swagger.json</code>) publishes the
+path parameter as <code>asGroup.id</code>. It publishes the body as
+<code>ASGroupServiceUpdateASGroupBody</code>, whose only property is <code>asGroup</code>:</p>
+<pre class="highlight"><code class="language-json"><span class="nt">"parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"asGroup.id"</span><span class="p">,</span><span class="w"> </span><span class="nt">"in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"path"</span><span class="p">,</span><span class="w"> </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"body"</span><span class="p">,</span><span class="w"> </span><span class="nt">"in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"body"</span><span class="p">,</span><span class="w"> </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"$ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"#/definitions/ASGroupServiceUpdateASGroupBody"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="p">],</span>
+<span class="nt">"ASGroupServiceUpdateASGroupBody"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"asGroup"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w"> </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="nt">"asn"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p><code>UpdateSiteMarket</code> has the same layout: <code>{site_market.id}</code>, <code>body: &quot;*&quot;</code>, and
+the body property <code>siteMarket</code>.</p>
+<h2 id="md-why-we-think-the-defect-is-in-the-api">Why we think the defect is in the API</h2>
+<ol>
+<li>The client sends the body that the published OpenAPI document defines.</li>
+<li>The proto3 JSON mapping requires every parser to accept both the
+lowerCamelCase JSON name and the proto field name
+(<a href="https://protobuf.dev/programming-guides/json/">ProtoJSON format</a>).
+<code>asGroup</code> and <code>as_group</code> are two spellings of one field.</li>
+<li>The 400 message names <code>request.as_group.name</code>. The server built
+<code>request.as_group</code> from the URL (<code>{as_group.id}</code>), and the body never
+reached that object.</li>
+<li>A request with both spellings succeeds, and the server keeps <code>as_group</code>
+and drops <code>asGroup</code> without an error (steps A4 and B4).</li>
+<li>The same service accepts camelCase on create, where the URL sets no field.</li>
+<li>The same update over gRPC succeeds with the same data.</li>
+<li>Routes where both spellings are the same word (<code>label</code>, <code>site</code>) work. The
+AutoAck request returned HTTP 500 <code>SyntaxError</code>, so it does not confirm
+whether that route has the body-merge defect. The confirmed failures are
+the AS group and site market routes. The wider cause remains unproven.</li>
+</ol>
+<p>A likely cause: the REST layer turns <code>{as_group.id}</code> into
+<code>{&quot;as_group&quot;: {&quot;id&quot;: &quot;...&quot;}}</code>, merges that object with the JSON body as plain
+objects keyed by spelling, and then reads <code>as_group</code>. The fix is to normalize
+the body to one spelling, or to decode it with a ProtoJSON parser, before the
+layer sets the path value.</p>
+<h2 id="md-scope-across-the-schema">Scope across the schema</h2>
+<p>We read the <code>google.api.http</code> rules of all services. 101 rules carry a body.
+4 have this layout: <code>body: &quot;*&quot;</code>, and a path variable inside a top-level field
+whose proto name differs from its JSON name.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Path</th>
+<th>Live result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ASGroupService.UpdateASGroup</code></td>
+<td><code>PUT /as_group/v202212/as_group/{as_group.id}</code></td>
+<td>Affected</td>
+</tr>
+<tr>
+<td><code>SiteService.UpdateSiteMarket</code></td>
+<td><code>PUT /site/v202509/site_markets/{site_market.id}</code></td>
+<td>Affected</td>
+</tr>
+<tr>
+<td><code>AlertAutoAckService.Replace</code></td>
+<td><code>PATCH /v202505/alerts/ack/auto/{auto_ack.id}</code></td>
+<td>No body-merge failure seen: both spellings reached the same validation; real-record PATCH returned separate <code>SyntaxError</code></td>
+</tr>
+<tr>
+<td><code>FlowTagService.UpdateFlowTag</code></td>
+<td><code>PUT /flow_tag/v202404alpha1/tag/{flow_tag.id}</code></td>
+<td>No body-merge failure seen: documented body returned 200 on 2026-10-27</td>
+</tr>
+</tbody>
+</table>
+<p>The other 97 rules cannot hit this defect:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Rules</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No path variable</td>
+<td>55, including 31 of the 34 creates</td>
+<td>The URL sets no field.</td>
+</tr>
+<tr>
+<td>Flat path variable, <code>body: &quot;*&quot;</code></td>
+<td>15</td>
+<td>The URL sets a top-level scalar.</td>
+</tr>
+<tr>
+<td>Body is one field</td>
+<td>11</td>
+<td>The body is the object, with no wrapper key.</td>
+</tr>
+<tr>
+<td>Same name in both spellings</td>
+<td>14</td>
+<td>For example <code>label</code>, <code>site</code>, <code>device</code>, <code>user</code>.</td>
+</tr>
+<tr>
+<td>Only a nested leaf is renamed</td>
+<td>2</td>
+<td><code>mkp</code> tenant users, <code>{user.tenant_id}</code>. Not checked live.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-ask">Ask</h2>
+<p>Make the <code>as_group</code> and <code>site</code> REST layers accept the body that the OpenAPI
+document publishes. A body key in either spelling must reach the same field.
+A value from the URL must be merged into that field, not replace it. The
+FlowTag update returned HTTP 200. Investigate its separate create failure.
+Investigate the AutoAck <code>SyntaxError</code> as a separate issue. Confirm the V5 batch
+success status with the API team.</p>
+<h2 id="md-reproduce-without-the-sdk">Reproduce without the SDK</h2>
+<p>You need <code>curl</code> 8.3 or later, <code>jq</code>, <code>grpcurl</code>, and an <code>api-schema-public</code>
+checkout next to the current directory. The responses below are real
+responses from 2026-10-21 at 22:02 UTC. Your IDs and timestamps will differ.</p>
+<h3 id="md-step-0-set-up-the-session">Step 0: set up the session</h3>
+<p>The helpers read the credentials from the environment, so the token never
+appears on a command line.</p>
+<pre class="highlight"><code class="language-bash"><span class="nb">export</span><span class="w"> </span><span class="nv">KENTIK_EMAIL</span><span class="o">=</span><span class="s1">'you@example.com'</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">KENTIK_API_TOKEN</span><span class="o">=</span><span class="s1">'...'</span>
+<span class="nv">BASE</span><span class="o">=</span>https://grpc.api.kentik.com
+
+<span class="nv">AUTH</span><span class="o">=(</span>--variable<span class="w"> </span>%KENTIK_EMAIL<span class="w"> </span>--variable<span class="w"> </span>%KENTIK_API_TOKEN
+<span class="w">      </span>--expand-header<span class="w"> </span><span class="s1">'X-CH-Auth-Email: {{KENTIK_EMAIL}}'</span>
+<span class="w">      </span>--expand-header<span class="w"> </span><span class="s1">'X-CH-Auth-API-Token: {{KENTIK_API_TOKEN}}'</span>
+<span class="w">      </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-sS<span class="w"> </span>-w<span class="w"> </span><span class="s1">'\nHTTP %{http_code}\n'</span><span class="o">)</span>
+
+<span class="nv">GRPC</span><span class="o">=(</span>grpcurl<span class="w"> </span>-expand-headers
+<span class="w">      </span>-H<span class="w"> </span><span class="s1">'X-CH-Auth-Email: ${KENTIK_EMAIL}'</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'X-CH-Auth-API-Token: ${KENTIK_API_TOKEN}'</span>
+<span class="w">      </span>-import-path<span class="w"> </span>../api-schema-public/proto
+<span class="w">      </span>-import-path<span class="w"> </span>../api-schema-public/protovendor/github.com/googleapis/googleapis
+<span class="w">      </span>-import-path<span class="w"> </span>../api-schema-public/protovendor/github.com/grpc-ecosystem/grpc-gateway<span class="o">)</span>
+</code></pre>
+<h3 id="md-as-group">AS group</h3>
+<p>Step A1: create a test AS group with the camelCase key. This works.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c","asn":["36459"]}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c","asn":[{"asn":36459,"name":"Microsoft (GitHub),US"}],"createdDate":"2026-10-21T22:02:49.157Z","updatedDate":"2026-10-21T22:02:49.157Z"}}
+HTTP 200
+</code></pre>
+<p>Step A2: update it with the documented body. This fails.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group/9719305276"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c-camel","asn":["36459"]}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"code":3,"message":"At path: request.as_group.name -- Expected a string, but received: undefined (errxid dbckd2czked00d9jjnq0)","details":[]}
+HTTP 400
+</code></pre>
+<p>Step A3: send the same update with the proto-name key. This works.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group/9719305276"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"as_group":{"name":"sdk-e2e-test-curl-e8d1082c-snake","asn":["36459"]}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-snake",...}}
+HTTP 200
+</code></pre>
+<p>Step A4: send both spellings with different names. The server keeps
+<code>as_group</code> (<code>-b</code>) and drops <code>asGroup</code> (<code>-a</code>) without an error.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group/9719305276"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"asGroup":{"name":"sdk-e2e-test-curl-e8d1082c-a","asn":["36459"]},</span>
+<span class="s1">       "as_group":{"name":"sdk-e2e-test-curl-e8d1082c-b","asn":["36459"]}}'</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group/9719305276"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-b",...}}
+HTTP 200
+{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-b",...}}
+HTTP 200
+</code></pre>
+<p>Step A5: send the camelCase update over gRPC. <code>grpcurl</code> reads the JSON with
+a ProtoJSON parser. This works, and a REST GET shows the change.</p>
+<pre class="highlight"><code class="language-bash"><span class="s2">"</span><span class="si">${</span><span class="nv">GRPC</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>-proto<span class="w"> </span>kentik/as_group/v202212/as_group.proto<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-grpc","asn":["36459","46489"]}}'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>grpc.api.kentik.com:443<span class="w"> </span>kentik.as_group.v202212.ASGroupService/UpdateASGroup
+</code></pre>
+<pre class="highlight"><code class="language-text">{"asGroup":{"id":"9719305276","name":"sdk-e2e-test-curl-e8d1082c-grpc","asn":[{"asn":36459,...},{"asn":46489,"name":"Twitch.tv (Amazon),US"}],...}}
+</code></pre>
+<h3 id="md-site-market">Site market</h3>
+<p>Step B1: create a test site market with the camelCase key. This works.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/site/v202509/site_markets"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c"}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"","numberOfSites":0,...}}
+HTTP 200
+</code></pre>
+<p>Step B2: update it with the documented body. This fails.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/site/v202509/site_markets/1994"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c","description":"camel"}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"code":13,"message":"internal error (name:TypeError type:object) (errxid dbckd2wsmfx00gt3td1g)","details":[]}
+HTTP 500
+</code></pre>
+<p>Step B3: send the same update with <code>site_market</code>. This works.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/site/v202509/site_markets/1994"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"site_market":{"name":"sdk-e2e-test-curl-e8d1082c","description":"snake"}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"snake",...}}
+HTTP 200
+</code></pre>
+<p>Step B4: send both spellings. The server keeps <code>snake</code>.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/site/v202509/site_markets/1994"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"siteMarket":{"name":"sdk-e2e-test-curl-e8d1082c","description":"camel"},</span>
+<span class="s1">       "site_market":{"name":"sdk-e2e-test-curl-e8d1082c","description":"snake"}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"siteMarket":{"id":"1994",...,"description":"snake",...}}
+HTTP 200
+</code></pre>
+<p>Step B5: send the camelCase update over gRPC. This works.</p>
+<pre class="highlight"><code class="language-bash"><span class="s2">"</span><span class="si">${</span><span class="nv">GRPC</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>-proto<span class="w"> </span>kentik/site/v202509/site.proto<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"grpc"}}'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>grpc.api.kentik.com:443<span class="w"> </span>kentik.site.v202509.SiteService/UpdateSiteMarket
+</code></pre>
+<pre class="highlight"><code class="language-text">{"siteMarket":{"id":"1994","name":"sdk-e2e-test-curl-e8d1082c","description":"grpc",...}}
+</code></pre>
+<h3 id="md-control-label">Control: label</h3>
+<p>The label body key is <code>label</code> in both spellings, and the update path sets
+<code>{label.id}</code>. The documented body works.</p>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/label/v202210/labels"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"label":{"name":"sdk-e2e-test-curl-e8d1082c","color":"#5289D9"}}'</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/label/v202210/labels/42057"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"label":{"name":"sdk-e2e-test-curl-e8d1082c-updated","color":"#E35B5B"}}'</span>
+</code></pre>
+<pre class="highlight"><code class="language-text">{"label":{"id":"42057","name":"sdk-e2e-test-curl-e8d1082c",...}}
+HTTP 200
+{"label":{"id":"42057","name":"sdk-e2e-test-curl-e8d1082c-updated","color":"#E35B5B",...}}
+HTTP 200
+</code></pre>
+<h3 id="md-clean-up">Clean up</h3>
+<pre class="highlight"><code class="language-bash">curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/as_group/v202212/as_group/9719305276"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span>
+curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/site/v202509/site_markets/1994"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span>
+curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE</span><span class="s2">/label/v202210/labels/42057"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">AUTH</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span>
+</code></pre>
+<h2 id="md-request-ids">Request IDs</h2>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Call</th>
+<th>Status</th>
+<th>errxid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>curl</td>
+<td>UpdateASGroup</td>
+<td>400</td>
+<td><code>dbckd2czked00d9jjnq0</code></td>
+</tr>
+<tr>
+<td>curl</td>
+<td>UpdateSiteMarket</td>
+<td>500</td>
+<td><code>dbckd2wsmfx00gt3td1g</code></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>UpdateASGroup</td>
+<td>400</td>
+<td><code>dbck70czked004gescz0</code></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>UpdateSiteMarket</td>
+<td>500</td>
+<td><code>dbck71msmfx0081rvfx0</code></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>AutoAck Replace control</td>
+<td>400</td>
+<td><code>dbck78dzked00d9jjmr0</code></td>
+</tr>
+<tr>
+<td>REST</td>
+<td>AutoAck Replace documented body</td>
+<td>500</td>
+<td><code>dbgge7gzked0089cpq20</code></td>
+</tr>
+<tr>
+<td>REST</td>
+<td>CreateFlowTag</td>
+<td>500</td>
+<td><code>dbgesketkfgg04rgdw1g</code></td>
+</tr>
+</tbody>
+</table>
+</article>
+</div>
+<!-- report-markdown:end -->
+<footer>Request ids (2026-10-21), curl run: UpdateASGroup 400 <code>dbckd2czked00d9jjnq0</code>; UpdateSiteMarket 500
+  <code>dbckd2wsmfx00gt3td1g</code>. SDK run: UpdateASGroup 400 <code>dbck70czked004gescz0</code>; UpdateSiteMarket 500
+  <code>dbck71msmfx0081rvfx0</code>; UpdateFlowTag 500 REST <code>dbck71mzked00d9jjmkg</code>, gRPC <code>dbck71mzked00d9jjmm0</code>;
+  CreateFlowTag 500 <code>dbck71wsmfx0081rvfxg</code>; AutoAck Replace control 400 <code>dbck78dzked00d9jjmr0</code>.</footer>
+</div>
+<script type="application/json" id="diagram-data">{"body-merge-flow": {"caption": "The documented REST body failed on two update routes. Proto-name REST and camelCase gRPC controls succeeded.", "select": "camel", "hint": "Select a request path to compare the documented body with the observed controls.", "parts": {"update": {"role": "The same logical update, sent three ways.", "facts": ["UpdateASGroup", "UpdateSiteMarket"], "stops": "No update is sent.", "evidence": "curl, SDK, and grpcurl runs in the archived report.", "title": "Update request"}, "camel": {"role": "The published OpenAPI body uses lowerCamelCase wrapper keys.", "facts": ["asGroup", "siteMarket", "REST PUT"], "stops": "The AS-group request returned HTTP 400, and the site-market request returned HTTP 500.", "evidence": "curl and SDK runs produced the same results; see request IDs in the report.", "title": "Documented REST body"}, "proto": {"role": "The same REST routes accepted the corresponding proto field names.", "facts": ["as_group", "site_market", "REST PUT"], "stops": "The API updated both objects when the body used the proto-name key.", "evidence": "Direct curl controls returned HTTP 200.", "title": "Proto-name REST control"}, "grpc": {"role": "The same camelCase data succeeded over gRPC.", "facts": ["ProtoJSON body", "UpdateASGroup and UpdateSiteMarket"], "stops": "The two update operations completed over gRPC.", "evidence": "grpcurl controls returned success; REST GETs showed the updates.", "title": "gRPC camelCase control"}, "rest_error": {"role": "REST rejected the documented body for both observed operations.", "facts": ["AS group: HTTP 400 missing-field error", "Site market: HTTP 500 TypeError"], "stops": "Clients that follow OpenAPI cannot update these objects over REST until the server accepts the documented form.", "evidence": "Observed with curl on 2026-10-21; request IDs are in the archived report.", "title": "REST documented-body failure"}, "rest_ok": {"role": "The proto-name controls succeeded over REST.", "facts": ["AS group: HTTP 200", "Site market: HTTP 200"], "stops": "These controls show that the route can update the object with the alternate key spelling.", "evidence": "Live responses in the archived report.", "title": "REST proto-key success"}, "grpc_ok": {"role": "The documented camelCase data succeeded over gRPC.", "facts": ["AS group: OK", "Site market: OK"], "stops": "The observed failure is specific to the REST body/path interaction; the shared internal cause remains unconfirmed.", "evidence": "Live grpcurl controls in the archived report.", "title": "gRPC success"}}, "paths": {"documented": {"label": "Documented REST body", "title": "OpenAPI body fails on REST", "text": "The documented lowerCamelCase body failed on two REST update routes.", "links": ["camel>rest_error"], "family": "red"}, "proto_control": {"label": "Proto-name control", "title": "Alternate REST body succeeds", "text": "The proto field spelling updated both objects in direct controls.", "links": ["proto>rest_ok"], "family": "orange"}, "grpc_control": {"label": "gRPC control", "title": "CamelCase data succeeds over gRPC", "text": "The same logical body succeeded through the gRPC methods.", "links": ["grpc>grpc_ok"], "family": "green"}}, "links": {"camel>rest_error": "documented camelCase body", "proto>rest_ok": "proto field spelling", "grpc>grpc_ok": "same data over gRPC"}}}</script>
+<script src="../assets/explorer.js" defer></script>
+<script src="../assets/report-tabs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class ResultType(str, Enum):
+    RESULT_TYPE_UNSPECIFIED = "RESULT_TYPE_UNSPECIFIED"
+
+    RESULT_TYPE_ERROR = "RESULT_TYPE_ERROR"
+
+    RESULT_TYPE_DE_QUERY_OBJECT = "RESULT_TYPE_DE_QUERY_OBJECT"
+
+    RESULT_TYPE_ME_QUERY_OBJECT = "RESULT_TYPE_ME_QUERY_OBJECT"
+
+    RESULT_TYPE_KNOWLEDGE_BASE = "RESULT_TYPE_KNOWLEDGE_BASE"
+
+    RESULT_TYPE_DDOS_ALERTS = "RESULT_TYPE_DDOS_ALERTS"

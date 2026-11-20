@@ -1,0 +1,189 @@
+/* AUTO-GENERATED from scripts/generation/diagram_assets/ by explorer_docs.py. */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --sunk: #e9edf2; --fg: #1c222a; --muted: #57616d;
+  --line: #d4dae1; --line-strong: #a9b3be; --accent: #5f3dc4; --accent-soft: #efeaff;
+  --ok: #2b8a3e; --ok-soft: #e3f6e7; --warn: #b35900; --warn-soft: #fff1dc; --crit: #c92a2a; --crit-soft: #ffe7e7;
+  --wire: #77818c; --wire-hi: #1c222a;
+  --blue-strong: #a5d8ff; --blue-pale: #e7f5ff; --blue-border: #1971c2; --blue-text: #1864ab;
+  --violet-strong: #d0bfff; --violet-pale: #f3f0ff; --violet-border: #7048e8; --violet-text: #5f3dc4;
+  --green-strong: #b2f2bb; --green-pale: #ebfbee; --green-border: #2f9e44; --green-text: #2b8a3e;
+  --orange-strong: #ffd8a8; --orange-pale: #fff4e6; --orange-border: #e8590c; --orange-text: #d9480f;
+  --red-strong: #ffc9c9; --red-pale: #fff5f5; --red-border: #e03131; --red-text: #c92a2a;
+  --cyan-strong: #99e9f2; --cyan-pale: #e3fafc; --cyan-border: #1098ad; --cyan-text: #0b7285;
+  --yellow-strong: #ffec99; --yellow-pale: #fff9db; --yellow-border: #f08c00; --yellow-text: #a35a00;
+  --neu-fill: #f8f9fa; --neu-border: #495057; --neu-text: #212529; --cont-fill: #fafbfc;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151a; --surface: #181d24; --sunk: #1f262e; --fg: #e5e9ee; --muted: #9ba5b1;
+    --line: #2b333d; --line-strong: #4a5562; --accent: #b197fc; --accent-soft: #261f42;
+    --ok: #69db7c; --ok-soft: #15301c; --warn: #ffa94d; --warn-soft: #3a2610; --crit: #ff8787; --crit-soft: #3a1818;
+    --wire: #8792a0; --wire-hi: #f1f3f5;
+    --blue-strong: #1b4a73; --blue-pale: #102a40; --blue-border: #4dabf7; --blue-text: #d0ebff;
+    --violet-strong: #43307f; --violet-pale: #251c45; --violet-border: #9775fa; --violet-text: #e5dbff;
+    --green-strong: #1e5a2c; --green-pale: #12301a; --green-border: #51cf66; --green-text: #d3f9d8;
+    --orange-strong: #6a3a14; --orange-pale: #3b220e; --orange-border: #ff922b; --orange-text: #ffe8cc;
+    --red-strong: #6b2222; --red-pale: #3a1616; --red-border: #ff6b6b; --red-text: #ffe3e3;
+    --cyan-strong: #0d5560; --cyan-pale: #0a3036; --cyan-border: #22b8cf; --cyan-text: #c5f6fa;
+    --yellow-strong: #5c4600; --yellow-pale: #332800; --yellow-border: #fcc419; --yellow-text: #fff3bf;
+    --neu-fill: #222a33; --neu-border: #adb5bd; --neu-text: #e9ecef; --cont-fill: #151a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151a; --surface: #181d24; --sunk: #1f262e; --fg: #e5e9ee; --muted: #9ba5b1;
+  --line: #2b333d; --line-strong: #4a5562; --accent: #b197fc; --accent-soft: #261f42;
+  --ok: #69db7c; --ok-soft: #15301c; --warn: #ffa94d; --warn-soft: #3a2610; --crit: #ff8787; --crit-soft: #3a1818;
+  --wire: #8792a0; --wire-hi: #f1f3f5;
+  --blue-strong: #1b4a73; --blue-pale: #102a40; --blue-border: #4dabf7; --blue-text: #d0ebff;
+  --violet-strong: #43307f; --violet-pale: #251c45; --violet-border: #9775fa; --violet-text: #e5dbff;
+  --green-strong: #1e5a2c; --green-pale: #12301a; --green-border: #51cf66; --green-text: #d3f9d8;
+  --orange-strong: #6a3a14; --orange-pale: #3b220e; --orange-border: #ff922b; --orange-text: #ffe8cc;
+  --red-strong: #6b2222; --red-pale: #3a1616; --red-border: #ff6b6b; --red-text: #ffe3e3;
+  --cyan-strong: #0d5560; --cyan-pale: #0a3036; --cyan-border: #22b8cf; --cyan-text: #c5f6fa;
+  --yellow-strong: #5c4600; --yellow-pale: #332800; --yellow-border: #fcc419; --yellow-text: #fff3bf;
+  --neu-fill: #222a33; --neu-border: #adb5bd; --neu-text: #e9ecef; --cont-fill: #151a20;
+  color-scheme: dark;
+}
+.kx .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.kx .chip { font: 600 0.84rem/1 var(--body); border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 13px; background: var(--surface); color: var(--fg); cursor: pointer; }
+.kx .chip:hover { border-color: var(--fg); }
+.kx .chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.kx .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+.kx figure { margin: 0; display: grid; gap: 10px; }
+.kx .diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.kx .diagram svg { display: block; width: 100%; height: auto; min-width: 960px; }
+.kx .diagram.narrow svg { min-width: 720px; }
+.kx figcaption { font-size: 0.88rem; color: var(--muted); max-width: 80ch; }
+.kx .detail { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; display: grid; gap: 14px; }
+.kx .detail .head { display: grid; gap: 2px; }
+.kx .detail .role { color: var(--muted); }
+.kx .detail .cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px 28px; }
+.kx .detail ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.kx .detail .rel { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.kx .rel button { font: 500 0.82rem/1.2 var(--body); border: 1px solid var(--line-strong); background: var(--sunk); color: var(--fg); border-radius: 8px; padding: 5px 9px; cursor: pointer; text-align: left; }
+.kx .rel button span { display: block; font: 400 0.74rem var(--mono); color: var(--muted); }
+.kx .none { font-size: 0.86rem; color: var(--muted); }
+.kx .stops { border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 10px 14px; border-radius: 0 10px 10px 0; }
+.kx .stops p { max-width: none; }
+.kx .evidence { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); max-width: none; overflow-wrap: anywhere; }
+.kx .evidence b { color: var(--fg); }
+.kx .setting { font: 400 0.84rem/1.5 var(--mono); background: var(--sunk); padding: 10px 12px; border-radius: 10px; overflow-wrap: anywhere; }
+.kx .badge { font: 700 0.7rem/1 var(--mono); padding: 4px 7px; border-radius: 6px; white-space: nowrap; background: var(--sunk); color: var(--muted); }
+.kx .badge.ok { background: var(--ok-soft); color: var(--ok); }
+.kx .badge.warn { background: var(--warn-soft); color: var(--warn); }
+.kx .badge.crit { background: var(--crit-soft); color: var(--crit); }
+.kx .badge.info { background: var(--blue-pale); color: var(--blue-text); border: 1px solid var(--blue-border); }
+.kx .badge.outline { background: none; border: 1px solid var(--line-strong); font-weight: 600; }
+.kx svg text { font-family: var(--mono); }
+.kx .node rect { stroke-width: 2; transition: stroke-width .15s; }
+.kx .node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.kx .node .ft { font-size: 12px; text-anchor: middle; }
+.kx .fam-blue.src rect { fill: var(--blue-strong); stroke: var(--blue-border); }
+.kx .fam-blue.proc rect { fill: var(--blue-pale); stroke: var(--blue-border); }
+.kx .fam-blue text { fill: var(--blue-text); }
+.kx .fam-violet.src rect { fill: var(--violet-strong); stroke: var(--violet-border); }
+.kx .fam-violet.proc rect { fill: var(--violet-pale); stroke: var(--violet-border); }
+.kx .fam-violet text { fill: var(--violet-text); }
+.kx .fam-green.src rect { fill: var(--green-strong); stroke: var(--green-border); }
+.kx .fam-green.proc rect { fill: var(--green-pale); stroke: var(--green-border); }
+.kx .fam-green text { fill: var(--green-text); }
+.kx .fam-orange.src rect { fill: var(--orange-strong); stroke: var(--orange-border); }
+.kx .fam-orange.proc rect { fill: var(--orange-pale); stroke: var(--orange-border); }
+.kx .fam-orange text { fill: var(--orange-text); }
+.kx .fam-red.src rect { fill: var(--red-strong); stroke: var(--red-border); }
+.kx .fam-red.proc rect { fill: var(--red-pale); stroke: var(--red-border); }
+.kx .fam-red text { fill: var(--red-text); }
+.kx .fam-cyan.src rect { fill: var(--cyan-strong); stroke: var(--cyan-border); }
+.kx .fam-cyan.proc rect { fill: var(--cyan-pale); stroke: var(--cyan-border); }
+.kx .fam-cyan text { fill: var(--cyan-text); }
+.kx .fam-yellow.src rect { fill: var(--yellow-strong); stroke: var(--yellow-border); }
+.kx .fam-yellow.proc rect { fill: var(--yellow-pale); stroke: var(--yellow-border); }
+.kx .fam-yellow text { fill: var(--yellow-text); }
+.kx .fam-neutral rect { fill: var(--neu-fill); stroke: var(--neu-border); }
+.kx .fam-neutral text { fill: var(--neu-text); }
+.kx .planned rect { stroke-dasharray: 7 6; }
+.kx .container rect { fill: var(--cont-fill); stroke: var(--line-strong); stroke-width: 1.5; }
+.kx .clabel { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.kx .wire { fill: none; stroke: var(--wire); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.kx .access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.kx .elabel { font-size: 12px; fill: var(--muted); }
+.kx .ah { fill: var(--wire); }
+.kx .ah-hi { fill: var(--wire-hi); }
+.kx .note { font-size: 12px; font-weight: 600; fill: var(--muted); }
+.kx .note.warn { fill: var(--warn); }
+.kx .note.fam-blue { fill: var(--blue-border); }
+.kx .note.fam-violet { fill: var(--violet-border); }
+.kx .note.fam-green { fill: var(--green-border); }
+.kx .note.fam-orange { fill: var(--orange-border); }
+.kx .note.fam-red { fill: var(--red-border); }
+.kx .note.fam-cyan { fill: var(--cyan-border); }
+.kx .note.fam-yellow { fill: var(--yellow-border); }
+.kx .note.fam-neutral { fill: var(--neu-border); }
+.kx .explorer .node { cursor: pointer; }
+.kx .explorer .node:focus { outline: none; }
+.kx .explorer .node:focus-visible rect, .kx .explorer .node.sel rect { stroke: var(--accent); stroke-width: 4; }
+.kx .explorer .node, .kx .explorer .edge { transition: opacity .2s; }
+.kx .explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.kx .explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.kx .edge.hi .wire, .kx .edge.flow .wire { stroke: var(--wire-hi); stroke-width: 3; }
+.kx .edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.kx .edge.flow.access .wire, .kx .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) {.kx .edge.flow .wire { animation: none; stroke-dasharray: none; }
+.kx * { transition: none !important; }}
+.kx .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: var(--muted); }
+.kx .legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
+.kx h3 { font-size: 1.1rem; margin: 0; }
+.kx p { margin: 0; }
+.kx h4 { margin: 0 0 6px; font: 600 0.72rem/1.3 var(--body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.kx { display: grid; gap: 14px; margin: 1.5rem 0; color: var(--fg); }
+.kx .diagram svg { min-width: 720px; }
+.kx { --tone: var(--fg); --tone-bg: var(--fg); --tone-fg: var(--bg); }
+.kx [data-tone="blue"], .kx[data-tone="blue"] { --tone: var(--blue-border); --tone-bg: var(--blue-strong); --tone-fg: var(--blue-text); }
+.kx [data-tone="violet"], .kx[data-tone="violet"] { --tone: var(--violet-border); --tone-bg: var(--violet-strong); --tone-fg: var(--violet-text); }
+.kx [data-tone="green"], .kx[data-tone="green"] { --tone: var(--green-border); --tone-bg: var(--green-strong); --tone-fg: var(--green-text); }
+.kx [data-tone="orange"], .kx[data-tone="orange"] { --tone: var(--orange-border); --tone-bg: var(--orange-strong); --tone-fg: var(--orange-text); }
+.kx [data-tone="red"], .kx[data-tone="red"] { --tone: var(--red-border); --tone-bg: var(--red-strong); --tone-fg: var(--red-text); }
+.kx [data-tone="cyan"], .kx[data-tone="cyan"] { --tone: var(--cyan-border); --tone-bg: var(--cyan-strong); --tone-fg: var(--cyan-text); }
+.kx [data-tone="yellow"], .kx[data-tone="yellow"] { --tone: var(--yellow-border); --tone-bg: var(--yellow-strong); --tone-fg: var(--yellow-text); }
+.kx .chip .dot { background: var(--tone); }
+.kx .chip:hover:not(:disabled) { border-color: var(--tone); }
+.kx .chip[aria-pressed="true"] { background: var(--tone-bg); color: var(--tone-fg); border-color: var(--tone); }
+.kx.seq-steps { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0.5rem 0 1.5rem; }
+.kx .seq-nav { border-color: var(--tone); }
+.kx .seq-nav:last-child:not(:disabled) { background: var(--tone-bg); color: var(--tone-fg); }
+.kx .seq-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.kx .seq-group + .seq-group { padding-left: 12px; border-left: 1px solid var(--line-strong); }
+.kx .chip:disabled { opacity: 0.4; cursor: default; }
+.kx .seq-status { flex-basis: 100%; font: 0.85rem/1.4 var(--mono); color: var(--muted); border-left: 3px solid var(--tone); padding-left: 8px; }
+/* Mermaid parts painted with the page-theme tokens, so a diagram follows the
+   dark mode. :is(svg, #kx-mermaid) lifts each rule above the id-scoped rules
+   that Mermaid writes, and inline styles from sequence-steps.js still win. */
+/* The Sphinx theme inverts Mermaid diagrams in dark mode; the tokens already do that job. */
+html[data-theme="dark"] .mermaid > svg:is(svg, #kx-mermaid) { filter: none; }
+.mermaid svg:is(svg, #kx-mermaid) .messageText,
+.mermaid svg:is(svg, #kx-mermaid) .labelText,
+.mermaid svg:is(svg, #kx-mermaid) text.actor { fill: var(--neu-text); stroke: none; }
+.mermaid svg:is(svg, #kx-mermaid) text.actor > tspan { fill: inherit; }
+.mermaid svg:is(svg, #kx-mermaid) .loopText,
+.mermaid svg:is(svg, #kx-mermaid) .sectionTitle { fill: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) rect.actor,
+.mermaid svg:is(svg, #kx-mermaid) .labelBox { fill: var(--neu-fill); stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-man :is(circle, rect) { fill: var(--neu-fill); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-man :is(circle, rect, line, path) { stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .actor-line { stroke: var(--line-strong); }
+.mermaid svg:is(svg, #kx-mermaid) :is(.messageLine0, .messageLine1) { stroke: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) [id$="arrowhead"] path { fill: var(--muted); stroke: var(--muted); }
+.mermaid svg:is(svg, #kx-mermaid) .loopLine { stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) rect.note { fill: var(--yellow-pale); stroke: var(--yellow-border); }
+.mermaid svg:is(svg, #kx-mermaid) .noteText,
+.mermaid svg:is(svg, #kx-mermaid) .noteText > tspan { fill: var(--yellow-text); }
+.mermaid svg:is(svg, #kx-mermaid) .node :is(rect, path, polygon) { fill: var(--neu-fill); stroke: var(--neu-border); }
+.mermaid svg:is(svg, #kx-mermaid) .node :is(.nodeLabel, .nodeLabel p, text) { color: var(--neu-text); fill: var(--neu-text); }
+.mermaid svg:is(svg, #kx-mermaid) .relation { stroke: var(--wire); }
+.mermaid svg:is(svg, #kx-mermaid) :is(.edgeLabel, .edgeLabel p, .labelBkg) { color: var(--muted); background-color: var(--surface); }
+.mermaid svg:is(svg, #kx-mermaid) .edgeLabel rect { fill: var(--surface); }

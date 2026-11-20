@@ -1,0 +1,8 @@
+extend = "../pyproject.toml"
+line-length = 80
+
+[lint]
+extend-select = ["D", "E4", "E501", "E7", "E9", "F", "PL"]
+
+[lint.pydocstyle]
+convention = "google"

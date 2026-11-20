@@ -1,0 +1,18 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class BaselineConfigCompareMode(str, Enum):
+    COMPARE_MODE_UNSPECIFIED = "COMPARE_MODE_UNSPECIFIED"
+
+    COMPARE_MODE_PREVIOUS_HOURS = "COMPARE_MODE_PREVIOUS_HOURS"
+
+    COMPARE_MODE_PREVIOUS_DAYS = "COMPARE_MODE_PREVIOUS_DAYS"
+
+    COMPARE_MODE_PREVIOUS_DAYS_DISTINGUISH_WEEKENDS = (
+        "COMPARE_MODE_PREVIOUS_DAYS_DISTINGUISH_WEEKENDS"
+    )
+
+    COMPARE_MODE_PREVIOUS_WEEKS = "COMPARE_MODE_PREVIOUS_WEEKS"

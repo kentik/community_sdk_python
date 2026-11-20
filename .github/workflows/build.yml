@@ -1,45 +1,96 @@
 name: build
 
-# Run this workflow all on pushes to main
 on:
   pull_request:
-    branches: [ '**' ]
+    branches: ["**"]
   push:
-    branches: [ 'main' ]
+    branches: [main]
 
 jobs:
-  tests:
-    uses: ./.github/workflows/tests.yml
-
-  build-packages:
-    uses: ./.github/workflows/build_packages.yml
-
-  package-tests:
+  build:
     runs-on: ubuntu-latest
-    needs: [ build-packages ]
-    strategy: 
-      matrix:
-        version: ${{ fromJson(vars.PYTHON_VERSIONS) }}
     steps:
-      - name: Prepare python env
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
-          python-version: ${{ matrix.version }}
-          architecture: x64
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: artifacts.python${{ matrix.version }}
-          path: artifacts
-      - name: Install lib from package
+          python-version: "3.12"
+
+      - name: Build sdist and wheel
         run: |
-          pip install artifacts/dist/*.whl
-      - name: Show installed packages
-        run: pip freeze
-      - name: Check if import is possible
+          uv export --locked --only-group build --no-hashes --no-emit-project -o "$RUNNER_TEMP/build-constraints.txt"
+          uv build --build-constraints "$RUNNER_TEMP/build-constraints.txt"
+
+      - name: Test the unpacked source distribution
         run: |
-          for package in kentik_api kentik_api.auth kentik_api.api_calls
-          do
-            python artifacts/tests/library/test_imports.py ${package}
-            echo "Imported package: ${package}"
+          mkdir "$RUNNER_TEMP/sdist"
+          tar -xzf dist/*.tar.gz -C "$RUNNER_TEMP/sdist" --strip-components=1
+          cd "$RUNNER_TEMP/sdist"
+          uv run --locked --no-default-groups --group test pytest -q tests/
+
+      # Both installs read the built wheel from a hash-pinned requirements
+      # file, so they fail if the file changes after this step.
+      - name: Pin the built wheel by hash
+        run: |
+          wheel=$(realpath dist/*.whl)
+          echo "kentik-api @ file://$wheel --hash=sha256:$(sha256sum "$wheel" | cut -d' ' -f1)" > "$RUNNER_TEMP/wheel-requirements.txt"
+
+      # A clean venv, run from outside the checkout, so a module the wheel
+      # leaves out cannot be found in the dev environment or in src/.
+      - name: Install the wheel with locked runtime dependencies
+        run: |
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/wheel-locked" uv sync --locked --no-default-groups --no-install-project
+          uv pip install --python "$RUNNER_TEMP/wheel-locked/bin/python" --no-deps -r "$RUNNER_TEMP/wheel-requirements.txt"
+          uv pip check --python "$RUNNER_TEMP/wheel-locked/bin/python"
+
+      - name: Install the wheel as a fresh consumer
+        run: |
+          uv venv "$RUNNER_TEMP/wheel-venv"
+          uv pip install --python "$RUNNER_TEMP/wheel-venv/bin/python" -r "$RUNNER_TEMP/wheel-requirements.txt"
+
+      - name: Verify both wheel installations
+        run: |
+          cd "$RUNNER_TEMP"
+          for wheel_env in wheel-locked wheel-venv; do
+            "$wheel_env/bin/python" -I - <<'EOF'
+          import importlib
+          import pkgutil
+
+          import kentik_api
+          from kentik_api import KentikAPI
+
+          modules = [m.name for m in pkgutil.walk_packages(kentik_api.__path__, "kentik_api.")]
+          # kentik_api.analytics needs the analytics extra, which this wheel check does not install.
+          extra = [n for n in modules if n == "kentik_api.analytics" or n.startswith("kentik_api.analytics.")]
+          for name in modules:
+              if name not in extra:
+                  importlib.import_module(name)
+          try:
+              importlib.import_module("kentik_api.analytics")
+          except ImportError as exc:
+              assert "kentik-api[analytics]" in str(exc), exc
+          else:
+              raise AssertionError("kentik_api.analytics imported without the analytics extra")
+          print(f"imported {len(modules) - len(extra)} modules from {kentik_api.__file__}")
+
+          with KentikAPI("ci@example.com", "token", protocol="grpc", env_file=None) as client:
+              wrappers = [w for w in vars(client).values() if type(w).__name__.endswith("ServiceWrapper")]
+              dead = [
+                  f"{type(w).__name__}.{attr}"
+                  for w in wrappers
+                  for attr, stub in vars(w).items()
+                  if attr.startswith("_grpc_stub") and stub is None
+              ]
+              assert wrappers, "no service wrapper mounted"
+              assert not dead, f"gRPC stubs failed to build: {dead}"
+          print(f"built gRPC stubs for {len(wrappers)} services")
+          EOF
           done
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7

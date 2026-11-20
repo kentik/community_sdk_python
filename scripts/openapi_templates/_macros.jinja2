@@ -1,0 +1,6 @@
+{# HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly. #}
+{# Python literals from schema text. The generator autoescapes, so each one ends in `safe`. #}
+{% macro docstring(text, indent) %}"""
+{{ indent }}{{ text | replace('\\', '\\\\') | replace('"""', '\\"\\"\\"') | safe | indent(indent | length) }}
+{{ indent }}"""{% endmacro %}
+{% macro string(text) %}"{{ text | replace('\\', '\\\\') | replace('"', '\\"') | replace('\r\n', '\\n') | replace('\r', '\\n') | replace('\n', '\\n') | safe }}"{% endmacro %}

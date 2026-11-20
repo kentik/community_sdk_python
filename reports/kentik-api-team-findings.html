@@ -1,0 +1,1465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Upstream Issues Affecting Kentik SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=JetBrains+Mono:wght@400;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* House page theme. This file is the single source of every color token:
+   diagram_kit.py reads the hex values from it for static SVG files. The
+   dark block appears twice so that an explicit data-theme beats the OS. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --sunk: #e9edf2;
+  --fg: #1c222a;
+  --muted: #57616d;
+  --line: #d4dae1;
+  --line-strong: #a9b3be;
+  --accent: #5f3dc4;
+  --accent-soft: #efeaff;
+  --ok: #2b8a3e;
+  --ok-soft: #e3f6e7;
+  --warn: #b35900;
+  --warn-soft: #fff1dc;
+  --crit: #c92a2a;
+  --crit-soft: #ffe7e7;
+  --wire: #77818c;
+  --wire-hi: #1c222a;
+  --blue-strong: #a5d8ff;
+  --blue-pale: #e7f5ff;
+  --blue-border: #1971c2;
+  --blue-text: #1864ab;
+  --violet-strong: #d0bfff;
+  --violet-pale: #f3f0ff;
+  --violet-border: #7048e8;
+  --violet-text: #5f3dc4;
+  --green-strong: #b2f2bb;
+  --green-pale: #ebfbee;
+  --green-border: #2f9e44;
+  --green-text: #2b8a3e;
+  --orange-strong: #ffd8a8;
+  --orange-pale: #fff4e6;
+  --orange-border: #e8590c;
+  --orange-text: #d9480f;
+  --red-strong: #ffc9c9;
+  --red-pale: #fff5f5;
+  --red-border: #e03131;
+  --red-text: #c92a2a;
+  --cyan-strong: #99e9f2;
+  --cyan-pale: #e3fafc;
+  --cyan-border: #1098ad;
+  --cyan-text: #0b7285;
+  --yellow-strong: #ffec99;
+  --yellow-pale: #fff9db;
+  --yellow-border: #f08c00;
+  --yellow-text: #a35a00;
+  --neu-fill: #f8f9fa;
+  --neu-border: #495057;
+  --neu-text: #212529;
+  --cont-fill: #fafbfc;
+  --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --body: 'Public Sans', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #11151a;
+    --surface: #181d24;
+    --sunk: #1f262e;
+    --fg: #e5e9ee;
+    --muted: #9ba5b1;
+    --line: #2b333d;
+    --line-strong: #4a5562;
+    --accent: #b197fc;
+    --accent-soft: #261f42;
+    --ok: #69db7c;
+    --ok-soft: #15301c;
+    --warn: #ffa94d;
+    --warn-soft: #3a2610;
+    --crit: #ff8787;
+    --crit-soft: #3a1818;
+    --wire: #8792a0;
+    --wire-hi: #f1f3f5;
+    --blue-strong: #1b4a73;
+    --blue-pale: #102a40;
+    --blue-border: #4dabf7;
+    --blue-text: #d0ebff;
+    --violet-strong: #43307f;
+    --violet-pale: #251c45;
+    --violet-border: #9775fa;
+    --violet-text: #e5dbff;
+    --green-strong: #1e5a2c;
+    --green-pale: #12301a;
+    --green-border: #51cf66;
+    --green-text: #d3f9d8;
+    --orange-strong: #6a3a14;
+    --orange-pale: #3b220e;
+    --orange-border: #ff922b;
+    --orange-text: #ffe8cc;
+    --red-strong: #6b2222;
+    --red-pale: #3a1616;
+    --red-border: #ff6b6b;
+    --red-text: #ffe3e3;
+    --cyan-strong: #0d5560;
+    --cyan-pale: #0a3036;
+    --cyan-border: #22b8cf;
+    --cyan-text: #c5f6fa;
+    --yellow-strong: #5c4600;
+    --yellow-pale: #332800;
+    --yellow-border: #fcc419;
+    --yellow-text: #fff3bf;
+    --neu-fill: #222a33;
+    --neu-border: #adb5bd;
+    --neu-text: #e9ecef;
+    --cont-fill: #151a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #11151a;
+  --surface: #181d24;
+  --sunk: #1f262e;
+  --fg: #e5e9ee;
+  --muted: #9ba5b1;
+  --line: #2b333d;
+  --line-strong: #4a5562;
+  --accent: #b197fc;
+  --accent-soft: #261f42;
+  --ok: #69db7c;
+  --ok-soft: #15301c;
+  --warn: #ffa94d;
+  --warn-soft: #3a2610;
+  --crit: #ff8787;
+  --crit-soft: #3a1818;
+  --wire: #8792a0;
+  --wire-hi: #f1f3f5;
+  --blue-strong: #1b4a73;
+  --blue-pale: #102a40;
+  --blue-border: #4dabf7;
+  --blue-text: #d0ebff;
+  --violet-strong: #43307f;
+  --violet-pale: #251c45;
+  --violet-border: #9775fa;
+  --violet-text: #e5dbff;
+  --green-strong: #1e5a2c;
+  --green-pale: #12301a;
+  --green-border: #51cf66;
+  --green-text: #d3f9d8;
+  --orange-strong: #6a3a14;
+  --orange-pale: #3b220e;
+  --orange-border: #ff922b;
+  --orange-text: #ffe8cc;
+  --red-strong: #6b2222;
+  --red-pale: #3a1616;
+  --red-border: #ff6b6b;
+  --red-text: #ffe3e3;
+  --cyan-strong: #0d5560;
+  --cyan-pale: #0a3036;
+  --cyan-border: #22b8cf;
+  --cyan-text: #c5f6fa;
+  --yellow-strong: #5c4600;
+  --yellow-pale: #332800;
+  --yellow-border: #fcc419;
+  --yellow-text: #fff3bf;
+  --neu-fill: #222a33;
+  --neu-border: #adb5bd;
+  --neu-text: #e9ecef;
+  --cont-fill: #151a20;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+a {
+  color: var(--accent);
+}
+code,
+.mono {
+  font-family: var(--mono);
+  font-size: 0.86em;
+}
+code {
+  background: var(--sunk);
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+  overflow-wrap: anywhere;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  text-wrap: balance;
+  margin: 0;
+}
+h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 750;
+  font-stretch: 88%;
+  letter-spacing: -0.01em;
+}
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+h4 {
+  margin: 0 0 6px;
+  font: 600 0.72rem/1.3 var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+p {
+  margin: 0;
+  max-width: 68ch;
+}
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* masthead */
+.masthead {
+  padding-block: 40px 28px;
+  display: grid;
+  gap: 18px;
+}
+.eyebrow {
+  font: 600 0.78rem/1.4 var(--mono);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.masthead h1 {
+  font-size: clamp(2.2rem, 5.6vw, 4rem);
+  font-weight: 800;
+  font-stretch: 78%;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.masthead h1 span {
+  color: var(--accent);
+}
+.lede {
+  font-size: 1.12rem;
+  color: var(--fg);
+  max-width: 70ch;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font: 500 0.82rem/1.4 var(--mono);
+  color: var(--muted);
+}
+.meta b {
+  color: var(--fg);
+  font-weight: 700;
+}
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.figures div {
+  background: var(--surface);
+  padding: 14px 16px;
+  display: grid;
+  gap: 2px;
+}
+.figures strong {
+  font: 750 1.7rem/1.1 var(--display);
+  font-stretch: 85%;
+  font-variant-numeric: tabular-nums;
+}
+.figures span {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* progress per phase */
+.phases {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+.phase {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) 1fr 4.5rem;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.88rem;
+}
+.phase .name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.track {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--sunk);
+  overflow: hidden;
+  display: flex;
+}
+.track i {
+  display: block;
+  height: 100%;
+  background: var(--fg);
+}
+.track .open {
+  background: var(--warn);
+}
+.phase .n {
+  font: 600 0.8rem var(--mono);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* sticky section nav */
+.toc {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.toc a {
+  display: block;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--fg);
+  text-decoration: none;
+  font: 500 0.86rem var(--body);
+}
+.toc a:hover {
+  background: var(--sunk);
+}
+
+section {
+  padding-block: 36px 8px;
+  display: grid;
+  gap: 16px;
+  scroll-margin-top: 64px;
+}
+.intro {
+  display: grid;
+  gap: 8px;
+}
+.intro p {
+  color: var(--muted);
+}
+
+/* chips: toggles and filters, pressed state in aria-pressed */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  font: 600 0.84rem/1 var(--body);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 8px 13px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+.chip:hover {
+  border-color: var(--fg);
+}
+.chip[aria-pressed='true'] {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: 0;
+}
+
+/* a diagram scrolls inside its own box, so the page never scrolls sideways */
+figure {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.diagram {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+.diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 960px;
+}
+.diagram.narrow svg {
+  min-width: 720px;
+}
+figcaption {
+  font-size: 0.88rem;
+  color: var(--muted);
+  max-width: 80ch;
+}
+
+/* detail card under an explorer diagram */
+.detail {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: grid;
+  gap: 14px;
+}
+.detail .head {
+  display: grid;
+  gap: 2px;
+}
+.detail .role {
+  color: var(--muted);
+}
+.detail .cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 18px 28px;
+}
+.detail ul {
+  margin: 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: 4px;
+}
+.detail .rel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.rel button {
+  font: 500 0.82rem/1.2 var(--body);
+  border: 1px solid var(--line-strong);
+  background: var(--sunk);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 5px 9px;
+  cursor: pointer;
+  text-align: left;
+}
+.rel button span {
+  display: block;
+  font: 400 0.74rem var(--mono);
+  color: var(--muted);
+}
+.none {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.stops {
+  border-left: 4px solid var(--warn);
+  background: var(--warn-soft);
+  padding: 10px 14px;
+  border-radius: 0 10px 10px 0;
+}
+.stops p {
+  max-width: none;
+}
+.evidence {
+  font: 400 0.8rem/1.5 var(--mono);
+  color: var(--muted);
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+.evidence b {
+  color: var(--fg);
+}
+.setting {
+  font: 400 0.84rem/1.5 var(--mono);
+  background: var(--sunk);
+  padding: 10px 12px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+/* tile board: select a tile, read its detail in the box under it */
+.board {
+  display: grid;
+  gap: 10px;
+}
+.band {
+  display: grid;
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+.band > .label {
+  font: 600 0.84rem/1.3 var(--body);
+  color: var(--muted);
+  padding-top: 10px;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+.tile {
+  text-align: left;
+  font: inherit;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+}
+.tile:hover {
+  border-color: var(--line-strong);
+}
+.tile[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+.tile b {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tag {
+  font: 600 0.7rem/1 var(--mono);
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: var(--sunk);
+  color: var(--muted);
+}
+.tag.blue {
+  background: var(--blue-pale);
+  color: var(--blue-text);
+  border: 1px solid var(--blue-border);
+}
+.tag.violet {
+  background: var(--violet-pale);
+  color: var(--violet-text);
+  border: 1px solid var(--violet-border);
+}
+.tag.green {
+  background: var(--green-pale);
+  color: var(--green-text);
+  border: 1px solid var(--green-border);
+}
+.tag.orange {
+  background: var(--orange-pale);
+  color: var(--orange-text);
+  border: 1px solid var(--orange-border);
+}
+.tag.red {
+  background: var(--red-pale);
+  color: var(--red-text);
+  border: 1px solid var(--red-border);
+}
+.tag.cyan {
+  background: var(--cyan-pale);
+  color: var(--cyan-text);
+  border: 1px solid var(--cyan-border);
+}
+.tag.yellow {
+  background: var(--yellow-pale);
+  color: var(--yellow-text);
+  border: 1px solid var(--yellow-border);
+}
+.tag.neutral {
+  background: var(--neu-fill);
+  color: var(--neu-text);
+  border: 1px solid var(--line-strong);
+}
+.query {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+}
+.query pre {
+  margin: 0;
+  font: 400 0.84rem/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--sunk);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+.notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.notes div {
+  background: var(--sunk);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+}
+.notes b {
+  display: block;
+  font-family: var(--display);
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+/* tables and badges */
+.tablebox {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 820px;
+  font-size: 0.9rem;
+}
+th,
+td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  font: 600 0.72rem var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  background: var(--sunk);
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.badge {
+  font: 700 0.7rem/1 var(--mono);
+  padding: 4px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  background: var(--sunk);
+  color: var(--muted);
+}
+.badge.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.badge.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.badge.crit {
+  background: var(--crit-soft);
+  color: var(--crit);
+}
+.badge.info {
+  background: var(--blue-pale);
+  color: var(--blue-text);
+  border: 1px solid var(--blue-border);
+}
+.badge.outline {
+  background: none;
+  border: 1px solid var(--line-strong);
+  font-weight: 600;
+}
+.examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+.example {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+.example pre {
+  margin: 0;
+  font: 400 0.8rem/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* expandable cards with filter chips above them */
+.filters {
+  display: grid;
+  gap: 8px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+}
+.card summary::-webkit-details-marker {
+  display: none;
+}
+.card summary .name {
+  font: 700 0.95rem var(--mono);
+  overflow-wrap: anywhere;
+}
+.card .body {
+  margin: 0;
+  padding: 0 14px 14px;
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+}
+.card .body dt {
+  font: 600 0.7rem var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+.card .body dd {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.card[open] {
+  border-color: var(--line-strong);
+}
+.count {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* lessons, open tasks, lists */
+.lessons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+.lesson {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.lesson .when {
+  font: 600 0.74rem var(--mono);
+  color: var(--muted);
+}
+.lesson .src {
+  font: 400 0.76rem var(--mono);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.tasks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.task {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.task .id {
+  font: 700 0.8rem var(--mono);
+  color: var(--accent);
+}
+.task .due {
+  font: 600 0.78rem var(--mono);
+  color: var(--warn);
+}
+.lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+.lists > div {
+  background: var(--sunk);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.lists ul {
+  margin: 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+/* idea box: something noted for later, not built */
+.idea {
+  border: 2px dashed var(--accent);
+  border-radius: 18px;
+  padding: 22px;
+  display: grid;
+  gap: 16px;
+  background: var(--accent-soft);
+}
+.idea .quote {
+  font: 500 1.05rem/1.5 var(--body);
+  border-left: 4px solid var(--accent);
+  padding-left: 14px;
+  max-width: 70ch;
+}
+.idea .grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.idea .grid2 > div {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+}
+footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .detail .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .band > .label {
+    padding-top: 0;
+  }
+  .phase {
+    grid-template-columns: minmax(0, 1fr) 4rem;
+  }
+  .phase .track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+</style>
+<link rel="stylesheet" href="assets/report-tabs.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Kentik API · Upstream review · 2026-11-19</div>
+    <h1>Upstream issues with the <span>SDK</span></h1>
+    <p class="lede">A reviewed register of upstream API and schema problems
+    that affect the Kentik Community Python SDK. Confirmed failures, open
+    questions, stale claims, and SDK workarounds are marked separately.</p>
+    <div class="meta">
+      <span>Review <b>2026-11-19</b></span>
+      <span>Schema pin <b>9f58fdd</b></span>
+      <span>Latest read-only E2E <b>2026-11-19</b></span>
+    </div>
+    <div class="figures" aria-label="Review figures">
+      <div><strong>16</strong><span>upstream items reviewed</span></div>
+      <div><strong>92</strong><span>read-only E2E tests passed</span></div>
+      <div><strong>17</strong><span>expected E2E xfails</span></div>
+      <div><strong>3</strong><span>schema services with no REST paths</span></div>
+      <div><strong>13</strong><span>private or protected REST operations</span></div>
+    </div>
+  </header>
+<!-- report-tabs:start -->
+<div class="report-tabs" role="tablist" aria-label="Report views"><a role="tab" id="tab-interactive" href="#interactive" aria-controls="interactive" aria-selected="true">Interactive report</a><a role="tab" id="tab-full-report" href="#full-report" aria-controls="full-report" aria-selected="false" tabindex="-1">Full report</a><a class="source" href="kentik-api-team-findings.md">kentik-api-team-findings.md</a></div>
+<!-- report-tabs:end -->
+<div class="tabpanel" id="interactive" role="tabpanel" aria-labelledby="tab-interactive">
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#snapshot">Latest checks</a></li>
+      <li><a href="#groups">Issue groups</a></li>
+      <li><a href="#scope">Scope and evidence</a></li>
+      <li><a href="#full-report">Full report</a></li>
+    </ul>
+  </nav>
+
+  <section id="snapshot">
+    <div class="intro">
+      <h2>Latest checks</h2>
+      <p>The E2E run found no unexpected failures. Its expected xfails still
+      identify API behavior that needs an upstream answer or fix.</p>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead>
+          <tr><th>Suite result</th><th>Count</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Passed</td><td class="num">92</td><td>Read-only calls matched the SDK contract.</td></tr>
+          <tr><td>Expected failures</td><td class="num">17</td><td>Known upstream responses, including 500, 501, and the V5 chart timeout.</td></tr>
+          <tr><td>Skipped</td><td class="num">145</td><td>Mutating operations are excluded from the read-only run.</td></tr>
+          <tr><td>Deselected</td><td class="num">277</td><td>Tests outside the selected REST E2E suite.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <div><b>SDK workarounds</b>Two confirmed issues have shared-runtime or
+      generated-request workarounds. The server-side defects remain open.</div>
+      <div><b>Schema exposure</b>Public RPCs lack HTTP bindings, while
+      `PRIVATE` and `PROTECTED` operations appear in published OpenAPI.</div>
+      <div><b>Evidence limits</b>No live probes ran during this review. Mutating
+      canaries need an approved disposable resource and cleanup.</div>
+    </div>
+  </section>
+
+  <section id="groups">
+    <div class="intro">
+      <h2>Issue groups</h2>
+      <p>The full report records evidence date, SDK impact, and the next
+      upstream action for each item.</p>
+    </div>
+    <div class="cards">
+      <details class="card" open>
+        <summary><span class="name">Runtime behavior</span>
+          <span class="tags"><span class="tag red">500 / 501</span>
+          <span class="tag orange">deadline</span></span>
+        </summary>
+        <div class="body">
+          <p>Body parsing, FlowTag creation, AutoAck, gRPC deadlines, missing
+          resources, malformed IDs, and unimplemented methods.</p>
+          <a href="#md-up-01-rest-update-body-keys-conflict-with-the-published-contract">Open findings UP-01 to UP-10</a>
+        </div>
+      </details>
+      <details class="card" open>
+        <summary><span class="name">Schema publication</span>
+          <span class="tags"><span class="tag blue">13 missing paths</span>
+          <span class="tag red">visibility conflict</span></span>
+        </summary>
+        <div class="body">
+          <p>REST bindings are absent for public RPCs, while private or protected
+          paths are present in public OpenAPI.</p>
+          <a href="#md-up-11-public-kptr-and-deviceconf-rpcs-have-no-http-bindings">Open schema findings UP-11 and UP-12</a>
+        </div>
+      </details>
+      <details class="card" open>
+        <summary><span class="name">Contracts and tooling</span>
+          <span class="tags"><span class="tag yellow">needs answers</span>
+          <span class="tag neutral">dependency request</span></span>
+        </summary>
+        <div class="body">
+          <p>Rate-limit scope, the V5 batch response contract, and unused
+          generator dependencies need clarification.</p>
+          <a href="#md-up-13-rate-limit-documentation-conflicts-with-observed-headers">Open findings UP-13 to UP-16</a>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="scope">
+    <div class="intro">
+      <h2>Scope and evidence</h2>
+      <p>“Open” means an upstream behavior or contract remains unresolved.
+      It does not mean every item is a confirmed defect.</p>
+    </div>
+    <div class="stops">
+      <p>The schema audit used local HEAD `dbe7ce6`. A file-level comparison
+      found no changes to the affected services from the SDK pin `9f58fdd`.
+      It did not test server authorization.</p>
+    </div>
+    <p><a href="#full-report">Read all 16 findings, stale claims, and next actions.</a></p>
+    <p><a href="upstream/README.md">Browse supporting reports and evidence.</a></p>
+  </section>
+
+  </div>
+<!-- report-markdown:start -->
+<div class="tabpanel" id="full-report" role="tabpanel" aria-labelledby="tab-full-report">
+<article class="markdown-body">
+<h1 id="md-upstream-issues-affecting-kentik-sdk">Upstream Issues Affecting Kentik SDK</h1>
+<blockquote class="markdown-alert markdown-alert-warning">
+<p><span class="markdown-alert-title">Warning</span>This report includes findings from a lab account. It does not establish
+authorization behavior for private routes. Keep it within the API and SDK
+teams until they review the schema exposure findings.</p>
+</blockquote>
+<p>Reviewed: 2026-11-19. This is the single current tracker for upstream issues
+that affect the Kentik Community Python SDK. It links supporting evidence under
+<a href="upstream/"><code>upstream/</code></a>. It distinguishes confirmed behavior from old claims
+that need a safe recheck.</p>
+<h2 id="md-executive-summary">Executive summary</h2>
+<p>The review covers 16 unresolved upstream items across runtime behavior, schema
+publication, rate-limit documentation, and the generator dependency. The
+latest read-only E2E run passed 92 tests, skipped 145 mutating operations,
+deselected 277 tests, and reported 17 expected xfails. The xfails are evidence
+of known behavior, not unexpected test failures.</p>
+<p>The current SDK mitigates two issues: it sends proto field names for two REST
+updates that reject the documented JSON names, and it suppresses deadlines on
+six gRPC services that fail when a deadline is present. The SDK cannot repair
+server-side 500 or 501 responses, missing REST bindings, or unclear API
+contracts.</p>
+<h2 id="md-finding-register">Finding register</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Finding</th>
+<th>Current state</th>
+<th>Latest evidence</th>
+<th>SDK effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UP-01</td>
+<td>REST update body keys conflict with the published contract</td>
+<td>Confirmed; SDK workaround</td>
+<td>2026-10-27</td>
+<td>Two updates work through REST only because the SDK sends proto field names.</td>
+</tr>
+<tr>
+<td>UP-02</td>
+<td><code>CreateFlowTag</code> returns HTTP 500</td>
+<td>Confirmed over REST; gRPC untested</td>
+<td>2026-10-27</td>
+<td>Flow-tag creation is unavailable over the tested REST path.</td>
+</tr>
+<tr>
+<td>UP-03</td>
+<td>AutoAck <code>Replace</code> returns <code>SyntaxError</code></td>
+<td>Observed; separate from body parsing</td>
+<td>2026-10-27</td>
+<td>The real-record update path remains unresolved.</td>
+</tr>
+<tr>
+<td>UP-04</td>
+<td>gRPC deadline causes <code>RangeError</code> on six services</td>
+<td>Confirmed; SDK workaround</td>
+<td>2026-10-27</td>
+<td>The SDK omits server deadlines and cancels calls locally.</td>
+</tr>
+<tr>
+<td>UP-05</td>
+<td>Filtered <code>CreateSavedFilter</code> returns HTTP 500</td>
+<td>Old result; recheck needed</td>
+<td>2026-10-26</td>
+<td>Filter creation may fail; current status is unknown.</td>
+</tr>
+<tr>
+<td>UP-06</td>
+<td>Missing custom application returns HTTP 200 with an empty object</td>
+<td>GET confirmed; repeated DELETE is stale</td>
+<td>2026-10-27</td>
+<td>The response can look successful unless callers inspect the empty ID.</td>
+</tr>
+<tr>
+<td>UP-07</td>
+<td>Missing AS group or site market returns HTTP 400</td>
+<td>Confirmed</td>
+<td>2026-10-27</td>
+<td>Missing resources use <code>INVALID_ARGUMENT</code>, unlike other services.</td>
+</tr>
+<tr>
+<td>UP-08</td>
+<td>Missing IDs return HTTP 500 in alerting, audit, and vault</td>
+<td>Reproduced by current E2E xfails</td>
+<td>2026-11-19</td>
+<td>Callers receive server errors for missing resources.</td>
+</tr>
+<tr>
+<td>UP-09</td>
+<td>Malformed IDs return HTTP 500</td>
+<td>Reproduced by current E2E xfails</td>
+<td>2026-11-19</td>
+<td>Invalid path values reach handlers instead of returning <code>INVALID_ARGUMENT</code>.</td>
+</tr>
+<tr>
+<td>UP-10</td>
+<td>Published operations return HTTP 501</td>
+<td>Reproduced by current E2E xfails and a separate probe</td>
+<td>2026-11-19; 2026-10-27</td>
+<td>Generated methods exist, but the server does not implement several.</td>
+</tr>
+<tr>
+<td>UP-11</td>
+<td>Public <code>kptr</code> and <code>deviceconf</code> RPCs have no HTTP bindings</td>
+<td>Confirmed in the pinned schema</td>
+<td>Pin <code>9f58fdd</code>; audit <code>dbe7ce6</code></td>
+<td>13 candidate RPCs have no generated REST methods.</td>
+</tr>
+<tr>
+<td>UP-12</td>
+<td>Private or protected services publish REST operations</td>
+<td>Confirmed in schema; authorization unknown</td>
+<td>Pin <code>9f58fdd</code>; audit <code>dbe7ce6</code></td>
+<td>The SDK exposes routes marked <code>PRIVATE</code> or <code>PROTECTED</code>; access was not tested.</td>
+</tr>
+<tr>
+<td>UP-13</td>
+<td>Rate-limit documentation conflicts with observed headers</td>
+<td>Scope observed; other limits unverified</td>
+<td>2026-10-27</td>
+<td>Clients cannot tell whether an account-wide or per-endpoint budget governs.</td>
+</tr>
+<tr>
+<td>UP-14</td>
+<td>V5 <code>topXchart</code> does not return a response</td>
+<td>Current expected xfail</td>
+<td>2026-11-19</td>
+<td>A chart call can time out while the server may still hold a query slot.</td>
+</tr>
+<tr>
+<td>UP-15</td>
+<td>V5 batch success response contract is unclear</td>
+<td>HTTP 200 observed; contract unresolved</td>
+<td>2026-10-27</td>
+<td>Callers do not know which success status or batch ID to rely on.</td>
+</tr>
+<tr>
+<td>UP-16</td>
+<td>Generator installs unused formatter packages</td>
+<td>Confirmed for locked version 2.1.2</td>
+<td>Lockfile review</td>
+<td><code>black</code>, <code>isort</code>, and <code>orjson</code> remain required despite <code>--formatter none</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="md-runtime-defects-and-behavior-gaps">Runtime defects and behavior gaps</h2>
+<h3 id="md-up-01-rest-update-body-keys-conflict-with-the-published-contract">UP-01: REST update body keys conflict with the published contract</h3>
+<p><strong>State:</strong> Confirmed on 2026-10-27. The SDK has a workaround.</p>
+<p><code>UpdateASGroup</code> and <code>UpdateSiteMarket</code> reject the OpenAPI camelCase body keys
+<code>asGroup</code> and <code>siteMarket</code>. The same calls work when the body uses proto names
+<code>as_group</code> and <code>site_market</code>. The SDK rewrites those keys, so its calls work,
+but clients that follow the published schema still fail. The common server-side
+cause is not confirmed.</p>
+<p><strong>Ask:</strong> Accept the documented JSON keys while merging the URL-bound ID into
+the same object. See the <a href="upstream/upstream-rest-update-body-merge.md">body-merge report</a>.</p>
+<h3 id="md-up-02-createflowtag-returns-http-500">UP-02: <code>CreateFlowTag</code> returns HTTP 500</h3>
+<p><strong>State:</strong> Confirmed over REST on 2026-10-27. The gRPC create path was not
+checked.</p>
+<p>The create request returns HTTP 500 <code>StatusCodeError</code>, including a minimal
+name-only request. The successful <code>UpdateFlowTag</code> check on the same date means
+the old claim that every FlowTag write fails is stale.</p>
+<p><strong>Ask:</strong> Return a valid created object or a client error for an invalid body.
+Check gRPC create with an approved disposable tag before claiming that both
+transports fail.</p>
+<h3 id="md-up-03-autoack-replace-returns-syntaxerror">UP-03: AutoAck <code>Replace</code> returns <code>SyntaxError</code></h3>
+<p><strong>State:</strong> Observed on 2026-10-27. This is not the REST body-merge failure.</p>
+<p>A missing-ID validation control showed that the server reads the documented
+camelCase <code>autoAck</code> body. The separate real-record <code>Replace</code> call returned
+<code>SyntaxError</code>; the cause and affected payload remain unclear.</p>
+<p><strong>Ask:</strong> Inspect the recorded server request and provide a safe reproduction
+with an approved disposable rule. Keep this separate from UP-01.</p>
+<h3 id="md-up-04-grpc-deadlines-fail-on-six-services">UP-04: gRPC deadlines fail on six services</h3>
+<p><strong>State:</strong> Reproduced on 2026-10-27 for <code>alerting</code>, <code>audit</code>,
+<code>custom_application</code>, <code>custom_dimension</code>, <code>plan</code>, and <code>saved_filter</code>.
+The SDK has a workaround.</p>
+<p>The server returns <code>RangeError</code> when these calls carry <code>grpc-timeout</code>. Source
+inspection and a local reproduction point to a cyclic grpc-js call object
+being passed through a recursive <code>camelify</code> function. Production logs have
+not confirmed that cause. The SDK sends no server deadline for these services
+and cancels each call at the configured deadline.</p>
+<p><strong>Ask:</strong> Confirm the cause in server logs. Avoid recursively transforming the
+call object or register these services without camelification. The strict
+mutating canary is in
+<a href="../tests/e2e/test_upstream_workarounds_e2e.py"><code>test_upstream_workarounds_e2e.py</code></a>.</p>
+<h3 id="md-up-05-filtered-createsavedfilter-returns-http-500">UP-05: Filtered <code>CreateSavedFilter</code> returns HTTP 500</h3>
+<p><strong>State:</strong> A prior result from 2026-10-26. It has not been rechecked.</p>
+<p>Requests with a filter group and rule returned <code>ValidationError</code>; a name-only
+request succeeded. The available evidence does not establish whether the
+problem still occurs or which filter shape triggers it.</p>
+<p><strong>Next step:</strong> Recheck only with an approved disposable saved filter and
+guaranteed cleanup. Do not file it as a current confirmed defect until then.
+See <a href="archive/upstream-jira-drafts.md#4-createsavedfilter-with-a-filter-rule-returns-500-validationerror">historical reproduction details</a>.</p>
+<h3 id="md-up-06-missing-custom-application-returns-http-200-with-an-empty-object">UP-06: Missing custom application returns HTTP 200 with an empty object</h3>
+<p><strong>State:</strong> The empty GET response was confirmed on 2026-10-27. A repeated
+DELETE returned 500 in an older test and needs a new check.</p>
+<p>GET of a missing custom application returns an object whose ID is empty. This
+does not look like a not-found response to callers who check only HTTP status.
+The E2E cleanup helper detects this empty ID, but normal SDK calls still
+return the generated model.</p>
+<p><strong>Ask:</strong> Return 404 for a missing ID, or document and standardize an empty
+response. Recheck repeated DELETE only with a disposable application.</p>
+<h3 id="md-up-07-missing-as-groups-and-site-markets-return-http-400">UP-07: Missing AS groups and site markets return HTTP 400</h3>
+<p><strong>State:</strong> Confirmed on 2026-10-27.</p>
+<p>Missing AS group and site-market IDs return HTTP 400 <code>INVALID_ARGUMENT</code> with
+“does not exist” messages. A missing FlowTag returns HTTP 404 <code>NOT_FOUND</code>.
+This forces callers to interpret endpoint-specific status codes for the same
+condition.</p>
+<p><strong>Ask:</strong> Use <code>NOT_FOUND</code> consistently, or document why these endpoints use
+<code>INVALID_ARGUMENT</code>.</p>
+<h3 id="md-up-08-missing-ids-return-http-500-in-alerting-audit-and-vault">UP-08: Missing IDs return HTTP 500 in alerting, audit, and vault</h3>
+<p><strong>State:</strong> Reproduced in the read-only E2E suite on 2026-11-19.</p>
+<p>The failing operations include AutoAck, comments, silence notifications,
+suppressions, audit event reads, and vault secret reads. The read-only suite
+uses strict expected failures, so an upstream fix will produce an XPASS and
+require removal of the canary.</p>
+<p><strong>Ask:</strong> Return <code>NOT_FOUND</code> for missing objects. See the operation list in
+<a href="../tests/e2e/upstream_bugs.py"><code>upstream_bugs.py</code></a>.</p>
+<h3 id="md-up-09-malformed-ids-return-http-500">UP-09: Malformed IDs return HTTP 500</h3>
+<p><strong>State:</strong> Reproduced in the read-only E2E suite on 2026-11-19.</p>
+<p>Malformed IDs in alerting, custom application, and KMI reads can reach the
+handler and return HTTP 500 instead of HTTP 400 <code>INVALID_ARGUMENT</code>. The gRPC
+policy read also has a known malformed-ID failure.</p>
+<p><strong>Ask:</strong> Validate path values at the gateway or handler boundary and return a
+client error that names the invalid field.</p>
+<h3 id="md-up-10-published-operations-return-http-501">UP-10: Published operations return HTTP 501</h3>
+<p><strong>State:</strong> Reproduced in the read-only E2E suite on 2026-11-19. A separate
+<code>ktbgp</code> probe returned 501 on 2026-10-27.</p>
+<p>The current E2E xfails cover <code>kagent.get_capability</code>,
+<code>kagent.list_capabilities</code>, <code>kmeta.get_service_now_config</code>,
+<code>kmeta.list_service_now_configs</code>, and
+<code>synthetics.get_bulk_update_tests_status</code>. The <code>ktbgp.RouteService.List</code>
+probe also returned <code>UNIMPLEMENTED</code>.</p>
+<p><strong>Ask:</strong> Implement each published operation or remove it from public OpenAPI
+until the server supports it. The SDK should not silently hide these methods
+without an upstream decision.</p>
+<h3 id="md-up-14-v5-topxchart-does-not-return-a-response">UP-14: V5 <code>topXchart</code> does not return a response</h3>
+<p><strong>State:</strong> The expected-failure E2E test still timed out on 2026-11-19. A
+180-second live probe also timed out in October.</p>
+<p>The same query succeeds through <code>topXdata</code>. A chart request can continue to
+hold one of the Query API's four server-side slots after the client times out.
+The E2E test runs last for this reason.</p>
+<p><strong>Ask:</strong> Confirm whether V5 chart generation is supported and bounded. Avoid
+batching or looping this call until the API team explains the timeout.
+See the <a href="upstream/v5-feature-parity-audit.html#full-report">V5/V6 parity report</a>.</p>
+<h2 id="md-schema-and-publication-gaps">Schema and publication gaps</h2>
+<h3 id="md-up-11-public-kptr-and-deviceconf-rpcs-have-no-http-bindings">UP-11: Public <code>kptr</code> and <code>deviceconf</code> RPCs have no HTTP bindings</h3>
+<p><strong>State:</strong> Confirmed in the SDK's schema pin, <code>9f58fdd</code>. An offline audit of
+schema HEAD <code>dbe7ce6</code> finds the same affected files; only unrelated <code>kagent</code>
+files differ from the pin.</p>
+<p>Four <code>kptr</code> RPCs and nine eligible <code>deviceconf</code> RPCs have no
+<code>google.api.http</code> binding. <code>deviceconf.ExecuteCommand</code> is method-private and
+is excluded. The two <code>diagnostic</code> RPCs are marked <code>PUBLIC_KENTIK</code> and remain
+out of scope. The SDK therefore generates models but no REST operations for
+these methods.</p>
+<p><strong>Ask:</strong> Add HTTP bindings or confirm these methods are gRPC-only. See the
+<a href="upstream/upstream-kptr-missing-http-annotations.html#full-report">HTTP-binding report</a>.</p>
+<h3 id="md-up-12-private-and-protected-operations-appear-in-public-openapi">UP-12: Private and protected operations appear in public OpenAPI</h3>
+<p><strong>State:</strong> Confirmed in the SDK's schema pin. Whether an ordinary customer
+token can call these routes is unknown and was not tested.</p>
+<p>The public schema publishes 10 <code>PRIVATE</code> REST operations across <code>ktbgp</code>,
+<code>vault</code>, and kagent's <code>CapabilityAdminService</code>, plus three <code>PROTECTED</code> reads
+from <code>CapabilityReleaseService</code>. The custom visibility option is not carried
+into OpenAPI, so downstream generators cannot honor it. This report does not
+claim a security vulnerability or that authorization is absent.</p>
+<p><strong>Ask:</strong> Define <code>PRIVATE</code>, <code>PROTECTED</code>, and <code>PUBLIC_KENTIK</code>; confirm whether
+ordinary customer tokens may call these routes; and expose visibility in
+OpenAPI or omit non-public operations. See the
+<a href="upstream/upstream-service-visibility-exposure.html#full-report">visibility report</a>.</p>
+<h2 id="md-documentation-and-dependency-issues">Documentation and dependency issues</h2>
+<h3 id="md-up-13-rate-limit-documentation-conflicts-with-observed-headers">UP-13: Rate-limit documentation conflicts with observed headers</h3>
+<p><strong>State:</strong> Per-endpoint behavior was observed on 2026-10-27. Concurrency,
+soft-delay, hourly limits, and exceed behavior remain unverified.</p>
+<p>The API advertised <code>60, 60;w=60</code>. REST and gRPC calls to the device-list
+endpoint shared a counter. Site and site-market calls used separate counters.
+The Knowledge Base describes per-customer limits and additional limits that
+the response headers do not show. The probe was read-only and did not exhaust
+any quota.</p>
+<p><strong>Ask:</strong> State which limits apply to V6, which counter the headers describe,
+and whether the documented concurrency, delay, and hourly limits remain in
+force. See the <a href="upstream/upstream-ratelimit-scope-undocumented.html#full-report">rate-limit report</a>.</p>
+<h3 id="md-up-15-v5-batch-success-contract-is-unclear">UP-15: V5 batch success contract is unclear</h3>
+<p><strong>State:</strong> HTTP 200 was observed on 2026-10-27. No request ID was captured.</p>
+<p>The evidence does not settle whether 200 is the intended success code or
+whether the response must contain a batch ID.</p>
+<p><strong>Ask:</strong> Confirm the documented success code and required response fields.
+Do not present this as a confirmed defect until the contract is clear.</p>
+<h3 id="md-up-16-openapi-python-generator-installs-unused-formatter-packages">UP-16: <code>openapi-python-generator</code> installs unused formatter packages</h3>
+<p><strong>State:</strong> Confirmed against locked version 2.1.2. The draft issue is not
+recorded as filed.</p>
+<p>The SDK runs the generator with <code>--formatter none</code>, but the package still
+requires <code>black</code>, <code>isort</code>, and <code>orjson</code>. These packages remain in the locked
+development dependency graph.</p>
+<p><strong>Ask:</strong> Make formatter and alternate JSON packages optional, or provide a
+no-formatter extra with a clear missing-dependency error. The request draft
+is in <a href="upstream/upstream-openapi-python-generator-optional-formatters.md">upstream/</a>.</p>
+<h2 id="md-stale-or-out-of-scope-findings">Stale or out-of-scope findings</h2>
+<ul>
+<li>The alert-list <code>startedAt</code> requirement did not reproduce on 2026-10-27.
+Seven request bodies returned HTTP 200. Keep the older report as history.</li>
+<li>The claim that all FlowTag writes fail is stale. <code>UpdateFlowTag</code> accepted
+the documented body on 2026-10-27. The <code>CreateFlowTag</code> failure remains UP-02.</li>
+<li>The AutoAck body parses camelCase in a missing-ID control. Its <code>SyntaxError</code>
+remains a separate UP-03 issue.</li>
+<li><code>P3a</code> and <code>K2</code> in the pre-PR ledger concern repository administration and
+release ownership. They are not upstream API findings.</li>
+</ul>
+<h2 id="md-next-actions">Next actions</h2>
+<ol>
+<li>Send separate API reports for confirmed runtime failures. Keep request
+shapes and services separate where the cause is unknown.</li>
+<li>Ask the schema team to resolve the HTTP-binding and visibility questions.</li>
+<li>Ask the API team to clarify V6 rate limits and the V5 batch response
+contract.</li>
+<li>Recheck UP-05 and the repeated-delete part of UP-06 only with disposable
+resources and guaranteed cleanup.</li>
+<li>File UP-16 with the <code>openapi-python-generator</code> maintainers and add its
+issue link to the SDK dependency guide.</li>
+</ol>
+<h2 id="md-review-basis">Review basis</h2>
+<p>This review did not make live API calls. It uses the 2026-11-19 read-only E2E
+run, the dated local evidence, the SDK code and the schema audit. The schema
+audit read commit <code>dbe7ce6</code>; a file-level comparison found no changes to the
+affected services relative to the SDK pin <code>9f58fdd</code>.</p>
+<p>Supporting reports, archived drafts, and probes live under
+<a href="upstream/"><code>upstream/</code></a> and <a href="archive/"><code>archive/</code></a>. Reusable probes live in
+<a href="scripts/"><code>scripts/</code></a>. Local account captures remain ignored under
+<a href="local-evidence/"><code>local-evidence/</code></a>.</p>
+</article>
+</div>
+<!-- report-markdown:end -->
+<footer>
+    <p>Evidence is dated per finding. This report does not include credentials
+    or live account captures.</p>
+  </footer>
+</div>
+
+<!-- report-tabs-js:start -->
+<script type="module">
+// Tabs for a report page: the HTML view and its Markdown twin. Without
+// this script both panels show, one under the other, and the tabs work as
+// plain anchor links.
+const bar = document.querySelector('[role="tablist"].report-tabs');
+const tabs = bar ? [...bar.querySelectorAll('[role="tab"]')] : [];
+const panels = tabs.map((tab) =>
+  document.getElementById(tab.getAttribute('aria-controls')),
+);
+
+/**
+ * Draws the Mermaid diagrams of the visible panels.
+ *
+ * Mermaid measures text, so it can draw only in a visible panel.
+ */
+function drawMermaid() {
+  const nodes = panels.flatMap((panel) =>
+    panel.hidden
+      ? []
+      : [...panel.querySelectorAll('pre.mermaid:not([data-processed])')],
+  );
+  if (window.mermaid && nodes.length) window.mermaid.run({ nodes });
+}
+
+/**
+ * Shows one panel and marks its tab as selected.
+ *
+ * @param {number} index Position of the tab to show.
+ * @param {boolean} focus Whether to move focus to the tab.
+ */
+function show(index, focus) {
+  tabs.forEach((tab, i) => {
+    const on = i === index;
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    panels[i].hidden = !on;
+  });
+  if (focus) tabs[index].focus();
+  drawMermaid();
+}
+
+/**
+ * Shows the panel that the URL hash points into.
+ *
+ * A hash that names an element inside a panel opens that panel first.
+ */
+function follow() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  const index = target
+    ? panels.findIndex((panel) => panel.contains(target))
+    : -1;
+  show(Math.max(index, 0), false);
+  if (target && target !== panels[index]) target.scrollIntoView();
+}
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.replaceState(null, '', `#${panels[i].id}`);
+    show(i, false);
+  });
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = (i + step + tabs.length) % tabs.length;
+    history.replaceState(null, '', `#${panels[next].id}`);
+    show(next, true);
+  });
+});
+if (bar) {
+  addEventListener('hashchange', follow);
+  document.addEventListener('mermaid-ready', drawMermaid);
+  follow();
+}
+</script>
+<!-- report-tabs-js:end -->
+</body>
+</html>

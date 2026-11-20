@@ -1,0 +1,20 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class RpkiStatus(str, Enum):
+    RPKI_STATUS_UNSPECIFIED = "RPKI_STATUS_UNSPECIFIED"
+
+    RPKI_STATUS_NOT_FOUND = "RPKI_STATUS_NOT_FOUND"
+
+    RPKI_STATUS_EXPLICIT_INVALID = "RPKI_STATUS_EXPLICIT_INVALID"
+
+    RPKI_STATUS_INVALID_PREFIX = "RPKI_STATUS_INVALID_PREFIX"
+
+    RPKI_STATUS_INVALID = "RPKI_STATUS_INVALID"
+
+    RPKI_STATUS_VALID = "RPKI_STATUS_VALID"
+
+    RPKI_STATUS_ERROR = "RPKI_STATUS_ERROR"

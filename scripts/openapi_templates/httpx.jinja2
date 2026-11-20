@@ -1,0 +1,57 @@
+{# HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly. #}
+{% from "_macros.jinja2" import docstring %}
+{%  if async_client %}async {% endif %}def {{ operation_id }}(api_config_override : Optional[APIConfig] = None{% if params.strip() %}, *, {{ params.rstrip(', ') }}{% endif %}) -> {% if return_type.type is none or return_type.type.converted_type is none %}None{% else %}{{ return_type.type.converted_type}}{% endif %}:
+{% set summary = [operation.summary, operation.description if operation.description != operation.summary] | select | join("\n\n") %}
+{% if summary %}
+    {{ docstring(summary, "    ") }}
+{% endif %}
+    query_params : Dict[str,Any] = {
+    {% if query_params|length > 0 %}
+        {{ query_params | join(',\n') | safe }}
+    {% endif %}
+    }
+
+    header_params : Dict[str,Any] = {
+    {% if header_params|length > 0 %}
+        {{ header_params | join(',\n') | safe }}
+    {% endif %}
+    }
+
+    body = request_json(
+        method='{{ method }}',
+        path=f'{{ path_name }}',
+        path_template='{{ path_name }}',
+        api_config_override=api_config_override,
+        query_params=query_params,
+        {% if body_param %}
+        json_body={{ body_param }},
+        {% endif %}
+        header_params=header_params,
+        expected_status={{ return_type.status_code }},
+        operation_name='{{ operation_id }}',
+        error_cls={{ operation_id }}Error,
+    )
+
+{% if return_type.type is none or return_type.type.converted_type is none %}
+    return None
+{% elif return_type.complex_type %}
+    {%- if return_type.list_type is none %}
+    return parse_response_model(
+        {{ return_type.type.converted_type }},
+        body,
+        operation_name='{{ operation_id }}',
+        method='{{ method }}',
+        path='{{ path_name }}',
+    )
+    {%- else %}
+    return parse_response_model_list(
+        {{ return_type.list_type }},
+        body,
+        operation_name='{{ operation_id }}',
+        method='{{ method }}',
+        path='{{ path_name }}',
+    )
+    {%- endif %}
+{% else %}
+    return body
+{% endif %}

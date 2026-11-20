@@ -1,0 +1,24 @@
+# AUTO-GENERATED: openapi-python-generator, model generation
+# Rebuilt on every `uv run poe generate`. Do not edit by hand.
+
+from enum import Enum
+
+
+class FlowPolicyLevelSettingsConditionsOperator(str, Enum):
+    OPERATOR_UNSPECIFIED = "OPERATOR_UNSPECIFIED"
+
+    OPERATOR_GREATER_THAN_OR_EQUALS = "OPERATOR_GREATER_THAN_OR_EQUALS"
+
+    OPERATOR_GREATER_THAN = "OPERATOR_GREATER_THAN"
+
+    OPERATOR_EQUALS = "OPERATOR_EQUALS"
+
+    OPERATOR_NOT_EQUALS = "OPERATOR_NOT_EQUALS"
+
+    OPERATOR_LESS_THAN = "OPERATOR_LESS_THAN"
+
+    OPERATOR_LESS_THAN_OR_EQUALS = "OPERATOR_LESS_THAN_OR_EQUALS"
+
+    OPERATOR_IN_SET = "OPERATOR_IN_SET"
+
+    OPERATOR_NOT_IN_SET = "OPERATOR_NOT_IN_SET"

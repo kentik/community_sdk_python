@@ -1,0 +1,96 @@
+{
+  "results": [
+    {
+      "bucket": "Left +Y Axis",
+      "data": [
+        {
+          "key": "TCP",
+          "i_protocol_name": "TCP",
+          "avg_bits_per_sec": 1500.5,
+          "max_bits_per_sec": 3000,
+          "timeSeries": {
+            "both_bits_per_sec": {
+              "flow": [
+                [
+                  1760572800000,
+                  1000,
+                  60
+                ],
+                [
+                  1760572860000,
+                  2000,
+                  60
+                ],
+                [
+                  1760572920000,
+                  3000,
+                  60
+                ],
+                [
+                  1760572980000,
+                  0,
+                  60
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "key": "UDP",
+          "i_protocol_name": "UDP",
+          "avg_bits_per_sec": 250.25,
+          "max_bits_per_sec": 400,
+          "timeSeries": {
+            "both_bits_per_sec": {
+              "flow": [
+                [
+                  1760572800000,
+                  100,
+                  60
+                ],
+                [
+                  1760572860000,
+                  200,
+                  60
+                ],
+                [
+                  1760572920000,
+                  300,
+                  60
+                ],
+                [
+                  1760572980000,
+                  400,
+                  60
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "bucket": "Top",
+      "data": [
+        {
+          "key": "TCP",
+          "i_protocol_name": "TCP",
+          "avg_bits_per_sec": 1500.5,
+          "max_bits_per_sec": 3000
+        },
+        {
+          "key": "UDP",
+          "i_protocol_name": "UDP",
+          "avg_bits_per_sec": 250.25,
+          "max_bits_per_sec": 400
+        },
+        {
+          "key": "ICMP",
+          "i_protocol_name": "ICMP",
+          "avg_bits_per_sec": 1.0,
+          "max_bits_per_sec": 2
+        }
+      ]
+    }
+  ]
+}

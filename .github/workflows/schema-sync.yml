@@ -1,0 +1,73 @@
+name: schema-sync
+
+# Moves the schema.lock pin to api-schema-public HEAD, regenerates, and opens a
+# pull request when the output changed. A run fails when the new schema breaks
+# generation, so the failure itself is the alert.
+#
+# Needs "Allow GitHub Actions to create and approve pull requests" in the
+# repository settings. A pull request opened with GITHUB_TOKEN starts no
+# workflows, so a maintainer closes and reopens it to run CI.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: schema-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Regenerate at schema HEAD
+        run: uv run poe sync-schema
+
+      - name: Open a pull request when the output changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Generated output already matches schema HEAD."
+            exit 0
+          fi
+          commit="$(cat schema.lock)"
+          branch="schema-sync/${commit:0:12}"
+          if git ls-remote --exit-code origin "refs/heads/$branch" > /dev/null; then
+            echo "Branch $branch already exists; its pull request is still open or was declined."
+            exit 0
+          fi
+
+          {
+            echo "Regenerated from api-schema-public \`$commit\` with \`uv run poe sync-schema\`."
+            echo
+            echo "Before merging, add a CHANGELOG.md Unreleased entry that names each"
+            echo "breaking change below, then close and reopen this pull request to run CI."
+            echo
+            uv run poe release-notes --since HEAD
+          } > "$RUNNER_TEMP/body.md"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -A
+          git commit -m "chore: regenerate from api-schema-public ${commit:0:12}"
+          git push origin "$branch"
+          gh pr create --base "$BASE" --head "$branch" \
+            --title "chore: regenerate from api-schema-public ${commit:0:12}" \
+            --body-file "$RUNNER_TEMP/body.md"

@@ -1,0 +1,42 @@
+<svg width="1600" height="310" id="visibility-path" viewBox="0 0 1600 310" role="group" aria-label="Visibility metadata does not filter published REST paths; public kptr RPCs without HTTP rules are omitted." xmlns="http://www.w3.org/2000/svg"><style>/* House diagram style: the SVG parts and the explorer states. It reads the
+   color tokens of page-theme/assets/theme.css, so load that file first. */
+svg text { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.node rect { stroke-width: 2; transition: stroke-width .15s; }
+.node .nm { font-size: 14px; font-weight: 700; text-anchor: middle; }
+.node .ft { font-size: 12px; text-anchor: middle; }
+.fam-blue.src rect { fill: #1b4a73; stroke: #4dabf7; } .fam-blue.proc rect { fill: #102a40; stroke: #4dabf7; } .fam-blue text { fill: #d0ebff; }
+.fam-violet.src rect { fill: #43307f; stroke: #9775fa; } .fam-violet.proc rect { fill: #251c45; stroke: #9775fa; } .fam-violet text { fill: #e5dbff; }
+.fam-green.src rect { fill: #1e5a2c; stroke: #51cf66; } .fam-green.proc rect { fill: #12301a; stroke: #51cf66; } .fam-green text { fill: #d3f9d8; }
+.fam-orange.src rect { fill: #6a3a14; stroke: #ff922b; } .fam-orange.proc rect { fill: #3b220e; stroke: #ff922b; } .fam-orange text { fill: #ffe8cc; }
+.fam-red.src rect { fill: #6b2222; stroke: #ff6b6b; } .fam-red.proc rect { fill: #3a1616; stroke: #ff6b6b; } .fam-red text { fill: #ffe3e3; }
+.fam-cyan.src rect { fill: #0d5560; stroke: #22b8cf; } .fam-cyan.proc rect { fill: #0a3036; stroke: #22b8cf; } .fam-cyan text { fill: #c5f6fa; }
+.fam-yellow.src rect { fill: #5c4600; stroke: #fcc419; } .fam-yellow.proc rect { fill: #332800; stroke: #fcc419; } .fam-yellow text { fill: #fff3bf; }
+.fam-neutral rect { fill: #222a33; stroke: #adb5bd; } .fam-neutral text { fill: #e9ecef; }
+.planned rect { stroke-dasharray: 7 6; }
+.container rect { fill: #151a20; stroke: #4a5562; stroke-width: 1.5; }
+.clabel { font-size: 12px; font-weight: 600; fill: #9ba5b1; }
+.wire { fill: none; stroke: #8792a0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.access .wire { stroke-dasharray: 1 7; stroke-width: 2.5; }
+.elabel { font-size: 12px; fill: #9ba5b1; }
+.ah { fill: #8792a0; } .ah-hi { fill: #f1f3f5; }
+.note { font-size: 12px; font-weight: 600; fill: #9ba5b1; }
+.note.warn { fill: #ffa94d; }
+.note.fam-blue { fill: #4dabf7; } .note.fam-violet { fill: #9775fa; } .note.fam-green { fill: #51cf66; }
+.note.fam-orange { fill: #ff922b; } .note.fam-red { fill: #ff6b6b; } .note.fam-cyan { fill: #22b8cf; }
+.note.fam-yellow { fill: #fcc419; } .note.fam-neutral { fill: #adb5bd; }
+
+.explorer .node { cursor: pointer; }
+.explorer .node:focus { outline: none; }
+.explorer .node:focus-visible rect, .explorer .node.sel rect { stroke: #b197fc; stroke-width: 4; }
+.explorer .node, .explorer .edge { transition: opacity .2s; }
+.explorer svg.dimming .node:not(.lit) { opacity: .28; }
+.explorer svg.dimming .edge:not(.hi):not(.flow) { opacity: .14; }
+.edge.hi .wire, .edge.flow .wire { stroke: #f1f3f5; stroke-width: 3; }
+.edge.flow .wire { stroke-dasharray: 9 7; animation: flow .9s linear infinite; }
+.edge.flow.access .wire, .edge.hi.access .wire { stroke-dasharray: 1 7; animation: none; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .edge.flow .wire { animation: none; stroke-dasharray: none; } * { transition: none !important; } }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.84rem; color: #9ba5b1; }
+.legend svg { width: 34px; height: 10px; vertical-align: middle; margin-right: 6px; min-width: 0; }
+</style><rect width="100%" height="100%" fill="#181d24"/><defs><marker id="visibility-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker><marker id="visibility-ah-hi" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hi"/></marker></defs><g class="edge data" data-seg="protos_stem" data-links="protos>private,protos>public"><path d="M190,161 H220" class="wire"/></g><g class="edge data" data-seg="protos_private" data-links="protos>private"><path d="M220,161 V76 H240" class="wire arrow" marker-end="url(#visibility-ah)"/></g><g class="edge data" data-seg="protos_public" data-links="protos>public"><path d="M220,161 V246 H240" class="wire arrow" marker-end="url(#visibility-ah)"/></g><g class="edge data" data-seg="private_http" data-links="private>http"><path d="M440,76 H530" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="485" y="68" class="elabel" text-anchor="middle">HTTP rules</text></g><g class="edge data" data-seg="http_openapi" data-links="http>openapi"><path d="M730,76 H820" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="775" y="68" class="elabel" text-anchor="middle">paths</text></g><g class="edge data" data-seg="openapi_schema" data-links="openapi>schema"><path d="M1040,76 H1130" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="1085" y="68" class="elabel" text-anchor="middle">swagger</text></g><g class="edge data" data-seg="schema_sdk" data-links="schema>sdk"><path d="M1330,76 H1410" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="1370" y="68" class="elabel" text-anchor="middle">operations</text></g><g class="edge data" data-seg="public_missing" data-links="public>missing"><path d="M440,246 H550" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="495" y="238" class="elabel" text-anchor="middle">no HTTP rule</text></g><g class="edge data" data-seg="missing_no_path" data-links="missing>no_path"><path d="M750,246 H900" class="wire arrow" marker-end="url(#visibility-ah)"/><text x="825" y="238" class="elabel" text-anchor="middle">no path emitted</text></g><g class="node fam-orange proc " data-id="private"><rect x="240" y="40" width="200" height="72" rx="14"/><text x="340" y="64.0" class="nm">PRIVATE / PROTECTED</text><text x="340" y="81.0" class="ft">3 services</text><text x="340" y="98.0" class="ft">10 REST ops</text></g><g class="node fam-orange proc " data-id="http"><rect x="530" y="40" width="200" height="72" rx="14"/><text x="630" y="72.5" class="nm">HTTP rules</text><text x="630" y="89.5" class="ft">present</text></g><g class="node fam-orange proc " data-id="openapi"><rect x="820" y="40" width="220" height="72" rx="14"/><text x="930" y="64.0" class="nm">OpenAPI generator</text><text x="930" y="81.0" class="ft">reads HTTP rules</text><text x="930" y="98.0" class="ft">drops visibility</text></g><g class="node fam-neutral hub " data-id="schema"><rect x="1130" y="40" width="200" height="72" rx="14"/><text x="1230" y="64.0" class="nm">Public schema</text><text x="1230" y="81.0" class="ft">REST paths</text><text x="1230" y="98.0" class="ft">published</text></g><g class="node fam-green proc " data-id="sdk"><rect x="1410" y="40" width="170" height="72" rx="14"/><text x="1495" y="64.0" class="nm">Community SDK</text><text x="1495" y="81.0" class="ft">methods</text><text x="1495" y="98.0" class="ft">generated</text></g><g class="node fam-blue proc " data-id="public"><rect x="240" y="210" width="200" height="72" rx="14"/><text x="340" y="234.0" class="nm">PUBLIC kptr</text><text x="340" y="251.0" class="ft">4 RPCs</text><text x="340" y="268.0" class="ft">no HTTP rules</text></g><g class="node fam-red proc " data-id="missing"><rect x="550" y="210" width="200" height="72" rx="14"/><text x="650" y="242.5" class="nm">HTTP binding</text><text x="650" y="259.5" class="ft">absent</text></g><g class="node fam-neutral hub " data-id="no_path"><rect x="900" y="210" width="220" height="72" rx="14"/><text x="1010" y="234.0" class="nm">No public REST</text><text x="1010" y="251.0" class="ft">path or SDK</text><text x="1010" y="268.0" class="ft">wrapper</text></g><g class="node fam-neutral hub " data-id="protos"><rect x="10" y="125" width="180" height="72" rx="14"/><text x="100.0" y="149.0" class="nm">Proto services</text><text x="100.0" y="166.0" class="ft">visibility option</text><text x="100.0" y="183.0" class="ft">set per service</text></g></svg>

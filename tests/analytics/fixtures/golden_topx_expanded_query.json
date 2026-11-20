@@ -1,0 +1,34 @@
+{
+  "queries": [
+    {
+      "bucket": "Left +Y Axis",
+      "query": {
+        "metric": "bytes",
+        "dimension": [
+          "Proto"
+        ],
+        "device_name": "router1",
+        "topx": 8,
+        "depth": 25,
+        "lookback_seconds": 0,
+        "starting_time": "2025-10-16 00:00",
+        "ending_time": "2025-10-16 01:00"
+      }
+    },
+    {
+      "bucket": "Top",
+      "query": {
+        "metric": "bytes",
+        "dimension": [
+          "Proto"
+        ],
+        "device_name": "router1",
+        "topx": 8,
+        "depth": 25,
+        "lookback_seconds": 0,
+        "starting_time": "2025-10-16 00:00",
+        "ending_time": "2025-10-16 01:00"
+      }
+    }
+  ]
+}
