@@ -4,4 +4,7 @@
 
 The generator builds this module from a description in the local schema base, `schema/openapi/`. It is REST only.
 
-The Sphinx page [`docs/sphinx/services/v5.md`](../../../../docs/sphinx/services/v5.md) gives the parameters, responses, and a usage example for each operation, and documents each data model.
+See the [service reference][reference] for the data models.
+For each operation, it lists parameters, responses, and a usage example.
+
+[reference]: ../../../../docs/sphinx/services/v5.md

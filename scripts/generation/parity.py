@@ -1,6 +1,7 @@
 # HAND-WRITTEN: not modified by `uv run poe generate`. Edit directly.
 """Swagger file selection, superseded-file dropping, schema file validation, and
-generated/schema service-directory parity validation."""
+generated/schema service-directory parity validation.
+"""
 
 import json
 import re

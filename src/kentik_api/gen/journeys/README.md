@@ -4,4 +4,7 @@
 
 The generator builds this module from the Kentik OpenAPI v3 schema.
 
-The Sphinx page [`docs/sphinx/services/journeys.md`](../../../../docs/sphinx/services/journeys.md) gives the parameters, responses, and a usage example for each operation, and documents each data model.
+See the [service reference][reference] for the data models.
+For each operation, it lists parameters, responses, and a usage example.
+
+[reference]: ../../../../docs/sphinx/services/journeys.md

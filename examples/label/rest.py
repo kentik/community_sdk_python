@@ -5,6 +5,7 @@ from kentik_api.client import KentikAPI
 
 
 def main() -> None:
+    """List device labels over REST."""
     client = KentikAPI(protocol="rest")
     response = client.label.list()
     labels = [label for label in (response.labels or []) if label is not None]

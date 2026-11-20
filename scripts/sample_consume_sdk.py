@@ -38,7 +38,6 @@ def run_mock_demo(region: str = "us") -> None:
 
 def run_real_call(region: str = "us") -> None:
     """Runs a real API call using explicit credentials or .env/.environment values."""
-
     client = KentikAPI(
         protocol="rest",
         region=region,

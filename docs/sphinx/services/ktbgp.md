@@ -33,6 +33,7 @@ flowchart TD
 ```
 
 <!-- /github-only -->
+<!-- markdownlint-disable MD013 -->
 <!-- sphinx-only
 ```{raw} html
 <div class="kx">
@@ -47,6 +48,7 @@ flowchart TD
 </div>
 ```
 -->
+<!-- markdownlint-enable MD013 -->
 
 On an error status or a failed call, the SDK raises an error class from `gen/ktbgp/error/`, or a shared type from `kentik_api.errors`.
 

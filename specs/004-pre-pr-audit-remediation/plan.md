@@ -121,5 +121,5 @@ Outputs: [data-model.md](data-model.md), [contracts/remediation-contract.md](con
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
+| --- | --- | --- |
 | None | N/A | N/A |

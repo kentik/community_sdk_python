@@ -207,5 +207,5 @@ current figure as its floor, so the bar is never met by letting it fall.
 > No Constitution Check violations. Table intentionally empty.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| (none) | | |
+| --- | --- | --- |
+| None | N/A | N/A |

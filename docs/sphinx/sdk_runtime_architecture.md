@@ -48,6 +48,7 @@ flowchart TD
 ```
 
 <!-- /github-only -->
+<!-- markdownlint-disable MD013 -->
 <!-- sphinx-only
 ```{raw} html
 <div class="kx">
@@ -62,6 +63,7 @@ flowchart TD
 </div>
 ```
 -->
+<!-- markdownlint-enable MD013 -->
 
 ## Call Path
 
@@ -161,6 +163,7 @@ flowchart TD
 ```
 
 <!-- /github-only -->
+<!-- markdownlint-disable MD013 -->
 <!-- sphinx-only
 ```{raw} html
 <div class="kx">
@@ -175,6 +178,7 @@ flowchart TD
 </div>
 ```
 -->
+<!-- markdownlint-enable MD013 -->
 
 The table lists each module group, and the groups that it imports, with the
 number of import statements.
