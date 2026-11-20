@@ -112,6 +112,18 @@ pip install -U "kentik-api>=2"
 
 The SDK requires Python 3.12 or later.
 
+### Install from a source checkout with locked dependencies
+
+[`requirements.txt`](requirements.txt) pins every runtime dependency to the version and hashes in `uv.lock`.
+Install the dependencies first. Then install the SDK without dependencies, so pip adds nothing unpinned:
+
+```bash
+pip install --require-hashes -r requirements.txt
+pip install --no-deps .
+```
+
+Run `uv run poe export-requirements` to rebuild the file after `uv.lock` changes.
+
 ## Authentication
 
 Create `.env` in your project root:
